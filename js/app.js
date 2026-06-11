@@ -1,0 +1,299 @@
+// ============================================
+// Use Case Arms Race - Main JavaScript
+// Evil Brain Labs Production System
+// ============================================
+
+// Supabase Configuration
+const SUPABASE_URL = 'https://aslcrwmbdtvimjrexxzw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls';
+
+// Initialize Supabase client (will be loaded from CDN)
+let supabase = null;
+
+// ============================================
+// Initialize
+// ============================================
+
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🧠 Evil Brain Labs - Use Case Arms Race initialized');
+
+    // Initialize Supabase
+    if (typeof window.supabase !== 'undefined') {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    // Load latest episode
+    await loadLatestEpisode();
+
+    // Load episode archive
+    await loadEpisodeArchive();
+
+    // Setup event listeners
+    setupEventListeners();
+
+    // Update episode count
+    updateEpisodeCount();
+});
+
+// ============================================
+// Episode Loading
+// ============================================
+
+async function loadLatestEpisode() {
+    const container = document.getElementById('latest-episode');
+
+    if (!supabase) {
+        console.warn('Supabase not initialized - using placeholder');
+        return;
+    }
+
+    try {
+        // Query latest episode from Supabase
+        const { data, error } = await supabase
+            .from('episodes')
+            .select('*')
+            .order('episode_number', { ascending: false })
+            .limit(1)
+            .single();
+
+        if (error) throw error;
+
+        if (data && data.video_url) {
+            // Replace placeholder with actual video
+            container.innerHTML = `
+                <video controls autoplay>
+                    <source src="${data.video_url}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading latest episode:', error);
+    }
+}
+
+async function loadEpisodeArchive() {
+    const grid = document.getElementById('episode-grid');
+
+    if (!supabase) {
+        console.warn('Supabase not initialized - using mock data');
+        return;
+    }
+
+    try {
+        // Query all episodes from Supabase
+        const { data, error } = await supabase
+            .from('episodes')
+            .select('*')
+            .order('episode_number', { ascending: false });
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+            // Clear placeholder
+            grid.innerHTML = '';
+
+            // Render episodes
+            data.forEach(episode => {
+                const card = createEpisodeCard(episode);
+                grid.appendChild(card);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading episode archive:', error);
+    }
+}
+
+function createEpisodeCard(episode) {
+    const card = document.createElement('div');
+    card.className = 'episode-card';
+    card.onclick = () => openEpisode(episode.episode_number);
+
+    const episodeNum = String(episode.episode_number).padStart(3, '0');
+    const date = new Date(episode.published_at).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+    });
+
+    card.innerHTML = `
+        <div class="episode-thumbnail">
+            ${episode.thumbnail_url
+                ? `<img src="${episode.thumbnail_url}" alt="Episode ${episodeNum}">`
+                : `<span class="episode-number">E${episodeNum}</span>`
+            }
+        </div>
+        <div class="episode-info">
+            <h3>Episode ${episode.episode_number}: ${episode.title}</h3>
+            <p>${episode.use_case_summary}</p>
+            <span class="episode-date">${date}</span>
+        </div>
+    `;
+
+    return card;
+}
+
+function openEpisode(episodeNumber) {
+    // Navigate to episode detail page (or open modal)
+    window.location.href = `/episodes/${episodeNumber}.html`;
+}
+
+// ============================================
+// Form Handling
+// ============================================
+
+function setupEventListeners() {
+    // Submit use case form
+    const submitForm = document.getElementById('submit-form');
+    if (submitForm) {
+        submitForm.addEventListener('submit', handleUseCaseSubmit);
+    }
+
+    // Newsletter form
+    const newsletterForm = document.getElementById('newsletter-form');
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', handleNewsletterSubmit);
+    }
+}
+
+async function handleUseCaseSubmit(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const useCase = form.querySelector('#use-case').value;
+    const name = form.querySelector('#name').value;
+    const email = form.querySelector('#email').value;
+
+    if (!supabase) {
+        alert('Submission system not configured yet. The Evil Brain is still setting up.');
+        return;
+    }
+
+    try {
+        // Insert submission into Supabase
+        const { data, error } = await supabase
+            .from('use_case_submissions')
+            .insert([
+                {
+                    use_case: useCase,
+                    submitter_name: name || 'Anonymous Meat Sack',
+                    submitter_email: email || null,
+                    status: 'pending',
+                    submitted_at: new Date().toISOString()
+                }
+            ]);
+
+        if (error) throw error;
+
+        // Show success message
+        form.style.display = 'none';
+        document.getElementById('submit-success').style.display = 'block';
+
+        // Reset form after 3 seconds
+        setTimeout(() => {
+            form.reset();
+            form.style.display = 'block';
+            document.getElementById('submit-success').style.display = 'none';
+        }, 3000);
+
+    } catch (error) {
+        console.error('Error submitting use case:', error);
+        alert('Submission failed. The Evil Brain is experiencing technical difficulties.');
+    }
+}
+
+async function handleNewsletterSubmit(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const email = form.querySelector('input[type="email"]').value;
+
+    if (!supabase) {
+        alert('Newsletter system not configured yet.');
+        return;
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from('newsletter_subscribers')
+            .insert([
+                {
+                    email: email,
+                    subscribed_at: new Date().toISOString(),
+                    source: 'footer'
+                }
+            ]);
+
+        if (error) throw error;
+
+        alert('✓ Subscribed! The Evil Brain will send weekly memos.');
+        form.reset();
+
+    } catch (error) {
+        console.error('Error subscribing to newsletter:', error);
+        alert('Subscription failed. Try again later.');
+    }
+}
+
+// ============================================
+// Stats & Counters
+// ============================================
+
+async function updateEpisodeCount() {
+    const countElement = document.getElementById('episode-count');
+
+    if (!supabase) {
+        countElement.textContent = '1';
+        return;
+    }
+
+    try {
+        const { count, error } = await supabase
+            .from('episodes')
+            .select('*', { count: 'exact', head: true });
+
+        if (error) throw error;
+
+        countElement.textContent = count || 0;
+    } catch (error) {
+        console.error('Error getting episode count:', error);
+    }
+}
+
+// Contract countdown (days until Jason's natural expiration)
+// This is a joke - there's no actual end date
+function updateContractCountdown() {
+    const element = document.getElementById('contract-countdown');
+    if (element) {
+        element.textContent = 'Upon natural death';
+    }
+}
+
+// ============================================
+// Utility Functions
+// ============================================
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+    });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ============================================
+// Export for use in other scripts
+// ============================================
+
+window.UseCaseArmsRace = {
+    loadLatestEpisode,
+    loadEpisodeArchive,
+    updateEpisodeCount
+};

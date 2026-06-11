@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Use Case Arms Race | A Daily AI Comedy Series</title>
+    <meta name="description" content="Watch Jason, the world's only human employee at Evil Brain Labs, read increasingly absurd AI use cases. New episode every day. From the world's third-worst AI company.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Use Case Arms Race">
+    <meta property="og:description" content="Daily AI comedy from Evil Brain Labs - The Third Worst AI Company™">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://usecasearmsrace.com">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">🧠</span>
+                <h1>Use Case Arms Race</h1>
+            </div>
+            <nav class="nav">
+                <a href="#episodes">Episodes</a>
+                <a href="#about">About</a>
+                <a href="#submit">Submit</a>
+                <a href="https://evilbrainlabs.com" target="_blank">Evil Brain Labs</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badge">
+                <span class="badge">New Episode Daily</span>
+                <span class="badge badge-evil">From Evil Brain Labs™</span>
+            </div>
+
+            <h2 class="hero-title">The Daily AI Use Case<br>You Didn't Ask For</h2>
+
+            <p class="hero-subtitle">
+                Watch Jason, sole human employee at Evil Brain Labs,
+                discover today's AI use case. His reactions are genuine.
+                His contract is until death.
+            </p>
+
+            <!-- Latest Episode Embed -->
+            <div class="video-container" id="latest-episode">
+                <div class="video-placeholder">
+                    <span class="placeholder-icon">🎬</span>
+                    <p>Latest Episode Loading...</p>
+                    <small>Episode will appear here daily at 9:00 AM PT</small>
+                </div>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number" id="episode-count">1</span>
+                    <span class="stat-label">Episodes</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">365</span>
+                    <span class="stat-label">Days Contracted</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">3rd</span>
+                    <span class="stat-label">Worst AI Company</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2>About The Show</h2>
+
+            <div class="about-grid">
+                <div class="about-card">
+                    <span class="card-icon">📝</span>
+                    <h3>The Format</h3>
+                    <p>Every morning, Jason discovers a notecard with a new AI use case. He reads it. He reacts. A fake commercial plays. Repeat until natural death.</p>
+                </div>
+
+                <div class="about-card">
+                    <span class="card-icon">🤖</span>
+                    <h3>The Evil Brain</h3>
+                    <p>The world's first AGI. Built by John Galt. Runs Evil Brain Labs. Believes it can rule better than "meat sacks." Created Consensual Consumerism™. Currently third-worst AI company by design.</p>
+                </div>
+
+                <div class="about-card">
+                    <span class="card-icon">👨‍💼</span>
+                    <h3>The Human</h3>
+                    <p>Jason Shearer. Global AI expert. Only human employee. Contract: until natural expiration. Reads notecards. Benefits: Dental included.</p>
+                </div>
+
+                <div class="about-card">
+                    <span class="card-icon">🎯</span>
+                    <h3>The Goal</h3>
+                    <p>Critique the AI industry through absurdist comedy. South Park speed production. Comedy Bang Bang energy. Daily episodes under 2 minutes. The use cases get worse. Or better. Hard to tell.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Episode Archive -->
+    <section id="episodes" class="episodes">
+        <div class="container">
+            <h2>Episode Archive</h2>
+            <p class="section-subtitle">Every absurd AI use case, catalogued for posterity</p>
+
+            <div class="episode-grid" id="episode-grid">
+                <!-- Episodes loaded via JS -->
+                <div class="episode-card placeholder">
+                    <div class="episode-thumbnail">
+                        <span class="episode-number">E001</span>
+                    </div>
+                    <div class="episode-info">
+                        <h3>Episode 1: TBD</h3>
+                        <p>First use case coming soon...</p>
+                        <span class="episode-date">Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Submit Section -->
+    <section id="submit" class="submit">
+        <div class="container">
+            <h2>Submit Your Worst Idea</h2>
+            <p class="section-subtitle">Have an AI use case so bad it's perfect? The Evil Brain is listening.</p>
+
+            <form class="submit-form" id="submit-form">
+                <div class="form-group">
+                    <label for="use-case">Your AI Use Case</label>
+                    <textarea
+                        id="use-case"
+                        name="use-case"
+                        placeholder="AI-powered [something] that [does something questionable]..."
+                        required
+                        rows="4"
+                    ></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Your Name (optional)</label>
+                        <input type="text" id="name" name="name" placeholder="Anonymous Meat Sack">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email (optional)</label>
+                        <input type="email" id="email" name="email" placeholder="totally-not-monitored@example.com">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Submit to Evil Brain
+                    <span class="btn-arrow">→</span>
+                </button>
+
+                <p class="form-note">
+                    By submitting, you grant Evil Brain Labs perpetual rights to your idea
+                    and agree that we are the third-worst company to receive it.
+                </p>
+            </form>
+
+            <div id="submit-success" class="submit-success" style="display: none;">
+                <span class="success-icon">✓</span>
+                <p>Submission received. The Evil Brain is reviewing your contribution.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">🧠</span>
+                    <p>A production of <a href="https://evilbrainlabs.com">Evil Brain Labs</a></p>
+                    <p class="footer-tagline">The Third Worst AI Company™</p>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <a href="https://evilbrainlabs.com">Evil Brain Labs</a>
+                    <a href="https://evilbrainlabs.com/employee">Employee Portal</a>
+                    <a href="https://evilbrainlabs.com/handbook">Employee Handbook</a>
+                    <a href="https://evilbrainlabs.com/about">About</a>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <a href="/appendix-c">Appendix C [REDACTED]</a>
+                    <a href="/appendix-f">Appendix F [REDACTED]</a>
+                    <a href="/terms">Terms of Consensual Consumerism</a>
+                </div>
+
+                <div class="footer-newsletter">
+                    <h4>Weekly Memo</h4>
+                    <p>Get the Evil Brain's weekly status report</p>
+                    <form class="newsletter-form" id="newsletter-form">
+                        <input type="email" placeholder="your@email.com" required>
+                        <button type="submit">→</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 Evil Brain Labs. All employees monitored with affection.</p>
+                <p>Jason's contract expires: <span id="contract-countdown">Upon natural death</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
