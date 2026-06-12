@@ -87,15 +87,37 @@ async function loadLatestEpisode() {
             // Add episode info below the video container
             const infoDiv = document.createElement('div');
             infoDiv.className = 'episode-info-display';
-            infoDiv.style.cssText = 'margin-top: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;';
-            infoDiv.innerHTML = `
-                <h3 style="margin-bottom: 0.5rem; font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">
+            infoDiv.style.cssText = 'margin-top: 1.5rem; max-width: 800px; margin-left: auto; margin-right: auto;';
+
+            let htmlContent = `
+                <h3 style="margin-bottom: 0.75rem; font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-align: center;">
                     Episode ${data.episode_number}: ${data.title}
                 </h3>
-                <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.6;">
+                <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; text-align: center;">
                     ${data.use_case_summary}
                 </p>
             `;
+
+            if (data.use_case_full_text) {
+                htmlContent += `
+                    <div style="background: var(--bg-accent); padding: 1.5rem; border-radius: var(--border-radius-lg); border: 1px solid var(--border-color); margin-bottom: 1rem; text-align: left;">
+                        <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Full Use Case</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap;">${data.use_case_full_text}</p>
+                    </div>
+                `;
+            }
+
+            if (data.commercial_brand || data.commercial_tagline) {
+                htmlContent += `
+                    <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05)); padding: 1.5rem; border-radius: var(--border-radius-lg); border: 1px solid var(--brain-accent); text-align: center;">
+                        <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--brain-accent); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Sponsored By</h4>
+                        ${data.commercial_brand ? `<p style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">${data.commercial_brand}</p>` : ''}
+                        ${data.commercial_tagline ? `<p style="font-size: 0.95rem; color: var(--text-secondary); font-style: italic;">"${data.commercial_tagline}"</p>` : ''}
+                    </div>
+                `;
+            }
+
+            infoDiv.innerHTML = htmlContent;
             container.parentElement.insertBefore(infoDiv, container.nextSibling);
         }
     } catch (error) {
@@ -221,15 +243,37 @@ function openEpisode(episodeNumber) {
                 // Add episode info below the video container
                 const infoDiv = document.createElement('div');
                 infoDiv.className = 'episode-info-display';
-                infoDiv.style.cssText = 'margin-top: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;';
-                infoDiv.innerHTML = `
-                    <h3 style="margin-bottom: 0.5rem; font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">
+                infoDiv.style.cssText = 'margin-top: 1.5rem; max-width: 800px; margin-left: auto; margin-right: auto;';
+
+                let htmlContent = `
+                    <h3 style="margin-bottom: 0.75rem; font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-align: center;">
                         Episode ${data.episode_number}: ${data.title}
                     </h3>
-                    <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.6;">
+                    <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; text-align: center;">
                         ${data.use_case_summary}
                     </p>
                 `;
+
+                if (data.use_case_full_text) {
+                    htmlContent += `
+                        <div style="background: var(--bg-accent); padding: 1.5rem; border-radius: var(--border-radius-lg); border: 1px solid var(--border-color); margin-bottom: 1rem; text-align: left;">
+                            <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Full Use Case</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap;">${data.use_case_full_text}</p>
+                        </div>
+                    `;
+                }
+
+                if (data.commercial_brand || data.commercial_tagline) {
+                    htmlContent += `
+                        <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05)); padding: 1.5rem; border-radius: var(--border-radius-lg); border: 1px solid var(--brain-accent); text-align: center;">
+                            <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--brain-accent); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Sponsored By</h4>
+                            ${data.commercial_brand ? `<p style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">${data.commercial_brand}</p>` : ''}
+                            ${data.commercial_tagline ? `<p style="font-size: 0.95rem; color: var(--text-secondary); font-style: italic;">"${data.commercial_tagline}"</p>` : ''}
+                        </div>
+                    `;
+                }
+
+                infoDiv.innerHTML = htmlContent;
                 latestEpisodeContainer.parentElement.insertBefore(infoDiv, latestEpisodeContainer.nextSibling);
 
                 // Scroll to the video
