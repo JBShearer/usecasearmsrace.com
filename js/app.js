@@ -8,7 +8,7 @@ const SUPABASE_URL = 'https://aslcrwmbdtvimjrexxzw.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls';
 
 // Initialize Supabase client (will be loaded from CDN)
-let supabase = null;
+let supabaseClient = null;
 
 // ============================================
 // Initialize
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initialize Supabase
     if (typeof window.supabase !== 'undefined') {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
     // Load latest episode
@@ -42,14 +42,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadLatestEpisode() {
     const container = document.getElementById('latest-episode');
 
-    if (!supabase) {
+    if (!supabaseClient) {
         console.warn('Supabase not initialized - using placeholder');
         return;
     }
 
     try {
         // Query latest episode from Supabase
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('episodes')
             .select('*')
             .eq('status', 'published')
@@ -83,14 +83,14 @@ async function loadLatestEpisode() {
 async function loadEpisodeArchive() {
     const grid = document.getElementById('episode-grid');
 
-    if (!supabase) {
+    if (!supabaseClient) {
         console.warn('Supabase not initialized - using mock data');
         return;
     }
 
     try {
         // Query all published episodes from Supabase
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('episodes')
             .select('*')
             .eq('status', 'published')
@@ -177,14 +177,14 @@ async function handleUseCaseSubmit(e) {
     const name = form.querySelector('#name').value;
     const email = form.querySelector('#email').value;
 
-    if (!supabase) {
+    if (!supabaseClient) {
         alert('Submission system not configured yet. The Evil Brain is still setting up.');
         return;
     }
 
     try {
         // Insert submission into Supabase
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('use_case_submissions')
             .insert([
                 {
@@ -221,13 +221,13 @@ async function handleNewsletterSubmit(e) {
     const form = e.target;
     const email = form.querySelector('input[type="email"]').value;
 
-    if (!supabase) {
+    if (!supabaseClient) {
         alert('Newsletter system not configured yet.');
         return;
     }
 
     try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('newsletter_subscribers')
             .insert([
                 {
@@ -255,13 +255,13 @@ async function handleNewsletterSubmit(e) {
 async function updateEpisodeCount() {
     const countElement = document.getElementById('episode-count');
 
-    if (!supabase) {
+    if (!supabaseClient) {
         countElement.textContent = '1';
         return;
     }
 
     try {
-        const { count, error } = await supabase
+        const { count, error } = await supabaseClient
             .from('episodes')
             .select('*', { count: 'exact', head: true })
             .eq('status', 'published');
