@@ -6,8 +6,8 @@
     <title>Admin - Use Case Arms Race</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/logo.jpg">
-    <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="/css/style.css?v=2">
     <style>
         .admin-container {
             max-width: 800px;
@@ -220,8 +220,8 @@
     </div>
 
     <script>
-        // Admin functionality
-        const supabase = window.supabase.createClient(
+        // Admin functionality - use adminSupabase to avoid conflicts
+        const adminSupabase = window.supabase.createClient(
             'https://aslcrwmbdtvimjrexxzw.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls'
         );
@@ -231,7 +231,7 @@
             const container = document.getElementById('episodes-container');
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await adminSupabase
                     .from('episodes')
                     .select('*')
                     .order('episode_number', { ascending: false });
@@ -316,7 +316,7 @@
             console.log('Uploading episode:', episodeData);
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await adminSupabase
                     .from('episodes')
                     .insert([episodeData])
                     .select();
@@ -339,7 +339,7 @@
             }
 
             try {
-                const { error } = await supabase
+                const { error } = await adminSupabase
                     .from('episodes')
                     .delete()
                     .eq('id', id);
