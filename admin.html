@@ -146,7 +146,7 @@
         <a href="/" class="back-link">← Back to Site</a>
 
         <div class="admin-header">
-            <h1>🧠 Episode Manager</h1>
+            <h1>◉ Episode Manager</h1>
             <p style="color: var(--text-secondary);">Upload and manage Use Case Arms Race episodes</p>
         </div>
 
@@ -159,7 +159,11 @@
             <div class="form-instructions">
                 <strong>📝 Instructions:</strong><br>
                 • Episode number must be unique<br>
-                • Video URL should be YouTube embed URL (e.g., https://www.youtube.com/embed/VIDEO_ID)<br>
+                • <strong>Video URL options:</strong><br>
+                  - YouTube watch URL: https://www.youtube.com/watch?v=VIDEO_ID<br>
+                  - YouTube embed URL: https://www.youtube.com/embed/VIDEO_ID<br>
+                  - Just the VIDEO_ID itself<br>
+                • The system will auto-convert to embed format<br>
                 • Use case and commercial are optional - can be added later<br>
                 • Published episodes appear immediately on the site
             </div>
@@ -181,8 +185,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="video-url">Video URL (YouTube embed) *</label>
-                    <input type="url" id="video-url" required placeholder="https://www.youtube.com/embed/VIDEO_ID">
+                    <label for="video-url">YouTube Video URL or ID *</label>
+                    <input type="text" id="video-url" required placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ or just dQw4w9WgXcQ">
+                    <small style="display: block; margin-top: 4px; color: var(--text-muted);">Paste any YouTube URL format, iframe code, or just the video ID</small>
                 </div>
 
                 <div class="form-group">
@@ -196,7 +201,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    📤 Upload Episode
+                    Upload Episode →
                 </button>
             </form>
         </div>
@@ -252,19 +257,57 @@
             }
         }
 
+        // Helper function to extract YouTube video ID from any format
+        function extractYouTubeId(input) {
+            // If it's already just an ID (11 characters, alphanumeric with hyphens/underscores)
+            if (/^[a-zA-Z0-9_-]{11}$/.test(input.trim())) {
+                return input.trim();
+            }
+
+            // Extract from iframe
+            const iframeMatch = input.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/);
+            if (iframeMatch) return iframeMatch[1];
+
+            // Extract from watch URL
+            const watchMatch = input.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+            if (watchMatch) return watchMatch[1];
+
+            // Extract from embed URL
+            const embedMatch = input.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/);
+            if (embedMatch) return embedMatch[1];
+
+            // Extract from youtu.be short URL
+            const shortMatch = input.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+            if (shortMatch) return shortMatch[1];
+
+            return null;
+        }
+
         // Upload new episode
         document.getElementById('upload-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const videoInput = document.getElementById('video-url').value;
+            const videoId = extractYouTubeId(videoInput);
+
+            if (!videoId) {
+                showError('Could not extract YouTube video ID. Please paste a valid YouTube URL, iframe, or video ID.');
+                return;
+            }
+
+            const embedUrl = `https://www.youtube.com/embed/${videoId}`;
 
             const episodeData = {
                 episode_number: parseInt(document.getElementById('episode-number').value),
                 title: document.getElementById('title').value,
                 description: document.getElementById('description').value || null,
-                video_url: document.getElementById('video-url').value,
+                video_url: embedUrl,
                 use_case_text: document.getElementById('use-case').value || null,
                 commercial_script: document.getElementById('commercial').value || null,
                 published_at: new Date().toISOString()
             };
+
+            console.log('Uploading episode:', episodeData);
 
             try {
                 const { data, error } = await supabase
@@ -274,10 +317,11 @@
 
                 if (error) throw error;
 
-                showSuccess(`Episode ${episodeData.episode_number} uploaded successfully! 🎉`);
+                showSuccess(`Episode ${episodeData.episode_number} uploaded successfully! 🎉 Video ID: ${videoId}`);
                 document.getElementById('upload-form').reset();
                 loadEpisodes();
             } catch (error) {
+                console.error('Upload error:', error);
                 showError('Error uploading episode: ' + error.message);
             }
         });
