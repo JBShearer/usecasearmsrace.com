@@ -328,7 +328,15 @@
                 loadEpisodes();
             } catch (error) {
                 console.error('Upload error:', error);
-                showError('Error uploading episode: ' + error.message);
+
+                // Better error messages
+                if (error.code === '23505') {
+                    showError(`Episode ${episodeData.episode_number} already exists! Try a different episode number or delete the existing one first.`);
+                } else if (error.message) {
+                    showError('Error uploading episode: ' + error.message);
+                } else {
+                    showError('Error uploading episode. Check console for details.');
+                }
             }
         });
 
