@@ -62,7 +62,7 @@ async function loadLatestEpisode() {
         console.log('Latest episode loaded:', data);
 
         if (data && data.video_url) {
-            // Replace placeholder with YouTube embed and episode info
+            // Replace placeholder with YouTube embed
             container.innerHTML = `
                 <iframe
                     width="100%"
@@ -75,8 +75,15 @@ async function loadLatestEpisode() {
                 </iframe>
             `;
 
+            // Remove old info div if it exists
+            const oldInfo = container.nextElementSibling;
+            if (oldInfo && oldInfo.classList.contains('episode-info-display')) {
+                oldInfo.remove();
+            }
+
             // Add episode info below the video container
             const infoDiv = document.createElement('div');
+            infoDiv.className = 'episode-info-display';
             infoDiv.style.cssText = 'margin-top: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;';
             infoDiv.innerHTML = `
                 <h3 style="margin-bottom: 0.5rem; font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">
@@ -142,10 +149,19 @@ function createEpisodeCard(episode) {
         year: 'numeric'
     });
 
+    // Extract YouTube video ID from video_url
+    let thumbnailUrl = episode.thumbnail_url;
+    if (!thumbnailUrl && episode.video_url) {
+        const videoIdMatch = episode.video_url.match(/embed\/([a-zA-Z0-9_-]{11})/);
+        if (videoIdMatch) {
+            thumbnailUrl = `https://img.youtube.com/vi/${videoIdMatch[1]}/hqdefault.jpg`;
+        }
+    }
+
     card.innerHTML = `
         <div class="episode-thumbnail">
-            ${episode.thumbnail_url
-                ? `<img src="${episode.thumbnail_url}" alt="Episode ${episodeNum}">`
+            ${thumbnailUrl
+                ? `<img src="${thumbnailUrl}" alt="Episode ${episodeNum}" style="width: 100%; height: 100%; object-fit: cover;">`
                 : `<span class="episode-number">E${episodeNum}</span>`
             }
         </div>
