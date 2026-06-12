@@ -52,19 +52,27 @@ async function loadLatestEpisode() {
         const { data, error } = await supabase
             .from('episodes')
             .select('*')
+            .eq('status', 'published')
             .order('episode_number', { ascending: false })
             .limit(1)
             .single();
 
         if (error) throw error;
 
+        console.log('Latest episode loaded:', data);
+
         if (data && data.video_url) {
-            // Replace placeholder with actual video
+            // Replace placeholder with YouTube embed
             container.innerHTML = `
-                <video controls autoplay>
-                    <source src="${data.video_url}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
+                <iframe
+                    width="100%"
+                    height="100%"
+                    src="${data.video_url}"
+                    title="${data.title}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
             `;
         }
     } catch (error) {
@@ -81,10 +89,11 @@ async function loadEpisodeArchive() {
     }
 
     try {
-        // Query all episodes from Supabase
+        // Query all published episodes from Supabase
         const { data, error } = await supabase
             .from('episodes')
             .select('*')
+            .eq('status', 'published')
             .order('episode_number', { ascending: false });
 
         if (error) throw error;
@@ -250,7 +259,8 @@ async function updateEpisodeCount() {
     try {
         const { count, error } = await supabase
             .from('episodes')
-            .select('*', { count: 'exact', head: true });
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'published');
 
         if (error) throw error;
 
