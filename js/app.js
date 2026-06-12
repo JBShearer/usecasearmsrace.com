@@ -98,6 +98,8 @@ async function loadEpisodeArchive() {
 
         if (error) throw error;
 
+        console.log('Episodes loaded:', data);
+
         if (data && data.length > 0) {
             // Clear placeholder
             grid.innerHTML = '';
@@ -107,6 +109,8 @@ async function loadEpisodeArchive() {
                 const card = createEpisodeCard(episode);
                 grid.appendChild(card);
             });
+        } else {
+            console.log('No published episodes found');
         }
     } catch (error) {
         console.error('Error loading episode archive:', error);
