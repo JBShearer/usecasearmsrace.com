@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Use Case Arms Race</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .admin-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--space-2xl) var(--space-md);
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: var(--space-2xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .admin-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-sm);
+            background: linear-gradient(135deg, var(--brain-accent), var(--brain-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .upload-section {
+            background: var(--bg-primary);
+            padding: var(--space-xl);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: var(--space-xl);
+        }
+
+        .upload-section h2 {
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+        }
+
+        .form-instructions {
+            background: var(--bg-accent);
+            padding: var(--space-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--space-lg);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            border-left: 3px solid var(--brain-accent);
+        }
+
+        .form-instructions strong {
+            color: var(--text-primary);
+        }
+
+        .episode-list {
+            margin-top: var(--space-2xl);
+        }
+
+        .episode-item {
+            background: var(--bg-secondary);
+            padding: var(--space-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--space-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .episode-item-info h3 {
+            margin-bottom: var(--space-xs);
+            color: var(--text-primary);
+        }
+
+        .episode-item-info p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .episode-item-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .btn-small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.875rem;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--brain-green);
+            color: var(--brain-green);
+            padding: var(--space-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--space-md);
+            display: none;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: var(--space-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--space-md);
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--text-muted);
+            padding: var(--space-lg);
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--brain-accent);
+            text-decoration: none;
+            margin-bottom: var(--space-lg);
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: var(--brain-purple);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <a href="/" class="back-link">← Back to Site</a>
+
+        <div class="admin-header">
+            <h1>🧠 Episode Manager</h1>
+            <p style="color: var(--text-secondary);">Upload and manage Use Case Arms Race episodes</p>
+        </div>
+
+        <div id="success-message" class="success-message"></div>
+        <div id="error-message" class="error-message"></div>
+
+        <div class="upload-section">
+            <h2>Upload New Episode</h2>
+
+            <div class="form-instructions">
+                <strong>📝 Instructions:</strong><br>
+                • Episode number must be unique<br>
+                • Video URL should be YouTube embed URL (e.g., https://www.youtube.com/embed/VIDEO_ID)<br>
+                • Use case and commercial are optional - can be added later<br>
+                • Published episodes appear immediately on the site
+            </div>
+
+            <form id="upload-form">
+                <div class="form-group">
+                    <label for="episode-number">Episode Number *</label>
+                    <input type="number" id="episode-number" required placeholder="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="title">Title *</label>
+                    <input type="text" id="title" required placeholder="AI-Powered Sock Sorter">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" rows="3" placeholder="Optional brief description of the episode"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="video-url">Video URL (YouTube embed) *</label>
+                    <input type="url" id="video-url" required placeholder="https://www.youtube.com/embed/VIDEO_ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="use-case">Use Case Text</label>
+                    <textarea id="use-case" rows="4" placeholder="The actual use case text (optional)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="commercial">Commercial Script</label>
+                    <textarea id="commercial" rows="4" placeholder="The commercial script (optional)"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    📤 Upload Episode
+                </button>
+            </form>
+        </div>
+
+        <div class="episode-list">
+            <h2>Published Episodes</h2>
+            <div id="episodes-container">
+                <div class="loading">Loading episodes...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script>
+        // Admin functionality
+        const supabase = window.supabase.createClient(
+            'https://aslcrwmbdtvimjrexxzw.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls'
+        );
+
+        // Load existing episodes
+        async function loadEpisodes() {
+            const container = document.getElementById('episodes-container');
+
+            try {
+                const { data, error } = await supabase
+                    .from('episodes')
+                    .select('*')
+                    .order('episode_number', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="loading">No episodes yet. Upload your first episode!</div>';
+                    return;
+                }
+
+                container.innerHTML = data.map(ep => `
+                    <div class="episode-item">
+                        <div class="episode-item-info">
+                            <h3>Episode ${ep.episode_number}: ${ep.title}</h3>
+                            <p>${new Date(ep.published_at).toLocaleDateString()} • ${ep.views || 0} views</p>
+                        </div>
+                        <div class="episode-item-actions">
+                            <button class="btn btn-small" onclick="viewEpisode('${ep.id}')">👁️ View</button>
+                            <button class="btn btn-small btn-danger" onclick="deleteEpisode('${ep.id}', ${ep.episode_number})">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                showError('Error loading episodes: ' + error.message);
+                container.innerHTML = '<div class="loading">Error loading episodes. Check console.</div>';
+            }
+        }
+
+        // Upload new episode
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const episodeData = {
+                episode_number: parseInt(document.getElementById('episode-number').value),
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value || null,
+                video_url: document.getElementById('video-url').value,
+                use_case_text: document.getElementById('use-case').value || null,
+                commercial_script: document.getElementById('commercial').value || null,
+                published_at: new Date().toISOString()
+            };
+
+            try {
+                const { data, error } = await supabase
+                    .from('episodes')
+                    .insert([episodeData])
+                    .select();
+
+                if (error) throw error;
+
+                showSuccess(`Episode ${episodeData.episode_number} uploaded successfully! 🎉`);
+                document.getElementById('upload-form').reset();
+                loadEpisodes();
+            } catch (error) {
+                showError('Error uploading episode: ' + error.message);
+            }
+        });
+
+        // Delete episode
+        window.deleteEpisode = async (id, episodeNumber) => {
+            if (!confirm(`Are you sure you want to delete Episode ${episodeNumber}? This cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('episodes')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                showSuccess(`Episode ${episodeNumber} deleted.`);
+                loadEpisodes();
+            } catch (error) {
+                showError('Error deleting episode: ' + error.message);
+            }
+        };
+
+        // View episode
+        window.viewEpisode = (id) => {
+            window.location.href = `/?episode=${id}`;
+        };
+
+        // Show messages
+        function showSuccess(message) {
+            const el = document.getElementById('success-message');
+            el.textContent = message;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        function showError(message) {
+            const el = document.getElementById('error-message');
+            el.textContent = message;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        // Load episodes on page load
+        loadEpisodes();
+    </script>
+</body>
+</html>

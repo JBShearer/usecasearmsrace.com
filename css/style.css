@@ -93,10 +93,10 @@ body {
 }
 
 .logo-icon {
-    height: 40px;
+    height: 80px;
     width: auto;
-    max-width: 200px;
-    max-height: 40px;
+    max-width: 400px;
+    max-height: 80px;
     object-fit: contain;
     display: block;
 }
