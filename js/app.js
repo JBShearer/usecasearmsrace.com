@@ -62,7 +62,7 @@ async function loadLatestEpisode() {
         console.log('Latest episode loaded:', data);
 
         if (data && data.video_url) {
-            // Replace placeholder with YouTube embed
+            // Replace placeholder with YouTube embed and episode info
             container.innerHTML = `
                 <iframe
                     width="100%"
@@ -73,6 +73,10 @@ async function loadLatestEpisode() {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowfullscreen>
                 </iframe>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Episode ${data.episode_number}: ${data.title}</h3>
+                    <p style="color: var(--text-secondary);">${data.use_case_summary}</p>
+                </div>
             `;
         }
     } catch (error) {
@@ -147,8 +151,43 @@ function createEpisodeCard(episode) {
 }
 
 function openEpisode(episodeNumber) {
-    // Navigate to episode detail page (or open modal)
-    window.location.href = `/episodes/${episodeNumber}.html`;
+    // Scroll to latest episode section and load this episode
+    const latestEpisodeContainer = document.getElementById('latest-episode');
+
+    // Fetch and display the episode
+    supabaseClient
+        .from('episodes')
+        .select('*')
+        .eq('episode_number', episodeNumber)
+        .eq('status', 'published')
+        .single()
+        .then(({ data, error }) => {
+            if (error) {
+                console.error('Error loading episode:', error);
+                return;
+            }
+
+            if (data && data.video_url) {
+                latestEpisodeContainer.innerHTML = `
+                    <iframe
+                        width="100%"
+                        height="100%"
+                        src="${data.video_url}"
+                        title="${data.title}"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
+                    <div style="margin-top: 1rem; text-align: center;">
+                        <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Episode ${data.episode_number}: ${data.title}</h3>
+                        <p style="color: var(--text-secondary);">${data.use_case_summary}</p>
+                    </div>
+                `;
+
+                // Scroll to the video
+                latestEpisodeContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
 }
 
 // ============================================
