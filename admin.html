@@ -164,8 +164,8 @@
                   - YouTube embed URL: https://www.youtube.com/embed/VIDEO_ID<br>
                   - Just the VIDEO_ID itself<br>
                 • The system will auto-convert to embed format<br>
-                • Use case and commercial are optional - can be added later<br>
-                • Published episodes appear immediately on the site
+                • Use case summary and full text are REQUIRED<br>
+                • Commercial fields are optional
             </div>
 
             <form id="upload-form">
@@ -175,13 +175,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="title">Title *</label>
+                    <label for="title">Episode Title *</label>
                     <input type="text" id="title" required placeholder="AI-Powered Sock Sorter">
-                </div>
-
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" rows="3" placeholder="Optional brief description of the episode"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -191,13 +186,23 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="use-case">Use Case Text</label>
-                    <textarea id="use-case" rows="4" placeholder="The actual use case text (optional)"></textarea>
+                    <label for="use-case-summary">Use Case Summary *</label>
+                    <textarea id="use-case-summary" rows="2" required placeholder="Brief summary of the use case (required)"></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="commercial">Commercial Script</label>
-                    <textarea id="commercial" rows="4" placeholder="The commercial script (optional)"></textarea>
+                    <label for="use-case-full">Full Use Case Text *</label>
+                    <textarea id="use-case-full" rows="4" required placeholder="The complete use case text that Jason reads (required)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="commercial-brand">Commercial Brand</label>
+                    <textarea id="commercial-brand" rows="2" placeholder="The fake product/brand being advertised (optional)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="commercial-tagline">Commercial Tagline</label>
+                    <textarea id="commercial-tagline" rows="2" placeholder="The fake commercial tagline/script (optional)"></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-primary">
@@ -300,10 +305,12 @@
             const episodeData = {
                 episode_number: parseInt(document.getElementById('episode-number').value),
                 title: document.getElementById('title').value,
-                description: document.getElementById('description').value || null,
+                use_case_summary: document.getElementById('use-case-summary').value,
+                use_case_full_text: document.getElementById('use-case-full').value,
                 video_url: embedUrl,
-                use_case_text: document.getElementById('use-case').value || null,
-                commercial_script: document.getElementById('commercial').value || null,
+                commercial_brand: document.getElementById('commercial-brand').value || null,
+                commercial_tagline: document.getElementById('commercial-tagline').value || null,
+                status: 'published',
                 published_at: new Date().toISOString()
             };
 
