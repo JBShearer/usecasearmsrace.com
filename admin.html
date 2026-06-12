@@ -217,6 +217,22 @@
                 <div class="loading">Loading episodes...</div>
             </div>
         </div>
+
+        <div class="episode-list">
+            <h2>Use Case Submissions</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Ideas submitted by users through the website</p>
+            <div id="submissions-container">
+                <div class="loading">Loading submissions...</div>
+            </div>
+        </div>
+
+        <div class="episode-list">
+            <h2>Newsletter Subscribers</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Email addresses from newsletter signups</p>
+            <div id="subscribers-container">
+                <div class="loading">Loading subscribers...</div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -368,6 +384,113 @@
             window.location.href = `/?episode=${id}`;
         };
 
+        // Load submissions
+        async function loadSubmissions() {
+            const container = document.getElementById('submissions-container');
+
+            try {
+                const { data, error } = await adminSupabase
+                    .from('use_case_submissions')
+                    .select('*')
+                    .order('submitted_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-muted);">No submissions yet</p>';
+                    return;
+                }
+
+                container.innerHTML = data.map(sub => `
+                    <div class="episode-item">
+                        <div class="episode-item-info">
+                            <h3>${sub.use_case}</h3>
+                            <p>From: ${sub.submitter_name || 'Anonymous'} ${sub.submitter_email ? `(${sub.submitter_email})` : ''}</p>
+                            <p style="font-size: 0.75rem; color: var(--text-muted);">
+                                ${new Date(sub.submitted_at).toLocaleString()} · Status: ${sub.status}
+                            </p>
+                        </div>
+                        <div class="episode-item-actions">
+                            <button class="btn btn-small btn-danger" onclick="deleteSubmission('${sub.id}')">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading submissions:', error);
+                container.innerHTML = '<p style="color: #ef4444;">Error loading submissions</p>';
+            }
+        }
+
+        // Load subscribers
+        async function loadSubscribers() {
+            const container = document.getElementById('subscribers-container');
+
+            try {
+                const { data, error } = await adminSupabase
+                    .from('newsletter_subscribers')
+                    .select('*')
+                    .order('subscribed_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-muted);">No subscribers yet</p>';
+                    return;
+                }
+
+                container.innerHTML = data.map(sub => `
+                    <div class="episode-item">
+                        <div class="episode-item-info">
+                            <h3>${sub.email}</h3>
+                            <p style="font-size: 0.75rem; color: var(--text-muted);">
+                                ${new Date(sub.subscribed_at).toLocaleString()} · Source: ${sub.source || 'unknown'}
+                            </p>
+                        </div>
+                        <div class="episode-item-actions">
+                            <button class="btn btn-small btn-danger" onclick="deleteSubscriber('${sub.id}')">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading subscribers:', error);
+                container.innerHTML = '<p style="color: #ef4444;">Error loading subscribers</p>';
+            }
+        }
+
+        // Delete submission
+        window.deleteSubmission = async (id) => {
+            if (!confirm('Delete this submission?')) return;
+
+            try {
+                const { error } = await adminSupabase
+                    .from('use_case_submissions')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+                loadSubmissions();
+            } catch (error) {
+                showError('Error deleting submission: ' + error.message);
+            }
+        };
+
+        // Delete subscriber
+        window.deleteSubscriber = async (id) => {
+            if (!confirm('Delete this subscriber?')) return;
+
+            try {
+                const { error } = await adminSupabase
+                    .from('newsletter_subscribers')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+                loadSubscribers();
+            } catch (error) {
+                showError('Error deleting subscriber: ' + error.message);
+            }
+        };
+
         // Show messages
         function showSuccess(message) {
             const el = document.getElementById('success-message');
@@ -385,6 +508,8 @@
 
         // Load episodes on page load
         loadEpisodes();
+        loadSubmissions();
+        loadSubscribers();
     </script>
 </body>
 </html>
