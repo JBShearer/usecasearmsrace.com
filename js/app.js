@@ -60,6 +60,9 @@ async function loadLatestEpisode() {
         if (error) throw error;
 
         console.log('Latest episode loaded:', data);
+        console.log('Full text:', data.use_case_full_text);
+        console.log('Commercial brand:', data.commercial_brand);
+        console.log('Commercial tagline:', data.commercial_tagline);
 
         if (data && data.video_url) {
             // Add YouTube player parameters for better control
