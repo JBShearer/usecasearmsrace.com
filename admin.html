@@ -238,6 +238,8 @@
 
                 if (error) throw error;
 
+                console.log('Loaded episodes from database:', data);
+
                 if (!data || data.length === 0) {
                     container.innerHTML = '<div class="loading">No episodes yet. Upload your first episode!</div>';
                     return;
@@ -247,7 +249,7 @@
                     <div class="episode-item">
                         <div class="episode-item-info">
                             <h3>Episode ${ep.episode_number}: ${ep.title}</h3>
-                            <p>${new Date(ep.published_at).toLocaleDateString()} • ${ep.views || 0} views</p>
+                            <p>${new Date(ep.published_at).toLocaleDateString()} • ${ep.view_count || 0} views • Status: ${ep.status}</p>
                         </div>
                         <div class="episode-item-actions">
                             <button class="btn btn-small" onclick="viewEpisode('${ep.id}')">👁️ View</button>
