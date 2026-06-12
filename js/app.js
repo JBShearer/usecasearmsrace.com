@@ -73,11 +73,20 @@ async function loadLatestEpisode() {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowfullscreen>
                 </iframe>
-                <div style="margin-top: 1rem; text-align: center;">
-                    <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Episode ${data.episode_number}: ${data.title}</h3>
-                    <p style="color: var(--text-secondary);">${data.use_case_summary}</p>
-                </div>
             `;
+
+            // Add episode info below the video container
+            const infoDiv = document.createElement('div');
+            infoDiv.style.cssText = 'margin-top: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;';
+            infoDiv.innerHTML = `
+                <h3 style="margin-bottom: 0.5rem; font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">
+                    Episode ${data.episode_number}: ${data.title}
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.6;">
+                    ${data.use_case_summary}
+                </p>
+            `;
+            container.parentElement.insertBefore(infoDiv, container.nextSibling);
         }
     } catch (error) {
         console.error('Error loading latest episode:', error);
@@ -168,6 +177,7 @@ function openEpisode(episodeNumber) {
             }
 
             if (data && data.video_url) {
+                // Update video
                 latestEpisodeContainer.innerHTML = `
                     <iframe
                         width="100%"
@@ -178,11 +188,27 @@ function openEpisode(episodeNumber) {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen>
                     </iframe>
-                    <div style="margin-top: 1rem; text-align: center;">
-                        <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Episode ${data.episode_number}: ${data.title}</h3>
-                        <p style="color: var(--text-secondary);">${data.use_case_summary}</p>
-                    </div>
                 `;
+
+                // Remove old info div if it exists
+                const oldInfo = latestEpisodeContainer.nextElementSibling;
+                if (oldInfo && oldInfo.classList.contains('episode-info-display')) {
+                    oldInfo.remove();
+                }
+
+                // Add episode info below the video container
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'episode-info-display';
+                infoDiv.style.cssText = 'margin-top: 1.5rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;';
+                infoDiv.innerHTML = `
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">
+                        Episode ${data.episode_number}: ${data.title}
+                    </h3>
+                    <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.6;">
+                        ${data.use_case_summary}
+                    </p>
+                `;
+                latestEpisodeContainer.parentElement.insertBefore(infoDiv, latestEpisodeContainer.nextSibling);
 
                 // Scroll to the video
                 latestEpisodeContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
