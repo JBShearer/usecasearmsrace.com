@@ -62,12 +62,15 @@ async function loadLatestEpisode() {
         console.log('Latest episode loaded:', data);
 
         if (data && data.video_url) {
+            // Add YouTube player parameters for better control
+            const videoUrl = data.video_url + (data.video_url.includes('?') ? '&' : '?') + 'cc_load_policy=1&rel=0';
+
             // Replace placeholder with YouTube embed
             container.innerHTML = `
                 <iframe
                     width="100%"
                     height="100%"
-                    src="${data.video_url}"
+                    src="${videoUrl}"
                     title="${data.title}"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -193,12 +196,15 @@ function openEpisode(episodeNumber) {
             }
 
             if (data && data.video_url) {
+                // Add YouTube player parameters for better control
+                const videoUrl = data.video_url + (data.video_url.includes('?') ? '&' : '?') + 'cc_load_policy=1&rel=0';
+
                 // Update video
                 latestEpisodeContainer.innerHTML = `
                     <iframe
                         width="100%"
                         height="100%"
-                        src="${data.video_url}"
+                        src="${videoUrl}"
                         title="${data.title}"
                         frameborder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

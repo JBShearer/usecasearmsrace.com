@@ -222,6 +222,7 @@ body {
     background: var(--bg-accent);
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--border-color);
+    margin-top: var(--space-xl);
 }
 
 .stat {
@@ -322,6 +323,27 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: var(--space-lg);
+    max-height: 800px;
+    overflow-y: auto;
+    padding: var(--space-xs);
+}
+
+.episode-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.episode-grid::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.episode-grid::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.episode-grid::-webkit-scrollbar-thumb:hover {
+    background: var(--brain-accent);
 }
 
 .episode-card {
@@ -362,12 +384,18 @@ body {
 .episode-info h3 {
     font-size: 1.125rem;
     margin-bottom: var(--space-xs);
+    line-height: 1.3;
 }
 
 .episode-info p {
     color: var(--text-secondary);
     font-size: 0.875rem;
     margin-bottom: var(--space-sm);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .episode-date {
