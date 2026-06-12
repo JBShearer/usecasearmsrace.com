@@ -95,7 +95,10 @@ body {
 .logo-icon {
     height: 40px;
     width: auto;
+    max-width: 200px;
+    max-height: 40px;
     object-fit: contain;
+    display: block;
 }
 
 .logo h1 {
