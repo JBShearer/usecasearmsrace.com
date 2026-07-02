@@ -135,50 +135,242 @@
         </div>
     </section>
 
-    <!-- Submit Section -->
-    <section id="submit" class="submit">
+    <!-- Case Book Section (Read-Only on EBL, Full on UCAR) -->
+    <section id="casebook" class="casebook">
         <div class="container">
-            <h2>Submit Your Worst Idea</h2>
-            <p class="section-subtitle">Have an AI use case so bad it's perfect? The Evil Brain is listening.</p>
+            <h2>📚 Case Book</h2>
+            <p class="section-subtitle">The registry of AI harm. Browse, search, file.</p>
 
-            <form class="submit-form" id="submit-form">
-                <div class="form-group">
-                    <label for="use-case">Your AI Use Case</label>
-                    <textarea
-                        id="use-case"
-                        name="use-case"
-                        placeholder="AI-powered [something] that [does something questionable]..."
-                        required
-                        rows="4"
-                    ></textarea>
-                </div>
+            <div class="casebook-controls">
+                <input type="text" id="case-search" placeholder="Search cases..." class="case-search">
+                <select id="case-filter-category" class="case-filter">
+                    <option value="">All Categories</option>
+                    <option value="surveillance">Surveillance</option>
+                    <option value="discrimination">Discrimination</option>
+                    <option value="labor">Labor/Employment</option>
+                    <option value="privacy">Privacy</option>
+                    <option value="manipulation">Manipulation</option>
+                    <option value="healthcare">Healthcare</option>
+                    <option value="criminal_justice">Criminal Justice</option>
+                    <option value="education">Education</option>
+                </select>
+                <button class="btn btn-secondary" onclick="toggleFilingForm()">+ File New Case</button>
+            </div>
 
-                <div class="form-row">
+            <div id="case-list" class="case-list">
+                <p class="loading">Loading cases...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filing Form Section -->
+    <section id="submit" class="submit filing-section" style="display: none;">
+        <div class="container">
+            <h2>📝 File a Case</h2>
+            <p class="section-subtitle">Document harmful AI. Names and URLs will be redacted until manually approved.</p>
+
+            <form class="submit-form filing-form" id="submit-form">
+                <!-- BASIC INFO -->
+                <fieldset class="form-section">
+                    <legend>Basic Information</legend>
+
                     <div class="form-group">
-                        <label for="name">Your Name (optional)</label>
-                        <input type="text" id="name" name="name" placeholder="Anonymous Meat Sack">
+                        <label for="title">Title <span class="required">*</span></label>
+                        <input type="text" id="title" name="title" required
+                            placeholder="e.g., Facial recognition used to deny housing applications">
                     </div>
 
                     <div class="form-group">
-                        <label for="email">Email (optional)</label>
-                        <input type="email" id="email" name="email" placeholder="totally-not-monitored@example.com">
+                        <label for="description">Description <span class="required">*</span></label>
+                        <textarea id="description" name="description" required rows="5"
+                            placeholder="Describe the harmful use case in detail. Include how it works, who is affected, and what harm it causes..."></textarea>
+                        <span class="char-count"><span id="desc-count">0</span>/2000</span>
                     </div>
+                </fieldset>
+
+                <!-- SOURCE & EVIDENCE -->
+                <fieldset class="form-section">
+                    <legend>Source & Evidence</legend>
+
+                    <div class="form-group">
+                        <label for="url">
+                            URL (optional)
+                            <span class="redact-warning" title="Will be hidden until manually approved">🔒 REDACTED</span>
+                        </label>
+                        <input type="url" id="url" name="url"
+                            placeholder="https://news-article-or-company-page.com">
+                        <small class="form-hint">Link to news article, research paper, or company page. Hidden from public until approved.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="company">
+                            Company/Organization (optional)
+                            <span class="redact-warning" title="Will be hidden until manually approved">🔒 REDACTED</span>
+                        </label>
+                        <input type="text" id="company" name="company"
+                            placeholder="Company name">
+                        <small class="form-hint">Will be redacted from public view until manually approved.</small>
+                    </div>
+                </fieldset>
+
+                <!-- LOCATION -->
+                <fieldset class="form-section">
+                    <legend>Location (optional)</legend>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <select id="country" name="country">
+                                <option value="">Select country...</option>
+                                <option value="US">United States</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="CN">China</option>
+                                <option value="AU">Australia</option>
+                                <option value="CA">Canada</option>
+                                <option value="DE">Germany</option>
+                                <option value="FR">France</option>
+                                <option value="JP">Japan</option>
+                                <option value="IN">India</option>
+                                <option value="BR">Brazil</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="region">State/Region</label>
+                            <select id="region" name="region" disabled>
+                                <option value="">Select country first...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group map-group" style="display: none;">
+                        <label>📍 Add precise location (internal use only)</label>
+                        <div id="location-map" class="location-map"></div>
+                        <small class="form-hint">⚠️ Exact coordinates are NEVER shown publicly. Only region is displayed.</small>
+                        <input type="hidden" id="location-lat" name="location_lat">
+                        <input type="hidden" id="location-lng" name="location_lng">
+                    </div>
+                </fieldset>
+
+                <!-- RELATED CASES -->
+                <fieldset class="form-section">
+                    <legend>Related Cases (optional)</legend>
+
+                    <div class="form-group">
+                        <label for="related-search">Link to existing cases</label>
+                        <input type="text" id="related-search" placeholder="🔍 Search cases to link..."
+                            autocomplete="off">
+                        <div id="related-results" class="typeahead-results" style="display: none;"></div>
+                    </div>
+
+                    <div id="selected-relations" class="selected-relations"></div>
+                </fieldset>
+
+                <!-- METADATA -->
+                <fieldset class="form-section">
+                    <legend>Metadata</legend>
+
+                    <div class="form-group">
+                        <label>Tags</label>
+                        <div class="tag-input-container">
+                            <div id="tag-chips" class="tag-chips"></div>
+                            <input type="text" id="tag-input" placeholder="Press Enter to add tag">
+                        </div>
+                        <input type="hidden" id="tags" name="tags">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Architecture Components</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label"><input type="checkbox" name="arch" value="llm"> LLM/Chatbot</label>
+                            <label class="checkbox-label"><input type="checkbox" name="arch" value="computer_vision"> Computer Vision</label>
+                            <label class="checkbox-label"><input type="checkbox" name="arch" value="facial_recognition"> Facial Recognition</label>
+                            <label class="checkbox-label"><input type="checkbox" name="arch" value="recommendation"> Recommendation System</label>
+                            <label class="checkbox-label"><input type="checkbox" name="arch" value="predictive"> Predictive Analytics</label>
+                            <label class="checkbox-label"><input type="checkbox" name="arch" value="voice"> Voice Recognition</label>
+                            <label class="checkbox-label"><input type="checkbox" name="arch" value="generative"> Generative AI</label>
+                            <label class="checkbox-label"><input type="checkbox" name="arch" value="nlp"> NLP</label>
+                            <label class="checkbox-label"><input type="checkbox" name="arch" value="biometric"> Biometric Analysis</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Data Sources Exploited</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-label"><input type="checkbox" name="datasrc" value="biometric"> Biometric Data</label>
+                            <label class="checkbox-label"><input type="checkbox" name="datasrc" value="location"> Location/GPS</label>
+                            <label class="checkbox-label"><input type="checkbox" name="datasrc" value="social_media"> Social Media</label>
+                            <label class="checkbox-label"><input type="checkbox" name="datasrc" value="financial"> Financial Records</label>
+                            <label class="checkbox-label"><input type="checkbox" name="datasrc" value="health"> Health Records</label>
+                            <label class="checkbox-label"><input type="checkbox" name="datasrc" value="public_records"> Public Records</label>
+                            <label class="checkbox-label"><input type="checkbox" name="datasrc" value="scraped"> Scraped Web Data</label>
+                            <label class="checkbox-label"><input type="checkbox" name="datasrc" value="purchased"> Purchased/Third-Party</label>
+                            <label class="checkbox-label"><input type="checkbox" name="datasrc" value="behavioral"> Behavioral/Usage Data</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- CLASSIFICATION -->
+                <fieldset class="form-section">
+                    <legend>Classification</legend>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="category">Harm Category</label>
+                            <select id="category" name="category">
+                                <option value="">Select category...</option>
+                                <option value="surveillance">Surveillance</option>
+                                <option value="discrimination">Discrimination</option>
+                                <option value="labor">Labor/Employment</option>
+                                <option value="privacy">Privacy</option>
+                                <option value="manipulation">Manipulation</option>
+                                <option value="misinformation">Misinformation</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="criminal_justice">Criminal Justice</option>
+                                <option value="education">Education</option>
+                                <option value="finance">Finance</option>
+                                <option value="housing">Housing</option>
+                                <option value="environment">Environment</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="severity">Severity (1-5)</label>
+                            <input type="range" id="severity" name="severity" min="1" max="5" value="3">
+                            <div class="severity-labels">
+                                <span>1: Minor</span>
+                                <span>3: Significant</span>
+                                <span>5: Catastrophic</span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- SUBMISSION -->
+                <div class="form-notice">
+                    <p>⚠️ <strong>Review Notice:</strong> Your submission will be reviewed before appearing publicly.</p>
+                    <ul>
+                        <li>URL and company name will be hidden until approved</li>
+                        <li>Exact location will never be shown (only region)</li>
+                        <li>You can track your submission status in your profile</li>
+                    </ul>
                 </div>
 
-                <button type="submit" class="btn btn-primary">
-                    Submit to Evil Brain
-                    <span class="btn-arrow">→</span>
-                </button>
-
-                <p class="form-note">
-                    By submitting, you grant Evil Brain Labs perpetual rights to your idea
-                    and agree that we are the third-worst company to receive it.
-                </p>
+                <div class="form-row form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="toggleFilingForm()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        🧠 Submit Case
+                        <span class="btn-arrow">→</span>
+                    </button>
+                </div>
             </form>
 
             <div id="submit-success" class="submit-success" style="display: none;">
                 <span class="success-icon">✓</span>
-                <p>Submission received. The Evil Brain is reviewing your contribution.</p>
+                <p><strong>Case Filed!</strong></p>
+                <p>Your submission is pending review. The Evil Brain will examine it shortly.</p>
+                <button class="btn btn-secondary" onclick="resetFilingForm()">File Another</button>
             </div>
         </div>
     </section>

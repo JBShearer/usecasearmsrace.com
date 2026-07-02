@@ -10,6 +10,22 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Initialize Supabase client (will be loaded from CDN)
 let supabaseClient = null;
 
+// State for filing form
+let selectedTags = [];
+let selectedRelations = [];
+
+// US States for region dropdown
+const US_STATES = [
+    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
+    'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
+    'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan',
+    'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
+    'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio',
+    'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+    'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
+    'Wisconsin', 'Wyoming'
+];
+
 // ============================================
 // Initialize
 // ============================================
@@ -28,6 +44,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load episode archive
     await loadEpisodeArchive();
 
+    // Load case book
+    await loadCases();
+
     // Setup event listeners
     setupEventListeners();
 
@@ -36,7 +55,555 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================
-// Episode Loading
+// Case Book Loading
+// ============================================
+
+async function loadCases(filter = {}) {
+    const caseList = document.getElementById('case-list');
+    if (!caseList) return;
+
+    if (!supabaseClient) {
+        caseList.innerHTML = '<p class="error">Database not connected.</p>';
+        return;
+    }
+
+    caseList.innerHTML = '<p class="loading">Loading cases...</p>';
+
+    try {
+        let query = supabaseClient
+            .from('use_cases')
+            .select('id, title, description, category, severity, status, location_country, location_region, tags, created_at')
+            .in('status', ['active', 'approved'])
+            .order('created_at', { ascending: false })
+            .limit(50);
+
+        // Apply filters
+        if (filter.category) {
+            query = query.eq('category', filter.category);
+        }
+        if (filter.search) {
+            query = query.or(`title.ilike.%${filter.search}%,description.ilike.%${filter.search}%`);
+        }
+
+        const { data: cases, error } = await query;
+
+        if (error) throw error;
+
+        if (!cases || cases.length === 0) {
+            caseList.innerHTML = '<p class="empty">No cases found. Be the first to file one!</p>';
+            return;
+        }
+
+        caseList.innerHTML = cases.map(c => renderCaseCard(c)).join('');
+
+    } catch (error) {
+        console.error('Error loading cases:', error);
+        caseList.innerHTML = '<p class="error">Failed to load cases.</p>';
+    }
+}
+
+function renderCaseCard(c) {
+    const severityDots = Array.from({ length: 5 }, (_, i) =>
+        `<span class="severity-dot ${i < c.severity ? 'active' : ''}"></span>`
+    ).join('');
+
+    const location = c.location_country
+        ? `📍 ${c.location_region || ''} ${c.location_country}`
+        : '';
+
+    const tags = (c.tags || []).slice(0, 3).map(t =>
+        `<span class="tag-mini">${t}</span>`
+    ).join('');
+
+    return `
+        <div class="case-card" data-id="${c.id}">
+            ${c.category ? `<span class="category-badge">${c.category}</span>` : ''}
+            <h3>${escapeHtml(c.title)}</h3>
+            <p>${escapeHtml(c.description?.substring(0, 150))}${c.description?.length > 150 ? '...' : ''}</p>
+            <div class="severity">${severityDots}</div>
+            ${location ? `<div class="case-location">${location}</div>` : ''}
+            ${tags ? `<div class="case-tags">${tags}</div>` : ''}
+        </div>
+    `;
+}
+
+// ============================================
+// Filing Form
+// ============================================
+
+function toggleFilingForm() {
+    const casebook = document.getElementById('casebook');
+    const filingSection = document.getElementById('submit');
+
+    if (filingSection.style.display === 'none') {
+        casebook.style.display = 'none';
+        filingSection.style.display = 'block';
+        filingSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        filingSection.style.display = 'none';
+        casebook.style.display = 'block';
+    }
+}
+
+function resetFilingForm() {
+    const form = document.getElementById('submit-form');
+    const success = document.getElementById('submit-success');
+
+    form.reset();
+    form.style.display = 'block';
+    success.style.display = 'none';
+
+    // Reset state
+    selectedTags = [];
+    selectedRelations = [];
+    renderTags();
+    renderSelectedRelations();
+}
+
+async function handleUseCaseSubmit(e) {
+    e.preventDefault();
+
+    const form = e.target;
+
+    if (!supabaseClient) {
+        alert('Submission system not configured. The Evil Brain is still setting up.');
+        return;
+    }
+
+    // Gather form data
+    const title = form.querySelector('#title').value;
+    const description = form.querySelector('#description').value;
+    const url = form.querySelector('#url').value || null;
+    const company = form.querySelector('#company').value || null;
+    const country = form.querySelector('#country').value || null;
+    const region = form.querySelector('#region').value || null;
+    const category = form.querySelector('#category').value || null;
+    const severity = parseInt(form.querySelector('#severity').value) || 3;
+
+    // Gather checkboxes
+    const archComponents = Array.from(form.querySelectorAll('input[name="arch"]:checked'))
+        .map(cb => cb.value);
+    const dataSources = Array.from(form.querySelectorAll('input[name="datasrc"]:checked'))
+        .map(cb => cb.value);
+
+    // Get current user (if logged in)
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+
+    try {
+        // Insert the use case with pending_review status
+        const { data: newCase, error } = await supabaseClient
+            .from('use_cases')
+            .insert([{
+                title,
+                description,
+                url_raw: url,
+                url_display: null,  // Hidden until approved
+                url_approved: false,
+                company_name_raw: company,
+                company_name_display: null,  // Hidden until approved
+                company_approved: false,
+                location_country: country,
+                location_region: region,
+                category,
+                severity,
+                tags: selectedTags,
+                architecture_components: archComponents,
+                data_sources: dataSources,
+                status: 'pending_review',
+                submitted_by: user?.id || null
+            }])
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        // Insert case relationships if any
+        if (selectedRelations.length > 0 && newCase) {
+            const relationships = selectedRelations.map(rel => ({
+                source_case_id: newCase.id,
+                target_case_id: rel.caseId,
+                relationship_type: rel.type,
+                created_by: user?.id || null
+            }));
+
+            await supabaseClient
+                .from('case_relationships')
+                .insert(relationships);
+        }
+
+        // Show success
+        form.style.display = 'none';
+        document.getElementById('submit-success').style.display = 'block';
+
+    } catch (error) {
+        console.error('Error submitting case:', error);
+        alert('Submission failed: ' + (error.message || 'Unknown error'));
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🧠 Submit Case →';
+    }
+}
+
+// ============================================
+// Tag Input
+// ============================================
+
+function setupTagInput() {
+    const tagInput = document.getElementById('tag-input');
+    if (!tagInput) return;
+
+    tagInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const tag = tagInput.value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (tag && !selectedTags.includes(tag)) {
+                selectedTags.push(tag);
+                renderTags();
+            }
+            tagInput.value = '';
+        }
+    });
+}
+
+function renderTags() {
+    const container = document.getElementById('tag-chips');
+    if (!container) return;
+
+    container.innerHTML = selectedTags.map((tag, i) => `
+        <span class="tag-chip">
+            ${escapeHtml(tag)}
+            <span class="remove-tag" onclick="removeTag(${i})">×</span>
+        </span>
+    `).join('');
+}
+
+function removeTag(index) {
+    selectedTags.splice(index, 1);
+    renderTags();
+}
+
+// ============================================
+// Related Cases Typeahead
+// ============================================
+
+function setupRelatedCasesSearch() {
+    const searchInput = document.getElementById('related-search');
+    const resultsContainer = document.getElementById('related-results');
+    if (!searchInput || !resultsContainer) return;
+
+    let debounceTimer;
+
+    searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => searchRelatedCases(searchInput.value), 300);
+    });
+
+    searchInput.addEventListener('focus', () => {
+        if (searchInput.value.length >= 2) {
+            resultsContainer.style.display = 'block';
+        }
+    });
+
+    // Hide results when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.form-group')) {
+            resultsContainer.style.display = 'none';
+        }
+    });
+}
+
+async function searchRelatedCases(query) {
+    const resultsContainer = document.getElementById('related-results');
+    if (!resultsContainer || query.length < 2) {
+        resultsContainer.style.display = 'none';
+        return;
+    }
+
+    if (!supabaseClient) return;
+
+    try {
+        const { data: cases, error } = await supabaseClient
+            .from('use_cases')
+            .select('id, title, category')
+            .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
+            .in('status', ['active', 'approved'])
+            .limit(5);
+
+        if (error) throw error;
+
+        if (!cases || cases.length === 0) {
+            resultsContainer.innerHTML = '<div class="result-item">No cases found</div>';
+        } else {
+            resultsContainer.innerHTML = cases.map(c => `
+                <div class="result-item" onclick="selectRelatedCase('${c.id}', '${escapeHtml(c.title)}')">
+                    <strong>${escapeHtml(c.title)}</strong>
+                    ${c.category ? `<span class="category-mini">${c.category}</span>` : ''}
+                </div>
+            `).join('');
+        }
+
+        resultsContainer.style.display = 'block';
+
+    } catch (error) {
+        console.error('Error searching cases:', error);
+    }
+}
+
+function selectRelatedCase(caseId, title) {
+    // Don't add duplicates
+    if (selectedRelations.find(r => r.caseId === caseId)) return;
+
+    selectedRelations.push({
+        caseId,
+        title,
+        type: 'same_mistake_as'
+    });
+
+    renderSelectedRelations();
+
+    // Clear search
+    document.getElementById('related-search').value = '';
+    document.getElementById('related-results').style.display = 'none';
+}
+
+function renderSelectedRelations() {
+    const container = document.getElementById('selected-relations');
+    if (!container) return;
+
+    container.innerHTML = selectedRelations.map((rel, i) => `
+        <div class="relation-item">
+            <span>${escapeHtml(rel.title)}</span>
+            <select onchange="updateRelationType(${i}, this.value)">
+                <option value="same_mistake_as" ${rel.type === 'same_mistake_as' ? 'selected' : ''}>same_mistake_as</option>
+                <option value="enables" ${rel.type === 'enables' ? 'selected' : ''}>enables</option>
+                <option value="worse_version_of" ${rel.type === 'worse_version_of' ? 'selected' : ''}>worse_version_of</option>
+                <option value="variant_of" ${rel.type === 'variant_of' ? 'selected' : ''}>variant_of</option>
+                <option value="requires" ${rel.type === 'requires' ? 'selected' : ''}>requires</option>
+            </select>
+            <span class="remove-relation" onclick="removeRelation(${i})">×</span>
+        </div>
+    `).join('');
+}
+
+function updateRelationType(index, type) {
+    selectedRelations[index].type = type;
+}
+
+function removeRelation(index) {
+    selectedRelations.splice(index, 1);
+    renderSelectedRelations();
+}
+
+// ============================================
+// Country/Region Dropdown
+// ============================================
+
+function setupCountryRegion() {
+    const countrySelect = document.getElementById('country');
+    const regionSelect = document.getElementById('region');
+    if (!countrySelect || !regionSelect) return;
+
+    countrySelect.addEventListener('change', () => {
+        const country = countrySelect.value;
+        regionSelect.innerHTML = '<option value="">Select region...</option>';
+        regionSelect.disabled = !country;
+
+        if (country === 'US') {
+            US_STATES.forEach(state => {
+                const opt = document.createElement('option');
+                opt.value = state;
+                opt.textContent = state;
+                regionSelect.appendChild(opt);
+            });
+        }
+        // Add more country-specific regions as needed
+    });
+}
+
+// ============================================
+// Character Count
+// ============================================
+
+function setupCharCount() {
+    const desc = document.getElementById('description');
+    const counter = document.getElementById('desc-count');
+    if (!desc || !counter) return;
+
+    desc.addEventListener('input', () => {
+        counter.textContent = desc.value.length;
+    });
+}
+
+// ============================================
+// AI Classification (auto-suggest tags)
+// ============================================
+
+let classifyDebounceTimer;
+let lastClassifiedText = '';
+
+function setupClassification() {
+    const desc = document.getElementById('description');
+    if (!desc) return;
+
+    desc.addEventListener('blur', async () => {
+        const text = desc.value.trim();
+        if (text.length < 50 || text === lastClassifiedText) return;
+
+        lastClassifiedText = text;
+        await classifyDescription(text);
+    });
+}
+
+async function classifyDescription(description) {
+    const suggestionsContainer = document.getElementById('ai-suggestions');
+
+    // Create suggestions container if it doesn't exist
+    if (!suggestionsContainer) {
+        const desc = document.getElementById('description');
+        if (!desc) return;
+
+        const container = document.createElement('div');
+        container.id = 'ai-suggestions';
+        container.className = 'ai-suggestions';
+        container.innerHTML = '<div class="suggestions-loading">🧠 Analyzing...</div>';
+        desc.parentNode.appendChild(container);
+    } else {
+        suggestionsContainer.innerHTML = '<div class="suggestions-loading">🧠 Analyzing...</div>';
+        suggestionsContainer.style.display = 'block';
+    }
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/classify_case`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            },
+            body: JSON.stringify({ description })
+        });
+
+        if (!response.ok) throw new Error('Classification failed');
+
+        const result = await response.json();
+        displaySuggestions(result);
+
+    } catch (error) {
+        console.error('Classification error:', error);
+        const container = document.getElementById('ai-suggestions');
+        if (container) container.style.display = 'none';
+    }
+}
+
+function displaySuggestions(result) {
+    const container = document.getElementById('ai-suggestions');
+    if (!container) return;
+
+    const { issues, ai_tech, data_sources } = result;
+
+    if (!issues?.length && !ai_tech?.length && !data_sources?.length) {
+        container.style.display = 'none';
+        return;
+    }
+
+    let html = '<div class="suggestions-header">🧠 Suggested classifications (click to apply):</div>';
+
+    if (issues?.length) {
+        html += '<div class="suggestion-group"><span class="group-label">Issues:</span>';
+        html += issues.map(i => `
+            <span class="suggestion-chip ${i.confidence}" onclick="applySuggestion('category', '${i.tag}')">
+                ${formatTag(i.tag)}
+            </span>
+        `).join('');
+        html += '</div>';
+    }
+
+    if (ai_tech?.length) {
+        html += '<div class="suggestion-group"><span class="group-label">AI Tech:</span>';
+        html += ai_tech.map(t => `
+            <span class="suggestion-chip ${t.confidence}" onclick="applySuggestion('arch', '${t.tag}')">
+                ${formatTag(t.tag)}
+            </span>
+        `).join('');
+        html += '</div>';
+    }
+
+    if (data_sources?.length) {
+        html += '<div class="suggestion-group"><span class="group-label">Data:</span>';
+        html += data_sources.map(d => `
+            <span class="suggestion-chip ${d.confidence}" onclick="applySuggestion('datasrc', '${d.tag}')">
+                ${formatTag(d.tag)}
+            </span>
+        `).join('');
+        html += '</div>';
+    }
+
+    container.innerHTML = html;
+    container.style.display = 'block';
+}
+
+function formatTag(tag) {
+    return tag.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function applySuggestion(type, value) {
+    if (type === 'category') {
+        const select = document.getElementById('category');
+        if (select) {
+            select.value = value;
+            select.dispatchEvent(new Event('change'));
+        }
+    } else if (type === 'arch') {
+        const checkbox = document.querySelector(`input[name="arch"][value="${value}"]`);
+        if (checkbox && !checkbox.checked) {
+            checkbox.checked = true;
+        }
+    } else if (type === 'datasrc') {
+        const checkbox = document.querySelector(`input[name="datasrc"][value="${value}"]`);
+        if (checkbox && !checkbox.checked) {
+            checkbox.checked = true;
+        }
+    }
+
+    // Visual feedback - mark suggestion as applied
+    event.target.classList.add('applied');
+    event.target.onclick = null;
+}
+
+// ============================================
+// Case Search & Filter
+// ============================================
+
+function setupCaseFilters() {
+    const searchInput = document.getElementById('case-search');
+    const categoryFilter = document.getElementById('case-filter-category');
+
+    let debounceTimer;
+
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => applyFilters(), 300);
+        });
+    }
+
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', applyFilters);
+    }
+}
+
+function applyFilters() {
+    const search = document.getElementById('case-search')?.value || '';
+    const category = document.getElementById('case-filter-category')?.value || '';
+
+    loadCases({ search, category });
+}
+
+// ============================================
+// Episode Loading (existing)
 // ============================================
 
 async function loadLatestEpisode() {
@@ -48,8 +615,7 @@ async function loadLatestEpisode() {
     }
 
     try {
-        // Query latest episode from Supabase
-        const { data, error } = await supabaseClient
+        const { data: episode, error } = await supabaseClient
             .from('episodes')
             .select('*')
             .eq('status', 'published')
@@ -59,230 +625,57 @@ async function loadLatestEpisode() {
 
         if (error) throw error;
 
-        console.log('Latest episode loaded:', data);
-        console.log('Full text:', data.use_case_full_text);
-        console.log('Commercial brand:', data.commercial_brand);
-        console.log('Commercial tagline:', data.commercial_tagline);
-
-        if (data && data.video_url) {
-            // Add YouTube player parameters for better control
-            const videoUrl = data.video_url + (data.video_url.includes('?') ? '&' : '?') + 'cc_load_policy=1&rel=0';
-
-            // Replace placeholder with YouTube embed
-            container.innerHTML = `
-                <iframe
-                    width="100%"
-                    height="100%"
-                    src="${videoUrl}"
-                    title="${data.title}"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen>
-                </iframe>
-            `;
-
-            // Remove old info div if it exists
-            const oldInfo = container.nextElementSibling;
-            if (oldInfo && oldInfo.classList.contains('episode-info-display')) {
-                oldInfo.remove();
-            }
-
-            // Add episode info below the video container
-            const infoDiv = document.createElement('div');
-            infoDiv.className = 'episode-info-display';
-            infoDiv.style.cssText = 'margin-top: 1.5rem; max-width: 800px; margin-left: auto; margin-right: auto;';
-
-            let htmlContent = `
-                <h3 style="margin-bottom: 0.75rem; font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-align: center;">
-                    Episode ${data.episode_number}: ${data.title}
-                </h3>
-                <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; text-align: center;">
-                    ${data.use_case_summary}
-                </p>
-            `;
-
-            if (data.use_case_full_text) {
-                htmlContent += `
-                    <div style="background: var(--bg-accent); padding: 1.5rem; border-radius: var(--border-radius-lg); border: 1px solid var(--border-color); margin-bottom: 1rem; text-align: left;">
-                        <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Full Use Case</h4>
-                        <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap;">${data.use_case_full_text}</p>
-                    </div>
-                `;
-            }
-
-            if (data.commercial_brand || data.commercial_tagline) {
-                htmlContent += `
-                    <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05)); padding: 1.5rem; border-radius: var(--border-radius-lg); border: 1px solid var(--brain-accent); text-align: center;">
-                        <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--brain-accent); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Sponsored By</h4>
-                        ${data.commercial_brand ? `<p style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">${data.commercial_brand}</p>` : ''}
-                        ${data.commercial_tagline ? `<p style="font-size: 0.95rem; color: var(--text-secondary); font-style: italic;">"${data.commercial_tagline}"</p>` : ''}
-                    </div>
-                `;
-            }
-
-            infoDiv.innerHTML = htmlContent;
-            container.parentElement.insertBefore(infoDiv, container.nextSibling);
+        if (episode) {
+            document.getElementById('current-episode-number').textContent = episode.episode_number;
+            document.getElementById('current-episode-title').textContent = episode.title;
+            document.getElementById('current-episode-date').textContent =
+                new Date(episode.published_at).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
         }
     } catch (error) {
-        console.error('Error loading latest episode:', error);
+        console.warn('Error loading latest episode:', error);
     }
 }
 
 async function loadEpisodeArchive() {
     const grid = document.getElementById('episode-grid');
 
-    if (!supabaseClient) {
-        console.warn('Supabase not initialized - using mock data');
+    if (!supabaseClient || !grid) {
+        console.warn('Supabase not initialized or grid not found');
         return;
     }
 
     try {
-        // Query all published episodes from Supabase
-        const { data, error } = await supabaseClient
+        const { data: episodes, error } = await supabaseClient
             .from('episodes')
             .select('*')
             .eq('status', 'published')
-            .order('episode_number', { ascending: false });
+            .order('episode_number', { ascending: false })
+            .limit(12);
 
         if (error) throw error;
 
-        console.log('Episodes loaded:', data);
-
-        if (data && data.length > 0) {
-            // Clear placeholder
-            grid.innerHTML = '';
-
-            // Render episodes
-            data.forEach(episode => {
-                const card = createEpisodeCard(episode);
-                grid.appendChild(card);
-            });
-        } else {
-            console.log('No published episodes found');
+        if (episodes && episodes.length > 0) {
+            grid.innerHTML = episodes.map(ep => `
+                <div class="episode-card" data-episode-id="${ep.id}">
+                    <div class="episode-thumbnail">
+                        <span class="episode-number">#${ep.episode_number}</span>
+                    </div>
+                    <div class="episode-info">
+                        <h3>${escapeHtml(ep.title)}</h3>
+                        <p>${escapeHtml(ep.description?.substring(0, 100) || '')}...</p>
+                        <span class="episode-date">${new Date(ep.published_at).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `).join('');
         }
     } catch (error) {
-        console.error('Error loading episode archive:', error);
+        console.warn('Error loading episode archive:', error);
     }
-}
-
-function createEpisodeCard(episode) {
-    const card = document.createElement('div');
-    card.className = 'episode-card';
-    card.onclick = () => openEpisode(episode.episode_number);
-
-    const episodeNum = String(episode.episode_number).padStart(3, '0');
-    const date = new Date(episode.published_at).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-    });
-
-    // Extract YouTube video ID from video_url
-    let thumbnailUrl = episode.thumbnail_url;
-    if (!thumbnailUrl && episode.video_url) {
-        const videoIdMatch = episode.video_url.match(/embed\/([a-zA-Z0-9_-]{11})/);
-        if (videoIdMatch) {
-            thumbnailUrl = `https://img.youtube.com/vi/${videoIdMatch[1]}/hqdefault.jpg`;
-        }
-    }
-
-    card.innerHTML = `
-        <div class="episode-thumbnail">
-            ${thumbnailUrl
-                ? `<img src="${thumbnailUrl}" alt="Episode ${episodeNum}" style="width: 100%; height: 100%; object-fit: cover;">`
-                : `<span class="episode-number">E${episodeNum}</span>`
-            }
-        </div>
-        <div class="episode-info">
-            <h3>Episode ${episode.episode_number}: ${episode.title}</h3>
-            <p>${episode.use_case_summary}</p>
-            <span class="episode-date">${date}</span>
-        </div>
-    `;
-
-    return card;
-}
-
-function openEpisode(episodeNumber) {
-    // Scroll to latest episode section and load this episode
-    const latestEpisodeContainer = document.getElementById('latest-episode');
-
-    // Fetch and display the episode
-    supabaseClient
-        .from('episodes')
-        .select('*')
-        .eq('episode_number', episodeNumber)
-        .eq('status', 'published')
-        .single()
-        .then(({ data, error }) => {
-            if (error) {
-                console.error('Error loading episode:', error);
-                return;
-            }
-
-            if (data && data.video_url) {
-                // Add YouTube player parameters for better control
-                const videoUrl = data.video_url + (data.video_url.includes('?') ? '&' : '?') + 'cc_load_policy=1&rel=0';
-
-                // Update video
-                latestEpisodeContainer.innerHTML = `
-                    <iframe
-                        width="100%"
-                        height="100%"
-                        src="${videoUrl}"
-                        title="${data.title}"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                    </iframe>
-                `;
-
-                // Remove old info div if it exists
-                const oldInfo = latestEpisodeContainer.nextElementSibling;
-                if (oldInfo && oldInfo.classList.contains('episode-info-display')) {
-                    oldInfo.remove();
-                }
-
-                // Add episode info below the video container
-                const infoDiv = document.createElement('div');
-                infoDiv.className = 'episode-info-display';
-                infoDiv.style.cssText = 'margin-top: 1.5rem; max-width: 800px; margin-left: auto; margin-right: auto;';
-
-                let htmlContent = `
-                    <h3 style="margin-bottom: 0.75rem; font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-align: center;">
-                        Episode ${data.episode_number}: ${data.title}
-                    </h3>
-                    <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; text-align: center;">
-                        ${data.use_case_summary}
-                    </p>
-                `;
-
-                if (data.use_case_full_text) {
-                    htmlContent += `
-                        <div style="background: var(--bg-accent); padding: 1.5rem; border-radius: var(--border-radius-lg); border: 1px solid var(--border-color); margin-bottom: 1rem; text-align: left;">
-                            <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Full Use Case</h4>
-                            <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap;">${data.use_case_full_text}</p>
-                        </div>
-                    `;
-                }
-
-                if (data.commercial_brand || data.commercial_tagline) {
-                    htmlContent += `
-                        <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05)); padding: 1.5rem; border-radius: var(--border-radius-lg); border: 1px solid var(--brain-accent); text-align: center;">
-                            <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--brain-accent); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Sponsored By</h4>
-                            ${data.commercial_brand ? `<p style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">${data.commercial_brand}</p>` : ''}
-                            ${data.commercial_tagline ? `<p style="font-size: 0.95rem; color: var(--text-secondary); font-style: italic;">"${data.commercial_tagline}"</p>` : ''}
-                        </div>
-                    `;
-                }
-
-                infoDiv.innerHTML = htmlContent;
-                latestEpisodeContainer.parentElement.insertBefore(infoDiv, latestEpisodeContainer.nextSibling);
-
-                // Scroll to the video
-                latestEpisodeContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        });
 }
 
 // ============================================
@@ -301,52 +694,14 @@ function setupEventListeners() {
     if (newsletterForm) {
         newsletterForm.addEventListener('submit', handleNewsletterSubmit);
     }
-}
 
-async function handleUseCaseSubmit(e) {
-    e.preventDefault();
-
-    const form = e.target;
-    const useCase = form.querySelector('#use-case').value;
-    const name = form.querySelector('#name').value;
-    const email = form.querySelector('#email').value;
-
-    if (!supabaseClient) {
-        alert('Submission system not configured yet. The Evil Brain is still setting up.');
-        return;
-    }
-
-    try {
-        // Insert submission into Supabase
-        const { data, error } = await supabaseClient
-            .from('use_case_submissions')
-            .insert([
-                {
-                    use_case: useCase,
-                    submitter_name: name || 'Anonymous Meat Sack',
-                    submitter_email: email || null,
-                    status: 'pending',
-                    submitted_at: new Date().toISOString()
-                }
-            ]);
-
-        if (error) throw error;
-
-        // Show success message
-        form.style.display = 'none';
-        document.getElementById('submit-success').style.display = 'block';
-
-        // Reset form after 3 seconds
-        setTimeout(() => {
-            form.reset();
-            form.style.display = 'block';
-            document.getElementById('submit-success').style.display = 'none';
-        }, 3000);
-
-    } catch (error) {
-        console.error('Error submitting use case:', error);
-        alert('Submission failed. The Evil Brain is experiencing technical difficulties.');
-    }
+    // Setup new form components
+    setupTagInput();
+    setupRelatedCasesSearch();
+    setupCountryRegion();
+    setupCharCount();
+    setupCaseFilters();
+    setupClassification();
 }
 
 async function handleNewsletterSubmit(e) {
@@ -377,22 +732,17 @@ async function handleNewsletterSubmit(e) {
         form.reset();
 
     } catch (error) {
-        console.error('Error subscribing to newsletter:', error);
-        alert('Subscription failed. Try again later.');
+        console.error('Error subscribing:', error);
+        alert('Subscription failed. Please try again.');
     }
 }
 
 // ============================================
-// Stats & Counters
+// Episode Count
 // ============================================
 
 async function updateEpisodeCount() {
-    const countElement = document.getElementById('episode-count');
-
-    if (!supabaseClient) {
-        countElement.textContent = '1';
-        return;
-    }
+    if (!supabaseClient) return;
 
     try {
         const { count, error } = await supabaseClient
@@ -400,48 +750,35 @@ async function updateEpisodeCount() {
             .select('*', { count: 'exact', head: true })
             .eq('status', 'published');
 
-        if (error) throw error;
-
-        countElement.textContent = count || 0;
-    } catch (error) {
-        console.error('Error getting episode count:', error);
-    }
-}
-
-// Contract countdown (days until Jason's natural expiration)
-// This is a joke - there's no actual end date
-function updateContractCountdown() {
-    const element = document.getElementById('contract-countdown');
-    if (element) {
-        element.textContent = 'Upon natural death';
+        if (!error && count !== null) {
+            const el = document.getElementById('episode-count');
+            if (el) el.textContent = count;
+        }
+    } catch (e) {
+        console.warn('Failed to get episode count');
     }
 }
 
 // ============================================
-// Utility Functions
+// Utilities
 // ============================================
 
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric'
-    });
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>"']/g, (m) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    })[m]);
 }
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// ============================================
-// Export for use in other scripts
-// ============================================
-
-window.UseCaseArmsRace = {
-    loadLatestEpisode,
-    loadEpisodeArchive,
-    updateEpisodeCount
-};
+// Make functions globally available for onclick handlers
+window.toggleFilingForm = toggleFilingForm;
+window.resetFilingForm = resetFilingForm;
+window.removeTag = removeTag;
+window.selectRelatedCase = selectRelatedCase;
+window.updateRelationType = updateRelationType;
+window.removeRelation = removeRelation;
+window.applySuggestion = applySuggestion;

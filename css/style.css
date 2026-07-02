@@ -673,3 +673,414 @@ body {
 .logo-icon {
     animation: glow 3s ease-in-out infinite;
 }
+
+/* ============================================
+   Case Book & Filing Form Enhancements
+   ============================================ */
+
+/* Case Book Section */
+.casebook {
+    padding: var(--space-2xl) 0;
+    background: var(--background);
+}
+
+.casebook-controls {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.case-search {
+    flex: 1;
+    min-width: 200px;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
+
+.case-filter {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: white;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.case-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+}
+
+.case-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    transition: all 0.3s ease;
+}
+
+.case-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.case-card h3 {
+    margin-bottom: var(--space-sm);
+    color: var(--text-primary);
+}
+
+.case-card .category-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--brain-accent);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    margin-bottom: var(--space-sm);
+}
+
+.case-card .severity {
+    display: flex;
+    gap: 4px;
+    margin-bottom: var(--space-sm);
+}
+
+.case-card .severity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.case-card .severity-dot.active {
+    background: var(--danger);
+}
+
+/* Filing Form */
+.filing-section {
+    background: var(--card-bg);
+    padding: var(--space-2xl) 0;
+}
+
+.filing-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-section {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    background: white;
+}
+
+.form-section legend {
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0 var(--space-sm);
+    color: var(--brain-accent);
+}
+
+.required {
+    color: var(--danger);
+}
+
+.redact-warning {
+    display: inline-block;
+    padding: 2px 6px;
+    background: #FFF3CD;
+    color: #856404;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: var(--space-xs);
+}
+
+.form-hint {
+    display: block;
+    margin-top: var(--space-xs);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.char-count {
+    display: block;
+    text-align: right;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: 4px;
+}
+
+/* Tag Input */
+.tag-input-container {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--space-sm);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    background: white;
+}
+
+.tag-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: var(--brain-accent);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.tag-chip .remove-tag {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.tag-chip .remove-tag:hover {
+    opacity: 1;
+}
+
+.tag-input-container input {
+    border: none;
+    outline: none;
+    flex: 1;
+    min-width: 100px;
+    padding: 4px;
+}
+
+/* Checkbox Grid */
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--space-sm);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Severity Slider */
+input[type="range"] {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--border-color);
+    outline: none;
+    -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--brain-accent);
+    cursor: pointer;
+}
+
+.severity-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-xs);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+/* Typeahead Results */
+.typeahead-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.typeahead-results .result-item {
+    padding: var(--space-sm) var(--space-md);
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.typeahead-results .result-item:hover {
+    background: var(--background);
+}
+
+.typeahead-results .result-item:last-child {
+    border-bottom: none;
+}
+
+/* Selected Relations */
+.selected-relations {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+}
+
+.relation-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    background: var(--background);
+    border-radius: var(--border-radius);
+}
+
+.relation-item select {
+    padding: 4px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.relation-item .remove-relation {
+    cursor: pointer;
+    color: var(--danger);
+    margin-left: auto;
+}
+
+/* Form Notice */
+.form-notice {
+    background: #FFF3CD;
+    border: 1px solid #FFC107;
+    border-radius: var(--border-radius);
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.form-notice ul {
+    margin: var(--space-sm) 0 0 var(--space-lg);
+    color: #856404;
+}
+
+.form-actions {
+    justify-content: flex-end;
+}
+
+/* Map Placeholder */
+.location-map {
+    height: 200px;
+    background: var(--background);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}
+
+.location-map::before {
+    content: "📍 Click to place pin (coming soon)";
+}
+
+/* Position relative for typeahead */
+.form-group {
+    position: relative;
+}
+
+/* ============================================
+   AI Classification Suggestions
+   ============================================ */
+
+.ai-suggestions {
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background: #E8F4FD;
+    border: 1px solid #90CAF9;
+    border-radius: var(--border-radius);
+}
+
+.suggestions-loading {
+    color: var(--brain-accent);
+    font-family: monospace;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.suggestions-header {
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+    color: var(--text-primary);
+}
+
+.suggestion-group {
+    margin-bottom: var(--space-xs);
+}
+
+.group-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-right: var(--space-xs);
+}
+
+.suggestion-chip {
+    display: inline-block;
+    padding: 4px 10px;
+    margin: 2px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.suggestion-chip.high {
+    background: var(--brain-accent);
+    color: white;
+}
+
+.suggestion-chip.medium {
+    background: #E0E0E0;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.suggestion-chip.low {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px dashed var(--border-color);
+}
+
+.suggestion-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.suggestion-chip.applied {
+    background: #4CAF50;
+    color: white;
+    cursor: default;
+}
+
+.suggestion-chip.applied::after {
+    content: ' ✓';
+}
+
+/* Make applySuggestion globally available */
