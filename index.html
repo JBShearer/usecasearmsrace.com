@@ -135,6 +135,12 @@ main { flex: 1 0 auto; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.case-snippet {
+  font-size: 0.8rem;
+  color: var(--pencil);
+  margin-top: 2px;
+  line-height: 1.3;
+}
 .case-meta {
   font-size: 0.8rem;
   color: var(--pencil);
@@ -313,7 +319,7 @@ main { flex: 1 0 auto; }
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 200;
+  z-index: 10000;
   padding: 16px;
 }
 .modal-overlay.active { display: flex; }
@@ -325,6 +331,8 @@ main { flex: 1 0 auto; }
   max-height: 80vh;
   overflow-y: auto;
   padding: 24px;
+  position: relative;
+  z-index: 10001;
 }
 .modal-close {
   float: right;
@@ -765,7 +773,7 @@ async function loadHomeCases() {
   try {
     const { data: cases, error } = await sb
       .from('use_cases')
-      .select('id, title, category, evil_votes, good_votes')
+      .select('id, title, description, category, evil_votes, good_votes')
       .in('status', ['active', 'approved'])
       .order('evil_votes', { ascending: false })
       .limit(5);
@@ -798,7 +806,7 @@ async function loadFullCases() {
   try {
     let query = sb
       .from('use_cases')
-      .select('id, title, category, evil_votes, good_votes, location_country')
+      .select('id, title, description, category, evil_votes, good_votes, location_country')
       .in('status', ['active', 'approved'])
       .order('created_at', { ascending: false })
       .limit(50);
@@ -838,12 +846,14 @@ function renderCaseRow(c, rank) {
   const isEvil = (c.evil_votes || 0) >= (c.good_votes || 0);
   const evilVoted = userVotes[c.id] === 'evil';
   const goodVoted = userVotes[c.id] === 'good';
+  const snippet = c.description ? c.description.substring(0, 80) + (c.description.length > 80 ? '...' : '') : '';
 
   return `
     <div class="case-row" onclick="openCase('${c.id}')">
       <div class="case-rank ${isEvil ? 'evil' : 'good'}">#${rank}</div>
       <div class="case-info">
         <div class="case-title">${esc(c.title)}</div>
+        ${snippet ? `<div class="case-snippet">${esc(snippet)}</div>` : ''}
         <div class="case-meta">
           ${c.category ? `<span class="case-category">${c.category.replace(/_/g, ' ')}</span>` : ''}
           ${c.location_country ? `<span>${c.location_country}</span>` : ''}
