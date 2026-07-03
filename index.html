@@ -19,14 +19,14 @@
   --manila: #E8DCC0;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { height: 100%; }
+html, body { height: 100%; margin: 0; }
 body {
   font-family: 'Georgia', serif;
   background: var(--paper);
   color: var(--ink);
-  min-height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 a { color: var(--ink); }
 .container { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
@@ -36,10 +36,7 @@ header {
   background: var(--manila);
   border-bottom: 3px solid var(--ink);
   padding: 12px 0;
-  padding-top: max(12px, env(safe-area-inset-top, 0px));
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  flex-shrink: 0;
 }
 header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
 .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
@@ -59,7 +56,8 @@ nav button:hover { background: var(--manila); }
 nav button.active { background: var(--ink); color: var(--paper); }
 
 /* Views */
-.view { display: none; padding: 24px 0; flex: 1; }
+main { flex: 1 0 auto; }
+.view { display: none; padding: 24px 0; }
 .view.active { display: block; }
 
 /* Hero Section */
@@ -345,7 +343,7 @@ footer {
   border-top: 3px solid var(--ink);
   padding: 24px 0;
   font-size: 0.9rem;
-  margin-top: auto;
+  flex-shrink: 0;
 }
 footer a { text-decoration: none; }
 .footer-grid { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
@@ -390,6 +388,7 @@ footer a { text-decoration: none; }
   </div>
 </header>
 
+<main>
 <!-- HOME VIEW -->
 <section class="view active" id="view-home">
   <div class="container">
@@ -634,6 +633,7 @@ footer a { text-decoration: none; }
     </div>
   </div>
 </section>
+</main>
 
 <!-- Case Modal -->
 <div class="modal-overlay" id="case-modal">
@@ -665,7 +665,7 @@ footer a { text-decoration: none; }
 const SUPABASE_URL = 'https://aslcrwmbdtvimjrexxzw.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls';
 
-let supabase = null;
+let sb = null;
 let map = null;
 let selectedCategory = '';
 let selectedValence = 'evil';
@@ -674,7 +674,7 @@ let userVotes = JSON.parse(localStorage.getItem('ucar_votes') || '{}');
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.supabase) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 
   // Nav
@@ -756,13 +756,13 @@ function initMap() {
 // Load home cases (top 5)
 async function loadHomeCases() {
   const container = document.getElementById('home-cases');
-  if (!supabase) {
+  if (!sb) {
     container.innerHTML = '<p style="color: var(--pencil)">Database not connected</p>';
     return;
   }
 
   try {
-    const { data: cases, error } = await supabase
+    const { data: cases, error } = await sb
       .from('use_cases')
       .select('id, title, category, evil_votes, good_votes')
       .in('status', ['active', 'approved'])
@@ -786,7 +786,7 @@ async function loadHomeCases() {
 // Load full cases
 async function loadFullCases() {
   const container = document.getElementById('full-case-list');
-  if (!supabase) return;
+  if (!sb) return;
 
   const search = document.getElementById('case-search').value;
   const valence = document.getElementById('valence-filter').value;
@@ -795,7 +795,7 @@ async function loadFullCases() {
   container.innerHTML = '<p style="color: var(--pencil)">Loading...</p>';
 
   try {
-    let query = supabase
+    let query = sb
       .from('use_cases')
       .select('id, title, category, evil_votes, good_votes, location_country')
       .in('status', ['active', 'approved'])
@@ -865,13 +865,13 @@ async function loadHomeEpisodes() {
   const container = document.getElementById('home-episodes');
   const videoContainer = document.getElementById('latest-video');
 
-  if (!supabase) {
+  if (!sb) {
     container.innerHTML = '<p style="color: var(--pencil)">Database not connected</p>';
     return;
   }
 
   try {
-    const { data: episodes, error } = await supabase
+    const { data: episodes, error } = await sb
       .from('episodes')
       .select('*')
       .eq('status', 'published')
@@ -915,7 +915,7 @@ async function openCase(id) {
   modal.classList.add('active');
 
   try {
-    const { data: c, error } = await supabase
+    const { data: c, error } = await sb
       .from('use_cases')
       .select('*')
       .eq('id', id)
@@ -974,7 +974,7 @@ function selectCategory(cat) {
 
 async function handleSubmit(e) {
   e.preventDefault();
-  if (!supabase) {
+  if (!sb) {
     toast('Error: Database not connected');
     return;
   }
@@ -997,7 +997,7 @@ async function handleSubmit(e) {
       good_votes: selectedValence === 'good' ? 1 : 0
     };
 
-    const { error } = await supabase.from('use_cases').insert([data]);
+    const { error } = await sb.from('use_cases').insert([data]);
     if (error) throw error;
 
     document.getElementById('submit-form').style.display = 'none';
