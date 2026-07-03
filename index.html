@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Use Case Arms Race | Document AI Before It Documents You</title>
 <meta name="description" content="The registry of AI deployment. Document use cases. Vote good or evil. Track the arms race.">
 <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/logo.jpg">
@@ -19,11 +19,14 @@
   --manila: #E8DCC0;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
+html { height: 100%; }
 body {
   font-family: 'Georgia', serif;
   background: var(--paper);
   color: var(--ink);
-  min-height: 100vh;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 a { color: var(--ink); }
 .container { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
@@ -33,6 +36,7 @@ header {
   background: var(--manila);
   border-bottom: 3px solid var(--ink);
   padding: 12px 0;
+  padding-top: max(12px, env(safe-area-inset-top, 0px));
   position: sticky;
   top: 0;
   z-index: 100;
@@ -55,7 +59,7 @@ nav button:hover { background: var(--manila); }
 nav button.active { background: var(--ink); color: var(--paper); }
 
 /* Views */
-.view { display: none; padding: 24px 0; }
+.view { display: none; padding: 24px 0; flex: 1; }
 .view.active { display: block; }
 
 /* Hero Section */
@@ -340,8 +344,8 @@ footer {
   background: var(--manila);
   border-top: 3px solid var(--ink);
   padding: 24px 0;
-  margin-top: 48px;
   font-size: 0.9rem;
+  margin-top: auto;
 }
 footer a { text-decoration: none; }
 .footer-grid { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
