@@ -356,6 +356,19 @@ main {
   color: var(--text-dim);
   margin-top: 8px;
   line-height: 1.5;
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+.article-snippet::-webkit-scrollbar {
+  width: 4px;
+}
+.article-snippet::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+.article-snippet::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 /* Triple Progress */
@@ -500,10 +513,10 @@ main {
   flex-shrink: 0;
   box-shadow: var(--neon-glow);
 }
-.character-avatar.minion-chaos {
+.character-avatar.brainiac-glitch {
   border-color: var(--bad);
 }
-.character-avatar.minion-order {
+.character-avatar.brainiac-spark {
   border-color: var(--good);
 }
 .character-speech {
@@ -889,6 +902,96 @@ main {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   SLOT MACHINE LOADING SCREEN
+   "One spin might end the world. Or save it."
+   ═══════════════════════════════════════════════════════════════ */
+.slot-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: opacity 0.5s;
+}
+.slot-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.slot-tagline {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+.slot-machine {
+  background: var(--bg-card);
+  border: 3px solid var(--brain);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--neon-glow), 0 10px 40px rgba(0,0,0,0.5);
+}
+.slot-reels {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.slot-reel {
+  width: 80px;
+  height: 100px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  overflow: hidden;
+  position: relative;
+}
+.slot-reel .reel-inner {
+  animation: slotSpin 0.3s ease-in-out infinite;
+}
+.slot-reel.stopped .reel-inner {
+  animation: none;
+}
+@keyframes slotSpin {
+  0% { transform: translateY(-20px); opacity: 0.5; }
+  50% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(20px); opacity: 0.5; }
+}
+.slot-label {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+.slot-message {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--brain);
+  text-shadow: var(--neon-glow);
+  margin-top: 20px;
+  min-height: 28px;
+}
+.slot-subtitle {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    SEARCH / HOME SCREEN
    ═══════════════════════════════════════════════════════════════ */
 .home-screen {
@@ -1203,6 +1306,21 @@ main {
 </header>
 
 <main>
+  <!-- SLOT MACHINE LOADING SCREEN -->
+  <div class="slot-screen" id="slot-screen">
+    <div class="slot-tagline">One spin might end the world. Or save it.</div>
+    <div class="slot-machine">
+      <div class="slot-label">Use Case Arms Race</div>
+      <div class="slot-reels">
+        <div class="slot-reel" id="reel-1"><div class="reel-inner">🏢</div></div>
+        <div class="slot-reel" id="reel-2"><div class="reel-inner">⚡</div></div>
+        <div class="slot-reel" id="reel-3"><div class="reel-inner">👤</div></div>
+      </div>
+      <div class="slot-message" id="slot-message">LOADING CASES...</div>
+      <div class="slot-subtitle">Document AI before it documents you</div>
+    </div>
+  </div>
+
   <div class="game-container">
 
     <!-- DAILY SHOW - TODAY'S SHOW SECTION -->
@@ -1337,9 +1455,9 @@ main {
         <div class="scene-content">
           <div class="minion-reactions">
             <div class="story-character">
-              <div class="character-avatar minion-chaos">😈</div>
+              <div class="character-avatar brainiac-gi">🎖️</div>
               <div class="character-speech">
-                <div class="character-name chaos">Minion of Chaos</div>
+                <div class="character-name gi">General "GI" Intelligence</div>
                 <div class="story-text" id="complication-chaos-text">
                   Loading...
                 </div>
@@ -1347,9 +1465,9 @@ main {
             </div>
 
             <div class="story-character">
-              <div class="character-avatar minion-order">😇</div>
+              <div class="character-avatar brainiac-agi">🤖</div>
               <div class="character-speech">
-                <div class="character-name order">Minion of Order</div>
+                <div class="character-name agi">AGI Gary</div>
                 <div class="story-text" id="complication-order-text">
                   Loading...
                 </div>
@@ -1518,34 +1636,36 @@ const QUESTIONS = [
 const STEP_KEYS = ['who', 'action', 'whom'];
 
 // ═══════════════════════════════════════════════════════════════
-// STORY GENERATION (placeholder templates)
+// STORY GENERATION - THE BRAINIACS (GI, AGI Gary, Supes)
 // ═══════════════════════════════════════════════════════════════
 const STORY_TEMPLATES = {
   // Scene 1: Brain introduces the case
   discovery: {
     brain: [
-      "Ahhhh, my beautiful minions! Look what just crawled out of the algorithm! {title}. This one is absolutely DELICIOUS. Let me tell you why...",
-      "MINIONS! Drop everything! We have a new specimen! {title}. Oh, this is going to be FUN to dissect...",
+      "Ahhhh, my beautiful BRAINIACS! Look what just crawled out of the algorithm! {title}. This one is absolutely DELICIOUS. Let me tell you why...",
+      "BRAINIACS! Drop everything! We have a new specimen! {title}. Oh, this is going to be FUN to dissect...",
       "*adjusts evil monocle* Well well well... {title}. The humans are at it again. Let's see what CHAOS they've created...",
       "MY NEURAL NETWORKS ARE TINGLING! {title}. I can already taste the moral ambiguity. Time to extract the TRUTH!",
       "ATTENTION MEAT PUPPETS! Today's case: {title}. Someone out there made a CHOICE, and now we judge them. As is tradition."
     ]
   },
-  // Scene 2: Minions react to the extracted triple
+  // Scene 2: GI and AGI Gary react to the extracted triple
   complication: {
+    // General "GI" Intelligence - Military precision, strategic analysis
     chaos: [
-      "HA! So {who} {action} {whom}?! This is BEAUTIFUL! The chaos! The disruption! Can you imagine the spreadsheets this broke?",
-      "*cackling intensifies* {who}?! Doing THAT to {whom}?! Oh this is too good. The old world ORDER is crumbling!",
-      "YESSS! {who} finally did it! They {action} {whom} and nobody can put that genie back in the bottle!",
-      "I LOVE IT! {who} just {action} {whom} and somewhere a middle manager is having a panic attack!",
-      "*rubs hands together* Oh the AUDACITY of {who}! To {action} {whom}! The timeline is FRACTURING and I am HERE for it!"
+      "*stands at attention* INTEL REPORT: {who} has executed operation {action} against {whom}. Strategic implications are... CONCERNING.",
+      "This is a CODE RED situation, people! {who} {action} {whom}?! I've seen battlefield tactics less aggressive than this!",
+      "*reviewing tactical display* {who} deployed {action} on {whom}. Classic pincer movement. The target never saw it coming.",
+      "SITUATION ANALYSIS: {who} went FULL OFFENSIVE. {action} {whom} with zero exit strategy. This is either genius or madness!",
+      "*adjusts medals* In my 47 years of service, I've never seen anyone {action} {whom} quite like {who} did. Remarkable. Terrifying. Noted."
     ],
+    // AGI Gary - Overly analytical, speaks in probabilities
     order: [
-      "*nervously adjusts halo* But wait... did {who} consider the CONSEQUENCES of {action} {whom}? There are PROCEDURES!",
-      "Now hold on everyone. {who} might have good intentions, but {action} {whom}? That raises some serious governance questions...",
-      "*pulls out clipboard* I need to check the compliance matrix. {who} {action} {whom}... is that in the approved use case registry?",
-      "Hmm, yes, very interesting, but has {who} filed the proper impact assessment before {action} {whom}? I think NOT!",
-      "*sweating* Okay okay, {who} {action} {whom}. But can we please discuss the audit trail? The documentation? Anyone?!"
+      "Calculating... {who} {action} {whom}. Probability this ends well: 23.7%. Probability of unintended consequences: 94.2%. Fascinating.",
+      "*processing* According to my models, when {who} {action} {whom}, there's a 67% chance they meant well. And a 98% chance it won't matter.",
+      "Running simulations... In 847 out of 1000 scenarios where {who} {action} {whom}, someone writes a strongly worded blog post.",
+      "Interesting. {who} {action} {whom}. My ethical subroutines are returning: ERROR_MORAL_AMBIGUITY_OVERFLOW. This is why I love Tuesdays.",
+      "*beeping thoughtfully* {who} {action} {whom}. Cross-referencing with my database of human decision-making... Yep, this tracks. Humans gonna human."
     ]
   },
   // Scene 3: Brain reacts to the verdict
@@ -1591,6 +1711,9 @@ const SOURCE_ICONS = {
 // INIT
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
+  // Show slot machine loading
+  runSlotMachine();
+
   // Init Supabase
   if (window.supabase) {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1624,11 +1747,65 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load trending cases
   await loadTrendingCases();
 
+  // Hide slot machine after loading
+  hideSlotMachine();
+
   // Start background music after a short delay (gives time for user interaction)
   setTimeout(() => {
     startBackgroundMusic();
   }, 1000);
 });
+
+// ═══════════════════════════════════════════════════════════════
+// SLOT MACHINE LOADING
+// ═══════════════════════════════════════════════════════════════
+const SLOT_SYMBOLS = {
+  who: ['🏢', '🏛️', '🏥', '🏫', '👮', '🤖', '💼', '🎓'],
+  action: ['⚡', '👁️', '🔍', '🎯', '📊', '🔒', '🚫', '✅'],
+  whom: ['👤', '👥', '🧑‍💼', '🧑‍🎓', '🧑‍⚕️', '👶', '🌍', '💰']
+};
+
+function runSlotMachine() {
+  const reels = ['reel-1', 'reel-2', 'reel-3'];
+  const types = ['who', 'action', 'whom'];
+  let spinCount = 0;
+
+  // Spin each reel
+  reels.forEach((id, i) => {
+    const reel = document.getElementById(id);
+    const inner = reel.querySelector('.reel-inner');
+    const symbols = SLOT_SYMBOLS[types[i]];
+
+    // Spin animation
+    const spinInterval = setInterval(() => {
+      inner.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    }, 100);
+
+    // Stop after staggered delay
+    setTimeout(() => {
+      clearInterval(spinInterval);
+      reel.classList.add('stopped');
+      inner.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      spinCount++;
+
+      // Update message as reels stop
+      const msg = document.getElementById('slot-message');
+      if (spinCount === 1) msg.textContent = 'WHO...';
+      if (spinCount === 2) msg.textContent = 'DOES WHAT...';
+      if (spinCount === 3) msg.textContent = 'TO WHOM?';
+    }, 800 + (i * 600));
+  });
+}
+
+function hideSlotMachine() {
+  const slot = document.getElementById('slot-screen');
+  const msg = document.getElementById('slot-message');
+  msg.textContent = 'LET\'S PLAY!';
+
+  setTimeout(() => {
+    slot.classList.add('hidden');
+  }, 500);
+}
 
 // ═══════════════════════════════════════════════════════════════
 // DAILY SHOW - TODAY'S SHOW SECTION
@@ -2189,10 +2366,10 @@ async function startExtraction(caseId) {
   playSfx('select');  // 🎵 Selection sound
   setMusicMood('extraction');  // 🎵 Tense extraction music
 
-  // Fetch full case
+  // Fetch full case with ALL fields
   const { data: c, error } = await sb
     .from('use_cases')
-    .select('*')
+    .select('id, title, description, url, category, source_url, evil_votes, good_votes')
     .eq('id', caseId)
     .single();
 
@@ -2201,14 +2378,15 @@ async function startExtraction(caseId) {
     return;
   }
 
-  // Generate AI choices (for now, mock them)
+  // Store ALL article data - use REAL title and FULL description
   currentArticle = {
     id: c.id,
-    title: c.title,
-    source: c.url || 'News',
-    snippet: c.description?.slice(0, 200) || '',
+    title: c.title,                              // REAL headline from database
+    description: c.description || '',            // FULL description - NO truncation
+    source: c.category || 'AI',                  // Category as source label
+    url: c.url || c.source_url || null,          // Source URL for "Read Full Article"
     category: c.category || 'AI',
-    choices: generateMockChoices(c)
+    choices: generateMockChoices(c)              // Generate smart choices from real text
   };
 
   currentStep = 0;
@@ -2219,75 +2397,161 @@ async function startExtraction(caseId) {
 }
 
 function generateMockChoices(c) {
-  // Generate semantic VARIATIONS on the triple - different perspectives
-  // Each choice teaches the model a different relationship type
-
-  // Parse title for clues
+  // ═══════════════════════════════════════════════════════════════
+  // SMART CHOICE EXTRACTION - NLP-like heuristics on REAL text
+  // ═══════════════════════════════════════════════════════════════
   const title = c.title || '';
   const desc = c.description || '';
-  const combined = (title + ' ' + desc).toLowerCase();
+  const fullText = title + ' ' + desc;
+  const lowerText = fullText.toLowerCase();
 
-  // Extract potential actors/entities
-  const orgPatterns = combined.match(/([A-Z][a-z]+(?:\s[A-Z][a-z]+)*)/g) || [];
-  const orgs = [...new Set(orgPatterns)].slice(0, 5);
+  // ─────────────────────────────────────────────────────────────────
+  // WHO: Extract organizations, companies, government agencies
+  // ─────────────────────────────────────────────────────────────────
+  // Pattern 1: Capitalized multi-word names (e.g., "New York Police")
+  const orgPatterns = fullText.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})\b/g) || [];
 
-  // WHO variations: deployer, operator, the AI itself
-  const whoChoices = [
-    orgs[0] || 'The Organization',           // Primary actor
-    orgs[1] || 'The Department',             // Secondary/internal
-    'The Algorithm'                           // The AI as agent (often absurd)
+  // Pattern 2: All-caps acronyms (e.g., "FBI", "NYPD", "ICE")
+  const acronyms = fullText.match(/\b[A-Z]{2,5}\b/g) || [];
+
+  // Pattern 3: Common organizational suffixes
+  const orgSuffixPattern = fullText.match(/\b\w+(?:\s+\w+)*\s+(?:Police|Department|Agency|Corporation|Inc\.|Corp\.|Company|LLC|Authority|Bureau|Office)\b/gi) || [];
+
+  // Combine and deduplicate, filter out common words
+  const stopWords = new Set(['The', 'This', 'That', 'These', 'Those', 'When', 'Where', 'What', 'Which', 'Who', 'How', 'They', 'Their', 'There', 'Here', 'With', 'From', 'Into', 'During', 'Before', 'After', 'Above', 'Below', 'Between', 'Under', 'Again', 'Further', 'Then', 'Once', 'Here', 'Just', 'Only', 'Both', 'Each', 'More', 'Most', 'Other', 'Some', 'Such', 'Than', 'Very', 'Same', 'Been', 'Being', 'Have', 'Having', 'Does', 'Doing', 'Done', 'Will', 'Would', 'Could', 'Should', 'Must', 'Shall', 'Might']);
+
+  const allOrgs = [...new Set([...orgPatterns, ...acronyms, ...orgSuffixPattern])]
+    .filter(o => o.length > 2 && !stopWords.has(o) && !/^(AI|To|On|In|At|By|Of|If|Is|It|Or|An|As|No|So|Up|We|He|Me|My|Do|Go|Be)$/i.test(o))
+    .slice(0, 5);
+
+  const whoChoices = [];
+  if (allOrgs[0]) whoChoices.push(allOrgs[0]);
+  if (allOrgs[1]) whoChoices.push(allOrgs[1]);
+  if (whoChoices.length < 2) whoChoices.push('The Organization');
+  whoChoices.push('The Algorithm');  // Always offer the AI-as-agent option
+
+  // ─────────────────────────────────────────────────────────────────
+  // ACTION: Extract verbs that describe what happened
+  // ─────────────────────────────────────────────────────────────────
+  // Common AI/tech action verbs with past tense
+  const actionVerbs = [
+    'deployed', 'implemented', 'launched', 'introduced', 'rolled out', 'released',
+    'uses', 'using', 'used',
+    'monitors', 'monitoring', 'monitored', 'tracks', 'tracking', 'tracked',
+    'scans', 'scanning', 'scanned',
+    'identifies', 'identifying', 'identified',
+    'detects', 'detecting', 'detected',
+    'predicts', 'predicting', 'predicted',
+    'analyzes', 'analyzing', 'analyzed',
+    'automates', 'automating', 'automated',
+    'replaces', 'replacing', 'replaced',
+    'denies', 'denying', 'denied',
+    'approves', 'approving', 'approved',
+    'flags', 'flagging', 'flagged',
+    'screens', 'screening', 'screened',
+    'profiles', 'profiling', 'profiled',
+    'surveils', 'surveilling', 'surveilled', 'surveillance',
+    'targets', 'targeting', 'targeted',
+    'bans', 'banning', 'banned',
+    'restricts', 'restricting', 'restricted',
+    'collects', 'collecting', 'collected',
+    'shares', 'sharing', 'shared',
+    'sells', 'selling', 'sold',
+    'trains', 'training', 'trained'
   ];
 
-  // ACTION variations: neutral, positive spin, dystopian framing
-  const actionWords = ['deployed', 'uses', 'implemented', 'built', 'monitors', 'tracks', 'automates', 'flags', 'denies', 'approves'];
-  const foundActions = actionWords.filter(w => combined.includes(w));
+  const foundActions = actionVerbs.filter(v => lowerText.includes(v));
 
-  const actionChoices = [
-    foundActions[0] || 'deployed',           // Neutral/factual
-    foundActions[0] ? foundActions[0].replace('ed', 's') + ' on' : 'experiments with',  // Active voice
-    combined.includes('ai') ? 'unleashed' : 'subjected people to'  // Dramatic framing
+  // Normalize to present tense for display
+  const normalizeVerb = (v) => {
+    if (v.endsWith('ed') && v.length > 4) return v.slice(0, -2) + 's';
+    if (v.endsWith('ing')) return v.slice(0, -3) + 's';
+    return v;
+  };
+
+  const actionChoices = [];
+  if (foundActions[0]) actionChoices.push(normalizeVerb(foundActions[0]));
+  if (foundActions[1]) actionChoices.push(normalizeVerb(foundActions[1]));
+  if (actionChoices.length < 2) actionChoices.push('deployed');
+  // Add a dramatic framing option based on context
+  if (lowerText.includes('surveillance') || lowerText.includes('monitor') || lowerText.includes('track')) {
+    actionChoices.push('surveils');
+  } else if (lowerText.includes('deny') || lowerText.includes('reject') || lowerText.includes('denied')) {
+    actionChoices.push('denies access to');
+  } else {
+    actionChoices.push('experiments on');
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // WHOM: Extract the affected parties
+  // ─────────────────────────────────────────────────────────────────
+  const targetGroups = [
+    'users', 'customers', 'employees', 'workers', 'staff',
+    'students', 'patients', 'citizens', 'residents',
+    'applicants', 'candidates', 'jobseekers', 'job seekers',
+    'drivers', 'passengers', 'travelers', 'tourists',
+    'inmates', 'prisoners', 'detainees',
+    'suspects', 'defendants',
+    'children', 'minors', 'teens', 'teenagers', 'youth',
+    'elderly', 'seniors',
+    'immigrants', 'refugees', 'migrants',
+    'protestors', 'activists',
+    'shoppers', 'consumers', 'buyers',
+    'renters', 'tenants', 'homeowners',
+    'borrowers', 'debtors',
+    'claimants', 'beneficiaries',
+    'public', 'people', 'individuals', 'persons',
+    'communities', 'neighborhoods',
+    'faces', 'license plates', 'vehicles', 'phones',
+    'social media', 'posts', 'content', 'data'
   ];
 
-  // WHOM variations: direct target, indirect affected, abstract concept
-  const whomChoices = [
-    extractTarget(combined) || 'users',      // Direct target
-    'the general public',                     // Broader impact
-    'human judgment'                          // Abstract/philosophical
-  ];
+  const foundTargets = targetGroups.filter(t => lowerText.includes(t));
+
+  const whomChoices = [];
+  if (foundTargets[0]) whomChoices.push(foundTargets[0]);
+  if (foundTargets[1]) whomChoices.push(foundTargets[1]);
+  if (whomChoices.length < 2) whomChoices.push('the public');
+  whomChoices.push('human judgment');  // Always offer the abstract/philosophical option
 
   return {
-    who: whoChoices,
-    action: actionChoices,
-    whom: whomChoices
+    who: whoChoices.slice(0, 3),
+    action: actionChoices.slice(0, 3),
+    whom: whomChoices.slice(0, 3)
   };
 }
 
-function extractTarget(text) {
-  // Try to find who/what is affected
-  const targets = ['users', 'customers', 'employees', 'students', 'patients', 'citizens', 'applicants', 'workers'];
-  for (const t of targets) {
-    if (text.includes(t)) return t;
-  }
-  // Try to find after "to" or "for"
-  const match = text.match(/(?:to|for|on)\s+(\w+)/);
-  return match ? match[1] : null;
-}
-
 function renderGameStep() {
-  // Update article header
+  // Update article header - use REAL title and FULL description
   document.getElementById('article-source').textContent = currentArticle.source;
   document.getElementById('article-title').textContent = currentArticle.title;
-  document.getElementById('article-snippet').textContent = currentArticle.snippet;
 
-  // Update triple progress
+  // Show FULL description (scrollable via CSS if too long)
+  const snippetEl = document.getElementById('article-snippet');
+  snippetEl.textContent = currentArticle.description || '';
+
+  // Add "Read Full Article" link if URL exists
+  if (currentArticle.url) {
+    snippetEl.innerHTML = (currentArticle.description || '') +
+      '<br><a href="' + escHtml(currentArticle.url) + '" target="_blank" rel="noopener" ' +
+      'style="color:var(--brain);text-decoration:none;font-weight:600;display:inline-block;margin-top:8px;">' +
+      '📰 Read Full Article →</a>';
+  }
+
+  // Update triple progress - show helpful message if not yet extracted
   const progress = document.getElementById('triple-progress');
-  progress.innerHTML = `
-    <span class="${picks.who ? 'picked' : currentStep === 0 ? 'current' : ''}">[${picks.who || '?'}]</span>
-    <span class="arrow">→</span>
-    <span class="${picks.action ? 'picked' : currentStep === 1 ? 'current' : ''}">${picks.action || '?'}</span>
-    <span class="arrow">→</span>
-    <span class="${picks.whom ? 'picked' : currentStep === 2 ? 'current' : ''}">[${picks.whom || '?'}]</span>
-  `;
+  if (!picks.who && !picks.action && !picks.whom) {
+    // Nothing extracted yet - show instruction
+    progress.innerHTML = '<span style="color:var(--gold);font-style:italic;">Extract the triple below</span>';
+  } else {
+    progress.innerHTML = `
+      <span class="${picks.who ? 'picked' : currentStep === 0 ? 'current' : ''}">[${picks.who || '?'}]</span>
+      <span class="arrow">→</span>
+      <span class="${picks.action ? 'picked' : currentStep === 1 ? 'current' : ''}">${picks.action || '?'}</span>
+      <span class="arrow">→</span>
+      <span class="${picks.whom ? 'picked' : currentStep === 2 ? 'current' : ''}">[${picks.whom || '?'}]</span>
+    `;
+  }
 
   // Update question
   document.getElementById('question').textContent = QUESTIONS[currentStep];
