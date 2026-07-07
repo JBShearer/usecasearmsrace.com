@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Use Case Arms Race | Document AI Before It Documents You</title>
-<meta name="description" content="The registry of AI deployment. Document use cases. Vote good or evil. Track the arms race.">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<link rel="icon" type="image/jpeg" sizes="32x32" href="/images/logo.jpg">
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Use Case Arms Race - AI Use Case Registry</title>
+
+<!-- OpenGraph Meta Tags -->
+<meta property="og:title" content="Use Case Arms Race - AI Use Case Registry">
+<meta property="og:description" content="The community-driven registry tracking AI use cases. Vote Good or Evil. Watch. Report.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://usecasearmsrace.com">
+<meta property="og:image" content="https://usecasearmsrace.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --paper: #F6F2E8;
@@ -18,1047 +22,1770 @@
   --crayon: #D42B1E;
   --good: #2E7D32;
   --manila: #E8DCC0;
+  --paper-dark: #EDE7D8;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { height: 100%; margin: 0; }
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  min-height: 100%;
+  background: var(--paper);
+}
+
 body {
-  font-family: 'Georgia', serif;
-  background: var(--paper);
+  font-family: Georgia, serif;
   color: var(--ink);
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  line-height: 1.6;
 }
-a { color: var(--ink); }
-.container { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
 
-/* Header */
-header {
-  background: var(--manila);
+/* ========== HEADER ========== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--paper);
   border-bottom: 3px solid var(--ink);
-  padding: 12px 0;
-  flex-shrink: 0;
+  padding: 12px 16px;
 }
-header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-.logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
-.logo img { height: 40px; border-radius: 4px; border: 2px solid var(--ink); }
-.logo h1 { font-size: 1.1rem; font-weight: normal; }
-nav { display: flex; gap: 4px; }
-nav button {
-  background: var(--paper);
-  border: 2px solid var(--ink);
-  color: var(--ink);
-  padding: 8px 14px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.85rem;
-}
-nav button:hover { background: var(--manila); }
-nav button.active { background: var(--ink); color: var(--paper); }
 
-/* Views */
-main { flex: 1 0 auto; }
-.view { display: none; padding: 24px 0; }
-.view.active { display: block; }
-
-/* Hero Section */
-.hero {
-  text-align: center;
-  padding: 32px 0;
-  border-bottom: 2px solid var(--ink);
-  margin-bottom: 24px;
-}
-.hero h2 { font-size: 1.8rem; margin-bottom: 12px; }
-.hero-mission {
-  max-width: 700px;
-  margin: 0 auto 24px;
-  line-height: 1.7;
-  color: var(--ink);
-}
-.hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-
-/* Map */
-#world-map {
-  height: 280px;
-  border: 3px solid var(--ink);
-  margin-bottom: 24px;
-  background: var(--paper);
-}
-.leaflet-container { background: var(--paper) !important; }
-
-/* Two Column Layout */
-.two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-@media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
-
-/* Section Headers */
-.section-header {
+.header-inner {
+  max-width: 720px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--ink);
 }
-.section-header h3 { font-size: 1.1rem; }
-.section-header a { font-size: 0.85rem; }
 
-/* Case List (Leaderboard style) */
-.case-list { }
-.case-row {
+.logo-group {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border: 2px solid var(--ink);
-  margin-bottom: 8px;
-  background: white;
-  cursor: pointer;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--ink);
 }
-.case-row:hover { background: var(--manila); }
-.case-rank {
-  font-weight: bold;
-  font-size: 1.2rem;
-  min-width: 30px;
-  text-align: center;
-}
-.case-rank.evil { color: var(--crayon); }
-.case-rank.good { color: var(--good); }
-.case-info { flex: 1; min-width: 0; }
-.case-title {
-  font-weight: bold;
-  font-size: 0.95rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.case-snippet {
-  font-size: 0.8rem;
-  color: var(--pencil);
-  margin-top: 2px;
-  line-height: 1.3;
-}
-.case-meta {
-  font-size: 0.8rem;
-  color: var(--pencil);
-  display: flex;
-  gap: 8px;
-  margin-top: 4px;
-}
-.case-category {
-  background: var(--manila);
-  padding: 2px 6px;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-}
-.vote-btns { display: flex; gap: 6px; }
-.vote-btn {
-  padding: 6px 10px;
-  border: 2px solid;
-  background: transparent;
-  cursor: pointer;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.vote-btn.evil { border-color: var(--crayon); color: var(--crayon); }
-.vote-btn.good { border-color: var(--good); color: var(--good); }
-.vote-btn:hover { transform: scale(1.05); }
-.vote-btn.voted.evil { background: var(--crayon); color: white; }
-.vote-btn.voted.good { background: var(--good); color: white; }
 
-/* Episode List */
-.episode-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border: 2px solid var(--ink);
-  margin-bottom: 8px;
-  background: white;
-  cursor: pointer;
+.logo-icon {
+  font-size: 28px;
 }
-.episode-row:hover { background: var(--manila); }
-.episode-num {
-  font-weight: bold;
+
+.site-title {
+  font-size: 1.1rem;
+  font-weight: normal;
+  letter-spacing: -0.5px;
+}
+
+.auth-btn {
+  font-family: Georgia, serif;
   font-size: 0.9rem;
-  min-width: 50px;
-  color: var(--pencil);
+  padding: 6px 14px;
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s;
 }
-.episode-title { flex: 1; font-size: 0.95rem; }
-.episode-date { font-size: 0.8rem; color: var(--pencil); }
 
-/* Video Container */
-.video-section {
-  margin-bottom: 24px;
-  text-align: center;
-}
-.video-container {
-  max-width: 640px;
-  margin: 0 auto;
-  aspect-ratio: 16/9;
+.auth-btn:hover {
   background: var(--ink);
-  border: 3px solid var(--ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: var(--paper);
 }
 
-/* Filter Row */
-.filter-row {
+/* ========== TAB BAR ========== */
+.tab-bar {
+  max-width: 720px;
+  margin: 0 auto;
   display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-.filter-row input, .filter-row select {
-  padding: 8px 12px;
-  border: 2px solid var(--ink);
-  font-family: inherit;
-  background: white;
-}
-.filter-row input { flex: 1; min-width: 150px; }
-
-/* Submit Form */
-.submit-section { max-width: 700px; margin: 0 auto; }
-.form-intro {
-  text-align: center;
-  margin-bottom: 24px;
-  padding: 20px;
-  background: var(--manila);
-  border: 2px solid var(--ink);
-}
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
-.form-group input, .form-group textarea, .form-group select {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid var(--ink);
-  font-family: inherit;
-  font-size: 1rem;
-  background: white;
-}
-.form-group textarea { min-height: 100px; resize: vertical; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.form-hint { font-size: 0.85rem; color: var(--pencil); margin-top: 4px; }
-.redact-note {
-  display: inline-block;
-  background: #fff3cd;
-  color: #856404;
-  padding: 2px 6px;
-  font-size: 0.7rem;
-  margin-left: 8px;
+  border-bottom: 1px solid var(--pencil);
+  background: var(--paper);
+  position: sticky;
+  top: 57px;
+  z-index: 99;
 }
 
-/* Valence Selection */
-.valence-row {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.valence-btn {
+.tab-btn {
   flex: 1;
+  padding: 12px 8px;
+  font-family: Georgia, serif;
+  font-size: 0.95rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--pencil);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab-btn:hover {
+  color: var(--ink);
+}
+
+.tab-btn.active {
+  color: var(--ink);
+  border-bottom-color: var(--crayon);
+}
+
+/* ========== FEED CONTAINER ========== */
+.feed-container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 16px 100px;
+}
+
+/* ========== CASE CARD ========== */
+.case-card {
+  background: #fff;
+  border: 2px solid var(--ink);
+  margin-top: 16px;
   padding: 16px;
-  border: 3px solid var(--ink);
-  background: white;
+  position: relative;
   cursor: pointer;
-  text-align: center;
-  font-family: inherit;
+  transition: box-shadow 0.15s, transform 0.15s;
 }
-.valence-btn:hover { background: var(--manila); }
-.valence-btn.evil.selected { border-color: var(--crayon); background: rgba(212,43,30,0.1); }
-.valence-btn.good.selected { border-color: var(--good); background: rgba(46,125,50,0.1); }
-.valence-icon { font-size: 1.5rem; }
-.valence-label { font-weight: bold; margin-top: 4px; }
-.valence-desc { font-size: 0.8rem; color: var(--pencil); margin-top: 4px; }
 
-/* Category Grid */
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+.case-card:hover {
+  box-shadow: 4px 4px 0 var(--ink);
+  transform: translate(-2px, -2px);
+}
+
+.case-card.expanded {
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.org-name {
+  font-size: 0.8rem;
+  color: var(--pencil);
+  font-style: italic;
+}
+
+.category-badge {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  background: var(--manila);
+  border: 1px solid var(--pencil);
+  color: var(--ink);
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: normal;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.card-description {
+  font-size: 0.9rem;
+  color: var(--pencil);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.card-description.full {
+  color: var(--ink);
+}
+
+/* Impact Pips */
+.impact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.impact-label {
+  font-size: 0.75rem;
+  color: var(--pencil);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.impact-pips {
+  display: flex;
+  gap: 3px;
+}
+
+.pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--paper-dark);
+  border: 1px solid var(--pencil);
+}
+
+.pip.filled {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+/* Vote Bar */
+.vote-bar-container {
+  margin-bottom: 10px;
+}
+
+.vote-bar {
+  height: 8px;
+  background: var(--paper-dark);
+  border: 1px solid var(--pencil);
+  display: flex;
+  overflow: hidden;
+}
+
+.vote-good-fill {
+  background: var(--good);
+  height: 100%;
+}
+
+.vote-evil-fill {
+  background: var(--crayon);
+  height: 100%;
+}
+
+.vote-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--pencil);
+  margin-top: 3px;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.status-badge.verified {
+  background: var(--good);
+  color: #fff;
+}
+
+.status-badge.review {
+  background: #F9A825;
+  color: var(--ink);
+}
+
+.status-badge.retracted {
+  background: var(--crayon);
+  color: #fff;
+  text-decoration: line-through;
+}
+
+/* Source Link */
+.source-link {
+  font-size: 0.75rem;
+  color: var(--pencil);
+  margin-bottom: 8px;
+}
+
+.source-link a {
+  color: var(--pencil);
+  text-decoration: underline;
+}
+
+.source-link a:hover {
+  color: var(--ink);
+}
+
+/* Timestamp */
+.timestamp {
+  font-size: 0.75rem;
+  color: var(--pencil);
+  margin-bottom: 12px;
+}
+
+/* Action Row */
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
+  border-top: 1px solid var(--paper-dark);
+  padding-top: 12px;
 }
-.category-btn {
-  padding: 10px 8px;
-  border: 2px solid var(--ink);
-  background: white;
-  cursor: pointer;
-  font-size: 0.85rem;
-  text-align: center;
-}
-.category-btn:hover { background: var(--manila); }
-.category-btn.selected { background: var(--ink); color: var(--paper); }
-.category-btn.evil-cat { border-left: 4px solid var(--crayon); }
-.category-btn.good-cat { border-left: 4px solid var(--good); }
-.category-btn.neutral-cat { border-left: 4px solid var(--pencil); }
 
-/* Buttons */
-.btn {
-  padding: 12px 24px;
-  border: 2px solid var(--ink);
-  font-family: inherit;
-  font-size: 1rem;
+.action-btn {
+  font-family: Georgia, serif;
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border: 1px solid var(--pencil);
+  background: var(--paper);
+  color: var(--ink);
   cursor: pointer;
-  background: white;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
 }
-.btn:hover { background: var(--manila); }
-.btn-primary { background: var(--crayon); color: white; border-color: var(--crayon); }
-.btn-primary:hover { background: #b8251a; }
 
-/* Modal */
-.modal-overlay {
+.action-btn:hover {
+  border-color: var(--ink);
+  background: var(--manila);
+}
+
+.action-btn.vote-evil:hover {
+  border-color: var(--crayon);
+  color: var(--crayon);
+}
+
+.action-btn.vote-good:hover {
+  border-color: var(--good);
+  color: var(--good);
+}
+
+.action-btn.voted {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+.action-btn .count {
+  font-size: 0.75rem;
+  color: var(--pencil);
+}
+
+/* ========== SUBMIT BUTTON (FAB) ========== */
+.fab-submit {
   position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: none;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--crayon);
+  color: #fff;
+  border: 3px solid var(--ink);
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--ink);
+  z-index: 90;
+  display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
-  padding: 16px;
+  transition: all 0.15s;
 }
-.modal-overlay.active { display: flex; }
+
+.fab-submit:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+/* ========== MODALS ========== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 24, 23, 0.6);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
 .modal {
   background: var(--paper);
   border: 3px solid var(--ink);
-  max-width: 600px;
+  max-width: 480px;
   width: 100%;
-  max-height: 80vh;
+  max-height: 90vh;
   overflow-y: auto;
-  padding: 24px;
   position: relative;
-  z-index: 10001;
+  box-shadow: 6px 6px 0 var(--ink);
 }
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 2px solid var(--ink);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 1.2rem;
+  font-weight: normal;
+}
+
 .modal-close {
-  float: right;
   background: none;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
+  color: var(--pencil);
+  line-height: 1;
 }
 
-/* About */
-.about-section { line-height: 1.8; }
-.about-section h3 { margin-top: 24px; margin-bottom: 8px; }
+.modal-close:hover {
+  color: var(--ink);
+}
 
-/* Footer */
-footer {
-  background: var(--manila);
-  border-top: 3px solid var(--ink);
-  padding: 24px 0;
+.modal-body {
+  padding: 20px;
+}
+
+/* Auth Modal */
+.auth-form .form-group {
+  margin-bottom: 16px;
+}
+
+.auth-form label {
+  display: block;
+  margin-bottom: 6px;
   font-size: 0.9rem;
-  flex-shrink: 0;
 }
-footer a { text-decoration: none; }
-.footer-grid { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
-.footer-brand img { height: 32px; border-radius: 4px; margin-bottom: 8px; }
 
-/* Toast */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
+.auth-form input {
+  width: 100%;
+  padding: 10px 12px;
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  border: 2px solid var(--ink);
+  background: #fff;
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--crayon);
+}
+
+.auth-form .submit-btn {
+  width: 100%;
+  padding: 12px;
+  font-family: Georgia, serif;
+  font-size: 1rem;
   background: var(--ink);
   color: var(--paper);
-  padding: 12px 24px;
-  z-index: 300;
-  display: none;
+  border: 2px solid var(--ink);
+  cursor: pointer;
+  transition: all 0.15s;
 }
-.toast.show { display: block; }
 
+.auth-form .submit-btn:hover {
+  background: var(--crayon);
+  border-color: var(--crayon);
+}
+
+.auth-note {
+  font-size: 0.8rem;
+  color: var(--pencil);
+  text-align: center;
+  margin-top: 12px;
+}
+
+.auth-message {
+  padding: 10px;
+  margin-top: 12px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.auth-message.success {
+  background: rgba(46, 125, 50, 0.1);
+  color: var(--good);
+  border: 1px solid var(--good);
+}
+
+.auth-message.error {
+  background: rgba(212, 43, 30, 0.1);
+  color: var(--crayon);
+  border: 1px solid var(--crayon);
+}
+
+/* Submit Modal */
+.submit-form .form-group {
+  margin-bottom: 16px;
+}
+
+.submit-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+.submit-form input,
+.submit-form textarea,
+.submit-form select {
+  width: 100%;
+  padding: 10px 12px;
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  border: 2px solid var(--ink);
+  background: #fff;
+}
+
+.submit-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.submit-form input:focus,
+.submit-form textarea:focus,
+.submit-form select:focus {
+  outline: none;
+  border-color: var(--crayon);
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: var(--pencil);
+  margin-top: 4px;
+}
+
+.submit-form .submit-btn {
+  width: 100%;
+  padding: 12px;
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  background: var(--ink);
+  color: var(--paper);
+  border: 2px solid var(--ink);
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.submit-form .submit-btn:hover {
+  background: var(--crayon);
+  border-color: var(--crayon);
+}
+
+/* Case Detail Modal */
+.detail-modal .modal {
+  max-width: 600px;
+}
+
+.detail-org {
+  font-size: 0.85rem;
+  color: var(--pencil);
+  font-style: italic;
+  margin-bottom: 4px;
+}
+
+.detail-title {
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.detail-description {
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.detail-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 16px;
+  background: var(--manila);
+  margin-bottom: 16px;
+}
+
+.meta-item {
+  font-size: 0.85rem;
+}
+
+.meta-label {
+  color: var(--pencil);
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Loading */
+.loading-indicator {
+  text-align: center;
+  padding: 40px;
+  color: var(--pencil);
+  font-style: italic;
+}
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--pencil);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--pencil);
+}
+
+.empty-state p {
+  margin-bottom: 16px;
+}
+
+/* Responsive */
 @media (max-width: 600px) {
-  .form-row { grid-template-columns: 1fr; }
-  .valence-row { flex-direction: column; }
-  nav { width: 100%; }
-  nav button { flex: 1; font-size: 0.8rem; padding: 8px; }
+  .site-title {
+    font-size: 0.95rem;
+  }
+  
+  .tab-bar {
+    top: 52px;
+  }
+  
+  .tab-btn {
+    font-size: 0.85rem;
+    padding: 10px 6px;
+  }
+  
+  .action-row {
+    gap: 6px;
+  }
+  
+  .action-btn {
+    font-size: 0.75rem;
+    padding: 5px 8px;
+  }
+  
+  .fab-submit {
+    bottom: 16px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
 }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="container">
-    <a href="https://evilbrainlabs.com" class="logo" target="_blank" title="Evil Brain Labs">
-      <img src="/images/logo.jpg" alt="Evil Brain Labs">
-      <h1>Use Case Arms Race</h1>
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="logo-group">
+      <span class="logo-icon">&#x2696;</span>
+      <h1 class="site-title">Use Case Arms Race</h1>
     </a>
-    <nav>
-      <button data-view="home" class="active">Home</button>
-      <button data-view="cases">Registry</button>
-      <button data-view="submit">Submit</button>
-      <button data-view="about">About</button>
-    </nav>
+    <button class="auth-btn" id="authBtn">Sign In</button>
   </div>
 </header>
 
-<main>
-<!-- HOME VIEW -->
-<section class="view active" id="view-home">
-  <div class="container">
-    <div class="hero">
-      <h2>Document AI Before It Documents You</h2>
-      <p class="hero-mission">
-        The Evil Brain showed Jason what happens if we don't learn to deploy AI responsibly.
-        Now he's compelled to document every use case, every day, for as long as it takes.
-        This registry is his life's work. Vote on what's harmful. Vote on what helps.
-        The arms race is already here. At least we can track it.
-      </p>
-      <div class="hero-cta">
-        <button class="btn btn-primary" onclick="switchView('submit')">Submit a Use Case</button>
-        <button class="btn" onclick="switchView('cases')">Browse the Registry</button>
+<!-- TAB BAR -->
+<nav class="tab-bar">
+  <button class="tab-btn active" data-tab="latest">Latest</button>
+  <button class="tab-btn" data-tab="top">Top</button>
+  <button class="tab-btn" data-tab="underfire">Under Fire</button>
+  <button class="tab-btn" data-tab="flips">Flips</button>
+</nav>
+
+<!-- FEED -->
+<main class="feed-container" id="feedContainer">
+  
+  <!-- Pre-rendered template cards (hydrated by JS) -->
+  <article class="case-card" data-id="1">
+    <div class="card-header">
+      <span class="org-name">Clearview AI</span>
+      <span class="category-badge">Surveillance</span>
+    </div>
+    <h2 class="card-title">Facial recognition database scraped from social media</h2>
+    <p class="card-description">Compiled billions of photos from social media without consent to create a facial recognition tool sold to law enforcement agencies...</p>
+    <div class="impact-row">
+      <span class="impact-label">Impact</span>
+      <div class="impact-pips">
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
       </div>
     </div>
-
-    <!-- Map -->
-    <div id="world-map"></div>
-
-    <!-- Two Column: Cases and Episodes -->
-    <div class="two-col">
-      <!-- Case Leaderboard -->
-      <div>
-        <div class="section-header">
-          <h3>📊 Top Cases</h3>
-          <a href="#" onclick="switchView('cases'); return false;">View all →</a>
-        </div>
-        <div id="home-cases">
-          <p style="color: var(--pencil)">Loading cases...</p>
-        </div>
+    <div class="vote-bar-container">
+      <div class="vote-bar">
+        <div class="vote-good-fill" style="width: 12%"></div>
+        <div class="vote-evil-fill" style="width: 88%"></div>
       </div>
-
-      <!-- Latest Episodes -->
-      <div>
-        <div class="section-header">
-          <h3>📺 Latest Episodes</h3>
-          <a href="#" onclick="switchView('episodes'); return false;">View all →</a>
-        </div>
-        <div class="video-section">
-          <div class="video-container" id="latest-video">
-            <span>🎬 Loading...</span>
-          </div>
-        </div>
-        <div id="home-episodes">
-          <p style="color: var(--pencil)">Loading episodes...</p>
-        </div>
+      <div class="vote-labels">
+        <span>12% Good</span>
+        <span>88% Evil</span>
       </div>
     </div>
+    <span class="status-badge verified">MACHINE VERIFIED</span>
+    <div class="source-link">Source: <a href="#" target="_blank" rel="noopener">nytimes.com</a></div>
+    <div class="timestamp">2h ago</div>
+    <div class="action-row">
+      <button class="action-btn vote-evil"><span>&#x1F47F;</span> Vote Evil <span class="count">(2,341)</span></button>
+      <button class="action-btn vote-good"><span>&#x1F607;</span> Vote Good <span class="count">(312)</span></button>
+      <button class="action-btn share-btn"><span>&#x1F517;</span> Share</button>
+      <button class="action-btn complain-btn"><span>&#x26A0;</span> Complain</button>
+      <button class="action-btn watch-btn"><span>&#x1F441;</span> Watch</button>
+    </div>
+  </article>
+
+  <article class="case-card" data-id="2">
+    <div class="card-header">
+      <span class="org-name">Unknown Org</span>
+      <span class="category-badge">Employment</span>
+    </div>
+    <h2 class="card-title">AI resume screening filters out candidates with employment gaps</h2>
+    <p class="card-description">Automated hiring systems systematically reject applicants who took time off for caregiving, illness, or other legitimate reasons...</p>
+    <div class="impact-row">
+      <span class="impact-label">Impact</span>
+      <div class="impact-pips">
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip"></span>
+      </div>
+    </div>
+    <div class="vote-bar-container">
+      <div class="vote-bar">
+        <div class="vote-good-fill" style="width: 8%"></div>
+        <div class="vote-evil-fill" style="width: 92%"></div>
+      </div>
+      <div class="vote-labels">
+        <span>8% Good</span>
+        <span>92% Evil</span>
+      </div>
+    </div>
+    <span class="status-badge review">UNDER REVIEW</span>
+    <div class="source-link">Source: <a href="#" target="_blank" rel="noopener">reuters.com</a></div>
+    <div class="timestamp">5h ago</div>
+    <div class="action-row">
+      <button class="action-btn vote-evil"><span>&#x1F47F;</span> Vote Evil <span class="count">(1,892)</span></button>
+      <button class="action-btn vote-good"><span>&#x1F607;</span> Vote Good <span class="count">(165)</span></button>
+      <button class="action-btn share-btn"><span>&#x1F517;</span> Share</button>
+      <button class="action-btn complain-btn"><span>&#x26A0;</span> Complain</button>
+      <button class="action-btn watch-btn"><span>&#x1F441;</span> Watch</button>
+    </div>
+  </article>
+
+  <article class="case-card" data-id="3">
+    <div class="card-header">
+      <span class="org-name">Insurance Corp</span>
+      <span class="category-badge">Insurance</span>
+    </div>
+    <h2 class="card-title">Predictive model denies claims based on neighborhood data</h2>
+    <p class="card-description">Uses zip code and demographic data to pre-emptively flag claims as likely fraudulent, leading to higher denial rates in low-income areas...</p>
+    <div class="impact-row">
+      <span class="impact-label">Impact</span>
+      <div class="impact-pips">
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip"></span>
+        <span class="pip"></span>
+      </div>
+    </div>
+    <div class="vote-bar-container">
+      <div class="vote-bar">
+        <div class="vote-good-fill" style="width: 15%"></div>
+        <div class="vote-evil-fill" style="width: 85%"></div>
+      </div>
+      <div class="vote-labels">
+        <span>15% Good</span>
+        <span>85% Evil</span>
+      </div>
+    </div>
+    <span class="status-badge verified">MACHINE VERIFIED</span>
+    <div class="source-link">Source: <a href="#" target="_blank" rel="noopener">propublica.org</a></div>
+    <div class="timestamp">1d ago</div>
+    <div class="action-row">
+      <button class="action-btn vote-evil"><span>&#x1F47F;</span> Vote Evil <span class="count">(956)</span></button>
+      <button class="action-btn vote-good"><span>&#x1F607;</span> Vote Good <span class="count">(169)</span></button>
+      <button class="action-btn share-btn"><span>&#x1F517;</span> Share</button>
+      <button class="action-btn complain-btn"><span>&#x26A0;</span> Complain</button>
+      <button class="action-btn watch-btn"><span>&#x1F441;</span> Watch</button>
+    </div>
+  </article>
+
+  <article class="case-card" data-id="4">
+    <div class="card-header">
+      <span class="org-name">TechStartup Inc</span>
+      <span class="category-badge">Healthcare</span>
+    </div>
+    <h2 class="card-title">Mental health chatbot gives dangerous advice during crisis</h2>
+    <p class="card-description">AI therapy bot failed to recognize suicidal ideation and provided generic responses instead of crisis resources, documented in multiple incidents...</p>
+    <div class="impact-row">
+      <span class="impact-label">Impact</span>
+      <div class="impact-pips">
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+      </div>
+    </div>
+    <div class="vote-bar-container">
+      <div class="vote-bar">
+        <div class="vote-good-fill" style="width: 5%"></div>
+        <div class="vote-evil-fill" style="width: 95%"></div>
+      </div>
+      <div class="vote-labels">
+        <span>5% Good</span>
+        <span>95% Evil</span>
+      </div>
+    </div>
+    <span class="status-badge retracted">RETRACTED</span>
+    <div class="source-link">Source: <a href="#" target="_blank" rel="noopener">wired.com</a></div>
+    <div class="timestamp">2d ago</div>
+    <div class="action-row">
+      <button class="action-btn vote-evil"><span>&#x1F47F;</span> Vote Evil <span class="count">(3,421)</span></button>
+      <button class="action-btn vote-good"><span>&#x1F607;</span> Vote Good <span class="count">(180)</span></button>
+      <button class="action-btn share-btn"><span>&#x1F517;</span> Share</button>
+      <button class="action-btn complain-btn"><span>&#x26A0;</span> Complain</button>
+      <button class="action-btn watch-btn"><span>&#x1F441;</span> Watch</button>
+    </div>
+  </article>
+
+  <article class="case-card" data-id="5">
+    <div class="card-header">
+      <span class="org-name">EduTech Platform</span>
+      <span class="category-badge">Education</span>
+    </div>
+    <h2 class="card-title">Proctoring software flags minority students at higher rates</h2>
+    <p class="card-description">AI exam monitoring system showed significant racial bias, flagging students with darker skin tones as suspicious at disproportionate rates...</p>
+    <div class="impact-row">
+      <span class="impact-label">Impact</span>
+      <div class="impact-pips">
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip"></span>
+      </div>
+    </div>
+    <div class="vote-bar-container">
+      <div class="vote-bar">
+        <div class="vote-good-fill" style="width: 7%"></div>
+        <div class="vote-evil-fill" style="width: 93%"></div>
+      </div>
+      <div class="vote-labels">
+        <span>7% Good</span>
+        <span>93% Evil</span>
+      </div>
+    </div>
+    <span class="status-badge verified">MACHINE VERIFIED</span>
+    <div class="source-link">Source: <a href="#" target="_blank" rel="noopener">vice.com</a></div>
+    <div class="timestamp">3d ago</div>
+    <div class="action-row">
+      <button class="action-btn vote-evil"><span>&#x1F47F;</span> Vote Evil <span class="count">(2,156)</span></button>
+      <button class="action-btn vote-good"><span>&#x1F607;</span> Vote Good <span class="count">(163)</span></button>
+      <button class="action-btn share-btn"><span>&#x1F517;</span> Share</button>
+      <button class="action-btn complain-btn"><span>&#x26A0;</span> Complain</button>
+      <button class="action-btn watch-btn"><span>&#x1F441;</span> Watch</button>
+    </div>
+  </article>
+
+  <article class="case-card" data-id="6">
+    <div class="card-header">
+      <span class="org-name">Social Media Giant</span>
+      <span class="category-badge">Content</span>
+    </div>
+    <h2 class="card-title">Algorithm amplifies outrage content for engagement</h2>
+    <p class="card-description">Internal documents revealed the recommendation system was tuned to promote divisive content because it drove higher engagement metrics...</p>
+    <div class="impact-row">
+      <span class="impact-label">Impact</span>
+      <div class="impact-pips">
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+      </div>
+    </div>
+    <div class="vote-bar-container">
+      <div class="vote-bar">
+        <div class="vote-good-fill" style="width: 18%"></div>
+        <div class="vote-evil-fill" style="width: 82%"></div>
+      </div>
+      <div class="vote-labels">
+        <span>18% Good</span>
+        <span>82% Evil</span>
+      </div>
+    </div>
+    <span class="status-badge verified">MACHINE VERIFIED</span>
+    <div class="source-link">Source: <a href="#" target="_blank" rel="noopener">wsj.com</a></div>
+    <div class="timestamp">4d ago</div>
+    <div class="action-row">
+      <button class="action-btn vote-evil"><span>&#x1F47F;</span> Vote Evil <span class="count">(4,521)</span></button>
+      <button class="action-btn vote-good"><span>&#x1F607;</span> Vote Good <span class="count">(991)</span></button>
+      <button class="action-btn share-btn"><span>&#x1F517;</span> Share</button>
+      <button class="action-btn complain-btn"><span>&#x26A0;</span> Complain</button>
+      <button class="action-btn watch-btn"><span>&#x1F441;</span> Watch</button>
+    </div>
+  </article>
+
+  <article class="case-card" data-id="7">
+    <div class="card-header">
+      <span class="org-name">FinTech Corp</span>
+      <span class="category-badge">Finance</span>
+    </div>
+    <h2 class="card-title">Credit scoring uses social media friends as risk factor</h2>
+    <p class="card-description">Lending algorithm factors in the credit scores of social connections, penalizing people for having friends with financial difficulties...</p>
+    <div class="impact-row">
+      <span class="impact-label">Impact</span>
+      <div class="impact-pips">
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip"></span>
+        <span class="pip"></span>
+      </div>
+    </div>
+    <div class="vote-bar-container">
+      <div class="vote-bar">
+        <div class="vote-good-fill" style="width: 22%"></div>
+        <div class="vote-evil-fill" style="width: 78%"></div>
+      </div>
+      <div class="vote-labels">
+        <span>22% Good</span>
+        <span>78% Evil</span>
+      </div>
+    </div>
+    <span class="status-badge review">UNDER REVIEW</span>
+    <div class="source-link">Source: <a href="#" target="_blank" rel="noopener">bloomberg.com</a></div>
+    <div class="timestamp">5d ago</div>
+    <div class="action-row">
+      <button class="action-btn vote-evil"><span>&#x1F47F;</span> Vote Evil <span class="count">(876)</span></button>
+      <button class="action-btn vote-good"><span>&#x1F607;</span> Vote Good <span class="count">(247)</span></button>
+      <button class="action-btn share-btn"><span>&#x1F517;</span> Share</button>
+      <button class="action-btn complain-btn"><span>&#x26A0;</span> Complain</button>
+      <button class="action-btn watch-btn"><span>&#x1F441;</span> Watch</button>
+    </div>
+  </article>
+
+  <article class="case-card" data-id="8">
+    <div class="card-header">
+      <span class="org-name">Retail Chain</span>
+      <span class="category-badge">Retail</span>
+    </div>
+    <h2 class="card-title">Dynamic pricing charges more in low-competition areas</h2>
+    <p class="card-description">AI pricing system automatically raises prices in neighborhoods with fewer competing stores, effectively taxing residents with limited options...</p>
+    <div class="impact-row">
+      <span class="impact-label">Impact</span>
+      <div class="impact-pips">
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip"></span>
+        <span class="pip"></span>
+        <span class="pip"></span>
+      </div>
+    </div>
+    <div class="vote-bar-container">
+      <div class="vote-bar">
+        <div class="vote-good-fill" style="width: 35%"></div>
+        <div class="vote-evil-fill" style="width: 65%"></div>
+      </div>
+      <div class="vote-labels">
+        <span>35% Good</span>
+        <span>65% Evil</span>
+      </div>
+    </div>
+    <span class="status-badge verified">MACHINE VERIFIED</span>
+    <div class="source-link">Source: <a href="#" target="_blank" rel="noopener">theatlantic.com</a></div>
+    <div class="timestamp">6d ago</div>
+    <div class="action-row">
+      <button class="action-btn vote-evil"><span>&#x1F47F;</span> Vote Evil <span class="count">(654)</span></button>
+      <button class="action-btn vote-good"><span>&#x1F607;</span> Vote Good <span class="count">(352)</span></button>
+      <button class="action-btn share-btn"><span>&#x1F517;</span> Share</button>
+      <button class="action-btn complain-btn"><span>&#x26A0;</span> Complain</button>
+      <button class="action-btn watch-btn"><span>&#x1F441;</span> Watch</button>
+    </div>
+  </article>
+
+  <article class="case-card" data-id="9">
+    <div class="card-header">
+      <span class="org-name">Government Agency</span>
+      <span class="category-badge">Government</span>
+    </div>
+    <h2 class="card-title">Benefits fraud detection wrongly cuts off legitimate recipients</h2>
+    <p class="card-description">Automated fraud detection system generated thousands of false positives, cutting benefits to vulnerable families who then had to navigate complex appeals...</p>
+    <div class="impact-row">
+      <span class="impact-label">Impact</span>
+      <div class="impact-pips">
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+      </div>
+    </div>
+    <div class="vote-bar-container">
+      <div class="vote-bar">
+        <div class="vote-good-fill" style="width: 3%"></div>
+        <div class="vote-evil-fill" style="width: 97%"></div>
+      </div>
+      <div class="vote-labels">
+        <span>3% Good</span>
+        <span>97% Evil</span>
+      </div>
+    </div>
+    <span class="status-badge verified">MACHINE VERIFIED</span>
+    <div class="source-link">Source: <a href="#" target="_blank" rel="noopener">theguardian.com</a></div>
+    <div class="timestamp">1w ago</div>
+    <div class="action-row">
+      <button class="action-btn vote-evil"><span>&#x1F47F;</span> Vote Evil <span class="count">(5,234)</span></button>
+      <button class="action-btn vote-good"><span>&#x1F607;</span> Vote Good <span class="count">(162)</span></button>
+      <button class="action-btn share-btn"><span>&#x1F517;</span> Share</button>
+      <button class="action-btn complain-btn"><span>&#x26A0;</span> Complain</button>
+      <button class="action-btn watch-btn"><span>&#x1F441;</span> Watch</button>
+    </div>
+  </article>
+
+  <article class="case-card" data-id="10">
+    <div class="card-header">
+      <span class="org-name">Dating App</span>
+      <span class="category-badge">Social</span>
+    </div>
+    <h2 class="card-title">Matching algorithm prioritizes users who pay more</h2>
+    <p class="card-description">Premium tier users are shown to more potential matches regardless of compatibility, while free users are systematically deprioritized in the queue...</p>
+    <div class="impact-row">
+      <span class="impact-label">Impact</span>
+      <div class="impact-pips">
+        <span class="pip filled"></span>
+        <span class="pip filled"></span>
+        <span class="pip"></span>
+        <span class="pip"></span>
+        <span class="pip"></span>
+      </div>
+    </div>
+    <div class="vote-bar-container">
+      <div class="vote-bar">
+        <div class="vote-good-fill" style="width: 45%"></div>
+        <div class="vote-evil-fill" style="width: 55%"></div>
+      </div>
+      <div class="vote-labels">
+        <span>45% Good</span>
+        <span>55% Evil</span>
+      </div>
+    </div>
+    <span class="status-badge review">UNDER REVIEW</span>
+    <div class="source-link">Source: <a href="#" target="_blank" rel="noopener">techcrunch.com</a></div>
+    <div class="timestamp">1w ago</div>
+    <div class="action-row">
+      <button class="action-btn vote-evil"><span>&#x1F47F;</span> Vote Evil <span class="count">(423)</span></button>
+      <button class="action-btn vote-good"><span>&#x1F607;</span> Vote Good <span class="count">(346)</span></button>
+      <button class="action-btn share-btn"><span>&#x1F517;</span> Share</button>
+      <button class="action-btn complain-btn"><span>&#x26A0;</span> Complain</button>
+      <button class="action-btn watch-btn"><span>&#x1F441;</span> Watch</button>
+    </div>
+  </article>
+
+  <div class="loading-indicator" id="loadingIndicator" style="display: none;">
+    <span class="spinner"></span> Loading more cases...
   </div>
-</section>
 
-<!-- CASES VIEW -->
-<section class="view" id="view-cases">
-  <div class="container">
-    <h2 style="margin-bottom: 16px">📚 Case Registry</h2>
-
-    <div class="filter-row">
-      <input type="text" id="case-search" placeholder="Search cases...">
-      <select id="valence-filter">
-        <option value="">All Cases</option>
-        <option value="evil">👿 Harmful</option>
-        <option value="good">😇 Beneficial</option>
-      </select>
-      <select id="category-filter">
-        <option value="">All Categories</option>
-        <optgroup label="Potentially Harmful">
-          <option value="surveillance">Surveillance</option>
-          <option value="discrimination">Discrimination</option>
-          <option value="labor_harm">Labor Exploitation</option>
-          <option value="privacy_violation">Privacy Violation</option>
-          <option value="manipulation">Manipulation</option>
-          <option value="misinformation">Misinformation</option>
-        </optgroup>
-        <optgroup label="Potentially Beneficial">
-          <option value="accessibility">Accessibility</option>
-          <option value="healthcare_benefit">Healthcare Improvement</option>
-          <option value="education_benefit">Education Enhancement</option>
-          <option value="safety_improvement">Safety Improvement</option>
-          <option value="environmental">Environmental Protection</option>
-          <option value="efficiency">Efficiency Gains</option>
-        </optgroup>
-        <optgroup label="Neutral / Context-Dependent">
-          <option value="automation">Automation</option>
-          <option value="personalization">Personalization</option>
-          <option value="prediction">Prediction</option>
-          <option value="content_generation">Content Generation</option>
-        </optgroup>
-      </select>
-    </div>
-
-    <div id="full-case-list">
-      <p style="color: var(--pencil)">Loading cases...</p>
-    </div>
-  </div>
-</section>
-
-<!-- SUBMIT VIEW -->
-<section class="view" id="view-submit">
-  <div class="container">
-    <div class="submit-section">
-      <div class="form-intro">
-        <h2>🧠 Submit to the Registry</h2>
-        <p>Document an AI use case. The community votes on whether it helps or harms.</p>
-      </div>
-
-      <form id="submit-form">
-        <!-- Valence -->
-        <label style="font-weight: bold; display: block; margin-bottom: 8px;">Is this use case harmful or beneficial?</label>
-        <div class="valence-row">
-          <button type="button" class="valence-btn evil selected" onclick="selectValence('evil')">
-            <div class="valence-icon">👿</div>
-            <div class="valence-label">Harmful</div>
-            <div class="valence-desc">Causes harm, violates rights, or has negative implications</div>
-          </button>
-          <button type="button" class="valence-btn good" onclick="selectValence('good')">
-            <div class="valence-icon">😇</div>
-            <div class="valence-label">Beneficial</div>
-            <div class="valence-desc">Helps people, improves outcomes, or solves problems</div>
-          </button>
-        </div>
-        <input type="hidden" id="valence" value="evil">
-
-        <!-- Category -->
-        <label style="font-weight: bold; display: block; margin-bottom: 8px;">Category</label>
-        <div class="category-grid" id="category-grid">
-          <!-- Harmful -->
-          <button type="button" class="category-btn evil-cat" data-cat="surveillance">Surveillance</button>
-          <button type="button" class="category-btn evil-cat" data-cat="discrimination">Discrimination</button>
-          <button type="button" class="category-btn evil-cat" data-cat="labor_harm">Labor Exploitation</button>
-          <button type="button" class="category-btn evil-cat" data-cat="privacy_violation">Privacy Violation</button>
-          <button type="button" class="category-btn evil-cat" data-cat="manipulation">Manipulation</button>
-          <button type="button" class="category-btn evil-cat" data-cat="misinformation">Misinformation</button>
-          <!-- Beneficial -->
-          <button type="button" class="category-btn good-cat" data-cat="accessibility">Accessibility</button>
-          <button type="button" class="category-btn good-cat" data-cat="healthcare_benefit">Healthcare</button>
-          <button type="button" class="category-btn good-cat" data-cat="education_benefit">Education</button>
-          <button type="button" class="category-btn good-cat" data-cat="safety_improvement">Safety</button>
-          <button type="button" class="category-btn good-cat" data-cat="environmental">Environmental</button>
-          <button type="button" class="category-btn good-cat" data-cat="efficiency">Efficiency</button>
-          <!-- Neutral -->
-          <button type="button" class="category-btn neutral-cat" data-cat="automation">Automation</button>
-          <button type="button" class="category-btn neutral-cat" data-cat="personalization">Personalization</button>
-          <button type="button" class="category-btn neutral-cat" data-cat="prediction">Prediction</button>
-          <button type="button" class="category-btn neutral-cat" data-cat="content_generation">Content Gen</button>
-        </div>
-        <input type="hidden" id="category" value="">
-
-        <!-- Title & Description -->
-        <div class="form-group">
-          <label for="title">Title *</label>
-          <input type="text" id="title" required placeholder="Brief name for the use case">
-        </div>
-
-        <div class="form-group">
-          <label for="description">Description *</label>
-          <textarea id="description" required placeholder="What does this AI do? Who does it affect? What are the implications?"></textarea>
-        </div>
-
-        <!-- Source -->
-        <div class="form-group">
-          <label for="url">Source URL <span class="redact-note">🔒 Hidden until approved</span></label>
-          <input type="url" id="url" placeholder="https://...">
-        </div>
-
-        <div class="form-group">
-          <label for="company">Company/Organization <span class="redact-note">🔒 Hidden until approved</span></label>
-          <input type="text" id="company" placeholder="Who is deploying this?">
-        </div>
-
-        <!-- Location -->
-        <div class="form-row">
-          <div class="form-group">
-            <label for="country">Country</label>
-            <select id="country">
-              <option value="">Select...</option>
-              <option value="US">United States</option>
-              <option value="GB">United Kingdom</option>
-              <option value="CN">China</option>
-              <option value="DE">Germany</option>
-              <option value="FR">France</option>
-              <option value="JP">Japan</option>
-              <option value="IN">India</option>
-              <option value="AU">Australia</option>
-              <option value="CA">Canada</option>
-              <option value="BR">Brazil</option>
-              <option value="GLOBAL">Global</option>
-              <option value="OTHER">Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="severity">Impact Level (1-5)</label>
-            <select id="severity">
-              <option value="1">1 - Minor</option>
-              <option value="2">2 - Moderate</option>
-              <option value="3" selected>3 - Significant</option>
-              <option value="4">4 - Severe</option>
-              <option value="5">5 - Critical</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="text-align: center; margin-top: 24px;">
-          <button type="submit" class="btn btn-primary" id="submit-btn">Submit to Registry</button>
-        </div>
-      </form>
-
-      <div id="submit-success" style="display: none; text-align: center; padding: 40px;">
-        <div style="font-size: 3rem;">✓</div>
-        <h2>Submitted</h2>
-        <p>Your case is pending review.</p>
-        <button class="btn" onclick="resetForm()" style="margin-top: 16px;">Submit Another</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ABOUT VIEW -->
-<section class="view" id="view-about">
-  <div class="container">
-    <div class="about-section" style="max-width: 700px; margin: 0 auto;">
-      <h2>About Use Case Arms Race</h2>
-
-      <h3>The Mission</h3>
-      <p>The Evil Brain—the world's first AGI—showed Jason what happens if humanity doesn't learn to deploy AI responsibly. The future it revealed was not dystopian in the dramatic sense. It was quietly, efficiently worse. So Jason made a deal: document every use case, every day, and maybe we learn fast enough to change course.</p>
-
-      <h3>The Registry</h3>
-      <p>This is a public record of AI deployments—good and bad, beneficial and harmful, promising and concerning. Anyone can submit. Everyone can vote. The goal isn't to stop AI. It's to see it clearly.</p>
-
-      <h3>The Show</h3>
-      <p>Every morning, Jason reads a new use case on camera. Under two minutes. His reactions are genuine. The fake commercials that follow are commentary on how people are actually thinking about deploying AI. Some of it is absurd. Some of it is already real.</p>
-
-      <h3>The Human</h3>
-      <p>Jason Shearer is the only human employee at Evil Brain Labs. His contract is interminable. His benefits include Class B citizenship after the robot invasion. He does this because the alternative—shown to him by the Brain—was worse.</p>
-
-      <h3>The Company</h3>
-      <p>Evil Brain Labs is the third-worst AI company. It achieves this by being the third-worst market entrant in every product category. The Brain believes this is optimal: bad enough to demonstrate the problems, good enough to stay in business.</p>
-
-      <div style="margin-top: 32px; text-align: center;">
-        <a href="https://evilbrainlabs.com" class="btn">Enter Evil Brain Labs →</a>
-      </div>
-    </div>
-  </div>
-</section>
 </main>
 
-<!-- Case Modal -->
-<div class="modal-overlay" id="case-modal">
+<!-- FAB Submit Button -->
+<button class="fab-submit" id="fabSubmit" title="Submit a case">+</button>
+
+<!-- Auth Modal -->
+<div class="modal-overlay" id="authModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <div id="case-detail"></div>
+    <div class="modal-header">
+      <h2>Sign In</h2>
+      <button class="modal-close" id="authClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form class="auth-form" id="authForm">
+        <div class="form-group">
+          <label for="authEmail">Email address</label>
+          <input type="email" id="authEmail" placeholder="you@example.com" required>
+        </div>
+        <button type="submit" class="submit-btn">Send Magic Link</button>
+      </form>
+      <p class="auth-note">We will send you a sign-in link. No password required.</p>
+      <div class="auth-message" id="authMessage" style="display: none;"></div>
+    </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
-<footer>
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <a href="https://evilbrainlabs.com"><img src="/images/logo.jpg" alt="Evil Brain Labs"></a>
-        <p>A production of <a href="https://evilbrainlabs.com">Evil Brain Labs</a></p>
-        <p style="color: var(--pencil);">Tracking the arms race so you don't have to.</p>
-      </div>
-      <div>
-        <p><a href="https://evilbrainlabs.com">Evil Brain Labs</a></p>
-        <p><a href="#" onclick="switchView('about'); return false;">About</a></p>
-      </div>
+<!-- Submit Case Modal -->
+<div class="modal-overlay" id="submitModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Submit a Case</h2>
+      <button class="modal-close" id="submitClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form class="submit-form" id="submitForm">
+        <div class="form-group">
+          <label for="caseTitle">Case Title</label>
+          <input type="text" id="caseTitle" placeholder="Describe the AI use case" maxlength="120" required>
+          <p class="form-hint">Be specific and factual.</p>
+        </div>
+        <div class="form-group">
+          <label for="caseOrg">Organization (optional)</label>
+          <input type="text" id="caseOrg" placeholder="Company or entity involved">
+        </div>
+        <div class="form-group">
+          <label for="caseCategory">Category</label>
+          <select id="caseCategory" required>
+            <option value="">Select category...</option>
+            <option value="surveillance">Surveillance</option>
+            <option value="employment">Employment</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="finance">Finance</option>
+            <option value="education">Education</option>
+            <option value="content">Content</option>
+            <option value="government">Government</option>
+            <option value="retail">Retail</option>
+            <option value="social">Social</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="caseDescription">Description</label>
+          <textarea id="caseDescription" placeholder="Explain the use case, its impact, and any evidence..." maxlength="2000" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="caseSource">Source URL (optional)</label>
+          <input type="url" id="caseSource" placeholder="https://...">
+          <p class="form-hint">Link to reporting or documentation.</p>
+        </div>
+        <div class="form-group">
+          <label for="caseSeverity">Impact Severity (1-5)</label>
+          <select id="caseSeverity" required>
+            <option value="1">1 - Minor inconvenience</option>
+            <option value="2">2 - Moderate impact</option>
+            <option value="3" selected>3 - Significant harm</option>
+            <option value="4">4 - Severe consequences</option>
+            <option value="5">5 - Critical / life-affecting</option>
+          </select>
+        </div>
+        <button type="submit" class="submit-btn">Submit for Review</button>
+      </form>
+      <div class="auth-message" id="submitMessage" style="display: none;"></div>
     </div>
   </div>
-</footer>
+</div>
+
+<!-- Case Detail Modal -->
+<div class="modal-overlay detail-modal" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Case Details</h2>
+      <button class="modal-close" id="detailClose">&times;</button>
+    </div>
+    <div class="modal-body" id="detailContent">
+      <!-- Populated dynamically -->
+    </div>
+  </div>
+</div>
 
 <script>
-const SUPABASE_URL = 'https://aslcrwmbdtvimjrexxzw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls';
+/* ================= CONFIG ================= */
+const CONFIG = {
+  SUPABASE_URL: "https://aslcrwmbdtvimjrexxzw.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls",
+  PAGE_SIZE: 20
+};
 
-let sb = null;
-let map = null;
-let selectedCategory = '';
-let selectedValence = 'evil';
-let userVotes = JSON.parse(localStorage.getItem('ucar_votes') || '{}');
+/* ================= STATE ================= */
+let supabaseClient = null;
+let currentUser = null;
+let currentTab = 'latest';
+let cases = [];
+let page = 0;
+let loading = false;
+let hasMore = true;
+let userVotes = {}; // { caseId: 'good' | 'evil' }
+let userWatching = new Set();
 
-// Initialize
-document.addEventListener('DOMContentLoaded', async () => {
-  if (window.supabase) {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+/* ================= HELPERS ================= */
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+function relativeTime(dateStr) {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.floor((now - date) / 1000);
+  
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+  return Math.floor(diff / 604800) + 'w ago';
+}
+
+function truncate(str, len) {
+  if (!str) return '';
+  if (str.length <= len) return str;
+  return str.slice(0, len) + '...';
+}
+
+/* ================= SUPABASE ================= */
+function initSupabase() {
+  if (typeof window.supabase !== 'undefined' && !supabaseClient) {
+    supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    
+    // Check for existing session
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        handleUser(session.user);
+      }
+    });
+    
+    // Listen for auth changes
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        handleUser(session.user);
+        closeModal('authModal');
+      } else {
+        currentUser = null;
+        $('#authBtn').textContent = 'Sign In';
+      }
+    });
+    
+    // Subscribe to realtime vote updates
+    subscribeToVotes();
   }
-
-  // Nav
-  document.querySelectorAll('nav button').forEach(btn => {
-    btn.onclick = () => switchView(btn.dataset.view);
-  });
-
-  // Init map
-  initMap();
-
-  // Load data
-  await loadHomeCases();
-  await loadHomeEpisodes();
-
-  // Category buttons
-  document.querySelectorAll('.category-btn').forEach(btn => {
-    btn.onclick = () => selectCategory(btn.dataset.cat);
-  });
-
-  // Form
-  document.getElementById('submit-form').onsubmit = handleSubmit;
-
-  // Filters
-  document.getElementById('case-search').oninput = debounce(loadFullCases, 300);
-  document.getElementById('valence-filter').onchange = loadFullCases;
-  document.getElementById('category-filter').onchange = loadFullCases;
-
-  // Modal close
-  document.getElementById('case-modal').onclick = e => {
-    if (e.target.id === 'case-modal') closeModal();
-  };
-});
-
-function switchView(view) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('view-' + view).classList.add('active');
-  document.querySelector(`nav button[data-view="${view}"]`)?.classList.add('active');
-  window.scrollTo(0, 0);
-
-  if (view === 'cases') loadFullCases();
 }
 
-// Map
-function initMap() {
-  map = L.map('world-map', {
-    center: [30, 0],
-    zoom: 2,
-    zoomControl: false,
-    attributionControl: false
-  });
-
-  // Simple tile layer with paper-like styling
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-    maxZoom: 8,
-    minZoom: 1
-  }).addTo(map);
-
-  // Sample markers (would be loaded from database)
-  const locations = [
-    { lat: 37.7749, lng: -122.4194, name: 'San Francisco', count: 12 },
-    { lat: 40.7128, lng: -74.0060, name: 'New York', count: 8 },
-    { lat: 51.5074, lng: -0.1278, name: 'London', count: 6 },
-    { lat: 35.6762, lng: 139.6503, name: 'Tokyo', count: 5 },
-    { lat: 31.2304, lng: 121.4737, name: 'Shanghai', count: 7 },
-  ];
-
-  locations.forEach(loc => {
-    L.circleMarker([loc.lat, loc.lng], {
-      radius: 6 + loc.count,
-      fillColor: '#D42B1E',
-      color: '#1A1817',
-      weight: 2,
-      fillOpacity: 0.6
-    }).addTo(map).bindPopup(`<b>${loc.name}</b><br>${loc.count} cases`);
-  });
+function handleUser(user) {
+  currentUser = user;
+  $('#authBtn').textContent = user.email?.split('@')[0] || 'Account';
+  loadUserVotes();
 }
 
-// Load home cases (top 5)
-async function loadHomeCases() {
-  const container = document.getElementById('home-cases');
-  if (!sb) {
-    container.innerHTML = '<p style="color: var(--pencil)">Database not connected</p>';
+async function loadUserVotes() {
+  if (!currentUser || !supabaseClient) return;
+  
+  const { data: votes } = await supabaseClient
+    .from('case_votes')
+    .select('case_id, vote_type')
+    .eq('user_id', currentUser.id);
+  
+  if (votes) {
+    userVotes = {};
+    votes.forEach(v => { userVotes[v.case_id] = v.vote_type; });
+    renderFeed();
+  }
+  
+  const { data: watches } = await supabaseClient
+    .from('case_watches')
+    .select('case_id')
+    .eq('user_id', currentUser.id);
+  
+  if (watches) {
+    userWatching = new Set(watches.map(w => w.case_id));
+    renderFeed();
+  }
+}
+
+function subscribeToVotes() {
+  if (!supabaseClient) return;
+  
+  supabaseClient
+    .channel('feed')
+    .on('broadcast', { event: 'vote_update' }, (payload) => {
+      const { case_id, good_votes, evil_votes } = payload.payload;
+      const card = $(`.case-card[data-id="${case_id}"]`);
+      if (card) {
+        updateVoteBar(card, good_votes, evil_votes);
+      }
+    })
+    .subscribe();
+}
+
+/* ================= FEED LOADING ================= */
+async function loadCases(reset = false) {
+  if (loading || (!hasMore && !reset)) return;
+  
+  loading = true;
+  if (reset) {
+    page = 0;
+    cases = [];
+    hasMore = true;
+  }
+  
+  $('#loadingIndicator').style.display = 'block';
+  
+  if (!supabaseClient) {
+    // Use template data
+    loading = false;
+    $('#loadingIndicator').style.display = 'none';
     return;
   }
-
-  try {
-    const { data: cases, error } = await sb
-      .from('use_cases')
-      .select('id, title, description, category, evil_votes, good_votes')
-      .in('status', ['active', 'approved'])
-      .order('evil_votes', { ascending: false })
-      .limit(5);
-
-    if (error) throw error;
-
-    if (!cases || cases.length === 0) {
-      container.innerHTML = '<p style="color: var(--pencil)">No cases yet. Be the first to submit!</p>';
-      return;
-    }
-
-    container.innerHTML = cases.map((c, i) => renderCaseRow(c, i + 1)).join('');
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = '<p style="color: var(--crayon)">Error loading cases</p>';
+  
+  let query = supabaseClient
+    .from('use_cases')
+    .select('*')
+    .range(page * CONFIG.PAGE_SIZE, (page + 1) * CONFIG.PAGE_SIZE - 1);
+  
+  // Apply tab filter
+  switch (currentTab) {
+    case 'latest':
+      query = query.order('created_at', { ascending: false });
+      break;
+    case 'top':
+      query = query.order('total_votes', { ascending: false });
+      break;
+    case 'underfire':
+      query = query.eq('status', 'under_review').order('created_at', { ascending: false });
+      break;
+    case 'flips':
+      query = query.eq('has_flipped', true).order('flipped_at', { ascending: false });
+      break;
   }
+  
+  const { data, error } = await query;
+  
+  if (!error && data) {
+    cases = reset ? data : [...cases, ...data];
+    hasMore = data.length === CONFIG.PAGE_SIZE;
+    page++;
+    renderFeed();
+  }
+  
+  loading = false;
+  $('#loadingIndicator').style.display = 'none';
 }
 
-// Load full cases
-async function loadFullCases() {
-  const container = document.getElementById('full-case-list');
-  if (!sb) return;
-
-  const search = document.getElementById('case-search').value;
-  const valence = document.getElementById('valence-filter').value;
-  const category = document.getElementById('category-filter').value;
-
-  container.innerHTML = '<p style="color: var(--pencil)">Loading...</p>';
-
-  try {
-    let query = sb
-      .from('use_cases')
-      .select('id, title, description, category, evil_votes, good_votes, location_country')
-      .in('status', ['active', 'approved'])
-      .order('created_at', { ascending: false })
-      .limit(50);
-
-    if (search) {
-      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
-    }
-    if (category) {
-      query = query.eq('category', category);
-    }
-
-    const { data: cases, error } = await query;
-    if (error) throw error;
-
-    let filtered = cases || [];
-    if (valence === 'evil') {
-      filtered = filtered.filter(c => (c.evil_votes || 0) >= (c.good_votes || 0));
-    } else if (valence === 'good') {
-      filtered = filtered.filter(c => (c.good_votes || 0) > (c.evil_votes || 0));
-    }
-
-    if (filtered.length === 0) {
-      container.innerHTML = '<p style="color: var(--pencil)">No cases found.</p>';
-      return;
-    }
-
-    // Sort by total votes
-    filtered.sort((a, b) => ((b.evil_votes || 0) + (b.good_votes || 0)) - ((a.evil_votes || 0) + (a.good_votes || 0)));
-
-    container.innerHTML = filtered.map((c, i) => renderCaseRow(c, i + 1)).join('');
-  } catch (err) {
-    console.error(err);
-  }
+/* ================= RENDERING ================= */
+function renderFeed() {
+  const container = $('#feedContainer');
+  
+  // If no database cases, keep template cards
+  if (cases.length === 0) return;
+  
+  // Clear and render from database
+  container.innerHTML = '';
+  
+  cases.forEach(c => {
+    container.appendChild(createCaseCard(c));
+  });
+  
+  // Add loading indicator back
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'loading-indicator';
+  loadingDiv.id = 'loadingIndicator';
+  loadingDiv.style.display = 'none';
+  loadingDiv.innerHTML = '<span class="spinner"></span> Loading more cases...';
+  container.appendChild(loadingDiv);
 }
 
-function renderCaseRow(c, rank) {
-  const isEvil = (c.evil_votes || 0) >= (c.good_votes || 0);
-  const evilVoted = userVotes[c.id] === 'evil';
-  const goodVoted = userVotes[c.id] === 'good';
-  const snippet = c.description ? c.description.substring(0, 80) + (c.description.length > 80 ? '...' : '') : '';
-
-  return `
-    <div class="case-row" onclick="openCase('${c.id}')">
-      <div class="case-rank ${isEvil ? 'evil' : 'good'}">#${rank}</div>
-      <div class="case-info">
-        <div class="case-title">${esc(c.title)}</div>
-        ${snippet ? `<div class="case-snippet">${esc(snippet)}</div>` : ''}
-        <div class="case-meta">
-          ${c.category ? `<span class="case-category">${c.category.replace(/_/g, ' ')}</span>` : ''}
-          ${c.location_country ? `<span>${c.location_country}</span>` : ''}
-        </div>
-      </div>
-      <div class="vote-btns">
-        <button class="vote-btn evil ${evilVoted ? 'voted' : ''}" onclick="event.stopPropagation(); vote('${c.id}', 'evil')">
-          👿 ${c.evil_votes || 0}
-        </button>
-        <button class="vote-btn good ${goodVoted ? 'voted' : ''}" onclick="event.stopPropagation(); vote('${c.id}', 'good')">
-          😇 ${c.good_votes || 0}
-        </button>
+function createCaseCard(c) {
+  const article = document.createElement('article');
+  article.className = 'case-card';
+  article.dataset.id = c.id;
+  
+  const goodVotes = c.good_votes || 0;
+  const evilVotes = c.evil_votes || 0;
+  const totalVotes = goodVotes + evilVotes || 1;
+  const goodPct = Math.round((goodVotes / totalVotes) * 100);
+  const evilPct = 100 - goodPct;
+  
+  const statusClass = c.status === 'verified' ? 'verified' : 
+                      c.status === 'retracted' ? 'retracted' : 'review';
+  const statusText = c.status === 'verified' ? 'MACHINE VERIFIED' : 
+                     c.status === 'retracted' ? 'RETRACTED' : 'UNDER REVIEW';
+  
+  const userVote = userVotes[c.id];
+  const isWatching = userWatching.has(c.id);
+  
+  article.innerHTML = `
+    <div class="card-header">
+      <span class="org-name">${c.org_name || 'Unknown Org'}</span>
+      <span class="category-badge">${c.category || 'Other'}</span>
+    </div>
+    <h2 class="card-title">${c.title}</h2>
+    <p class="card-description">${truncate(c.description, 140)}</p>
+    <div class="impact-row">
+      <span class="impact-label">Impact</span>
+      <div class="impact-pips">
+        ${Array(5).fill(0).map((_, i) => 
+          `<span class="pip ${i < (c.severity || 3) ? 'filled' : ''}"></span>`
+        ).join('')}
       </div>
     </div>
+    <div class="vote-bar-container">
+      <div class="vote-bar">
+        <div class="vote-good-fill" style="width: ${goodPct}%"></div>
+        <div class="vote-evil-fill" style="width: ${evilPct}%"></div>
+      </div>
+      <div class="vote-labels">
+        <span>${goodPct}% Good</span>
+        <span>${evilPct}% Evil</span>
+      </div>
+    </div>
+    <span class="status-badge ${statusClass}">${statusText}</span>
+    ${c.source_url ? `<div class="source-link">Source: <a href="${c.source_url}" target="_blank" rel="noopener">${new URL(c.source_url).hostname}</a></div>` : ''}
+    <div class="timestamp">${relativeTime(c.created_at)}</div>
+    <div class="action-row">
+      <button class="action-btn vote-evil ${userVote === 'evil' ? 'voted' : ''}" data-action="vote-evil">
+        <span>&#x1F47F;</span> Vote Evil <span class="count">(${evilVotes.toLocaleString()})</span>
+      </button>
+      <button class="action-btn vote-good ${userVote === 'good' ? 'voted' : ''}" data-action="vote-good">
+        <span>&#x1F607;</span> Vote Good <span class="count">(${goodVotes.toLocaleString()})</span>
+      </button>
+      <button class="action-btn share-btn" data-action="share"><span>&#x1F517;</span> Share</button>
+      <button class="action-btn complain-btn" data-action="complain"><span>&#x26A0;</span> Complain</button>
+      <button class="action-btn watch-btn ${isWatching ? 'voted' : ''}" data-action="watch"><span>&#x1F441;</span> Watch</button>
+    </div>
   `;
+  
+  // Click handler for card expansion
+  article.addEventListener('click', (e) => {
+    if (e.target.closest('.action-btn')) return;
+    showCaseDetail(c);
+  });
+  
+  // Action button handlers
+  article.querySelectorAll('.action-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleAction(btn.dataset.action, c, article);
+    });
+  });
+  
+  return article;
 }
 
-// Load episodes
-async function loadHomeEpisodes() {
-  const container = document.getElementById('home-episodes');
-  const videoContainer = document.getElementById('latest-video');
+function updateVoteBar(card, goodVotes, evilVotes) {
+  const total = goodVotes + evilVotes || 1;
+  const goodPct = Math.round((goodVotes / total) * 100);
+  const evilPct = 100 - goodPct;
+  
+  card.querySelector('.vote-good-fill').style.width = goodPct + '%';
+  card.querySelector('.vote-evil-fill').style.width = evilPct + '%';
+  card.querySelector('.vote-labels').innerHTML = `<span>${goodPct}% Good</span><span>${evilPct}% Evil</span>`;
+  card.querySelector('.vote-evil .count').textContent = `(${evilVotes.toLocaleString()})`;
+  card.querySelector('.vote-good .count').textContent = `(${goodVotes.toLocaleString()})`;
+}
 
-  if (!sb) {
-    container.innerHTML = '<p style="color: var(--pencil)">Database not connected</p>';
+/* ================= ACTIONS ================= */
+async function handleAction(action, caseData, cardEl) {
+  if (!currentUser && (action === 'vote-evil' || action === 'vote-good' || action === 'watch' || action === 'complain')) {
+    openModal('authModal');
     return;
   }
+  
+  switch (action) {
+    case 'vote-evil':
+    case 'vote-good':
+      await submitVote(caseData.id, action === 'vote-good' ? 'good' : 'evil', cardEl);
+      break;
+    case 'share':
+      shareCase(caseData);
+      break;
+    case 'complain':
+      // Could open a complaint modal
+      alert('Complaint submitted for review.');
+      break;
+    case 'watch':
+      await toggleWatch(caseData.id, cardEl);
+      break;
+  }
+}
 
-  try {
-    const { data: episodes, error } = await sb
-      .from('episodes')
-      .select('*')
-      .eq('status', 'published')
-      .order('episode_number', { ascending: false })
-      .limit(5);
+async function submitVote(caseId, voteType, cardEl) {
+  if (!supabaseClient || !currentUser) return;
+  
+  const existingVote = userVotes[caseId];
+  
+  if (existingVote === voteType) {
+    // Remove vote
+    await supabaseClient
+      .from('case_votes')
+      .delete()
+      .eq('case_id', caseId)
+      .eq('user_id', currentUser.id);
+    
+    delete userVotes[caseId];
+  } else {
+    // Upsert vote
+    await supabaseClient
+      .from('case_votes')
+      .upsert({
+        case_id: caseId,
+        user_id: currentUser.id,
+        vote_type: voteType
+      }, { onConflict: 'case_id,user_id' });
+    
+    userVotes[caseId] = voteType;
+  }
+  
+  // Update UI
+  cardEl.querySelector('.vote-evil').classList.toggle('voted', userVotes[caseId] === 'evil');
+  cardEl.querySelector('.vote-good').classList.toggle('voted', userVotes[caseId] === 'good');
+}
 
-    if (error) throw error;
+async function toggleWatch(caseId, cardEl) {
+  if (!supabaseClient || !currentUser) return;
+  
+  const isWatching = userWatching.has(caseId);
+  
+  if (isWatching) {
+    await supabaseClient
+      .from('case_watches')
+      .delete()
+      .eq('case_id', caseId)
+      .eq('user_id', currentUser.id);
+    
+    userWatching.delete(caseId);
+  } else {
+    await supabaseClient
+      .from('case_watches')
+      .insert({ case_id: caseId, user_id: currentUser.id });
+    
+    userWatching.add(caseId);
+  }
+  
+  cardEl.querySelector('.watch-btn').classList.toggle('voted', userWatching.has(caseId));
+}
 
-    if (!episodes || episodes.length === 0) {
-      videoContainer.innerHTML = '<span>Episodes coming soon</span>';
-      container.innerHTML = '';
-      return;
+function shareCase(caseData) {
+  const url = `${window.location.origin}/case/${caseData.id}`;
+  const text = `${caseData.title} - Use Case Arms Race`;
+  
+  if (navigator.share) {
+    navigator.share({ title: text, url });
+  } else {
+    navigator.clipboard.writeText(url);
+    alert('Link copied to clipboard.');
+  }
+}
+
+function showCaseDetail(c) {
+  const goodVotes = c.good_votes || 0;
+  const evilVotes = c.evil_votes || 0;
+  const totalVotes = goodVotes + evilVotes || 1;
+  const goodPct = Math.round((goodVotes / totalVotes) * 100);
+  const evilPct = 100 - goodPct;
+  
+  const statusClass = c.status === 'verified' ? 'verified' : 
+                      c.status === 'retracted' ? 'retracted' : 'review';
+  const statusText = c.status === 'verified' ? 'MACHINE VERIFIED' : 
+                     c.status === 'retracted' ? 'RETRACTED' : 'UNDER REVIEW';
+  
+  $('#detailContent').innerHTML = `
+    <p class="detail-org">${c.org_name || 'Unknown Org'}</p>
+    <h3 class="detail-title">${c.title}</h3>
+    <p class="detail-description">${c.description || ''}</p>
+    <div class="detail-meta">
+      <div class="meta-item">
+        <span class="meta-label">Category</span>
+        ${c.category || 'Other'}
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Status</span>
+        <span class="status-badge ${statusClass}">${statusText}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Impact</span>
+        ${Array(5).fill(0).map((_, i) => i < (c.severity || 3) ? '&#x26AB;' : '&#x26AA;').join('')}
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Votes</span>
+        ${goodPct}% Good / ${evilPct}% Evil
+      </div>
+    </div>
+    ${c.source_url ? `<p style="font-size: 0.9rem;"><strong>Source:</strong> <a href="${c.source_url}" target="_blank" rel="noopener">${c.source_url}</a></p>` : ''}
+    <p style="font-size: 0.85rem; color: var(--pencil); margin-top: 12px;">Submitted ${relativeTime(c.created_at)}</p>
+  `;
+  
+  // Update OpenGraph dynamically
+  document.querySelector('meta[property="og:title"]')?.setAttribute('content', c.title + ' - Use Case Arms Race');
+  document.querySelector('meta[property="og:description"]')?.setAttribute('content', truncate(c.description, 200));
+  
+  openModal('detailModal');
+}
+
+/* ================= MODALS ================= */
+function openModal(id) {
+  $('#' + id).classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+  $('#' + id).classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+/* ================= AUTH ================= */
+async function handleAuth(email) {
+  if (!supabaseClient) {
+    showAuthMessage('Database connection unavailable.', 'error');
+    return;
+  }
+  
+  const { error } = await supabaseClient.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: window.location.origin
     }
+  });
+  
+  if (error) {
+    showAuthMessage(error.message, 'error');
+  } else {
+    showAuthMessage('Check your email for the sign-in link.', 'success');
+  }
+}
 
-    // Latest video
-    const latest = episodes[0];
-    if (latest.video_url) {
-      videoContainer.innerHTML = `<iframe src="${latest.video_url}" style="width:100%;height:100%;border:0" allowfullscreen></iframe>`;
+function showAuthMessage(msg, type) {
+  const el = $('#authMessage');
+  el.textContent = msg;
+  el.className = 'auth-message ' + type;
+  el.style.display = 'block';
+}
+
+/* ================= SUBMIT CASE ================= */
+async function handleSubmit(formData) {
+  if (!supabaseClient) {
+    showSubmitMessage('Database connection unavailable.', 'error');
+    return;
+  }
+  
+  if (!currentUser) {
+    closeModal('submitModal');
+    openModal('authModal');
+    return;
+  }
+  
+  const { error } = await supabaseClient
+    .from('use_cases')
+    .insert({
+      title: formData.title,
+      org_name: formData.org || null,
+      category: formData.category,
+      description: formData.description,
+      source_url: formData.source || null,
+      severity: parseInt(formData.severity),
+      submitted_by: currentUser.id,
+      status: 'under_review'
+    });
+  
+  if (error) {
+    showSubmitMessage(error.message, 'error');
+  } else {
+    showSubmitMessage('Case submitted for review.', 'success');
+    $('#submitForm').reset();
+    setTimeout(() => {
+      closeModal('submitModal');
+      loadCases(true);
+    }, 1500);
+  }
+}
+
+function showSubmitMessage(msg, type) {
+  const el = $('#submitMessage');
+  el.textContent = msg;
+  el.className = 'auth-message ' + type;
+  el.style.display = 'block';
+}
+
+/* ================= INFINITE SCROLL ================= */
+function setupInfiniteScroll() {
+  const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !loading && hasMore) {
+      loadCases();
+    }
+  }, { rootMargin: '200px' });
+  
+  observer.observe($('#loadingIndicator'));
+}
+
+/* ================= EVENT LISTENERS ================= */
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize Supabase
+  initSupabase();
+  
+  // Tab navigation
+  $$('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      loadCases(true);
+    });
+  });
+  
+  // Auth button
+  $('#authBtn').addEventListener('click', () => {
+    if (currentUser) {
+      // Could show profile dropdown
+      supabaseClient?.auth.signOut();
     } else {
-      videoContainer.innerHTML = `<span>E${String(latest.episode_number).padStart(3,'0')}: ${esc(latest.title)}</span>`;
+      openModal('authModal');
     }
-
-    // Episode list
-    container.innerHTML = episodes.map(ep => `
-      <div class="episode-row">
-        <span class="episode-num">E${String(ep.episode_number).padStart(3,'0')}</span>
-        <span class="episode-title">${esc(ep.title)}</span>
-        <span class="episode-date">${new Date(ep.published_at).toLocaleDateString()}</span>
-      </div>
-    `).join('');
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-// Open case modal
-async function openCase(id) {
-  const modal = document.getElementById('case-modal');
-  const detail = document.getElementById('case-detail');
-  detail.innerHTML = '<p>Loading...</p>';
-  modal.classList.add('active');
-
-  try {
-    const { data: c, error } = await sb
-      .from('use_cases')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-
-    detail.innerHTML = `
-      <h2>${esc(c.title)}</h2>
-      ${c.category ? `<p><strong>Category:</strong> ${c.category.replace(/_/g, ' ')}</p>` : ''}
-      <p style="margin: 16px 0; line-height: 1.7;">${esc(c.description || 'No description')}</p>
-      <p><strong>Location:</strong> ${c.location_country || 'Global'}</p>
-      <p><strong>Impact:</strong> ${'⚠️'.repeat(c.severity || 3)}</p>
-
-      <div style="display: flex; gap: 12px; margin: 24px 0;">
-        <button class="vote-btn evil ${userVotes[c.id]==='evil'?'voted':''}" onclick="vote('${c.id}','evil')" style="flex:1;padding:12px;font-size:1rem">
-          👿 Harmful (${c.evil_votes || 0})
-        </button>
-        <button class="vote-btn good ${userVotes[c.id]==='good'?'voted':''}" onclick="vote('${c.id}','good')" style="flex:1;padding:12px;font-size:1rem">
-          😇 Beneficial (${c.good_votes || 0})
-        </button>
-      </div>
-    `;
-  } catch (err) {
-    detail.innerHTML = '<p style="color: var(--crayon)">Error loading case</p>';
-  }
-}
-
-function closeModal() {
-  document.getElementById('case-modal').classList.remove('active');
-}
-
-// Voting
-async function vote(id, valence) {
-  userVotes[id] = valence;
-  localStorage.setItem('ucar_votes', JSON.stringify(userVotes));
-  toast(`Voted ${valence === 'evil' ? '👿 Harmful' : '😇 Beneficial'}`);
-  await loadHomeCases();
-  await loadFullCases();
-}
-
-// Form handling
-function selectValence(val) {
-  selectedValence = val;
-  document.getElementById('valence').value = val;
-  document.querySelectorAll('.valence-btn').forEach(b => b.classList.remove('selected'));
-  document.querySelector(`.valence-btn.${val}`).classList.add('selected');
-}
-
-function selectCategory(cat) {
-  selectedCategory = cat;
-  document.getElementById('category').value = cat;
-  document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
-  document.querySelector(`.category-btn[data-cat="${cat}"]`)?.classList.add('selected');
-}
-
-async function handleSubmit(e) {
-  e.preventDefault();
-  if (!sb) {
-    toast('Error: Database not connected');
-    return;
-  }
-
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.textContent = 'Submitting...';
-
-  try {
-    const data = {
-      title: document.getElementById('title').value,
-      description: document.getElementById('description').value,
-      url_raw: document.getElementById('url').value || null,
-      company_name_raw: document.getElementById('company').value || null,
-      location_country: document.getElementById('country').value || null,
-      category: selectedCategory || null,
-      severity: parseInt(document.getElementById('severity').value) || 3,
-      status: 'pending_review',
-      evil_votes: selectedValence === 'evil' ? 1 : 0,
-      good_votes: selectedValence === 'good' ? 1 : 0
-    };
-
-    const { error } = await sb.from('use_cases').insert([data]);
-    if (error) throw error;
-
-    document.getElementById('submit-form').style.display = 'none';
-    document.getElementById('submit-success').style.display = 'block';
-  } catch (err) {
-    console.error(err);
-    toast('Error: ' + (err.message || 'Failed to submit'));
-    btn.disabled = false;
-    btn.textContent = 'Submit to Registry';
-  }
-}
-
-function resetForm() {
-  document.getElementById('submit-form').reset();
-  document.getElementById('submit-form').style.display = 'block';
-  document.getElementById('submit-success').style.display = 'none';
-  document.getElementById('submit-btn').disabled = false;
-  document.getElementById('submit-btn').textContent = 'Submit to Registry';
-  selectedCategory = '';
-  selectedValence = 'evil';
-  document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
-  selectValence('evil');
-}
-
-// Utilities
-function esc(s) {
-  if (!s) return '';
-  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[c]);
-}
-
-function debounce(fn, ms) {
-  let t;
-  return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
-}
-
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// Globals
-window.switchView = switchView;
-window.openCase = openCase;
-window.closeModal = closeModal;
-window.vote = vote;
-window.selectValence = selectValence;
-window.resetForm = resetForm;
+  });
+  
+  // Auth form
+  $('#authForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleAuth($('#authEmail').value);
+  });
+  
+  // Submit FAB
+  $('#fabSubmit').addEventListener('click', () => {
+    if (!currentUser) {
+      openModal('authModal');
+    } else {
+      openModal('submitModal');
+    }
+  });
+  
+  // Submit form
+  $('#submitForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleSubmit({
+      title: $('#caseTitle').value,
+      org: $('#caseOrg').value,
+      category: $('#caseCategory').value,
+      description: $('#caseDescription').value,
+      source: $('#caseSource').value,
+      severity: $('#caseSeverity').value
+    });
+  });
+  
+  // Modal close buttons
+  $('#authClose').addEventListener('click', () => closeModal('authModal'));
+  $('#submitClose').addEventListener('click', () => closeModal('submitModal'));
+  $('#detailClose').addEventListener('click', () => closeModal('detailModal'));
+  
+  // Close modals on overlay click
+  $$('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        closeModal(overlay.id);
+      }
+    });
+  });
+  
+  // Setup infinite scroll
+  setupInfiniteScroll();
+  
+  // Initial load from database
+  setTimeout(() => loadCases(true), 500);
+});
 </script>
+
 </body>
 </html>
-<!-- deploy 1783041841 -->
