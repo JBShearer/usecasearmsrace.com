@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>USE CASE ARMS RACE</title>
+<meta name="description" content="Extract the truth. Mint the card. Document AI before it documents you.">
+<link rel="icon" type="image/jpeg" href="/images/logo.jpg">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   DUAL PALETTE SYSTEM
+   Night: Pink neon gambling den
+   Day: Marker on notecard
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* Night mode (default) - Pink neon gambling */
+  --bg: #0a0a0f;
+  --bg-card: #12121a;
+  --bg-elevated: #1a1a24;
+  --text: #e8e0f0;
+  --text-dim: #8a8494;
+  --brain: #ff2d95;
+  --brain-glow: #ff2d9540;
+  --good: #00ff9d;
+  --bad: #ff3366;
+  --gold: #ffd700;
+  --purple: #9d4edd;
+  --border: #2a2a3a;
+  --card-bg: linear-gradient(145deg, #1a1a24 0%, #0f0f18 100%);
+  --neon-glow: 0 0 20px var(--brain-glow), 0 0 40px var(--brain-glow);
+}
+
+[data-theme="day"] {
+  /* Day mode - Marker on notecard */
+  --bg: #f5f0e6;
+  --bg-card: #fffef9;
+  --bg-elevated: #fff;
+  --text: #1a1817;
+  --text-dim: #6b6560;
+  --brain: #c1121f;
+  --brain-glow: transparent;
+  --good: #2d5a27;
+  --bad: #c1121f;
+  --gold: #b8860b;
+  --purple: #5a189a;
+  --border: #d4c9b8;
+  --card-bg: #fffef9;
+  --neon-glow: none;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'SF Pro', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HEADER - Minimal with inventory
+   ═══════════════════════════════════════════════════════════════ */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.logo .use { color: var(--brain); text-shadow: var(--neon-glow); }
+.logo .case { color: var(--text); }
+
+.inventory {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.inv-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.inv-coins { color: var(--gold); }
+.inv-cards { color: var(--purple); }
+
+.theme-toggle {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN GAME AREA
+   ═══════════════════════════════════════════════════════════════ */
+main {
+  padding-top: 60px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  width: 100%;
+}
+
+/* Article Header */
+.article-header {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.article-source {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.article-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.article-snippet {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* Triple Progress */
+.triple-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-dim);
+  flex-wrap: wrap;
+}
+.triple-progress .picked {
+  color: var(--brain);
+  font-weight: 700;
+}
+.triple-progress .arrow {
+  color: var(--text-dim);
+}
+.triple-progress .current {
+  color: var(--gold);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Question */
+.question {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 24px 0;
+  color: var(--text);
+}
+
+/* Choice Cards */
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.choice-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+.choice-card:hover {
+  border-color: var(--brain);
+  transform: translateY(-2px);
+  box-shadow: var(--neon-glow);
+}
+.choice-card:active {
+  transform: translateY(0);
+}
+.choice-card.selected {
+  border-color: var(--brain);
+  background: var(--brain);
+  color: white;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MINTING SCREEN
+   ═══════════════════════════════════════════════════════════════ */
+.mint-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+.mint-screen.active { display: flex; }
+
+.mint-triple {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: var(--text);
+}
+.mint-triple .subject,
+.mint-triple .object {
+  color: var(--brain);
+}
+.mint-triple .verb {
+  color: var(--text-dim);
+}
+
+/* The Card */
+.minted-card {
+  width: 200px;
+  height: 280px;
+  background: var(--card-bg);
+  border: 3px solid var(--brain);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--neon-glow);
+  animation: cardAppear 0.6s ease;
+}
+@keyframes cardAppear {
+  0% { transform: scale(0.8) rotateY(90deg); opacity: 0; }
+  100% { transform: scale(1) rotateY(0); opacity: 1; }
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.card-art {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.card-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.card-stats .atk { color: var(--bad); }
+.card-stats .def { color: var(--good); }
+.card-flavor {
+  font-size: 10px;
+  font-style: italic;
+  color: var(--text-dim);
+  text-align: center;
+  line-height: 1.4;
+}
+.card-faction {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.card-faction.heaven { color: var(--good); }
+.card-faction.hell { color: var(--bad); }
+
+/* Reward */
+.mint-reward {
+  margin-top: 24px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gold);
+  animation: rewardPop 0.4s ease 0.6s both;
+}
+@keyframes rewardPop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.continue-btn {
+  margin-top: 24px;
+  padding: 14px 32px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: var(--brain);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.continue-btn:hover {
+  transform: scale(1.05);
+  box-shadow: var(--neon-glow);
+}
+
+/* Case Closed Header */
+.case-closed-header {
+  font-size: 24px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--brain);
+  text-shadow: var(--neon-glow);
+  margin-bottom: 16px;
+  animation: caseClosedPulse 2s infinite;
+}
+@keyframes caseClosedPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; text-shadow: 0 0 30px var(--brain); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SEARCH / HOME SCREEN
+   ═══════════════════════════════════════════════════════════════ */
+.home-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.search-box {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.search-input {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--brain);
+}
+.search-input::placeholder {
+  color: var(--text-dim);
+}
+
+.triple-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.triple-input {
+  flex: 1;
+  padding: 10px;
+  font-size: 13px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  text-align: center;
+}
+.triple-input:focus {
+  outline: none;
+  border-color: var(--brain);
+}
+.triple-arrow {
+  color: var(--text-dim);
+  font-weight: bold;
+}
+
+.search-status {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.search-status .sources {
+  animation: pulse 1s infinite;
+}
+
+/* Case Feed */
+.case-feed {
+  flex: 1;
+  overflow-y: auto;
+}
+.feed-section {
+  margin-bottom: 24px;
+}
+.feed-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.case-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.case-card:hover {
+  border-color: var(--brain);
+  transform: translateX(4px);
+}
+.case-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.case-card-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.case-card-meta .heaven { color: var(--good); }
+.case-card-meta .hell { color: var(--bad); }
+
+/* Web results */
+.web-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+  font-size: 11px;
+  color: var(--purple);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.web-divider::before,
+.web-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.web-card {
+  border-left: 3px solid var(--purple);
+}
+.web-source {
+  color: var(--purple);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FACTION VOTE SCREEN
+   ═══════════════════════════════════════════════════════════════ */
+.vote-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+.vote-screen.active { display: flex; }
+
+.vote-question {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.vote-buttons {
+  display: flex;
+  gap: 20px;
+  margin: 20px 0;
+}
+.vote-btn {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid;
+  background: var(--bg-card);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.vote-btn .icon { font-size: 36px; }
+.vote-btn .label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.vote-btn .vote-desc {
+  font-size: 9px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+.vote-btn.heaven {
+  border-color: var(--good);
+  color: var(--good);
+}
+.vote-btn.heaven:hover {
+  background: var(--good);
+  color: white;
+}
+.vote-btn.hell {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.vote-btn.hell:hover {
+  background: var(--bad);
+  color: white;
+}
+
+/* Verdict Screen */
+.verdict-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+.verdict-screen.active { display: flex; }
+.verdict-question {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 20px 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.verdict-subtitle {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+}
+
+/* Case Notes Screen (Mad Libs) */
+.notes-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+.notes-screen.active { display: flex; }
+.notes-header {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.notes-subtitle {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+.notes-prompt {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 400px;
+}
+.notes-prompt .blank {
+  display: inline-block;
+  min-width: 100px;
+  border-bottom: 2px dashed var(--brain);
+  color: var(--brain);
+  padding: 2px 8px;
+  margin: 0 4px;
+}
+.notes-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px;
+}
+.notes-choice {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+  transition: all 0.2s;
+}
+.notes-choice:hover {
+  border-color: var(--brain);
+  transform: translateY(-2px);
+}
+.notes-choice.selected {
+  border-color: var(--brain);
+  background: var(--brain);
+  color: white;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .question { font-size: 18px; }
+  .choice-card { padding: 16px; font-size: 15px; }
+  .minted-card { width: 180px; height: 250px; }
+  .vote-btn { width: 100px; height: 100px; }
+  .vote-btn .icon { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="use">USE CASE</span> <span class="case">ARMS RACE</span>
+  </div>
+  <div class="inventory">
+    <div class="inv-item inv-coins">🧠 <span id="coin-count">0</span></div>
+    <div class="inv-item inv-cards">🎴 <span id="card-count">0</span></div>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+  </div>
+</header>
+
+<main>
+  <div class="game-container">
+
+    <!-- HOME / SEARCH SCREEN -->
+    <div class="home-screen" id="home-screen">
+      <div class="search-box">
+        <input class="search-input" id="search-input"
+               placeholder="Paste URL or search for AI use cases..."
+               oninput="handleSearch()">
+        <div class="triple-inputs">
+          <input class="triple-input" id="triple-who" placeholder="who" oninput="handleSearch()">
+          <span class="triple-arrow">→</span>
+          <input class="triple-input" id="triple-action" placeholder="action" oninput="handleSearch()">
+          <span class="triple-arrow">→</span>
+          <input class="triple-input" id="triple-whom" placeholder="whom" oninput="handleSearch()">
+        </div>
+        <div class="search-status" id="search-status"></div>
+      </div>
+
+      <div class="case-feed" id="case-feed">
+        <div class="feed-section">
+          <div class="feed-title">🔥 Trending Cases</div>
+          <div id="trending-cases">Loading...</div>
+        </div>
+        <div class="feed-section" id="web-results" style="display:none">
+          <div class="web-divider">🌐 From the Web</div>
+          <div id="web-cases"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXTRACTION GAME SCREEN -->
+    <div class="game-screen" id="game-screen" style="display:none">
+      <div class="article-header">
+        <div class="article-source" id="article-source">Loading...</div>
+        <div class="article-title" id="article-title">Article title here</div>
+        <div class="article-snippet" id="article-snippet"></div>
+      </div>
+
+      <div class="triple-progress" id="triple-progress">
+        <span class="current">[?]</span>
+        <span class="arrow">→</span>
+        <span>[?]</span>
+        <span class="arrow">→</span>
+        <span>[?]</span>
+      </div>
+
+      <div class="question" id="question">WHO is doing this?</div>
+
+      <div class="choices" id="choices">
+        <!-- Choices injected by JS -->
+      </div>
+    </div>
+
+    <!-- VERDICT SCREEN (after extraction) -->
+    <div class="verdict-screen" id="verdict-screen">
+      <div class="article-header">
+        <div class="article-source" id="verdict-source"></div>
+        <div class="article-title" id="verdict-title"></div>
+      </div>
+
+      <div class="triple-progress" id="verdict-triple"></div>
+
+      <div class="verdict-question">THE VERDICT</div>
+      <div class="verdict-subtitle">You've reviewed the evidence. What's your ruling?</div>
+
+      <div class="vote-buttons">
+        <button class="vote-btn heaven" onclick="selectVerdict('heaven')">
+          <span class="icon">😇</span>
+          <span class="label">Heaven</span>
+          <span class="vote-desc">Good for humanity</span>
+        </button>
+        <button class="vote-btn hell" onclick="selectVerdict('hell')">
+          <span class="icon">😈</span>
+          <span class="label">Hell</span>
+          <span class="vote-desc">Dystopian nightmare</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- CASE NOTES SCREEN (mad libs flavor) -->
+    <div class="notes-screen" id="notes-screen">
+      <div class="notes-header">📝 CASE NOTES</div>
+      <div class="notes-subtitle">Add your expert commentary</div>
+
+      <div class="triple-progress" id="notes-triple"></div>
+
+      <div class="notes-prompt" id="notes-prompt">
+        <!-- Mad lib prompt injected here -->
+      </div>
+
+      <div class="notes-choices" id="notes-choices">
+        <!-- Three flavor options -->
+      </div>
+    </div>
+
+    <!-- MINT SCREEN - CASE CLOSED -->
+    <div class="mint-screen" id="mint-screen">
+      <div class="case-closed-header">📁 CASE CLOSED</div>
+      <div class="mint-triple" id="mint-triple-display"></div>
+
+      <div class="minted-card" id="minted-card">
+        <div class="card-title" id="card-title">CARD NAME</div>
+        <div class="card-art" id="card-art">🤖</div>
+        <div class="card-stats">
+          <span class="atk">ATK: <span id="card-atk">5</span></span>
+          <span class="def">DEF: <span id="card-def">3</span></span>
+        </div>
+        <div class="card-flavor" id="card-flavor">"Corporate quote here"</div>
+        <div class="card-faction hell" id="card-faction">HELL</div>
+      </div>
+
+      <div class="mint-reward" id="mint-reward">+25 🧠</div>
+
+      <button class="continue-btn" onclick="continuePlaying()">Next Case →</button>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://aslcrwmbdtvimjrexxzw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls';
+
+let sb = null;
+let coins = parseInt(localStorage.getItem('ucar_coins') || '0');
+let cards = parseInt(localStorage.getItem('ucar_cards') || '0');
+
+// Current game state
+let currentArticle = null;
+let currentStep = 0; // 0=who, 1=action, 2=whom
+let picks = { who: null, action: null, whom: null };
+let currentFaction = null;
+let currentFlavorNote = null;
+
+const QUESTIONS = [
+  'WHO is doing this?',
+  'What ACTION did they take?',
+  'TO WHOM / TO WHAT?'
+];
+
+const STEP_KEYS = ['who', 'action', 'whom'];
+
+// Mad lib flavor templates based on faction
+const FLAVOR_TEMPLATES = {
+  heaven: [
+    '"Finally, AI doing something {positive_adj}."',
+    '"This is what {good_actor} intended all along."',
+    '"A rare win for {beneficiary}."'
+  ],
+  hell: [
+    '"We take {corporate_bs} seriously."',
+    '"This is fine. Everything is {disaster_adj}."',
+    '"What could possibly go {wrong_word}?"'
+  ]
+};
+
+const FLAVOR_OPTIONS = {
+  positive_adj: ['actually useful', 'not terrifying', 'genuinely helpful'],
+  good_actor: ['the engineers', 'humanity', 'the optimists'],
+  beneficiary: ['actual humans', 'the little guy', 'common sense'],
+  corporate_bs: ['your privacy', 'user safety', 'ethical AI'],
+  disaster_adj: ['fine', 'on fire', 'exactly as planned'],
+  wrong_word: ['wrong', 'sideways', 'full Skynet']
+};
+
+// Source icons for search
+const SOURCE_ICONS = {
+  'Google News': '📰', 'Hacker News': '🟧', 'Reddit': '🔴',
+  'GitHub': '🐙', 'arXiv': '📄', 'Wikipedia': '📚', 'web': '🌐'
+};
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  // Init Supabase
+  if (window.supabase) {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+
+  // Update inventory display
+  updateInventory();
+
+  // Load theme
+  const savedTheme = localStorage.getItem('ucar_theme') || 'night';
+  if (savedTheme === 'day') {
+    document.body.setAttribute('data-theme', 'day');
+    document.querySelector('.theme-toggle').textContent = '☀️';
+  }
+
+  // Load trending cases
+  await loadTrendingCases();
+});
+
+function updateInventory() {
+  document.getElementById('coin-count').textContent = coins;
+  document.getElementById('card-count').textContent = cards;
+}
+
+function addCoins(amount) {
+  coins += amount;
+  localStorage.setItem('ucar_coins', coins);
+  updateInventory();
+}
+
+function addCard() {
+  cards += 1;
+  localStorage.setItem('ucar_cards', cards);
+  updateInventory();
+}
+
+function toggleTheme() {
+  const btn = document.querySelector('.theme-toggle');
+  if (document.body.getAttribute('data-theme') === 'day') {
+    document.body.removeAttribute('data-theme');
+    btn.textContent = '🌙';
+    localStorage.setItem('ucar_theme', 'night');
+  } else {
+    document.body.setAttribute('data-theme', 'day');
+    btn.textContent = '☀️';
+    localStorage.setItem('ucar_theme', 'day');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOAD CASES
+// ═══════════════════════════════════════════════════════════════
+async function loadTrendingCases() {
+  const container = document.getElementById('trending-cases');
+  if (!sb) {
+    container.innerHTML = '<div class="case-card">Database not connected</div>';
+    return;
+  }
+
+  try {
+    const { data: cases, error } = await sb
+      .from('use_cases')
+      .select('id, title, category, evil_votes, good_votes')
+      .in('status', ['active', 'approved'])
+      .order('evil_votes', { ascending: false })
+      .limit(10);
+
+    if (error) throw error;
+
+    if (!cases || cases.length === 0) {
+      container.innerHTML = '<div class="case-card">No cases yet. Submit one!</div>';
+      return;
+    }
+
+    container.innerHTML = cases.map(c => `
+      <div class="case-card" onclick="startExtraction('${c.id}')">
+        <div class="case-card-title">${escHtml(c.title)}</div>
+        <div class="case-card-meta">
+          <span>${escHtml(c.category)}</span>
+          <span class="heaven">😇 ${c.good_votes || 0}</span>
+          <span class="hell">😈 ${c.evil_votes || 0}</span>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = '<div class="case-card">Error loading cases</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════════════
+let searchTimeout = null;
+
+function handleSearch() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(doSearch, 300);
+}
+
+async function doSearch() {
+  const text = document.getElementById('search-input').value.trim();
+  const who = document.getElementById('triple-who').value.trim();
+  const action = document.getElementById('triple-action').value.trim();
+  const whom = document.getElementById('triple-whom').value.trim();
+
+  const status = document.getElementById('search-status');
+  const webSection = document.getElementById('web-results');
+
+  if (!text && !who && !action && !whom) {
+    status.innerHTML = '';
+    webSection.style.display = 'none';
+    return;
+  }
+
+  // Is it a URL?
+  if (text.startsWith('http://') || text.startsWith('https://')) {
+    status.innerHTML = '<button onclick="submitUrl()" style="padding:8px 16px;background:var(--brain);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">Extract Cases →</button>';
+    return;
+  }
+
+  // Show searching
+  status.innerHTML = '<span class="sources">📰 🟧 🔴 🐙 📄 📚</span> Searching...';
+
+  // TODO: Call edge function for search
+  // For now, just search Supabase
+  try {
+    const query = text || [who, action, whom].filter(Boolean).join(' ');
+    const { data: cases, error } = await sb
+      .from('use_cases')
+      .select('id, title, category, evil_votes, good_votes')
+      .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
+      .in('status', ['active', 'approved'])
+      .limit(10);
+
+    if (cases && cases.length > 0) {
+      status.innerHTML = `<span style="color:var(--good)">${cases.length} found</span>`;
+      document.getElementById('trending-cases').innerHTML = cases.map(c => `
+        <div class="case-card" onclick="startExtraction('${c.id}')">
+          <div class="case-card-title">${escHtml(c.title)}</div>
+          <div class="case-card-meta">
+            <span>${escHtml(c.category)}</span>
+            <span class="heaven">😇 ${c.good_votes || 0}</span>
+            <span class="hell">😈 ${c.evil_votes || 0}</span>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      status.innerHTML = '<span style="color:var(--text-dim)">No matches</span>';
+    }
+  } catch (err) {
+    status.innerHTML = '<span style="color:var(--bad)">Search failed</span>';
+  }
+}
+
+async function submitUrl() {
+  const url = document.getElementById('search-input').value.trim();
+  // TODO: Call mine endpoint
+  alert('URL submission coming soon: ' + url);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXTRACTION GAME
+// ═══════════════════════════════════════════════════════════════
+async function startExtraction(caseId) {
+  // Fetch full case
+  const { data: c, error } = await sb
+    .from('use_cases')
+    .select('*')
+    .eq('id', caseId)
+    .single();
+
+  if (error || !c) {
+    alert('Could not load case');
+    return;
+  }
+
+  // Generate AI choices (for now, mock them)
+  currentArticle = {
+    id: c.id,
+    title: c.title,
+    source: c.url || 'News',
+    snippet: c.description?.slice(0, 200) || '',
+    choices: generateMockChoices(c)
+  };
+
+  currentStep = 0;
+  picks = { who: null, action: null, whom: null };
+
+  showScreen('game');
+  renderGameStep();
+}
+
+function generateMockChoices(c) {
+  // In production, this comes from AI
+  // For now, extract from title/description
+  const words = (c.title + ' ' + (c.description || '')).split(/\s+/);
+  const nouns = words.filter(w => w.length > 3 && /^[A-Z]/.test(w)).slice(0, 9);
+  const verbs = ['deployed', 'uses', 'built', 'monitors', 'tracks', 'analyzes', 'flags', 'denies', 'automates'];
+
+  return {
+    who: nouns.slice(0, 3).length >= 3 ? nouns.slice(0, 3) : ['Company', 'Government', 'Organization'],
+    action: verbs.slice(0, 3),
+    whom: nouns.slice(3, 6).length >= 3 ? nouns.slice(3, 6) : ['users', 'citizens', 'data']
+  };
+}
+
+function renderGameStep() {
+  // Update article header
+  document.getElementById('article-source').textContent = currentArticle.source;
+  document.getElementById('article-title').textContent = currentArticle.title;
+  document.getElementById('article-snippet').textContent = currentArticle.snippet;
+
+  // Update triple progress
+  const progress = document.getElementById('triple-progress');
+  progress.innerHTML = `
+    <span class="${picks.who ? 'picked' : currentStep === 0 ? 'current' : ''}">[${picks.who || '?'}]</span>
+    <span class="arrow">→</span>
+    <span class="${picks.action ? 'picked' : currentStep === 1 ? 'current' : ''}">${picks.action || '?'}</span>
+    <span class="arrow">→</span>
+    <span class="${picks.whom ? 'picked' : currentStep === 2 ? 'current' : ''}">[${picks.whom || '?'}]</span>
+  `;
+
+  // Update question
+  document.getElementById('question').textContent = QUESTIONS[currentStep];
+
+  // Render choices
+  const key = STEP_KEYS[currentStep];
+  const choices = currentArticle.choices[key];
+  document.getElementById('choices').innerHTML = choices.map((choice, i) => `
+    <div class="choice-card" onclick="selectChoice('${escAttr(choice)}')">${escHtml(choice)}</div>
+  `).join('');
+}
+
+function selectChoice(choice) {
+  const key = STEP_KEYS[currentStep];
+  picks[key] = choice;
+
+  // Animate selection
+  event.target.classList.add('selected');
+
+  setTimeout(() => {
+    currentStep++;
+
+    if (currentStep >= 3) {
+      // All picks made - go to VERDICT (not mint)
+      showVerdictScreen();
+    } else {
+      renderGameStep();
+    }
+  }, 300);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VERDICT SCREEN (after extraction, before notes)
+// ═══════════════════════════════════════════════════════════════
+function showVerdictScreen() {
+  document.getElementById('verdict-source').textContent = currentArticle.source;
+  document.getElementById('verdict-title').textContent = currentArticle.title;
+  document.getElementById('verdict-triple').innerHTML = `
+    <span class="picked">[${picks.who}]</span>
+    <span class="arrow">→</span>
+    <span class="picked">${picks.action}</span>
+    <span class="arrow">→</span>
+    <span class="picked">[${picks.whom}]</span>
+  `;
+
+  showScreen('verdict');
+}
+
+function selectVerdict(faction) {
+  currentFaction = faction;
+
+  // Animate the button
+  event.target.closest('.vote-btn').classList.add('selected');
+
+  setTimeout(() => {
+    showNotesScreen();
+  }, 400);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CASE NOTES SCREEN (Mad Libs flavor text)
+// ═══════════════════════════════════════════════════════════════
+function showNotesScreen() {
+  document.getElementById('notes-triple').innerHTML = `
+    <span class="picked">[${picks.who}]</span>
+    <span class="arrow">→</span>
+    <span class="picked">${picks.action}</span>
+    <span class="arrow">→</span>
+    <span class="picked">[${picks.whom}]</span>
+  `;
+
+  // Pick a random template for the faction
+  const templates = FLAVOR_TEMPLATES[currentFaction];
+  const template = templates[Math.floor(Math.random() * templates.length)];
+
+  // Find the blank in the template
+  const blankMatch = template.match(/\{(\w+)\}/);
+  if (blankMatch) {
+    const blankKey = blankMatch[1];
+    const options = FLAVOR_OPTIONS[blankKey] || ['option 1', 'option 2', 'option 3'];
+
+    // Display the prompt with blank
+    const promptHtml = template.replace(/\{(\w+)\}/, '<span class="blank">_______</span>');
+    document.getElementById('notes-prompt').innerHTML = promptHtml;
+
+    // Display the choices
+    document.getElementById('notes-choices').innerHTML = options.map((opt, i) => `
+      <div class="notes-choice" onclick="selectNote('${escAttr(opt)}', this)">${opt}</div>
+    `).join('');
+
+    // Store template for later
+    currentArticle.flavorTemplate = template;
+    currentArticle.flavorBlankKey = blankKey;
+  }
+
+  showScreen('notes');
+}
+
+function selectNote(note, el) {
+  currentFlavorNote = note;
+
+  // Animate selection
+  el.classList.add('selected');
+
+  // Fill in the blank
+  const template = currentArticle.flavorTemplate;
+  const filledFlavor = template.replace(/\{(\w+)\}/, note);
+  document.getElementById('notes-prompt').innerHTML = filledFlavor;
+
+  setTimeout(() => {
+    showMintScreen();
+  }, 600);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MINT SCREEN - CASE CLOSED
+// ═══════════════════════════════════════════════════════════════
+function showMintScreen() {
+  // Build card name from triple
+  const cardName = `${picks.who} ${picks.action} ${picks.whom}`.toUpperCase().slice(0, 24);
+
+  // Display triple
+  document.getElementById('mint-triple-display').innerHTML = `
+    <span class="subject">[${picks.who}]</span>
+    <span class="verb"> → ${picks.action} → </span>
+    <span class="object">[${picks.whom}]</span>
+  `;
+
+  // Card details
+  document.getElementById('card-title').textContent = cardName;
+  document.getElementById('card-art').textContent = currentFaction === 'heaven' ? '😇' : '😈';
+
+  const atk = currentFaction === 'hell' ? Math.floor(Math.random() * 4) + 5 : Math.floor(Math.random() * 3) + 2;
+  const def = currentFaction === 'heaven' ? Math.floor(Math.random() * 4) + 5 : Math.floor(Math.random() * 3) + 2;
+  document.getElementById('card-atk').textContent = atk;
+  document.getElementById('card-def').textContent = def;
+
+  // Use the player's flavor note!
+  const template = currentArticle.flavorTemplate || '"{note}"';
+  const flavorText = template.replace(/\{(\w+)\}/, currentFlavorNote || 'interesting');
+  document.getElementById('card-flavor').textContent = flavorText;
+
+  const factionEl = document.getElementById('card-faction');
+  factionEl.textContent = currentFaction.toUpperCase();
+  factionEl.className = 'card-faction ' + currentFaction;
+
+  // Reward
+  const reward = currentFaction === 'hell' ? 25 : 20;
+  document.getElementById('mint-reward').textContent = `+${reward} 🧠`;
+
+  // Add rewards
+  addCoins(reward);
+  addCard();
+
+  // TODO: Save to Supabase with DID
+
+  showScreen('mint');
+}
+
+function continuePlaying() {
+  showScreen('home');
+  loadTrendingCases();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCREEN MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+function showScreen(screen) {
+  document.getElementById('home-screen').style.display = screen === 'home' ? 'flex' : 'none';
+  document.getElementById('game-screen').style.display = screen === 'game' ? 'block' : 'none';
+  document.getElementById('verdict-screen').style.display = screen === 'verdict' ? 'flex' : 'none';
+  document.getElementById('verdict-screen').classList.toggle('active', screen === 'verdict');
+  document.getElementById('notes-screen').style.display = screen === 'notes' ? 'flex' : 'none';
+  document.getElementById('notes-screen').classList.toggle('active', screen === 'notes');
+  document.getElementById('mint-screen').style.display = screen === 'mint' ? 'flex' : 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function escAttr(str) {
+  if (!str) return '';
+  return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+</script>
+
+</body>
+</html>
