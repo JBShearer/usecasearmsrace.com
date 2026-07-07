@@ -1260,8 +1260,8 @@ async function loadFeed(reset = false) {
   try {
     let query = sb
       .from('use_cases')
-      .select('id, title, description, category, evil_votes, good_votes, status, severity, source_url, company_name, created_at, last_flip_at')
-      .in('status', ['active', 'approved', 'machine_verified', 'under_review'])
+      .select('id, title, description, category, evil_votes, good_votes, status, severity, url, company_name_display, created_at, last_flip_at')
+      .in('status', ['active', 'approved', 'machine_verified', 'under_review', 'pending_review'])
       .limit(20);
 
     // Apply tab filter
@@ -1341,14 +1341,14 @@ function renderFeedCard(c) {
   const userVote = userVotes[c.id];
 
   let sourceHost = '';
-  if (c.source_url) {
-    try { sourceHost = new URL(c.source_url).hostname; } catch (e) { sourceHost = 'source'; }
+  if (c.url) {
+    try { sourceHost = new URL(c.url).hostname; } catch (e) { sourceHost = 'source'; }
   }
 
   return `
     <article class="feed-card" data-id="${c.id}">
       <div class="feed-card-header">
-        <span class="feed-org">${esc(c.company_name || 'Unknown Org')}</span>
+        <span class="feed-org">${esc(c.company_name_display || 'Unknown Org')}</span>
         <span class="feed-category">${esc((c.category || 'other').replace(/_/g, ' '))}</span>
       </div>
       <h3 class="feed-title" onclick="openCase('${c.id}')">${esc(c.title)}</h3>
@@ -1366,7 +1366,7 @@ function renderFeedCard(c) {
         <span>${evilPct}% Evil</span>
       </div>
       <span class="feed-status ${status.class}">${status.text}</span>
-      ${c.source_url ? `<div class="feed-source">Source: <a href="${c.source_url}" target="_blank" rel="noopener">${sourceHost}</a></div>` : ''}
+      ${c.url ? `<div class="feed-source">Source: <a href="${c.url}" target="_blank" rel="noopener">${sourceHost}</a></div>` : ''}
       <div class="feed-time">${timeAgo}</div>
       <div class="feed-actions">
         <button class="feed-action vote-evil ${userVote === 'evil' ? 'voted' : ''}" onclick="vote('${c.id}', 'evil')">
