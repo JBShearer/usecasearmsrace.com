@@ -7,6 +7,7 @@
 <meta name="description" content="Extract the truth. Mint the card. Document AI before it documents you.">
 <link rel="icon" type="image/jpeg" href="/images/logo.jpg">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="/js/chiptune.js"></script>
 <style>
 /* ═══════════════════════════════════════════════════════════════
    DUAL PALETTE SYSTEM
@@ -105,6 +106,17 @@ header {
   font-size: 18px;
   cursor: pointer;
   padding: 4px;
+}
+.audio-toggle {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0.8;
+}
+.audio-toggle.muted {
+  opacity: 0.4;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -363,6 +375,134 @@ main {
 @keyframes caseClosedPulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.8; text-shadow: 0 0 30px var(--brain); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CARD COLLECTION
+   ═══════════════════════════════════════════════════════════════ */
+.collection-screen {
+  display: none;
+  flex-direction: column;
+  padding: 20px;
+  min-height: 100%;
+}
+.collection-screen.active { display: flex; }
+
+.collection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.collection-title {
+  font-size: 20px;
+  font-weight: 800;
+}
+.collection-filters {
+  display: flex;
+  gap: 8px;
+}
+.filter-btn {
+  padding: 6px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+}
+.filter-btn.active {
+  background: var(--brain);
+  border-color: var(--brain);
+  color: white;
+}
+.collection-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+.collection-stats b {
+  color: var(--text);
+}
+
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.mini-card {
+  aspect-ratio: 2.5/3.5;
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+.mini-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--neon-glow);
+}
+.mini-card.heaven { border-color: var(--good); }
+.mini-card.hell { border-color: var(--bad); }
+.mini-card.legendary {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px var(--gold);
+}
+
+.mini-card-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+.mini-card-art {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  background: var(--bg-elevated);
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+.mini-card-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  font-weight: 600;
+}
+.mini-card-stats .atk { color: var(--bad); }
+.mini-card-stats .def { color: var(--good); }
+.mini-card-rarity {
+  text-align: center;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+.mini-card-rarity.legendary { color: var(--gold); }
+.mini-card-rarity.rare { color: var(--purple); }
+
+.back-btn {
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -678,8 +818,9 @@ main {
   </div>
   <div class="inventory">
     <div class="inv-item inv-coins">🧠 <span id="coin-count">0</span></div>
-    <div class="inv-item inv-cards">🎴 <span id="card-count">0</span></div>
+    <div class="inv-item inv-cards" onclick="showCollection()" style="cursor:pointer" title="View your cards">🎴 <span id="card-count">0</span></div>
     <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    <button class="audio-toggle" id="audio-toggle" onclick="toggleAudio()">🔊</button>
   </div>
 </header>
 
@@ -777,6 +918,28 @@ main {
       <div class="notes-choices" id="notes-choices">
         <!-- Three flavor options -->
       </div>
+    </div>
+
+    <!-- CARD COLLECTION SCREEN -->
+    <div class="collection-screen" id="collection-screen">
+      <div class="collection-header">
+        <span class="collection-title">🎴 YOUR CARDS</span>
+        <div class="collection-filters">
+          <button class="filter-btn active" onclick="filterCollection('all')">All</button>
+          <button class="filter-btn" onclick="filterCollection('heaven')">😇</button>
+          <button class="filter-btn" onclick="filterCollection('hell')">😈</button>
+        </div>
+      </div>
+      <div class="collection-stats">
+        <span>Total: <b id="collection-total">0</b></span>
+        <span>Heaven: <b id="collection-heaven">0</b></span>
+        <span>Hell: <b id="collection-hell">0</b></span>
+        <span>Legendary: <b id="collection-legendary">0</b></span>
+      </div>
+      <div class="collection-grid" id="collection-grid">
+        <!-- Cards rendered here -->
+      </div>
+      <button class="back-btn" onclick="showScreen('home')">← Back</button>
     </div>
 
     <!-- MINT SCREEN - CASE CLOSED -->
@@ -877,8 +1040,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('.theme-toggle').textContent = '☀️';
   }
 
+  // Setup audio toggle state
+  const audioBtn = document.getElementById('audio-toggle');
+  if (window.chiptuneEngine.isMuted) {
+    audioBtn.textContent = '🔇';
+    audioBtn.classList.add('muted');
+  }
+
   // Load trending cases
   await loadTrendingCases();
+
+  // Start background music after a short delay (gives time for user interaction)
+  setTimeout(() => {
+    startBackgroundMusic();
+  }, 1000);
 });
 
 function updateInventory() {
@@ -890,6 +1065,7 @@ function addCoins(amount) {
   coins += amount;
   localStorage.setItem('ucar_coins', coins);
   updateInventory();
+  playSfx('coin');  // 🎵 Coin sound!
 }
 
 function addCard() {
@@ -909,6 +1085,36 @@ function toggleTheme() {
     btn.textContent = '☀️';
     localStorage.setItem('ucar_theme', 'day');
   }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIO CONTROL
+// ═══════════════════════════════════════════════════════════════
+function toggleAudio() {
+  const btn = document.getElementById('audio-toggle');
+  const muted = window.chiptuneEngine.toggleMute();
+  btn.textContent = muted ? '🔇' : '🔊';
+  btn.classList.toggle('muted', muted);
+
+  // Start playing if unmuting and not already playing
+  if (!muted && !window.chiptuneEngine.isPlaying) {
+    window.chiptuneEngine.start('menu');
+  }
+}
+
+function startBackgroundMusic() {
+  // Only start if not muted
+  if (!window.chiptuneEngine.isMuted) {
+    window.chiptuneEngine.start('menu');
+  }
+}
+
+function setMusicMood(mood) {
+  window.chiptuneEngine.setMood(mood);
+}
+
+function playSfx(type) {
+  window.chiptuneEngine.playSfx(type);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1027,6 +1233,9 @@ async function submitUrl() {
 // EXTRACTION GAME
 // ═══════════════════════════════════════════════════════════════
 async function startExtraction(caseId) {
+  playSfx('select');  // 🎵 Selection sound
+  setMusicMood('extraction');  // 🎵 Tense extraction music
+
   // Fetch full case
   const { data: c, error } = await sb
     .from('use_cases')
@@ -1100,6 +1309,8 @@ function selectChoice(choice) {
   const key = STEP_KEYS[currentStep];
   picks[key] = choice;
 
+  playSfx('confirm');  // 🎵 Confirmation beep
+
   // Animate selection
   event.target.classList.add('selected');
 
@@ -1119,6 +1330,8 @@ function selectChoice(choice) {
 // VERDICT SCREEN (after extraction, before notes)
 // ═══════════════════════════════════════════════════════════════
 function showVerdictScreen() {
+  setMusicMood('verdict');  // 🎵 Suspenseful music
+
   document.getElementById('verdict-source').textContent = currentArticle.source;
   document.getElementById('verdict-title').textContent = currentArticle.title;
   document.getElementById('verdict-triple').innerHTML = `
@@ -1134,6 +1347,10 @@ function showVerdictScreen() {
 
 function selectVerdict(faction) {
   currentFaction = faction;
+
+  // 🎵 Faction-specific sound and music
+  playSfx(faction);  // 'heaven' or 'hell' sound
+  setMusicMood(faction);  // Switch to heaven/hell music
 
   // Animate the button
   event.target.closest('.vote-btn').classList.add('selected');
@@ -1202,6 +1419,9 @@ function selectNote(note, el) {
 // MINT SCREEN - CASE CLOSED
 // ═══════════════════════════════════════════════════════════════
 function showMintScreen() {
+  setMusicMood('mint');  // 🎵 Triumphant fanfare music
+  playSfx('mint');  // 🎵 Slot machine win sound
+
   // Build card name from triple
   const cardName = `${picks.who} ${picks.action} ${picks.whom}`.toUpperCase().slice(0, 24);
 
@@ -1238,12 +1458,42 @@ function showMintScreen() {
   addCoins(reward);
   addCard();
 
+  // Save the minted card to collection!
+  const cardData = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+    name: cardName,
+    faction: currentFaction,
+    attack: atk,
+    defense: def,
+    flavor: flavorText,
+    triple: {
+      subject: picks.who,
+      verb: picks.action,
+      object: picks.whom
+    },
+    rarity: calculateRarity(),
+    caseId: currentArticle.id,
+    mintedAt: new Date().toISOString()
+  };
+  saveCardToCollection(cardData);
+
   // TODO: Save to Supabase with DID
 
   showScreen('mint');
 }
 
+// Calculate card rarity (more unique extractions = more rare)
+function calculateRarity() {
+  // For now, random with weights. Later: based on how unique the triple is
+  const rand = Math.random();
+  if (rand < 0.05) return 'legendary';
+  if (rand < 0.15) return 'rare';
+  if (rand < 0.40) return 'uncommon';
+  return 'common';
+}
+
 function continuePlaying() {
+  setMusicMood('browse');  // 🎵 Back to chill browse music
   showScreen('home');
   loadTrendingCases();
 }
@@ -1259,6 +1509,73 @@ function showScreen(screen) {
   document.getElementById('notes-screen').style.display = screen === 'notes' ? 'flex' : 'none';
   document.getElementById('notes-screen').classList.toggle('active', screen === 'notes');
   document.getElementById('mint-screen').style.display = screen === 'mint' ? 'flex' : 'none';
+  document.getElementById('collection-screen').style.display = screen === 'collection' ? 'flex' : 'none';
+  document.getElementById('collection-screen').classList.toggle('active', screen === 'collection');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CARD COLLECTION
+// ═══════════════════════════════════════════════════════════════
+let userCards = JSON.parse(localStorage.getItem('ucar_cards_collection') || '[]');
+let collectionFilter = 'all';
+
+function showCollection() {
+  playSfx('select');
+  setMusicMood('browse');
+  renderCollection();
+  showScreen('collection');
+}
+
+function renderCollection() {
+  const grid = document.getElementById('collection-grid');
+
+  // Filter cards
+  let filtered = userCards;
+  if (collectionFilter === 'heaven') filtered = userCards.filter(c => c.faction === 'heaven');
+  if (collectionFilter === 'hell') filtered = userCards.filter(c => c.faction === 'hell');
+
+  // Update stats
+  document.getElementById('collection-total').textContent = userCards.length;
+  document.getElementById('collection-heaven').textContent = userCards.filter(c => c.faction === 'heaven').length;
+  document.getElementById('collection-hell').textContent = userCards.filter(c => c.faction === 'hell').length;
+  document.getElementById('collection-legendary').textContent = userCards.filter(c => c.rarity === 'legendary').length;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim)">No cards yet. Extract some triples!</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map((card, i) => `
+    <div class="mini-card ${card.faction} ${card.rarity}" onclick="viewCard(${i})">
+      <div class="mini-card-title">${escHtml(card.name.slice(0, 20))}</div>
+      <div class="mini-card-art">${card.faction === 'heaven' ? '😇' : '😈'}</div>
+      <div class="mini-card-stats">
+        <span class="atk">ATK ${card.attack}</span>
+        <span class="def">DEF ${card.defense}</span>
+      </div>
+      <div class="mini-card-rarity ${card.rarity}">${card.rarity}</div>
+    </div>
+  `).join('');
+}
+
+function filterCollection(filter) {
+  collectionFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderCollection();
+}
+
+function viewCard(index) {
+  // TODO: Open card detail modal
+  playSfx('select');
+  const card = userCards[index];
+  alert(`${card.name}\n\n${card.triple.subject} → ${card.triple.verb} → ${card.triple.object}\n\nATK: ${card.attack} DEF: ${card.defense}\nRarity: ${card.rarity}\n\n"${card.flavor}"`);
+}
+
+// Save card to collection
+function saveCardToCollection(cardData) {
+  userCards.push(cardData);
+  localStorage.setItem('ucar_cards_collection', JSON.stringify(userCards));
 }
 
 // ═══════════════════════════════════════════════════════════════
