@@ -129,6 +129,104 @@ main {
   flex-direction: column;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   DAILY SHOW
+   ═══════════════════════════════════════════════════════════════ */
+.daily-show {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.show-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.show-header:hover {
+  background: var(--bg-elevated);
+}
+.show-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--brain);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.show-title {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.show-toggle {
+  font-size: 12px;
+  color: var(--text-dim);
+  transition: transform 0.2s;
+}
+.daily-show.collapsed .show-toggle {
+  transform: rotate(-90deg);
+}
+.show-content {
+  border-top: 1px solid var(--border);
+  transition: max-height 0.3s ease, opacity 0.2s;
+  max-height: 300px;
+  opacity: 1;
+}
+.daily-show.collapsed .show-content {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  border-top: none;
+}
+.show-video {
+  background: #000;
+}
+.show-video iframe {
+  display: block;
+}
+.show-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  font-size: 12px;
+}
+.show-links {
+  color: var(--text-dim);
+}
+.show-links a {
+  color: var(--brain);
+  text-decoration: none;
+}
+.show-links a:hover {
+  text-decoration: underline;
+}
+.watch-later-btn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.watch-later-btn:hover {
+  border-color: var(--brain);
+}
+.watch-later-btn.saved {
+  background: var(--brain);
+  color: white;
+  border-color: var(--brain);
+}
+
 .game-container {
   flex: 1;
   display: flex;
@@ -752,50 +850,45 @@ main {
   color: var(--text-dim);
   margin-bottom: 20px;
 }
-.notes-prompt {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  margin: 16px 0;
-  text-align: center;
-  font-size: 15px;
-  line-height: 1.6;
-  max-width: 400px;
-}
-.notes-prompt .blank {
-  display: inline-block;
-  min-width: 100px;
-  border-bottom: 2px dashed var(--brain);
-  color: var(--brain);
-  padding: 2px 8px;
-  margin: 0 4px;
-}
-.notes-choices {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.notes-textarea {
   width: 100%;
   max-width: 400px;
-}
-.notes-choice {
+  height: 120px;
+  padding: 14px;
   background: var(--bg-card);
   border: 2px solid var(--border);
   border-radius: 10px;
-  padding: 14px 16px;
-  cursor: pointer;
+  color: var(--text);
+  font-family: inherit;
   font-size: 14px;
-  text-align: center;
-  transition: all 0.2s;
+  resize: none;
+  margin-bottom: 8px;
 }
-.notes-choice:hover {
+.notes-textarea:focus {
+  outline: none;
   border-color: var(--brain);
-  transform: translateY(-2px);
 }
-.notes-choice.selected {
-  border-color: var(--brain);
-  background: var(--brain);
-  color: white;
+.notes-textarea::placeholder {
+  color: var(--text-dim);
+}
+.notes-char-count {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: right;
+  max-width: 400px;
+  margin-bottom: 20px;
+}
+.skip-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 12px;
+  padding: 8px 16px;
+}
+.skip-btn:hover {
+  color: var(--text);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -826,6 +919,33 @@ main {
 
 <main>
   <div class="game-container">
+
+    <!-- DAILY SHOW -->
+    <div class="daily-show" id="daily-show">
+      <div class="show-header" onclick="toggleShow()">
+        <span class="show-badge">📺 TODAY'S SHOW</span>
+        <span class="show-title" id="show-title">Loading...</span>
+        <span class="show-toggle" id="show-toggle">▼</span>
+      </div>
+      <div class="show-content" id="show-content">
+        <div class="show-video">
+          <iframe id="show-iframe" width="100%" height="200"
+            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <div class="show-meta">
+          <div class="show-links">
+            <a href="#" target="_blank">YouTube</a> ·
+            <a href="#" target="_blank">TikTok</a> ·
+            <a href="#" target="_blank">X</a>
+          </div>
+          <button class="watch-later-btn" onclick="toggleWatchLater()">
+            <span id="watch-later-icon">🕐</span> Watch Later
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- HOME / SEARCH SCREEN -->
     <div class="home-screen" id="home-screen">
@@ -904,20 +1024,23 @@ main {
       </div>
     </div>
 
-    <!-- CASE NOTES SCREEN (mad libs flavor) -->
+    <!-- CASE NOTES SCREEN (real user notes) -->
     <div class="notes-screen" id="notes-screen">
       <div class="notes-header">📝 CASE NOTES</div>
-      <div class="notes-subtitle">Add your expert commentary</div>
+      <div class="notes-subtitle">Add your expert commentary (optional)</div>
 
       <div class="triple-progress" id="notes-triple"></div>
 
-      <div class="notes-prompt" id="notes-prompt">
-        <!-- Mad lib prompt injected here -->
-      </div>
+      <textarea class="notes-textarea" id="notes-textarea"
+        placeholder="What do you think about this use case? Any context, concerns, or connections to other cases?"
+        maxlength="500"></textarea>
 
-      <div class="notes-choices" id="notes-choices">
-        <!-- Three flavor options -->
-      </div>
+      <div class="notes-char-count"><span id="notes-count">0</span>/500</div>
+
+      <button class="continue-btn" onclick="submitNotes()">
+        Close Case →
+      </button>
+      <button class="skip-btn" onclick="skipNotes()">Skip</button>
     </div>
 
     <!-- CARD COLLECTION SCREEN -->
@@ -982,7 +1105,7 @@ let currentArticle = null;
 let currentStep = 0; // 0=who, 1=action, 2=whom
 let picks = { who: null, action: null, whom: null };
 let currentFaction = null;
-let currentFlavorNote = null;
+let currentUserNotes = '';
 
 const QUESTIONS = [
   'WHO is doing this?',
@@ -991,29 +1114,6 @@ const QUESTIONS = [
 ];
 
 const STEP_KEYS = ['who', 'action', 'whom'];
-
-// Mad lib flavor templates based on faction
-const FLAVOR_TEMPLATES = {
-  heaven: [
-    '"Finally, AI doing something {positive_adj}."',
-    '"This is what {good_actor} intended all along."',
-    '"A rare win for {beneficiary}."'
-  ],
-  hell: [
-    '"We take {corporate_bs} seriously."',
-    '"This is fine. Everything is {disaster_adj}."',
-    '"What could possibly go {wrong_word}?"'
-  ]
-};
-
-const FLAVOR_OPTIONS = {
-  positive_adj: ['actually useful', 'not terrifying', 'genuinely helpful'],
-  good_actor: ['the engineers', 'humanity', 'the optimists'],
-  beneficiary: ['actual humans', 'the little guy', 'common sense'],
-  corporate_bs: ['your privacy', 'user safety', 'ethical AI'],
-  disaster_adj: ['fine', 'on fire', 'exactly as planned'],
-  wrong_word: ['wrong', 'sideways', 'full Skynet']
-};
 
 // Source icons for search
 const SOURCE_ICONS = {
@@ -1047,6 +1147,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     audioBtn.classList.add('muted');
   }
 
+  // Load daily show
+  loadDailyShow();
+
+  // Restore show collapsed state
+  if (localStorage.getItem('ucar_show_collapsed') === 'true') {
+    document.getElementById('daily-show').classList.add('collapsed');
+  }
+
   // Load trending cases
   await loadTrendingCases();
 
@@ -1055,6 +1163,60 @@ document.addEventListener('DOMContentLoaded', async () => {
     startBackgroundMusic();
   }, 1000);
 });
+
+// ═══════════════════════════════════════════════════════════════
+// DAILY SHOW
+// ═══════════════════════════════════════════════════════════════
+async function loadDailyShow() {
+  // Try to load latest episode from Supabase
+  if (!sb) return;
+
+  try {
+    const { data: episode, error } = await sb
+      .from('episodes')
+      .select('*')
+      .order('episode_number', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (episode) {
+      document.getElementById('show-title').textContent = `EP${episode.episode_number}: ${episode.title || 'New Episode'}`;
+      if (episode.youtube_id) {
+        document.getElementById('show-iframe').src = `https://www.youtube.com/embed/${episode.youtube_id}`;
+      }
+    } else {
+      document.getElementById('show-title').textContent = 'No episodes yet - Coming soon!';
+    }
+  } catch (err) {
+    document.getElementById('show-title').textContent = 'Daily show coming soon!';
+  }
+
+  // Check watch later status
+  if (localStorage.getItem('ucar_watch_later')) {
+    document.querySelector('.watch-later-btn').classList.add('saved');
+    document.getElementById('watch-later-icon').textContent = '✓';
+  }
+}
+
+function toggleShow() {
+  const show = document.getElementById('daily-show');
+  show.classList.toggle('collapsed');
+  localStorage.setItem('ucar_show_collapsed', show.classList.contains('collapsed'));
+}
+
+function toggleWatchLater() {
+  const btn = document.querySelector('.watch-later-btn');
+  const icon = document.getElementById('watch-later-icon');
+  const isSaved = btn.classList.toggle('saved');
+
+  if (isSaved) {
+    localStorage.setItem('ucar_watch_later', Date.now());
+    icon.textContent = '✓';
+  } else {
+    localStorage.removeItem('ucar_watch_later');
+    icon.textContent = '🕐';
+  }
+}
 
 function updateInventory() {
   document.getElementById('coin-count').textContent = coins;
@@ -1180,6 +1342,7 @@ async function doSearch() {
   if (!text && !who && !action && !whom) {
     status.innerHTML = '';
     webSection.style.display = 'none';
+    loadTrendingCases();  // Reset to trending
     return;
   }
 
@@ -1192,16 +1355,28 @@ async function doSearch() {
   // Show searching
   status.innerHTML = '<span class="sources">📰 🟧 🔴 🐙 📄 📚</span> Searching...';
 
-  // TODO: Call edge function for search
-  // For now, just search Supabase
   try {
-    const query = text || [who, action, whom].filter(Boolean).join(' ');
+    // Build search query - split into words for fuzzy matching
+    const searchText = text || [who, action, whom].filter(Boolean).join(' ');
+    const words = searchText.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+
+    if (words.length === 0) {
+      status.innerHTML = '<span style="color:var(--text-dim)">Type more to search</span>';
+      return;
+    }
+
+    // Build OR conditions for each word across title, description, category
+    const orConditions = words.map(word =>
+      `title.ilike.%${word}%,description.ilike.%${word}%,category.ilike.%${word}%`
+    ).join(',');
+
     const { data: cases, error } = await sb
       .from('use_cases')
-      .select('id, title, category, evil_votes, good_votes')
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
+      .select('id, title, description, category, evil_votes, good_votes')
+      .or(orConditions)
       .in('status', ['active', 'approved'])
-      .limit(10);
+      .order('evil_votes', { ascending: false })
+      .limit(15);
 
     if (cases && cases.length > 0) {
       status.innerHTML = `<span style="color:var(--good)">${cases.length} found</span>`;
@@ -1216,17 +1391,26 @@ async function doSearch() {
         </div>
       `).join('');
     } else {
-      status.innerHTML = '<span style="color:var(--text-dim)">No matches</span>';
+      // No results - offer to submit as new case
+      status.innerHTML = `
+        <span style="color:var(--text-dim)">No matches for "${escHtml(searchText)}"</span>
+        <button onclick="submitNewCase('${escAttr(searchText)}')" style="margin-left:8px;padding:6px 12px;background:var(--purple);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px">+ Submit as Case</button>
+      `;
+      document.getElementById('trending-cases').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-dim)">No cases found. Be the first to document this!</div>';
     }
   } catch (err) {
+    console.error('Search error:', err);
     status.innerHTML = '<span style="color:var(--bad)">Search failed</span>';
   }
 }
 
-async function submitUrl() {
-  const url = document.getElementById('search-input').value.trim();
-  // TODO: Call mine endpoint
-  alert('URL submission coming soon: ' + url);
+function submitNewCase(searchText) {
+  // Pre-fill the triple inputs with the search terms
+  const words = searchText.split(/\s+/);
+  if (words.length >= 1) document.getElementById('triple-who').value = words[0];
+  if (words.length >= 2) document.getElementById('triple-action').value = words[1];
+  if (words.length >= 3) document.getElementById('triple-whom').value = words.slice(2).join(' ');
+  alert('Fill in the triple (who → action → whom) and we\\'ll create a case for this!\\n\\nComing soon: AI-powered case creation from your description.');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1265,17 +1449,58 @@ async function startExtraction(caseId) {
 }
 
 function generateMockChoices(c) {
-  // In production, this comes from AI
-  // For now, extract from title/description
-  const words = (c.title + ' ' + (c.description || '')).split(/\s+/);
-  const nouns = words.filter(w => w.length > 3 && /^[A-Z]/.test(w)).slice(0, 9);
-  const verbs = ['deployed', 'uses', 'built', 'monitors', 'tracks', 'analyzes', 'flags', 'denies', 'automates'];
+  // Generate semantic VARIATIONS on the triple - different perspectives
+  // Each choice teaches the model a different relationship type
+
+  // Parse title for clues
+  const title = c.title || '';
+  const desc = c.description || '';
+  const combined = (title + ' ' + desc).toLowerCase();
+
+  // Extract potential actors/entities
+  const orgPatterns = combined.match(/([A-Z][a-z]+(?:\s[A-Z][a-z]+)*)/g) || [];
+  const orgs = [...new Set(orgPatterns)].slice(0, 5);
+
+  // WHO variations: deployer, operator, the AI itself
+  const whoChoices = [
+    orgs[0] || 'The Organization',           // Primary actor
+    orgs[1] || 'The Department',             // Secondary/internal
+    'The Algorithm'                           // The AI as agent (often absurd)
+  ];
+
+  // ACTION variations: neutral, positive spin, dystopian framing
+  const actionWords = ['deployed', 'uses', 'implemented', 'built', 'monitors', 'tracks', 'automates', 'flags', 'denies', 'approves'];
+  const foundActions = actionWords.filter(w => combined.includes(w));
+
+  const actionChoices = [
+    foundActions[0] || 'deployed',           // Neutral/factual
+    foundActions[0] ? foundActions[0].replace('ed', 's') + ' on' : 'experiments with',  // Active voice
+    combined.includes('ai') ? 'unleashed' : 'subjected people to'  // Dramatic framing
+  ];
+
+  // WHOM variations: direct target, indirect affected, abstract concept
+  const whomChoices = [
+    extractTarget(combined) || 'users',      // Direct target
+    'the general public',                     // Broader impact
+    'human judgment'                          // Abstract/philosophical
+  ];
 
   return {
-    who: nouns.slice(0, 3).length >= 3 ? nouns.slice(0, 3) : ['Company', 'Government', 'Organization'],
-    action: verbs.slice(0, 3),
-    whom: nouns.slice(3, 6).length >= 3 ? nouns.slice(3, 6) : ['users', 'citizens', 'data']
+    who: whoChoices,
+    action: actionChoices,
+    whom: whomChoices
   };
+}
+
+function extractTarget(text) {
+  // Try to find who/what is affected
+  const targets = ['users', 'customers', 'employees', 'students', 'patients', 'citizens', 'applicants', 'workers'];
+  for (const t of targets) {
+    if (text.includes(t)) return t;
+  }
+  // Try to find after "to" or "for"
+  const match = text.match(/(?:to|for|on)\s+(\w+)/);
+  return match ? match[1] : null;
 }
 
 function renderGameStep() {
@@ -1361,7 +1586,7 @@ function selectVerdict(faction) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CASE NOTES SCREEN (Mad Libs flavor text)
+// CASE NOTES SCREEN (real user input)
 // ═══════════════════════════════════════════════════════════════
 function showNotesScreen() {
   document.getElementById('notes-triple').innerHTML = `
@@ -1372,47 +1597,28 @@ function showNotesScreen() {
     <span class="picked">[${picks.whom}]</span>
   `;
 
-  // Pick a random template for the faction
-  const templates = FLAVOR_TEMPLATES[currentFaction];
-  const template = templates[Math.floor(Math.random() * templates.length)];
+  // Clear previous notes
+  const textarea = document.getElementById('notes-textarea');
+  textarea.value = '';
+  document.getElementById('notes-count').textContent = '0';
 
-  // Find the blank in the template
-  const blankMatch = template.match(/\{(\w+)\}/);
-  if (blankMatch) {
-    const blankKey = blankMatch[1];
-    const options = FLAVOR_OPTIONS[blankKey] || ['option 1', 'option 2', 'option 3'];
-
-    // Display the prompt with blank
-    const promptHtml = template.replace(/\{(\w+)\}/, '<span class="blank">_______</span>');
-    document.getElementById('notes-prompt').innerHTML = promptHtml;
-
-    // Display the choices
-    document.getElementById('notes-choices').innerHTML = options.map((opt, i) => `
-      <div class="notes-choice" onclick="selectNote('${escAttr(opt)}', this)">${opt}</div>
-    `).join('');
-
-    // Store template for later
-    currentArticle.flavorTemplate = template;
-    currentArticle.flavorBlankKey = blankKey;
-  }
+  // Setup character counter
+  textarea.oninput = () => {
+    document.getElementById('notes-count').textContent = textarea.value.length;
+  };
 
   showScreen('notes');
 }
 
-function selectNote(note, el) {
-  currentFlavorNote = note;
+function submitNotes() {
+  const notes = document.getElementById('notes-textarea').value.trim();
+  currentUserNotes = notes;
+  showMintScreen();
+}
 
-  // Animate selection
-  el.classList.add('selected');
-
-  // Fill in the blank
-  const template = currentArticle.flavorTemplate;
-  const filledFlavor = template.replace(/\{(\w+)\}/, note);
-  document.getElementById('notes-prompt').innerHTML = filledFlavor;
-
-  setTimeout(() => {
-    showMintScreen();
-  }, 600);
+function skipNotes() {
+  currentUserNotes = '';
+  showMintScreen();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1441,9 +1647,17 @@ function showMintScreen() {
   document.getElementById('card-atk').textContent = atk;
   document.getElementById('card-def').textContent = def;
 
-  // Use the player's flavor note!
-  const template = currentArticle.flavorTemplate || '"{note}"';
-  const flavorText = template.replace(/\{(\w+)\}/, currentFlavorNote || 'interesting');
+  // Generate a flavor quote from the triple
+  const flavorQuotes = currentFaction === 'heaven' ? [
+    `"Finally, ${picks.who} doing something right."`,
+    `"A rare win for ${picks.whom}."`,
+    `"This is what responsible AI looks like."`
+  ] : [
+    `"We take ${picks.whom} very seriously."`,
+    `"${picks.who} assures us this is fine."`,
+    `"What could possibly go wrong?"`
+  ];
+  const flavorText = flavorQuotes[Math.floor(Math.random() * flavorQuotes.length)];
   document.getElementById('card-flavor').textContent = flavorText;
 
   const factionEl = document.getElementById('card-faction');
