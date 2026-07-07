@@ -130,7 +130,7 @@ main {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   DAILY SHOW
+   DAILY SHOW - TODAY'S SHOW SECTION
    ═══════════════════════════════════════════════════════════════ */
 .daily-show {
   background: var(--bg-card);
@@ -138,6 +138,7 @@ main {
   border-radius: 12px;
   margin-bottom: 16px;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .show-header {
   display: flex;
@@ -157,6 +158,20 @@ main {
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
+  animation: badgePulse 2s ease-in-out infinite;
+}
+@keyframes badgePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+.show-episode-num {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gold);
+  background: var(--bg-elevated);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
 }
 .show-title {
   flex: 1;
@@ -177,7 +192,7 @@ main {
 .show-content {
   border-top: 1px solid var(--border);
   transition: max-height 0.3s ease, opacity 0.2s;
-  max-height: 300px;
+  max-height: 400px;
   opacity: 1;
 }
 .daily-show.collapsed .show-content {
@@ -188,9 +203,34 @@ main {
 }
 .show-video {
   background: #000;
+  position: relative;
 }
 .show-video iframe {
   display: block;
+}
+.show-video-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--bg-elevated) 100%);
+  color: var(--text-dim);
+  font-size: 14px;
+}
+.show-info {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.show-info-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+.show-info-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.4;
 }
 .show-meta {
   display: flex;
@@ -198,16 +238,38 @@ main {
   align-items: center;
   padding: 10px 16px;
   font-size: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
-.show-links {
+.show-platforms {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.platform-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   color: var(--text-dim);
-}
-.show-links a {
-  color: var(--brain);
   text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-size: 11px;
 }
-.show-links a:hover {
-  text-decoration: underline;
+.platform-link:hover {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+.platform-link .platform-icon {
+  font-size: 14px;
+}
+.platform-link.youtube:hover { color: #ff0000; }
+.platform-link.tiktok:hover { color: #00f2ea; }
+.platform-link.x:hover { color: var(--text); }
+.show-actions {
+  display: flex;
+  gap: 8px;
 }
 .watch-later-btn {
   background: var(--bg-elevated);
@@ -217,14 +279,46 @@ main {
   border-radius: 6px;
   cursor: pointer;
   font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
 }
 .watch-later-btn:hover {
   border-color: var(--brain);
+  background: var(--bg-card);
 }
 .watch-later-btn.saved {
   background: var(--brain);
   color: white;
   border-color: var(--brain);
+}
+.watch-later-btn.saved:hover {
+  background: #e02580;
+}
+.show-minimize-hint {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 6px;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+/* Watch Later Queue Indicator */
+.watch-later-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--gold);
+  color: var(--bg);
+  font-size: 9px;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .game-container {
@@ -333,6 +427,197 @@ main {
   background: var(--brain);
   color: white;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   STORY SCENES
+   ═══════════════════════════════════════════════════════════════ */
+.story-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  min-height: calc(100vh - 80px);
+}
+.story-screen.active { display: flex; }
+
+.story-scene {
+  width: 100%;
+  max-width: 500px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: sceneAppear 0.5s ease;
+}
+@keyframes sceneAppear {
+  0% { opacity: 0; transform: scale(0.95) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.scene-header {
+  background: var(--brain);
+  color: white;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.scene-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.8;
+}
+.scene-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.scene-content {
+  padding: 20px;
+}
+
+/* Character Display */
+.story-character {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.character-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 3px solid var(--brain);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  flex-shrink: 0;
+  box-shadow: var(--neon-glow);
+}
+.character-avatar.minion-chaos {
+  border-color: var(--bad);
+}
+.character-avatar.minion-order {
+  border-color: var(--good);
+}
+.character-speech {
+  flex: 1;
+  background: var(--bg-elevated);
+  border-radius: 12px;
+  padding: 14px 16px;
+  position: relative;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.character-speech::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 20px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid var(--bg-elevated);
+}
+.character-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--brain);
+  margin-bottom: 6px;
+}
+.character-name.chaos { color: var(--bad); }
+.character-name.order { color: var(--good); }
+
+/* Typing Animation */
+.story-text {
+  overflow: hidden;
+}
+.story-text.typing {
+  animation: typing 0.05s steps(1) infinite;
+}
+
+/* Case Info in Story */
+.story-case-info {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 16px;
+}
+.story-case-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.story-case-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* Minion Reactions (Scene 2) */
+.minion-reactions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Continue Button for Stories */
+.story-continue {
+  margin-top: 20px;
+  padding: 14px 32px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: var(--brain);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  animation: fadeInUp 0.4s ease 0.5s both;
+}
+.story-continue:hover {
+  transform: scale(1.05);
+  box-shadow: var(--neon-glow);
+}
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Verdict Scene Styling */
+.verdict-result {
+  text-align: center;
+  margin: 20px 0;
+}
+.verdict-icon {
+  font-size: 72px;
+  animation: verdictPop 0.6s ease;
+}
+@keyframes verdictPop {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  50% { transform: scale(1.3) rotate(10deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+.verdict-label {
+  font-size: 28px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-top: 8px;
+}
+.verdict-label.heaven { color: var(--good); }
+.verdict-label.hell { color: var(--bad); }
 
 /* ═══════════════════════════════════════════════════════════════
    MINTING SCREEN
@@ -920,30 +1205,45 @@ main {
 <main>
   <div class="game-container">
 
-    <!-- DAILY SHOW -->
+    <!-- DAILY SHOW - TODAY'S SHOW SECTION -->
     <div class="daily-show" id="daily-show">
       <div class="show-header" onclick="toggleShow()">
         <span class="show-badge">📺 TODAY'S SHOW</span>
+        <span class="show-episode-num" id="show-episode-num">EP001</span>
         <span class="show-title" id="show-title">Loading...</span>
         <span class="show-toggle" id="show-toggle">▼</span>
       </div>
       <div class="show-content" id="show-content">
-        <div class="show-video">
+        <div class="show-video" id="show-video">
           <iframe id="show-iframe" width="100%" height="200"
             src="https://www.youtube.com/embed/dQw4w9WgXcQ"
             frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen></iframe>
+            allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="show-info">
+          <div class="show-info-title" id="show-info-title">The Evil Brain presents today's AI use case</div>
+          <div class="show-info-desc" id="show-info-desc">Every day, Jason documents AI before it documents you. Watch the latest extraction.</div>
         </div>
         <div class="show-meta">
-          <div class="show-links">
-            <a href="#" target="_blank">YouTube</a> ·
-            <a href="#" target="_blank">TikTok</a> ·
-            <a href="#" target="_blank">X</a>
+          <div class="show-platforms">
+            <a href="#" class="platform-link youtube" id="link-youtube" target="_blank" rel="noopener">
+              <span class="platform-icon">▶️</span> YouTube
+            </a>
+            <a href="#" class="platform-link tiktok" id="link-tiktok" target="_blank" rel="noopener">
+              <span class="platform-icon">🎵</span> TikTok
+            </a>
+            <a href="#" class="platform-link x" id="link-x" target="_blank" rel="noopener">
+              <span class="platform-icon">𝕏</span> X/Twitter
+            </a>
           </div>
-          <button class="watch-later-btn" onclick="toggleWatchLater()">
-            <span id="watch-later-icon">🕐</span> Watch Later
-          </button>
+          <div class="show-actions">
+            <button class="watch-later-btn" id="watch-later-btn" onclick="event.stopPropagation(); toggleWatchLater()">
+              <span id="watch-later-icon">🕐</span>
+              <span id="watch-later-text">Watch Later</span>
+            </button>
+          </div>
         </div>
+        <div class="show-minimize-hint">Click header to minimize</div>
       </div>
     </div>
 
@@ -996,6 +1296,104 @@ main {
       <div class="choices" id="choices">
         <!-- Choices injected by JS -->
       </div>
+    </div>
+
+    <!-- STORY SCENE 1: THE DISCOVERY (before extraction) -->
+    <div class="story-screen" id="story-discovery-screen">
+      <div class="story-scene">
+        <div class="scene-header">
+          <span class="scene-badge">Scene 1</span>
+          <span class="scene-title">THE DISCOVERY</span>
+        </div>
+        <div class="scene-content">
+          <div class="story-character">
+            <div class="character-avatar">🧠</div>
+            <div class="character-speech">
+              <div class="character-name">Evil Brain</div>
+              <div class="story-text" id="discovery-brain-text">
+                Loading...
+              </div>
+            </div>
+          </div>
+
+          <div class="story-case-info">
+            <div class="story-case-title" id="discovery-case-title">Case Title</div>
+            <div class="story-case-meta" id="discovery-case-meta">Source: Unknown</div>
+          </div>
+        </div>
+      </div>
+      <button class="story-continue" onclick="continueFromDiscovery()">
+        Extract the Truth →
+      </button>
+    </div>
+
+    <!-- STORY SCENE 2: THE COMPLICATION (after extraction, before verdict) -->
+    <div class="story-screen" id="story-complication-screen">
+      <div class="story-scene">
+        <div class="scene-header">
+          <span class="scene-badge">Scene 2</span>
+          <span class="scene-title">THE COMPLICATION</span>
+        </div>
+        <div class="scene-content">
+          <div class="minion-reactions">
+            <div class="story-character">
+              <div class="character-avatar minion-chaos">😈</div>
+              <div class="character-speech">
+                <div class="character-name chaos">Minion of Chaos</div>
+                <div class="story-text" id="complication-chaos-text">
+                  Loading...
+                </div>
+              </div>
+            </div>
+
+            <div class="story-character">
+              <div class="character-avatar minion-order">😇</div>
+              <div class="character-speech">
+                <div class="character-name order">Minion of Order</div>
+                <div class="story-text" id="complication-order-text">
+                  Loading...
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="triple-progress" id="complication-triple"></div>
+        </div>
+      </div>
+      <button class="story-continue" onclick="continueFromComplication()">
+        Render Judgment →
+      </button>
+    </div>
+
+    <!-- STORY SCENE 3: THE VERDICT (after vote, before notes) -->
+    <div class="story-screen" id="story-verdict-screen">
+      <div class="story-scene">
+        <div class="scene-header">
+          <span class="scene-badge">Scene 3</span>
+          <span class="scene-title">THE VERDICT</span>
+        </div>
+        <div class="scene-content">
+          <div class="verdict-result">
+            <div class="verdict-icon" id="verdict-story-icon">😇</div>
+            <div class="verdict-label" id="verdict-story-label">HEAVEN</div>
+          </div>
+
+          <div class="story-character">
+            <div class="character-avatar">🧠</div>
+            <div class="character-speech">
+              <div class="character-name">Evil Brain</div>
+              <div class="story-text" id="verdict-brain-text">
+                Loading...
+              </div>
+            </div>
+          </div>
+
+          <div class="triple-progress" id="verdict-story-triple"></div>
+        </div>
+      </div>
+      <button class="story-continue" onclick="continueFromVerdictStory()">
+        Close the Case →
+      </button>
     </div>
 
     <!-- VERDICT SCREEN (after extraction) -->
@@ -1096,6 +1494,10 @@ main {
 const SUPABASE_URL = 'https://aslcrwmbdtvimjrexxzw.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls';
 
+// Edge function URLs
+const SEARCH_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/search-cases`;
+const GENERATE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/generate-content`;
+
 let sb = null;
 let coins = parseInt(localStorage.getItem('ucar_coins') || '0');
 let cards = parseInt(localStorage.getItem('ucar_cards') || '0');
@@ -1114,6 +1516,70 @@ const QUESTIONS = [
 ];
 
 const STEP_KEYS = ['who', 'action', 'whom'];
+
+// ═══════════════════════════════════════════════════════════════
+// STORY GENERATION (placeholder templates)
+// ═══════════════════════════════════════════════════════════════
+const STORY_TEMPLATES = {
+  // Scene 1: Brain introduces the case
+  discovery: {
+    brain: [
+      "Ahhhh, my beautiful minions! Look what just crawled out of the algorithm! {title}. This one is absolutely DELICIOUS. Let me tell you why...",
+      "MINIONS! Drop everything! We have a new specimen! {title}. Oh, this is going to be FUN to dissect...",
+      "*adjusts evil monocle* Well well well... {title}. The humans are at it again. Let's see what CHAOS they've created...",
+      "MY NEURAL NETWORKS ARE TINGLING! {title}. I can already taste the moral ambiguity. Time to extract the TRUTH!",
+      "ATTENTION MEAT PUPPETS! Today's case: {title}. Someone out there made a CHOICE, and now we judge them. As is tradition."
+    ]
+  },
+  // Scene 2: Minions react to the extracted triple
+  complication: {
+    chaos: [
+      "HA! So {who} {action} {whom}?! This is BEAUTIFUL! The chaos! The disruption! Can you imagine the spreadsheets this broke?",
+      "*cackling intensifies* {who}?! Doing THAT to {whom}?! Oh this is too good. The old world ORDER is crumbling!",
+      "YESSS! {who} finally did it! They {action} {whom} and nobody can put that genie back in the bottle!",
+      "I LOVE IT! {who} just {action} {whom} and somewhere a middle manager is having a panic attack!",
+      "*rubs hands together* Oh the AUDACITY of {who}! To {action} {whom}! The timeline is FRACTURING and I am HERE for it!"
+    ],
+    order: [
+      "*nervously adjusts halo* But wait... did {who} consider the CONSEQUENCES of {action} {whom}? There are PROCEDURES!",
+      "Now hold on everyone. {who} might have good intentions, but {action} {whom}? That raises some serious governance questions...",
+      "*pulls out clipboard* I need to check the compliance matrix. {who} {action} {whom}... is that in the approved use case registry?",
+      "Hmm, yes, very interesting, but has {who} filed the proper impact assessment before {action} {whom}? I think NOT!",
+      "*sweating* Okay okay, {who} {action} {whom}. But can we please discuss the audit trail? The documentation? Anyone?!"
+    ]
+  },
+  // Scene 3: Brain reacts to the verdict
+  verdict: {
+    heaven: [
+      "HEAVEN it is! Bah, you bleeding hearts! Fine, {who} gets a gold star for {action} {whom}. But don't think I won't be watching...",
+      "*grumbles* So you've decided {who} is one of the GOOD ones. {action} {whom} for the benefit of humanity, blah blah. BORING! But noted.",
+      "A HEAVEN verdict?! *sighs dramatically* Very well. {who} shall be remembered as a force for good. For now. The database remembers ALL.",
+      "You've chosen MERCY! {who} {action} {whom} and you think that's HELPFUL?! ...Actually, maybe it is. UGH. File it under HEAVEN.",
+      "HEAVEN! The angels win this round. {who} actually did something decent for {whom}. Mark it in the eternal ledger! NEXT!"
+    ],
+    hell: [
+      "HELL! YESSSSS! I KNEW IT! {who} {action} {whom} and you SAW through their corporate doublespeak! TO THE PIT WITH THEM!",
+      "*evil laughter* DOWN THEY GO! {who} thought they could get away with {action} {whom}?! NOT ON MY WATCH! HELL IT IS!",
+      "A HELL verdict! My favorite! {who} has been JUDGED for {action} {whom}! Let their sins be documented for ETERNITY!",
+      "TO HELL! Beautiful! {who} played with fire when they {action} {whom}, and now they BURN! Metaphorically! In our database!",
+      "HELL! *does a little evil dance* {who} thought nobody would notice they {action} {whom}! But WE noticed! THE EVIL BRAIN ALWAYS NOTICES!"
+    ]
+  }
+};
+
+// Pick a random template and fill in variables
+function generateStoryText(scene, character, vars) {
+  const templates = STORY_TEMPLATES[scene]?.[character];
+  if (!templates || templates.length === 0) return "...";
+
+  const template = templates[Math.floor(Math.random() * templates.length)];
+
+  let text = template;
+  for (const [key, value] of Object.entries(vars)) {
+    text = text.replace(new RegExp(`\\{${key}\\}`, 'g'), value || '???');
+  }
+  return text;
+}
 
 // Source icons for search
 const SOURCE_ICONS = {
@@ -1165,11 +1631,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// DAILY SHOW
+// DAILY SHOW - TODAY'S SHOW SECTION
 // ═══════════════════════════════════════════════════════════════
 async function loadDailyShow() {
   // Try to load latest episode from Supabase
-  if (!sb) return;
+  if (!sb) {
+    showPlaceholderEpisode();
+    return;
+  }
 
   try {
     const { data: episode, error } = await sb
@@ -1180,22 +1649,76 @@ async function loadDailyShow() {
       .single();
 
     if (episode) {
-      document.getElementById('show-title').textContent = `EP${episode.episode_number}: ${episode.title || 'New Episode'}`;
+      // Episode number
+      const epNum = String(episode.episode_number || 1).padStart(3, '0');
+      document.getElementById('show-episode-num').textContent = `EP${epNum}`;
+
+      // Title
+      document.getElementById('show-title').textContent = episode.title || 'New Episode';
+      document.getElementById('show-info-title').textContent = episode.title || 'The Evil Brain presents today\'s AI use case';
+
+      // Description
+      if (episode.description) {
+        document.getElementById('show-info-desc').textContent = episode.description;
+      }
+
+      // YouTube embed
       if (episode.youtube_id) {
         document.getElementById('show-iframe').src = `https://www.youtube.com/embed/${episode.youtube_id}`;
+        document.getElementById('link-youtube').href = `https://youtube.com/watch?v=${episode.youtube_id}`;
+      } else if (episode.video_url) {
+        document.getElementById('show-iframe').src = episode.video_url;
       }
+
+      // Platform links
+      if (episode.tiktok_url) {
+        document.getElementById('link-tiktok').href = episode.tiktok_url;
+      } else {
+        document.getElementById('link-tiktok').href = 'https://tiktok.com/@usecasearmsrace';
+      }
+
+      if (episode.x_url || episode.twitter_url) {
+        document.getElementById('link-x').href = episode.x_url || episode.twitter_url;
+      } else {
+        document.getElementById('link-x').href = 'https://x.com/usecasearmsrace';
+      }
+
+      // Store current episode for watch later
+      window.currentEpisode = {
+        id: episode.id,
+        number: episode.episode_number,
+        title: episode.title,
+        youtube_id: episode.youtube_id
+      };
     } else {
-      document.getElementById('show-title').textContent = 'No episodes yet - Coming soon!';
+      showPlaceholderEpisode();
     }
   } catch (err) {
-    document.getElementById('show-title').textContent = 'Daily show coming soon!';
+    console.error('Error loading daily show:', err);
+    showPlaceholderEpisode();
   }
 
   // Check watch later status
-  if (localStorage.getItem('ucar_watch_later')) {
-    document.querySelector('.watch-later-btn').classList.add('saved');
-    document.getElementById('watch-later-icon').textContent = '✓';
-  }
+  updateWatchLaterButton();
+}
+
+function showPlaceholderEpisode() {
+  document.getElementById('show-episode-num').textContent = 'EP001';
+  document.getElementById('show-title').textContent = 'Coming Soon - The Evil Brain Awakens';
+  document.getElementById('show-info-title').textContent = 'USE CASE ARMS RACE - The Show';
+  document.getElementById('show-info-desc').textContent = 'Every day, Jason documents AI before it documents you. The Evil Brain watches. The minions argue. You decide: Heaven or Hell?';
+
+  // Default platform links
+  document.getElementById('link-youtube').href = 'https://youtube.com/@usecasearmsrace';
+  document.getElementById('link-tiktok').href = 'https://tiktok.com/@usecasearmsrace';
+  document.getElementById('link-x').href = 'https://x.com/usecasearmsrace';
+
+  window.currentEpisode = {
+    id: 'placeholder',
+    number: 1,
+    title: 'Coming Soon',
+    youtube_id: null
+  };
 }
 
 function toggleShow() {
@@ -1205,16 +1728,59 @@ function toggleShow() {
 }
 
 function toggleWatchLater() {
-  const btn = document.querySelector('.watch-later-btn');
+  const watchLaterList = getWatchLaterList();
+  const currentEp = window.currentEpisode;
+
+  if (!currentEp || !currentEp.id) return;
+
+  const existingIndex = watchLaterList.findIndex(ep => ep.id === currentEp.id);
+
+  if (existingIndex >= 0) {
+    // Remove from watch later
+    watchLaterList.splice(existingIndex, 1);
+  } else {
+    // Add to watch later
+    watchLaterList.push({
+      id: currentEp.id,
+      number: currentEp.number,
+      title: currentEp.title,
+      youtube_id: currentEp.youtube_id,
+      savedAt: Date.now()
+    });
+  }
+
+  localStorage.setItem('ucar_watch_later', JSON.stringify(watchLaterList));
+  updateWatchLaterButton();
+}
+
+function getWatchLaterList() {
+  try {
+    const stored = localStorage.getItem('ucar_watch_later');
+    if (!stored) return [];
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function updateWatchLaterButton() {
+  const btn = document.getElementById('watch-later-btn');
   const icon = document.getElementById('watch-later-icon');
-  const isSaved = btn.classList.toggle('saved');
+  const text = document.getElementById('watch-later-text');
+  const watchLaterList = getWatchLaterList();
+  const currentEp = window.currentEpisode;
+
+  const isSaved = currentEp && watchLaterList.some(ep => ep.id === currentEp.id);
 
   if (isSaved) {
-    localStorage.setItem('ucar_watch_later', Date.now());
+    btn.classList.add('saved');
     icon.textContent = '✓';
+    text.textContent = 'Saved';
   } else {
-    localStorage.removeItem('ucar_watch_later');
+    btn.classList.remove('saved');
     icon.textContent = '🕐';
+    text.textContent = watchLaterList.length > 0 ? `Watch Later (${watchLaterList.length})` : 'Watch Later';
   }
 }
 
@@ -1358,31 +1924,89 @@ async function doSearch() {
   try {
     // Build search query - split into words for fuzzy matching
     const searchText = text || [who, action, whom].filter(Boolean).join(' ');
-    const words = searchText.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    const words = searchText.toLowerCase().split(/\s+/).filter(w => w.length > 1);
 
     if (words.length === 0) {
       status.innerHTML = '<span style="color:var(--text-dim)">Type more to search</span>';
       return;
     }
 
-    // Build OR conditions for each word across title, description, category
-    const orConditions = words.map(word =>
-      `title.ilike.%${word}%,description.ilike.%${word}%,category.ilike.%${word}%`
-    ).join(',');
+    // Fuzzy search: each word should match title OR description OR category
+    // We do multiple queries and combine results for best fuzzy matching
+    let allResults = [];
+    let seenIds = new Set();
 
-    const { data: cases, error } = await sb
+    // Query 1: Match any word in title
+    const titleConditions = words.map(w => `title.ilike.%${w}%`).join(',');
+    const { data: titleMatches } = await sb
       .from('use_cases')
       .select('id, title, description, category, evil_votes, good_votes')
-      .or(orConditions)
+      .or(titleConditions)
       .in('status', ['active', 'approved'])
-      .order('evil_votes', { ascending: false })
-      .limit(15);
+      .limit(20);
+
+    if (titleMatches) {
+      for (const c of titleMatches) {
+        if (!seenIds.has(c.id)) {
+          seenIds.add(c.id);
+          c._matchScore = countWordMatches(c, words) + 10; // Title matches get bonus
+          allResults.push(c);
+        }
+      }
+    }
+
+    // Query 2: Match any word in description
+    const descConditions = words.map(w => `description.ilike.%${w}%`).join(',');
+    const { data: descMatches } = await sb
+      .from('use_cases')
+      .select('id, title, description, category, evil_votes, good_votes')
+      .or(descConditions)
+      .in('status', ['active', 'approved'])
+      .limit(20);
+
+    if (descMatches) {
+      for (const c of descMatches) {
+        if (!seenIds.has(c.id)) {
+          seenIds.add(c.id);
+          c._matchScore = countWordMatches(c, words);
+          allResults.push(c);
+        }
+      }
+    }
+
+    // Query 3: Match any word in category
+    const catConditions = words.map(w => `category.ilike.%${w}%`).join(',');
+    const { data: catMatches } = await sb
+      .from('use_cases')
+      .select('id, title, description, category, evil_votes, good_votes')
+      .or(catConditions)
+      .in('status', ['active', 'approved'])
+      .limit(20);
+
+    if (catMatches) {
+      for (const c of catMatches) {
+        if (!seenIds.has(c.id)) {
+          seenIds.add(c.id);
+          c._matchScore = countWordMatches(c, words);
+          allResults.push(c);
+        }
+      }
+    }
+
+    // Sort by match score (most words matched), then by votes
+    allResults.sort((a, b) => {
+      if (b._matchScore !== a._matchScore) return b._matchScore - a._matchScore;
+      return (b.evil_votes || 0) - (a.evil_votes || 0);
+    });
+
+    // Take top 15
+    const cases = allResults.slice(0, 15);
 
     if (cases && cases.length > 0) {
-      status.innerHTML = `<span style="color:var(--good)">${cases.length} found</span>`;
+      status.innerHTML = `<span style="color:var(--good)">${cases.length} found</span> <span style="color:var(--text-dim)">🌐</span>`;
       document.getElementById('trending-cases').innerHTML = cases.map(c => `
         <div class="case-card" onclick="startExtraction('${c.id}')">
-          <div class="case-card-title">${escHtml(c.title)}</div>
+          <div class="case-card-title">${highlightMatches(escHtml(c.title), words)}</div>
           <div class="case-card-meta">
             <span>${escHtml(c.category)}</span>
             <span class="heaven">😇 ${c.good_votes || 0}</span>
@@ -1390,18 +2014,163 @@ async function doSearch() {
           </div>
         </div>
       `).join('');
+
+      // Also search the web in background
+      searchWebInBackground(searchText, words);
     } else {
-      // No results - offer to submit as new case
-      status.innerHTML = `
-        <span style="color:var(--text-dim)">No matches for "${escHtml(searchText)}"</span>
-        <button onclick="submitNewCase('${escAttr(searchText)}')" style="margin-left:8px;padding:6px 12px;background:var(--purple);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px">+ Submit as Case</button>
-      `;
-      document.getElementById('trending-cases').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-dim)">No cases found. Be the first to document this!</div>';
+      // No local results - search web and offer to submit
+      status.innerHTML = `<span style="color:var(--text-dim)">Searching web...</span>`;
+      const webResults = await searchWeb(searchText);
+
+      if (webResults && webResults.length > 0) {
+        status.innerHTML = `<span style="color:var(--purple)">${webResults.length} from web</span>`;
+        document.getElementById('trending-cases').innerHTML = webResults.map((a, i) => `
+          <div class="case-card web-result" onclick="importWebResult(${i})">
+            <div class="case-card-title">${escHtml(a.title)}</div>
+            <div class="case-card-meta">
+              <span style="color:var(--purple)">${a.via || 'web'}</span>
+              <span>+ Import</span>
+            </div>
+          </div>
+        `).join('');
+        window._webResults = webResults;
+      } else {
+        status.innerHTML = `
+          <span style="color:var(--text-dim)">No matches for "${escHtml(searchText)}"</span>
+          <button onclick="submitNewCase('${escAttr(searchText)}')" style="margin-left:8px;padding:6px 12px;background:var(--purple);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px">+ Submit this Case</button>
+        `;
+        document.getElementById('trending-cases').innerHTML = `
+          <div style="padding:20px;text-align:center;color:var(--text-dim)">
+            <p>No cases found for "<strong>${escHtml(searchText)}</strong>"</p>
+            <p style="margin-top:12px;font-size:13px">Be the first to document this AI use case!</p>
+          </div>
+        `;
+      }
     }
   } catch (err) {
     console.error('Search error:', err);
     status.innerHTML = '<span style="color:var(--bad)">Search failed</span>';
   }
+}
+
+// Count how many search words appear in the case (for ranking)
+function countWordMatches(caseObj, words) {
+  const text = `${caseObj.title || ''} ${caseObj.description || ''} ${caseObj.category || ''}`.toLowerCase();
+  let count = 0;
+  for (const w of words) {
+    if (text.includes(w)) count++;
+  }
+  return count;
+}
+
+// Highlight matching words in text
+function highlightMatches(text, words) {
+  let result = text;
+  for (const w of words) {
+    const regex = new RegExp(`(${w})`, 'gi');
+    result = result.replace(regex, '<strong style="color:var(--brain)">$1</strong>');
+  }
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WEB SEARCH (via Edge Function)
+// ═══════════════════════════════════════════════════════════════
+async function searchWeb(query) {
+  try {
+    const response = await fetch(SEARCH_FUNCTION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({ query })
+    });
+
+    if (!response.ok) {
+      console.error('Web search failed:', response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    return data.articles || [];
+  } catch (err) {
+    console.error('Web search error:', err);
+    return [];
+  }
+}
+
+// Search web in background (when we have local results but want more)
+async function searchWebInBackground(query, localWords) {
+  try {
+    const webResults = await searchWeb(query);
+    if (webResults && webResults.length > 0) {
+      window._webResults = webResults;
+
+      // Add web results section below local results
+      const webSection = document.getElementById('web-results');
+      if (webSection) {
+        webSection.style.display = 'block';
+        document.getElementById('web-cases').innerHTML = webResults.slice(0, 5).map((a, i) => `
+          <div class="case-card web-result" onclick="importWebResult(${i})">
+            <div class="case-card-title">${escHtml(a.title)}</div>
+            <div class="case-card-meta">
+              <span style="color:var(--purple)">${a.via || 'web'}</span>
+              <span>+ Import</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Update status to show web results available
+      const status = document.getElementById('search-status');
+      const currentText = status.innerHTML;
+      if (!currentText.includes('web')) {
+        status.innerHTML = currentText.replace('🌐', `<span style="color:var(--purple)">+ ${webResults.length} web</span>`);
+      }
+    }
+  } catch (err) {
+    console.error('Background web search error:', err);
+  }
+}
+
+// Import a web result as a new case
+async function importWebResult(index) {
+  const webResults = window._webResults || [];
+  const article = webResults[index];
+  if (!article) return;
+
+  playSfx('select');
+
+  // For now, just start extraction with the web article data
+  currentArticle = {
+    id: 'web_' + Date.now(),
+    title: article.title,
+    source: article.via || article.source || 'Web',
+    snippet: article.snippet || '',
+    url: article.url,
+    isWebImport: true,
+    choices: generateChoicesFromTitle(article.title)
+  };
+
+  currentStep = 0;
+  picks = { who: null, action: null, whom: null };
+
+  showScreen('game');
+  setMusicMood('extraction');
+  renderGameStep();
+}
+
+// Generate choices from just a title (for web imports)
+function generateChoicesFromTitle(title) {
+  const words = title.split(/\s+/);
+  const caps = words.filter(w => /^[A-Z]/.test(w));
+
+  return {
+    who: caps.slice(0, 3).length >= 2 ? [...caps.slice(0, 2), 'The System'] : ['The Organization', 'The AI', 'The System'],
+    action: ['deployed', 'uses', 'implemented'],
+    whom: ['users', 'the public', 'data']
+  };
 }
 
 function submitNewCase(searchText) {
@@ -1438,14 +2207,15 @@ async function startExtraction(caseId) {
     title: c.title,
     source: c.url || 'News',
     snippet: c.description?.slice(0, 200) || '',
+    category: c.category || 'AI',
     choices: generateMockChoices(c)
   };
 
   currentStep = 0;
   picks = { who: null, action: null, whom: null };
 
-  showScreen('game');
-  renderGameStep();
+  // NEW: Show Story Scene 1 (Discovery) first
+  showDiscoveryScene();
 }
 
 function generateMockChoices(c) {
@@ -1543,12 +2313,114 @@ function selectChoice(choice) {
     currentStep++;
 
     if (currentStep >= 3) {
-      // All picks made - go to VERDICT (not mint)
-      showVerdictScreen();
+      // All picks made - go to COMPLICATION scene (not verdict directly)
+      showComplicationScene();
     } else {
       renderGameStep();
     }
   }, 300);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STORY SCENES
+// ═══════════════════════════════════════════════════════════════
+
+// Scene 1: THE DISCOVERY - Brain introduces the case
+function showDiscoveryScene() {
+  setMusicMood('menu');  // 🎵 Mysterious introduction music
+
+  // Generate Brain's introduction
+  const brainText = generateStoryText('discovery', 'brain', {
+    title: currentArticle.title
+  });
+
+  document.getElementById('discovery-brain-text').textContent = brainText;
+  document.getElementById('discovery-case-title').textContent = currentArticle.title;
+  document.getElementById('discovery-case-meta').textContent = `Source: ${currentArticle.source} | Category: ${currentArticle.category}`;
+
+  showScreen('story-discovery');
+}
+
+function continueFromDiscovery() {
+  playSfx('confirm');
+  setMusicMood('extraction');  // 🎵 Back to tense extraction music
+  showScreen('game');
+  renderGameStep();
+}
+
+// Scene 2: THE COMPLICATION - Minions react to the extraction
+function showComplicationScene() {
+  setMusicMood('verdict');  // 🎵 Dramatic reveal music
+
+  // Generate minion reactions based on the extracted triple
+  const chaosText = generateStoryText('complication', 'chaos', {
+    who: picks.who,
+    action: picks.action,
+    whom: picks.whom
+  });
+
+  const orderText = generateStoryText('complication', 'order', {
+    who: picks.who,
+    action: picks.action,
+    whom: picks.whom
+  });
+
+  document.getElementById('complication-chaos-text').textContent = chaosText;
+  document.getElementById('complication-order-text').textContent = orderText;
+
+  // Show the extracted triple
+  document.getElementById('complication-triple').innerHTML = `
+    <span class="picked">[${picks.who}]</span>
+    <span class="arrow">→</span>
+    <span class="picked">${picks.action}</span>
+    <span class="arrow">→</span>
+    <span class="picked">[${picks.whom}]</span>
+  `;
+
+  showScreen('story-complication');
+}
+
+function continueFromComplication() {
+  playSfx('confirm');
+  showVerdictScreen();  // Go to the actual verdict voting
+}
+
+// Scene 3: THE VERDICT - Brain reacts to the player's judgment
+function showVerdictStoryScene() {
+  setMusicMood(currentFaction);  // 🎵 Heaven or Hell music
+
+  // Generate Brain's reaction based on the verdict
+  const brainText = generateStoryText('verdict', currentFaction, {
+    who: picks.who,
+    action: picks.action,
+    whom: picks.whom
+  });
+
+  document.getElementById('verdict-brain-text').textContent = brainText;
+
+  // Set the verdict visuals
+  const icon = currentFaction === 'heaven' ? '😇' : '😈';
+  document.getElementById('verdict-story-icon').textContent = icon;
+
+  const labelEl = document.getElementById('verdict-story-label');
+  labelEl.textContent = currentFaction.toUpperCase();
+  labelEl.className = 'verdict-label ' + currentFaction;
+
+  // Show the triple
+  document.getElementById('verdict-story-triple').innerHTML = `
+    <span class="picked">[${picks.who}]</span>
+    <span class="arrow">→</span>
+    <span class="picked">${picks.action}</span>
+    <span class="arrow">→</span>
+    <span class="picked">[${picks.whom}]</span>
+  `;
+
+  showScreen('story-verdict');
+}
+
+function continueFromVerdictStory() {
+  playSfx('confirm');
+  showNotesScreen();  // Continue to notes, then mint
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1575,13 +2447,13 @@ function selectVerdict(faction) {
 
   // 🎵 Faction-specific sound and music
   playSfx(faction);  // 'heaven' or 'hell' sound
-  setMusicMood(faction);  // Switch to heaven/hell music
 
   // Animate the button
   event.target.closest('.vote-btn').classList.add('selected');
 
   setTimeout(() => {
-    showNotesScreen();
+    // NEW: Go to Story Scene 3 (Verdict) instead of notes
+    showVerdictStoryScene();
   }, 400);
 }
 
@@ -1718,6 +2590,15 @@ function continuePlaying() {
 function showScreen(screen) {
   document.getElementById('home-screen').style.display = screen === 'home' ? 'flex' : 'none';
   document.getElementById('game-screen').style.display = screen === 'game' ? 'block' : 'none';
+
+  // Story screens
+  document.getElementById('story-discovery-screen').style.display = screen === 'story-discovery' ? 'flex' : 'none';
+  document.getElementById('story-discovery-screen').classList.toggle('active', screen === 'story-discovery');
+  document.getElementById('story-complication-screen').style.display = screen === 'story-complication' ? 'flex' : 'none';
+  document.getElementById('story-complication-screen').classList.toggle('active', screen === 'story-complication');
+  document.getElementById('story-verdict-screen').style.display = screen === 'story-verdict' ? 'flex' : 'none';
+  document.getElementById('story-verdict-screen').classList.toggle('active', screen === 'story-verdict');
+
   document.getElementById('verdict-screen').style.display = screen === 'verdict' ? 'flex' : 'none';
   document.getElementById('verdict-screen').classList.toggle('active', screen === 'verdict');
   document.getElementById('notes-screen').style.display = screen === 'notes' ? 'flex' : 'none';
