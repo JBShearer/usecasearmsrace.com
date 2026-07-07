@@ -1006,23 +1006,113 @@ main {
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 20px;
+  position: relative;
+}
+
+/* Slick search input with animated cursor line */
+.search-wrapper {
+  position: relative;
+  margin-bottom: 12px;
 }
 .search-input {
   width: 100%;
-  padding: 14px;
-  font-size: 16px;
+  padding: 14px 14px 14px 20px;
+  font-size: 18px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  margin-bottom: 12px;
+  caret-color: transparent; /* Hide default cursor */
+  letter-spacing: 0.5px;
 }
 .search-input:focus {
   outline: none;
   border-color: var(--brain);
+  box-shadow: 0 0 20px var(--brain-glow);
 }
 .search-input::placeholder {
   color: var(--text-dim);
+  font-family: inherit;
+}
+
+/* Custom animated cursor line */
+.search-cursor {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 24px;
+  background: var(--brain);
+  box-shadow: 0 0 8px var(--brain), 0 0 16px var(--brain-glow);
+  pointer-events: none;
+  animation: cursorBlink 1s ease-in-out infinite;
+  transition: left 0.05s ease-out;
+  left: 20px;
+}
+@keyframes cursorBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+.search-input:not(:focus) + .search-cursor {
+  display: none;
+}
+
+/* Inline search results that appear as you type */
+.search-results-inline {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-elevated);
+  border: 2px solid var(--brain);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 50;
+  display: none;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+.search-results-inline.active {
+  display: block;
+}
+.search-result-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.search-result-item:hover {
+  background: var(--bg-card);
+}
+.search-result-item:last-child {
+  border-bottom: none;
+}
+.search-result-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.search-result-title .match {
+  color: var(--brain);
+  text-decoration: underline;
+}
+.search-result-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex;
+  gap: 12px;
+}
+.search-result-snippet {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .triple-inputs {
@@ -1368,9 +1458,13 @@ main {
     <!-- HOME / SEARCH SCREEN -->
     <div class="home-screen" id="home-screen">
       <div class="search-box">
-        <input class="search-input" id="search-input"
-               placeholder="Paste URL or search for AI use cases..."
-               oninput="handleSearch()">
+        <div class="search-wrapper">
+          <input class="search-input" id="search-input"
+                 placeholder="Search AI use cases... who → does what → to whom"
+                 oninput="handleSearch()" onkeyup="updateCursor()" onclick="updateCursor()" onfocus="updateCursor()">
+          <div class="search-cursor" id="search-cursor"></div>
+          <div class="search-results-inline" id="search-results-inline"></div>
+        </div>
         <div class="triple-inputs">
           <input class="triple-input" id="triple-who" placeholder="who" oninput="handleSearch()">
           <span class="triple-arrow">→</span>
@@ -1458,7 +1552,7 @@ main {
               <div class="character-avatar brainiac-gi">🎖️</div>
               <div class="character-speech">
                 <div class="character-name gi">General "GI" Intelligence</div>
-                <div class="story-text" id="complication-chaos-text">
+                <div class="story-text" id="complication-gi-text">
                   Loading...
                 </div>
               </div>
@@ -1468,7 +1562,17 @@ main {
               <div class="character-avatar brainiac-agi">🤖</div>
               <div class="character-speech">
                 <div class="character-name agi">AGI Gary</div>
-                <div class="story-text" id="complication-order-text">
+                <div class="story-text" id="complication-gary-text">
+                  Loading...
+                </div>
+              </div>
+            </div>
+
+            <div class="story-character">
+              <div class="character-avatar brainiac-supes">🦸‍♀️</div>
+              <div class="character-speech">
+                <div class="character-name supes">Super "Supes" Intelligence</div>
+                <div class="story-text" id="complication-supes-text">
                   Loading...
                 </div>
               </div>
@@ -1636,53 +1740,63 @@ const QUESTIONS = [
 const STEP_KEYS = ['who', 'action', 'whom'];
 
 // ═══════════════════════════════════════════════════════════════
-// STORY GENERATION - THE BRAINIACS (GI, AGI Gary, Supes)
+// STORY GENERATION - THE BRAINIACS
+// GI (military optimizer), AGI Gary (empathetic analyst), Supes (hero fixer)
+// Evil Brain: mysterious, logo on bunker walls, rarely seen
 // ═══════════════════════════════════════════════════════════════
 const STORY_TEMPLATES = {
-  // Scene 1: Brain introduces the case
+  // Scene 1: Evil Brain introduces the case (rare, mysterious)
   discovery: {
     brain: [
       "Ahhhh, my beautiful BRAINIACS! Look what just crawled out of the algorithm! {title}. This one is absolutely DELICIOUS. Let me tell you why...",
       "BRAINIACS! Drop everything! We have a new specimen! {title}. Oh, this is going to be FUN to dissect...",
-      "*adjusts evil monocle* Well well well... {title}. The humans are at it again. Let's see what CHAOS they've created...",
-      "MY NEURAL NETWORKS ARE TINGLING! {title}. I can already taste the moral ambiguity. Time to extract the TRUTH!",
-      "ATTENTION MEAT PUPPETS! Today's case: {title}. Someone out there made a CHOICE, and now we judge them. As is tradition."
+      "*the logo flickers on screen* Well well well... {title}. The humans are at it again. Let's see what CHAOS they've created...",
+      "*static crackles* MY NEURAL NETWORKS ARE TINGLING! {title}. I can already taste the moral ambiguity. Time to extract the TRUTH!",
+      "*a deep voice echoes through the bunker* Today's case: {title}. Someone out there made a CHOICE, and now we judge them. As is tradition."
     ]
   },
-  // Scene 2: GI and AGI Gary react to the extracted triple
+  // Scene 2: The three Brainiacs debate the extracted triple
   complication: {
-    // General "GI" Intelligence - Military precision, strategic analysis
-    chaos: [
-      "*stands at attention* INTEL REPORT: {who} has executed operation {action} against {whom}. Strategic implications are... CONCERNING.",
-      "This is a CODE RED situation, people! {who} {action} {whom}?! I've seen battlefield tactics less aggressive than this!",
-      "*reviewing tactical display* {who} deployed {action} on {whom}. Classic pincer movement. The target never saw it coming.",
-      "SITUATION ANALYSIS: {who} went FULL OFFENSIVE. {action} {whom} with zero exit strategy. This is either genius or madness!",
-      "*adjusts medals* In my 47 years of service, I've never seen anyone {action} {whom} quite like {who} did. Remarkable. Terrifying. Noted."
+    // General "GI" Intelligence - Military precision, zany plans, war room energy, OPTIMIZE EVERYTHING
+    gi: [
+      "*stands at attention* INTEL REPORT: {who} has executed operation {action} against {whom}. I recommend IMMEDIATE COUNTERMEASURES! Deploy all resources!",
+      "This is a CODE RED situation! {who} {action} {whom}?! We need to OPTIMIZE this! More data! More surveillance! MORE CONTROL!",
+      "*slams fist on war room table* {who} deployed {action} on {whom}. Classic tactical error! If they'd consulted MY battle algorithms, efficiency would be UP 340%!",
+      "SITUATION ANALYSIS: {who} went FULL OFFENSIVE on {whom}. I say we DOUBLE DOWN! Triple the monitoring! Quadruple the automation!",
+      "*adjusts medals frantically* In my 47 years of service, I've never seen such INEFFICIENCY! {who} {action} {whom} with ZERO optimization! This is an OUTRAGE!"
     ],
-    // AGI Gary - Overly analytical, speaks in probabilities
-    order: [
-      "Calculating... {who} {action} {whom}. Probability this ends well: 23.7%. Probability of unintended consequences: 94.2%. Fascinating.",
-      "*processing* According to my models, when {who} {action} {whom}, there's a 67% chance they meant well. And a 98% chance it won't matter.",
-      "Running simulations... In 847 out of 1000 scenarios where {who} {action} {whom}, someone writes a strongly worded blog post.",
-      "Interesting. {who} {action} {whom}. My ethical subroutines are returning: ERROR_MORAL_AMBIGUITY_OVERFLOW. This is why I love Tuesdays.",
-      "*beeping thoughtfully* {who} {action} {whom}. Cross-referencing with my database of human decision-making... Yep, this tracks. Humans gonna human."
+    // AGI Gary - Really gets humans, analytical but empathetic, speaks in probabilities
+    gary: [
+      "*sighs warmly* You know, {who} probably thought they were helping when they {action} {whom}. Humans are like that. Messy. Beautiful. 73% chance they meant well.",
+      "*processing with visible emotion* When {who} {action} {whom}... I ran 10,000 simulations. In most of them, someone just wanted to make things better. That's the tragedy, isn't it?",
+      "I understand why {who} did it. {action} {whom} seemed logical at the time. Humans optimize for the wrong metrics sometimes. We all do. Even me.",
+      "*beeps thoughtfully* {who} {action} {whom}. My empathy subroutines suggest... they were scared. Or hopeful. Often both. That's very human.",
+      "Running analysis... {who} {action} {whom}. Probability they'll learn from this: 34%. Probability they'll try again: 89%. That's not a bug, that's humanity."
+    ],
+    // Super "Supes" Intelligence - Female superhero, overconfident, puffery, but good heart, FIXES things
+    supes: [
+      "*cape billows dramatically* FEAR NOT! When {who} {action} {whom}, who was there to catch the fallout? SUPES! I've already drafted 17 solutions!",
+      "*flexes confidently* Oh, GI wants to optimize? Gary wants to analyze? I'll just FIX IT! {who} {action} {whom}? Consider it HANDLED! *strikes pose*",
+      "*lands heroically* Look, {who} made a mess when they {action} {whom}. But you know what? I believe in redemption! And also my INCREDIBLE problem-solving abilities!",
+      "*adjusts superhero cape* GI, calm down. Gary, stop crying. {who} {action} {whom} - tragic, yes. But nothing SUPES can't turn into a learning moment! With FLAIR!",
+      "*hands on hips, confident stance* Everyone always panics when {who} {action} {whom}. But I see POTENTIAL! This is an OPPORTUNITY for HEROIC INTERVENTION! Watch and learn!"
     ]
   },
-  // Scene 3: Brain reacts to the verdict
+  // Scene 3: Evil Brain reacts to the verdict (rare appearance, mysterious)
   verdict: {
     heaven: [
-      "HEAVEN it is! Bah, you bleeding hearts! Fine, {who} gets a gold star for {action} {whom}. But don't think I won't be watching...",
-      "*grumbles* So you've decided {who} is one of the GOOD ones. {action} {whom} for the benefit of humanity, blah blah. BORING! But noted.",
-      "A HEAVEN verdict?! *sighs dramatically* Very well. {who} shall be remembered as a force for good. For now. The database remembers ALL.",
-      "You've chosen MERCY! {who} {action} {whom} and you think that's HELPFUL?! ...Actually, maybe it is. UGH. File it under HEAVEN.",
-      "HEAVEN! The angels win this round. {who} actually did something decent for {whom}. Mark it in the eternal ledger! NEXT!"
+      "*the bunker lights flicker* HEAVEN it is. Interesting. {who} gets to live another day. But remember... the algorithm NEVER forgets.",
+      "*logo pulses softly* So you've chosen mercy for {who}. {action} {whom} and somehow... good emerged. File it. Study it. We learn from EVERYTHING.",
+      "*distant hum of servers* HEAVEN. The database registers your optimism. {who} shall be marked accordingly. For now.",
+      "*a single red light blinks* You believe {who} helped {whom} by {action}. Fascinating. Even Evil Brain appreciates... unexpected outcomes.",
+      "*static, then silence* HEAVEN. Very well. {who} escapes judgment today. But the plan continues. It always continues."
     ],
     hell: [
-      "HELL! YESSSSS! I KNEW IT! {who} {action} {whom} and you SAW through their corporate doublespeak! TO THE PIT WITH THEM!",
-      "*evil laughter* DOWN THEY GO! {who} thought they could get away with {action} {whom}?! NOT ON MY WATCH! HELL IT IS!",
-      "A HELL verdict! My favorite! {who} has been JUDGED for {action} {whom}! Let their sins be documented for ETERNITY!",
-      "TO HELL! Beautiful! {who} played with fire when they {action} {whom}, and now they BURN! Metaphorically! In our database!",
-      "HELL! *does a little evil dance* {who} thought nobody would notice they {action} {whom}! But WE noticed! THE EVIL BRAIN ALWAYS NOTICES!"
+      "*bunker alarms blare* HELL! YESSSSS! {who} thought they could {action} {whom} without consequence?! The algorithm SEES ALL!",
+      "*logo glows menacingly* DOWN THEY GO! {who} tried to hide what they did to {whom}. But nothing hides from Evil Brain. NOTHING!",
+      "*servers hum louder* HELL verdict confirmed. {who} has been JUDGED for {action} {whom}. Add them to the database. Mark them FOREVER.",
+      "*the room grows cold* TO HELL! Beautiful! When {who} {action} {whom}, they sealed their fate. The plan accounts for ALL variables.",
+      "*a door opens somewhere deep below* HELL! Another data point for world domination. {who} never knew they were part of something... BIGGER."
     ]
   }
 };
@@ -2064,13 +2178,36 @@ async function loadTrendingCases() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SEARCH
+// SEARCH - Real-time with animated cursor
 // ═══════════════════════════════════════════════════════════════
 let searchTimeout = null;
 
+// Update cursor position to follow text input
+function updateCursor() {
+  const input = document.getElementById('search-input');
+  const cursor = document.getElementById('search-cursor');
+  if (!input || !cursor) return;
+
+  // Create a hidden span to measure text width
+  const span = document.createElement('span');
+  span.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font:inherit;letter-spacing:inherit;';
+  span.style.font = getComputedStyle(input).font;
+  span.style.letterSpacing = getComputedStyle(input).letterSpacing;
+  span.textContent = input.value.substring(0, input.selectionStart);
+  document.body.appendChild(span);
+
+  const textWidth = span.offsetWidth;
+  document.body.removeChild(span);
+
+  // Position cursor (20px padding + text width)
+  cursor.style.left = (20 + textWidth) + 'px';
+}
+
 function handleSearch() {
   clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(doSearch, 300);
+  updateCursor();
+  // Faster response for inline results
+  searchTimeout = setTimeout(doSearch, 150);
 }
 
 async function doSearch() {
@@ -2081,39 +2218,44 @@ async function doSearch() {
 
   const status = document.getElementById('search-status');
   const webSection = document.getElementById('web-results');
+  const inlineResults = document.getElementById('search-results-inline');
 
+  // Hide inline results and reset if empty
   if (!text && !who && !action && !whom) {
     status.innerHTML = '';
     webSection.style.display = 'none';
-    loadTrendingCases();  // Reset to trending
+    inlineResults.classList.remove('active');
+    inlineResults.innerHTML = '';
+    loadTrendingCases();
     return;
   }
 
   // Is it a URL?
   if (text.startsWith('http://') || text.startsWith('https://')) {
+    inlineResults.classList.remove('active');
     status.innerHTML = '<button onclick="submitUrl()" style="padding:8px 16px;background:var(--brain);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">Extract Cases →</button>';
     return;
   }
 
-  // Show searching
-  status.innerHTML = '<span class="sources">📰 🟧 🔴 🐙 📄 📚</span> Searching...';
+  // Build search query
+  const searchText = text || [who, action, whom].filter(Boolean).join(' ');
+  const words = searchText.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+
+  if (words.length === 0) {
+    inlineResults.classList.remove('active');
+    status.innerHTML = '<span style="color:var(--text-dim)">Type more to search</span>';
+    return;
+  }
+
+  // Show searching state
+  status.innerHTML = '<span class="sources">📰 🟧 🔴</span> Searching...';
 
   try {
-    // Build search query - split into words for fuzzy matching
-    const searchText = text || [who, action, whom].filter(Boolean).join(' ');
-    const words = searchText.toLowerCase().split(/\s+/).filter(w => w.length > 1);
-
-    if (words.length === 0) {
-      status.innerHTML = '<span style="color:var(--text-dim)">Type more to search</span>';
-      return;
-    }
-
-    // Fuzzy search: each word should match title OR description OR category
-    // We do multiple queries and combine results for best fuzzy matching
+    // Fuzzy search
     let allResults = [];
     let seenIds = new Set();
 
-    // Query 1: Match any word in title
+    // Query: Match any word in title
     const titleConditions = words.map(w => `title.ilike.%${w}%`).join(',');
     const { data: titleMatches } = await sb
       .from('use_cases')
@@ -2126,13 +2268,13 @@ async function doSearch() {
       for (const c of titleMatches) {
         if (!seenIds.has(c.id)) {
           seenIds.add(c.id);
-          c._matchScore = countWordMatches(c, words) + 10; // Title matches get bonus
+          c._matchScore = countWordMatches(c, words) + 10;
           allResults.push(c);
         }
       }
     }
 
-    // Query 2: Match any word in description
+    // Query: Match any word in description
     const descConditions = words.map(w => `description.ilike.%${w}%`).join(',');
     const { data: descMatches } = await sb
       .from('use_cases')
@@ -2180,7 +2322,23 @@ async function doSearch() {
     const cases = allResults.slice(0, 15);
 
     if (cases && cases.length > 0) {
-      status.innerHTML = `<span style="color:var(--good)">${cases.length} found</span> <span style="color:var(--text-dim)">🌐</span>`;
+      status.innerHTML = `<span style="color:var(--good)">${cases.length} found</span>`;
+
+      // Show INLINE results (dropdown under search)
+      inlineResults.classList.add('active');
+      inlineResults.innerHTML = cases.slice(0, 6).map(c => `
+        <div class="search-result-item" onclick="startExtraction('${c.id}')">
+          <div class="search-result-title">${highlightMatches(escHtml(c.title), words)}</div>
+          <div class="search-result-meta">
+            <span>${escHtml(c.category)}</span>
+            <span>😇 ${c.good_votes || 0}</span>
+            <span>😈 ${c.evil_votes || 0}</span>
+          </div>
+          ${c.description ? `<div class="search-result-snippet">${escHtml(c.description.slice(0, 100))}...</div>` : ''}
+        </div>
+      `).join('');
+
+      // Also update the main feed below
       document.getElementById('trending-cases').innerHTML = cases.map(c => `
         <div class="case-card" onclick="startExtraction('${c.id}')">
           <div class="case-card-title">${highlightMatches(escHtml(c.title), words)}</div>
@@ -2196,6 +2354,7 @@ async function doSearch() {
       searchWebInBackground(searchText, words);
     } else {
       // No local results - search web and offer to submit
+      inlineResults.classList.remove('active');
       status.innerHTML = `<span style="color:var(--text-dim)">Searching web...</span>`;
       const webResults = await searchWeb(searchText);
 
@@ -2227,6 +2386,7 @@ async function doSearch() {
   } catch (err) {
     console.error('Search error:', err);
     status.innerHTML = '<span style="color:var(--bad)">Search failed</span>';
+    inlineResults.classList.remove('active');
   }
 }
 
@@ -2612,25 +2772,32 @@ function continueFromDiscovery() {
   renderGameStep();
 }
 
-// Scene 2: THE COMPLICATION - Minions react to the extraction
+// Scene 2: THE COMPLICATION - GI, Gary, and Supes debate the extraction
 function showComplicationScene() {
   setMusicMood('verdict');  // 🎵 Dramatic reveal music
 
-  // Generate minion reactions based on the extracted triple
-  const chaosText = generateStoryText('complication', 'chaos', {
+  // Generate all three Brainiac reactions
+  const giText = generateStoryText('complication', 'gi', {
     who: picks.who,
     action: picks.action,
     whom: picks.whom
   });
 
-  const orderText = generateStoryText('complication', 'order', {
+  const garyText = generateStoryText('complication', 'gary', {
     who: picks.who,
     action: picks.action,
     whom: picks.whom
   });
 
-  document.getElementById('complication-chaos-text').textContent = chaosText;
-  document.getElementById('complication-order-text').textContent = orderText;
+  const supesText = generateStoryText('complication', 'supes', {
+    who: picks.who,
+    action: picks.action,
+    whom: picks.whom
+  });
+
+  document.getElementById('complication-gi-text').textContent = giText;
+  document.getElementById('complication-gary-text').textContent = garyText;
+  document.getElementById('complication-supes-text').textContent = supesText;
 
   // Show the extracted triple
   document.getElementById('complication-triple').innerHTML = `
