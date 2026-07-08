@@ -1,10 +1,7 @@
-// search-cases: the search engine endpoint. Hot path has ZERO external
-// APIs: query embedding runs on the edge runtime's local gte-small model,
-// then one SQL function does structured filters + HNSW similarity together.
-// Structured slots accept free text; resolution happens in SQL.
+// search-cases: the search engine endpoint. Fast paths use ILIKE only.
+// Deep/semantic search is disabled until embed() dependencies are fixed.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { embed } from "../steward.ts";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -112,33 +109,11 @@ Deno.serve(async (req) => {
     }), { headers: { ...CORS, "Content-Type": "application/json" } });
   }
 
-  let whoId = null, actionId = null, whomId = null, vec = null;
-  const jobs: Promise<void>[] = [];
-  if (b.who) jobs.push(supa.rpc("resolve_entity", { q: String(b.who) })
-    .then((r) => { whoId = r.data; }));
-  if (b.action) jobs.push(supa.rpc("resolve_action", { q: String(b.action) })
-    .then((r) => { actionId = r.data; }));
-  if (b.whom) jobs.push(supa.rpc("resolve_entity", { q: String(b.whom) })
-    .then((r) => { whomId = r.data; }));
-  if (b.q) jobs.push(embed(String(b.q)).then((v) => { vec = JSON.stringify(v); }));
-  await Promise.all(jobs);
-
-  const { data, error } = await supa.rpc("search_cases", {
-    p_who: whoId, p_action: actionId, p_whom: whomId,
-    p_embedding: vec,
-    p_faction: ["heaven", "hell", "unaligned"].includes(b.faction)
-      ? b.faction : null,
-    p_limit: Math.min(50, Number(b.limit) || 20),
-  });
-  if (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...CORS, "Content-Type": "application/json" } });
-  }
-  let web_results: unknown[] = [];
-  if (b.web && b.q && (data?.length ?? 0) < 5) {
-    web_results = await webSearch(String(b.q).slice(0, 120));
-  }
+  // Fallback: return empty if no conditions matched
+  // (Deep semantic search disabled - would need embed() from steward.ts)
   return new Response(JSON.stringify({
-    results: data, web_results, ms: Date.now() - t0,
-    resolved: { who: whoId, action: actionId, whom: whomId },
+    results: [],
+    ms: Date.now() - t0,
+    note: "Use q parameter for text search"
   }), { headers: { ...CORS, "Content-Type": "application/json" } });
 });
