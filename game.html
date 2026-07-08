@@ -1948,17 +1948,52 @@ main {
   border-color: var(--brain);
   transform: translateX(4px);
 }
+.case-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
 .case-card-title {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 6px;
   line-height: 1.3;
+  flex: 1;
+}
+.case-arc-badge {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.case-card-triple {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: rgba(168, 85, 247, 0.1);
+  border-radius: 6px;
+  border-left: 2px solid var(--purple);
+}
+.case-card-triple .who { color: var(--blue); font-weight: 500; }
+.case-card-triple .action { color: var(--purple); }
+.case-card-triple .whom { color: var(--orange); font-weight: 500; }
+.case-card-blurb {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.4;
+  margin-bottom: 8px;
+  opacity: 0.85;
 }
 .case-card-meta {
   display: flex;
   gap: 12px;
   font-size: 11px;
   color: var(--text-dim);
+}
+.case-card-meta .case-category {
+  background: var(--bg-dark);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 .case-card-meta .heaven { color: var(--good); }
 .case-card-meta .hell { color: var(--bad); }
@@ -5328,9 +5363,10 @@ async function loadTrendingCases() {
   }
 
   try {
+    // Fetch with semantic fields for richer display
     const { data: cases, error } = await sb
       .from('use_cases')
-      .select('id, title, category, evil_votes, good_votes')
+      .select('id, title, category, evil_votes, good_votes, subject, verb, object, summary, description, story_arc')
       .in('status', ['active', 'approved'])
       .order('evil_votes', { ascending: false })
       .limit(10);
@@ -5342,16 +5378,40 @@ async function loadTrendingCases() {
       return;
     }
 
-    container.innerHTML = cases.map(c => `
-      <div class="case-card" onclick="startExtraction('${c.id}')">
-        <div class="case-card-title">${escHtml(c.title)}</div>
-        <div class="case-card-meta">
-          <span>${escHtml(c.category)}</span>
-          <span class="heaven">😇 ${c.good_votes || 0}</span>
-          <span class="hell">😈 ${c.evil_votes || 0}</span>
+    container.innerHTML = cases.map(c => {
+      // Build semantic triple if available
+      const hasTriple = c.subject && c.verb && c.object;
+      const tripleHtml = hasTriple
+        ? `<div class="case-card-triple"><span class="who">${escHtml(c.subject)}</span> → <span class="action">${escHtml(c.verb)}</span> → <span class="whom">${escHtml(c.object)}</span></div>`
+        : '';
+
+      // Summary or snippet
+      const blurb = c.summary || c.description || '';
+      const blurbHtml = blurb
+        ? `<div class="case-card-blurb">${escHtml(blurb.slice(0, 120))}${blurb.length > 120 ? '...' : ''}</div>`
+        : '';
+
+      // Story arc badge if available
+      const arcBadge = c.story_arc
+        ? `<span class="case-arc-badge ${c.story_arc}">${STORY_ARC_TYPES[c.story_arc]?.icon || '📖'}</span>`
+        : '';
+
+      return `
+        <div class="case-card" onclick="startExtraction('${c.id}')">
+          <div class="case-card-header">
+            <div class="case-card-title">${escHtml(c.title)}</div>
+            ${arcBadge}
+          </div>
+          ${tripleHtml}
+          ${blurbHtml}
+          <div class="case-card-meta">
+            <span class="case-category">${escHtml(c.category || 'Uncategorized')}</span>
+            <span class="heaven">😇 ${c.good_votes || 0}</span>
+            <span class="hell">😈 ${c.evil_votes || 0}</span>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   } catch (err) {
     console.error(err);
     container.innerHTML = '<div class="case-card">Error loading cases</div>';
