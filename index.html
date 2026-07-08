@@ -1060,7 +1060,9 @@ const DEMO_CASES = [{
 
 /* ================= STATE + ROUTER ================= */
 let CASE=null, PICK={free:{}}, VOTE=null, PENDING_VOTE=null;
-const CACHE=new Map(); DEMO_CASES.forEach(c=>CACHE.set(c.id,c));
+const CACHE=new Map();
+// Only load demo cases when in DEMO mode (no Supabase configured)
+if(DEMO) DEMO_CASES.forEach(c=>CACHE.set(c.id,c));
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.getElementById(id).classList.add('on');
