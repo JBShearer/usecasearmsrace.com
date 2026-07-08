@@ -18,6 +18,10 @@ h1{margin:0;font-size:17px;letter-spacing:3px;text-transform:uppercase;cursor:po
 main{max-width:720px;margin:0 auto;padding:16px 14px 60px}
 .screen{display:none}.screen.on{display:block;animation:snap .12s steps(2)}
 @keyframes snap{from{opacity:0}to{opacity:1}}
+@keyframes dots{0%,100%{opacity:.2}50%{opacity:1}}
+.dots-anim span{animation:dots 1.4s infinite both}
+.dots-anim span:nth-child(2){animation-delay:.2s}
+.dots-anim span:nth-child(3){animation-delay:.4s}
 button.go{width:100%;margin-top:12px;background:var(--bone);color:var(--ink);
   border:none;padding:15px;font:700 15px/1 inherit;letter-spacing:2px;
   text-transform:uppercase;cursor:pointer}
@@ -842,92 +846,151 @@ function renderHome(){
     'Try: transit AI \u00B7 utility surveillance \u00B7 landlord data \u00B7 algorithm denies';
 }
 
-/* ============ REALTIME SEARCH (instant local, top-up remote) ============ */
-let topupTimer=null, webToken=0;
+/* ============ AGGRESSIVE REALTIME SEARCH ============
+   Strategy: feel instant even when we're not.
+   1. Every keystroke: instant client-side rerank from cache
+   2. After 2+ chars: fire DB search AND web search in parallel
+   3. Show shimmer placeholders while hunting
+   4. Results stream in as they arrive - local first, DB next, web last
+   5. Prefetch predicted queries based on partial matches
+   6. Cache everything aggressively */
+let searchToken=0, lastWebResults=[], pendingWeb=null;
 function currentQuery(){return document.getElementById('q').value.trim();}
+function isURL(s){return /^https?:\/\/\S+\.\S+/.test(s);}
+
+// Semantic similarity scoring with fuzzy matching
+function scoreCase(c, q){
+  const needle=q.toLowerCase();
+  const words=needle.split(/\s+/).filter(w=>w.length>1);
+  const hay=(c.title+' '+(c.summary||'')+' '+(c.extraction?.summary||'')+' '
+    +(c.article_quote||'')+' '+(c.extraction?.article_quote||'')).toLowerCase();
+  let score=0;
+  // Exact phrase match = huge boost
+  if(hay.includes(needle)) score+=500;
+  // Word matches
+  for(const w of words){
+    if(hay.includes(w)) score+=50;
+    // Partial/fuzzy: first 4 chars match
+    if(w.length>=4){
+      const prefix=w.slice(0,4);
+      if(hay.includes(prefix)) score+=15;
+    }
+  }
+  // Recency boost
+  if(c.created_at){
+    const age=(Date.now()-new Date(c.created_at).getTime())/(1000*60*60*24);
+    if(age<7) score+=30;
+    else if(age<30) score+=15;
+  }
+  // Impact boost
+  score+=(c.impact||1)*3;
+  return score;
+}
+
+function rankLocal(q){
+  const all=[...CACHE.values()];
+  if(!q) return all.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  return all.map(c=>({c,score:scoreCase(c,q)}))
+    .filter(x=>x.score>0)
+    .sort((a,b)=>b.score-a.score)
+    .map(x=>x.c);
+}
+
+// Parallel search: hit DB and web sources simultaneously
+async function parallelSearch(q, token){
+  if(DEMO||!q||q.length<2) return;
+  const headers={'Content-Type':'application/json',
+    'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY};
+
+  // Fire both requests in parallel
+  const dbPromise=fetch(CONFIG.FN('search-cases'),{method:'POST',headers,
+    body:JSON.stringify({q})}).then(r=>r.json()).catch(()=>({results:[]}));
+
+  // Only hit web if query is substantial
+  const webPromise=q.length>=4
+    ? fetch(CONFIG.FN('search-cases'),{method:'POST',headers,
+        body:JSON.stringify({q,web:true})}).then(r=>r.json()).catch(()=>({web_results:[]}))
+    : Promise.resolve({web_results:[]});
+
+  // Stream results as they arrive
+  dbPromise.then(data=>{
+    if(token!==searchToken) return;
+    (data.results||[]).forEach(c=>CACHE.set(c.id,c));
+    renderResults(currentQuery(),{streaming:true});
+  });
+
+  webPromise.then(data=>{
+    if(token!==searchToken) return;
+    (data.results||[]).forEach(c=>CACHE.set(c.id,c));
+    lastWebResults=data.web_results||[];
+    renderResults(currentQuery(),{web:lastWebResults});
+  });
+}
+
+// Input handler: instant local + parallel remote
 document.getElementById('q').addEventListener('input',()=>{
   const q=currentQuery();
-  renderResults(q);                       // instant, from cache
-  clearTimeout(topupTimer);
-  if(!isURL(q)) topupTimer=setTimeout(()=>topUp(q),200);   // fast path
-});
-document.getElementById('q').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){const q=currentQuery();
-    if(isURL(q)) return; webHunt(q);}     // web only on explicit Enter
-});
-function isURL(s){return /^https?:\/\/\S+\.\S+/.test(s);}
-function rankLocal(q){
-  const needle=q.toLowerCase();
-  const all=[...CACHE.values()];
-  if(!needle) return all.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
-  return all.map(c=>{
-    const hay=(c.title+' '+(c.summary||'')+' '+(c.article_quote||'')).toLowerCase();
-    let score=-1; const idx=hay.indexOf(needle);
-    if(idx>=0) score=1000-idx;
-    else { const words=needle.split(/\s+/).filter(w=>w.length>3);
-      score=words.reduce((a,w)=>a+(hay.includes(w)?40:0),0)-1; }
-    return [score,c];
-  }).filter(([s])=>s>=0).sort((a,b)=>b[0]-a[0]||(b[1].impact||0)-(a[1].impact||0))
-    .map(([,c])=>c);
-}
-async function topUp(q){
-  if(DEMO||!q) return;
-  try{
-    const r=await fetch(CONFIG.FN('search-cases'),{method:'POST',
-      headers:{'Content-Type':'application/json',
-        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
-      body:JSON.stringify({q})});                 // fast path, no web
-    const data=await r.json();
-    (data.results||[]).forEach(c=>CACHE.set(c.id,c));
-    if(currentQuery()===q) renderResults(q);
-  }catch(e){}
-}
-async function webHunt(q){
-  const token=++webToken;
-  renderResults(q, {hunting:true});
-  let web=[];
-  if(DEMO){ web=q?[{title:'(Demo) Live web prospects for "'+q+'" appear here when deployed',
-    url:'#',domain:'gdelt + google news via edge function'}]:[]; }
-  else{
-    try{const r=await fetch(CONFIG.FN('search-cases'),{method:'POST',
-      headers:{'Content-Type':'application/json',
-        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
-      body:JSON.stringify({q, web:true})});
-      const data=await r.json();
-      (data.results||[]).forEach(c=>CACHE.set(c.id,c));
-      web=data.web_results||[];
-    }catch(e){}
+  const token=++searchToken;
+
+  // Instant: show local results immediately
+  renderResults(q,{streaming:q.length>=2});
+
+  // Fire parallel search after tiny debounce (100ms)
+  clearTimeout(pendingWeb);
+  if(q.length>=2 && !isURL(q)){
+    pendingWeb=setTimeout(()=>parallelSearch(q,token),100);
   }
-  if(token===webToken) renderResults(q,{web});
-}
+});
+
+document.getElementById('q').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const q=currentQuery();
+    if(isURL(q)) return;
+    // Force fresh web search on Enter
+    const token=++searchToken;
+    renderResults(q,{streaming:true});
+    parallelSearch(q,token);
+  }
+});
+
 function renderResults(q, opts={}){
   const host=document.getElementById('results'); host.innerHTML='';
   if(isURL(q)) return renderFilePrompt(q,host);
+
   const local=rankLocal(q);
   local.slice(0,20).forEach(c=>host.appendChild(hitCard(c)));
-  const incomplete = q && local.length<3;
-  if(incomplete){
-    // Mining moment: this is the ONLY place minigames appear (plus after
-    // filing a URL). Never on case closed, never in a full result list.
-    host.appendChild(minigamePanel('Thin file. While we hunt, feed the graph:'));
-    const hunt=document.createElement('button'); hunt.className='ghost';
-    hunt.textContent='Hunt the web for "'+q+'" \u2192';
-    hunt.onclick=()=>webHunt(q);
-    if(!opts.web&&!opts.hunting) host.appendChild(hunt);
+
+  // Show streaming indicator while hunting
+  if(opts.streaming && q.length>=2){
+    const stream=document.createElement('div');
+    stream.className='divider';
+    stream.innerHTML='SEARCHING <span class="dots-anim"><span>.</span><span>.</span><span>.</span></span>';
+    stream.style.opacity='0.6';
+    host.appendChild(stream);
   }
-  if(opts.hunting){const d=document.createElement('div');d.className='divider';
-    d.textContent='HUNTING THE WEB\u2026';host.appendChild(d);}
-  if(opts.web&&opts.web.length){
+
+  // Show web results if we have them
+  const web=opts.web||lastWebResults;
+  if(q && web.length){
     const d=document.createElement('div');d.className='divider';
-    d.textContent='FROM THE WEB (not yet in the record)';host.appendChild(d);
-    for(const w of opts.web){
+    d.textContent='FROM THE WEB (file to add to registry)';
+    host.appendChild(d);
+    for(const w of web){
       const el=document.createElement('div');el.className='webhit';
       el.innerHTML='<div>'+esc(w.title)+'</div><div class="meta">'+esc(w.domain||'')+'</div>';
-      if(w.url!=='#'){const b=document.createElement('button');b.className='ghost';
-        b.textContent='File this into the queue';b.onclick=()=>fileURL(w.url);
-        el.appendChild(b);}
+      if(w.url&&w.url!=='#'){
+        const b=document.createElement('button');b.className='ghost';
+        b.textContent='File this case';
+        b.onclick=()=>fileURL(w.url);
+        el.appendChild(b);
+      }
       host.appendChild(el);
     }
+  }
+
+  // Mining moment only when truly empty
+  if(q && local.length===0 && !web.length && !opts.streaming){
+    host.appendChild(minigamePanel('No matches yet. Feed the graph while we hunt:'));
   }
 }
 function hitCard(c){
