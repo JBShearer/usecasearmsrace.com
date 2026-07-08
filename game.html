@@ -467,6 +467,34 @@ document.getElementById('q').addEventListener('keydown', e=>{
 });
 function isURL(s){ return /^https?:\/\/\S+\.\S+/.test(s.trim()); }
 
+// Cache all cases for instant client-side filtering
+let _allCases = null;
+let _caseLoadPromise = null;
+async function loadAllCases() {
+  if (_allCases) return _allCases;
+  if (_caseLoadPromise) return _caseLoadPromise;
+  _caseLoadPromise = fetch(CONFIG.FN('search-cases'), {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY},
+    body: JSON.stringify({q: '', limit: 100})
+  }).then(r => r.json()).then(d => {
+    _allCases = d.results || [];
+    return _allCases;
+  });
+  return _caseLoadPromise;
+}
+
+// Score a case against query for ranking
+function scoreCase(c, terms) {
+  if (!terms.length) return 1;
+  const text = ((c.title || c.raw_title || '') + ' ' + (c.summary || '') + ' ' + (c.extraction?.article_quote || '')).toLowerCase();
+  let score = 0;
+  for (const t of terms) {
+    if (text.includes(t)) score += t.length; // longer matches = better
+  }
+  return score;
+}
+
 async function doSearch(){
   const q=document.getElementById('q').value.trim();
   const host=document.getElementById('results');
@@ -481,12 +509,31 @@ async function doSearch(){
       +q+'"',url:'#',domain:'gdelt + google news via edge function'}];
     if(!results.length&&!q) results=DEMO_CASES;
   } else {
-    const r=await fetch(CONFIG.FN('search-cases'),{method:'POST',
-      headers:{'Content-Type':'application/json',
-        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
-      body:JSON.stringify({q, web:true})});
-    const data=await r.json();
-    results=data.results||[]; web=data.web_results||[];
+    // Load all cases once, then filter locally for instant response
+    const all = await loadAllCases();
+    const terms = q.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+    if (!terms.length) {
+      results = all.slice(0, 20);
+    } else {
+      results = all
+        .map(c => ({ c, score: scoreCase(c, terms) }))
+        .filter(x => x.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 20)
+        .map(x => x.c);
+    }
+    // Fetch web results only if few local results and query is substantial
+    if (results.length < 3 && q.length > 5) {
+      try {
+        const r = await fetch(CONFIG.FN('search-cases'), {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY},
+          body: JSON.stringify({q, web: true, limit: 1})
+        });
+        const data = await r.json();
+        web = data.web_results || [];
+      } catch(e) { /* web is best-effort */ }
+    }
   }
   window._lastResults=results;
   host.innerHTML='';
