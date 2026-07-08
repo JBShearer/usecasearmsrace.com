@@ -2998,6 +2998,204 @@ function deEscalate(text) {
   return result;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// COMEDY FORMULA ENGINE
+// Formulas ranked by impact for escalation
+// ═══════════════════════════════════════════════════════════════
+
+const COMEDY_FORMULAS = {
+  // SEMANTIC DUAL MEANING - strongest for our use case (AI terms have double meanings)
+  // "agent" = AI agent / tax agent / secret agent / real estate agent
+  semantic: {
+    triggers: ['agent', 'model', 'training', 'bias', 'learning', 'vision', 'network', 'intelligence'],
+    templates: {
+      agent: [
+        "Wait, when they said 'AI agents', I thought they meant tiny robots in tiny suits. Not... this.",
+        "The agents are autonomous now! ...I meant the software, but honestly, same energy.",
+        "Finally, an agent that doesn't take 15% commission. Just 100% of your data."
+      ],
+      model: [
+        "They trained the model. The model did not consent to this photoshoot.",
+        "It's not a model, it's a 'large language disaster waiting to happen'.",
+        "The model is biased? Which runway is it walking?"
+      ],
+      training: [
+        "The AI is in training. Just like my nephew. Neither follows instructions.",
+        "They're training it on the internet. This cannot possibly go wrong.",
+        "Training data includes the entire internet. So it's 40% cat pictures and 60% arguments."
+      ],
+      bias: [
+        "The algorithm has bias. To be fair, so does your aunt at Thanksgiving.",
+        "They're working on removing bias. Step one: stop training on human data.",
+        "It's not biased, it's 'statistically honest about humanity's worst tendencies'."
+      ],
+      learning: [
+        "Machine learning: when your computer makes the same mistakes, but faster.",
+        "It's called 'deep learning' because of how deep the lawsuits will be.",
+        "The machine is learning! Mostly that humans are terrible at labeling data."
+      ],
+      vision: [
+        "Computer vision: now your camera has opinions about what it sees.",
+        "It has vision! ...Unfortunately, it's 20/400 for minorities.",
+        "The AI can see! But like a toddler, it thinks everything is a dog."
+      ],
+      network: [
+        "Neural network: like a brain, but without the pesky ethics.",
+        "The network is trained. The network is ready. The network sees all.",
+        "It's called a neural network because it gives humans anxiety."
+      ],
+      intelligence: [
+        "Artificial intelligence: real consequences, artificial responsibility.",
+        "The intelligence is artificial. The lawsuits are very real.",
+        "It's intelligent! It's artificial! It's... probably going to deny your loan."
+      ]
+    },
+    generate: function(triple) {
+      for (const term of this.triggers) {
+        const text = `${triple.who} ${triple.action} ${triple.whom}`.toLowerCase();
+        if (text.includes(term) && this.templates[term]) {
+          return randomFrom(this.templates[term]);
+        }
+      }
+      return null;
+    }
+  },
+
+  // SURPRISE - strongest emotional impact, use for FINAL REVEAL
+  // The punchline contradicts expectation at the last possible moment
+  surprise: {
+    patterns: [
+      { setup: "so anyway, {who} decided to {action}...", punchline: "and somehow this was LEGAL." },
+      { setup: "{who} built a system to {action}...", punchline: "...the system works perfectly. That's the problem." },
+      { setup: "The good news: {who} improved {whom}!", punchline: "The bad news: they improved them into unemployment." },
+      { setup: "Nobody expected {who} to {action}...", punchline: "...including, apparently, {who}." },
+      { setup: "{whom} was completely safe from {who}...", punchline: "...until they weren't." }
+    ],
+    generate: function(triple) {
+      const pattern = randomFrom(this.patterns);
+      let result = pattern.setup.replace(/{who}/g, triple.who)
+        .replace(/{action}/g, triple.action)
+        .replace(/{whom}/g, triple.whom);
+      result += ' ' + pattern.punchline.replace(/{who}/g, triple.who)
+        .replace(/{action}/g, triple.action)
+        .replace(/{whom}/g, triple.whom);
+      return result;
+    }
+  },
+
+  // ESCALATION - building absurdity through repetition
+  // Each beat gets MORE ridiculous
+  escalation: {
+    beats: [
+      { level: 1, template: "{who} {action} {whom}. Fine. Normal. Whatever." },
+      { level: 2, template: "But then they {action} {whom} AGAIN. At scale. For efficiency." },
+      { level: 3, template: "And THEN they decided to {action} {whom} AUTOMATICALLY. 24/7." },
+      { level: 4, template: "THEN they sold the {action} data to OTHER companies so THEY could also {action} {whom}." },
+      { level: 5, template: "And now {whom} has to PAY to see what {who} {action}ed about them. SUBSCRIPTIONS." }
+    ],
+    generate: function(triple, level = null) {
+      const beat = level ? this.beats.find(b => b.level === level) : randomFrom(this.beats);
+      return beat.template.replace(/{who}/g, triple.who)
+        .replace(/{action}/g, triple.action)
+        .replace(/{whom}/g, triple.whom);
+    }
+  },
+
+  // JUXTAPOSITION - comparing incomparable things
+  // Tech jargon meets mundane reality
+  juxtaposition: {
+    comparisons: [
+      { tech: "machine learning", mundane: "a toddler with a crayon", explain: "both draw conclusions from incomplete data" },
+      { tech: "facial recognition", mundane: "your neighbor who's bad with faces", explain: "both confidently wrong about strangers" },
+      { tech: "predictive policing", mundane: "a Magic 8-Ball", explain: "equally reliable, less accountability" },
+      { tech: "automated hiring", mundane: "a dartboard", explain: "random but with plausible deniability" },
+      { tech: "algorithmic bias", mundane: "your uncle at dinner", explain: "same energy, bigger reach" },
+      { tech: "data mining", mundane: "going through someone's trash", explain: "both legal, both weird" }
+    ],
+    generate: function(triple) {
+      const comp = randomFrom(this.comparisons);
+      return `It's like ${comp.tech} meets ${comp.mundane} - ${comp.explain}.`;
+    }
+  },
+
+  // NON-SEQUITUR - random pivot for comedic contrast
+  nonSequitur: {
+    pivots: [
+      "Anyway, that's why I don't trust printers.",
+      "And that's the third-worst thing to happen this week.",
+      "In unrelated news, the cafeteria is out of pudding.",
+      "This concludes today's episode of 'Things That Make You Go Hmm.'",
+      "File this under: 'problems nobody asked for but everyone got.'",
+      "And that's how the cookie crumbles. The surveillance cookie."
+    ],
+    generate: function(triple) {
+      return randomFrom(this.pivots);
+    }
+  },
+
+  // FORMULA JOKES - callback patterns and structures
+  formula: {
+    callbacks: {
+      knockKnock: (who) => `Knock knock. Who's there? ${who}. ${who} who? ${who} already knows who you are, they have facial recognition.`,
+      rule: (action) => `Rule #1: Don't let AI ${action}. Rule #2: See rule #1. Rule #3: We forgot rule #1.`,
+      threePart: (who, action, whom) => `Three things are certain: death, taxes, and ${who} will ${action} ${whom}. Two of those are avoidable.`
+    },
+    generate: function(triple) {
+      const formulas = Object.values(this.callbacks);
+      const formula = randomFrom(formulas);
+      if (formula.length === 1) return formula(triple.who);
+      if (formula.length === 2) return formula(triple.action);
+      return formula(triple.who, triple.action, triple.whom);
+    }
+  }
+};
+
+// Detect best comedy type based on content
+function detectBestComedyType(triple) {
+  const text = `${triple.who} ${triple.action} ${triple.whom}`.toLowerCase();
+
+  // Check for semantic dual-meaning triggers first (strongest)
+  for (const term of COMEDY_FORMULAS.semantic.triggers) {
+    if (text.includes(term)) return 'semantic';
+  }
+
+  // Check for extreme actions (good for escalation)
+  if (/surveil|monitor|track|predict|automat/i.test(triple.action)) return 'escalation';
+
+  // Check for juxtaposition opportunities
+  if (/ai|algorithm|model|neural|machine/i.test(text)) return 'juxtaposition';
+
+  // Default to surprise (always works)
+  return 'surprise';
+}
+
+// Generate a comedy beat for a scene
+function generateComedyBeat(triple, forceType = null) {
+  const type = forceType || detectBestComedyType(triple);
+  const formula = COMEDY_FORMULAS[type];
+
+  if (formula && formula.generate) {
+    return formula.generate(triple);
+  }
+
+  return randomFrom(COMEDY_FORMULAS.nonSequitur.pivots);
+}
+
+// Generate escalating comedy (for story progression)
+function generateComedyEscalation(triple, level) {
+  return COMEDY_FORMULAS.escalation.generate(triple, level);
+}
+
+// Generate surprise ending (for final card reveal)
+function generateSurpriseEnding(triple) {
+  return COMEDY_FORMULAS.surprise.generate(triple);
+}
+
+// Helper: random array element
+function randomFrom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 // LESSONS LEARNED - 80s PBS Mr. Rogers energy
 // "And what have we learned today, minions?"
 const LESSONS_LEARNED = {
