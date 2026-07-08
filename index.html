@@ -6,7 +6,7 @@
 <title>USE CASE ARMS RACE</title>
 <style>
 :root{--ink:#0E0E0E;--bone:#EDE6D6;--crayon:#C1121F;--pencil:#7a7263;--gold:#c9a84c;
-  --gi:#6b7d5a;--gary:#4a7d9c;--supes:#c9a84c}
+  --gi:#6b7d5a;--gary:#4a7d9c;--supes:#c9a84c;--brainiac:#9a86b8}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--ink);color:var(--bone);
   font:16px/1.5 -apple-system,'Helvetica Neue',Arial,sans-serif;
@@ -21,7 +21,6 @@ main{max-width:720px;margin:0 auto;padding:16px 14px 60px}
 button.go{width:100%;margin-top:12px;background:var(--bone);color:var(--ink);
   border:none;padding:15px;font:700 15px/1 inherit;letter-spacing:2px;
   text-transform:uppercase;cursor:pointer}
-button.go:hover{opacity:0.85}
 button.ghost{width:100%;margin-top:8px;background:var(--ink);color:var(--bone);
   border:2px solid var(--bone);padding:12px;font:700 13px/1 inherit;
   letter-spacing:2px;text-transform:uppercase;cursor:pointer}
@@ -29,9 +28,9 @@ button.ghost{width:100%;margin-top:8px;background:var(--ink);color:var(--bone);
   font-size:11px;letter-spacing:1px;margin-right:6px}
 .badge.hell{border-color:var(--crayon);color:var(--crayon)}
 .badge.heaven{border-color:var(--gold);color:var(--gold)}
+.badge.new{border-color:var(--gold);color:var(--gold)}
 .stamp{color:var(--crayon);font-weight:800;text-transform:uppercase;
   letter-spacing:1px;transform:rotate(-2deg);display:inline-block}
-
 /* HOME */
 .videobox{border:2px solid var(--bone);aspect-ratio:16/9;margin:0 0 12px;
   display:flex;align-items:center;justify-content:center;color:var(--pencil);
@@ -41,151 +40,117 @@ button.ghost{width:100%;margin-top:8px;background:var(--ink);color:var(--bone);
 .epi{flex:0 0 auto;border:1px solid var(--pencil);padding:8px 12px;font-size:12px;
   letter-spacing:1px;text-transform:uppercase;color:var(--bone);cursor:pointer;
   white-space:nowrap;text-decoration:none}
-.searchwrap{position:relative;margin:6px 0 4px}
 #q{width:100%;background:var(--ink);color:var(--bone);border:2px solid var(--bone);
   padding:15px 14px;font:inherit}
-#qhint{color:var(--pencil);font-size:11px;letter-spacing:1px;margin:6px 2px 12px}
-.hit{border:2px solid var(--bone);padding:14px;margin:12px 0;cursor:pointer;
-  transition:border-color 0.15s}
-.hit:hover{border-color:var(--gold)}
-.hit h3{margin:0 0 6px;font-size:16px;text-transform:uppercase;letter-spacing:.5px}
-.hit .sum{font-size:14px;color:var(--bone);margin:6px 0}
+#qhint{color:var(--pencil);font-size:11px;letter-spacing:1px;margin:6px 2px 10px}
+.hit{border:2px solid var(--bone);padding:14px;margin:12px 0;cursor:pointer;position:relative}
+.hit h3{margin:0 0 6px;font-size:16px;text-transform:uppercase;letter-spacing:.5px;
+  padding-right:86px}
+.hit .sum{font-size:14px;margin:6px 0}
 .hit .qt{font-family:Georgia,serif;font-style:italic;font-size:13px;color:var(--pencil);
   border-left:3px solid var(--crayon);padding-left:8px;margin:8px 0 4px}
 .hit .meta{font-size:11px;color:var(--pencil);letter-spacing:1px}
+.qv{position:absolute;top:10px;right:10px;display:flex;gap:6px}
+.qv button{background:var(--ink);border:1px solid var(--pencil);color:var(--bone);
+  font-size:16px;padding:4px 8px;cursor:pointer}
+.qv button:hover{border-color:var(--bone)}
 .votebar{height:7px;background:var(--crayon);margin-top:8px;position:relative}
 .votebar i{position:absolute;left:0;top:0;bottom:0;background:var(--gold)}
-.quickvote{display:flex;gap:8px;margin-top:10px}
-.qv{background:none;border:2px solid;padding:6px 16px;font-size:18px;cursor:pointer;flex:1}
-.qv.heaven{border-color:var(--gold);color:var(--gold)}
-.qv.hell{border-color:var(--crayon);color:var(--crayon)}
-.qv:hover{opacity:0.7}
-.qv:disabled{opacity:0.4;cursor:default}
 .divider{color:var(--pencil);font-size:11px;letter-spacing:3px;text-transform:uppercase;
   border-bottom:1px dashed var(--pencil);padding-bottom:4px;margin:18px 0 6px}
 .webhit{border:1px dashed var(--pencil);padding:12px;margin:10px 0}
 .webhit .meta{font-size:11px;color:var(--pencil)}
-
-/* SCENE STAGING - theatrical view */
-.scene-stage{background:#0a0a09;border:3px solid var(--bone);margin:0 0 16px;
-  position:relative;overflow:hidden}
-.scene-art{width:100%;aspect-ratio:16/9;position:relative}
-.scene-art svg{width:100%;height:100%;display:block}
-.scene-art img{width:100%;height:100%;object-fit:cover}
-.scene-curtain{position:absolute;inset:0;background:linear-gradient(180deg,
-  transparent 60%,rgba(14,14,14,0.95) 100%)}
-.scene-label{position:absolute;bottom:12px;left:14px;right:14px;
-  font:800 13px/1.3 inherit;letter-spacing:3px;text-transform:uppercase;
-  color:var(--bone)}
-
-/* Character dialogue - proper acting */
-.dialogue{margin:16px 0;padding:0}
-.dialogue-line{display:flex;gap:14px;margin:12px 0;align-items:flex-start}
-.char-avatar{width:56px;height:56px;border-radius:50%;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font:800 20px/1 inherit;border:3px solid}
-.char-avatar.gi{background:#2a3425;border-color:var(--gi);color:var(--gi)}
-.char-avatar.gary{background:#1e3040;border-color:var(--gary);color:var(--gary)}
-.char-avatar.supes{background:#3d3520;border-color:var(--supes);color:var(--supes)}
-.char-avatar.brain{background:#2a1a1a;border-color:var(--crayon);color:var(--crayon)}
-.char-speech{flex:1}
-.char-name{font:800 11px/1 inherit;letter-spacing:2px;text-transform:uppercase;
-  margin-bottom:4px}
-.char-name.gi{color:var(--gi)}
-.char-name.gary{color:var(--gary)}
-.char-name.supes{color:var(--supes)}
-.char-name.brain{color:var(--crayon)}
-.char-text{font:15px/1.5 Georgia,serif;color:var(--bone)}
-.char-text em{color:var(--pencil);font-style:italic}
-
-/* Stage directions */
-.stage-direction{font:italic 13px/1.5 Georgia,serif;color:var(--pencil);
-  text-align:center;margin:16px 0;padding:8px 16px;
-  border-top:1px dashed var(--pencil);border-bottom:1px dashed var(--pencil)}
-
-/* Choices as dramatic options */
-.choice-prompt{font:800 18px/1.3 inherit;letter-spacing:1px;margin:20px 0 12px;
-  text-transform:uppercase}
-.choice{display:block;width:100%;text-align:left;background:var(--ink);
-  color:var(--bone);border:2px solid var(--bone);padding:14px 16px;margin:8px 0;
-  font:500 15px/1.4 inherit;cursor:pointer;transition:all 0.15s}
-.choice:hover{background:var(--bone);color:var(--ink)}
-.choice small{display:block;font:italic 12px/1.4 Georgia,serif;color:var(--pencil);
-  margin-top:4px}
-.choice:hover small{color:var(--ink);opacity:0.7}
-.choice.free{border-style:dashed;color:var(--pencil)}
-.choice.free:hover{color:var(--ink)}
-
-/* Progress dots */
+/* SCENES + STAGE */
+.art{border:2px solid var(--bone);margin:0 0 12px;line-height:0;position:relative}
+.art svg{width:100%;height:auto;display:block}
+.direction{color:var(--pencil);font-size:12px;letter-spacing:2px;
+  text-transform:uppercase;margin:10px 0 4px}
+.narr{font-family:Georgia,'Times New Roman',serif;font-size:16px;margin:8px 0}
+.line{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;margin:10px 0}
+.line .who{font:800 11px/1.2 inherit;letter-spacing:1px;padding:6px 7px;border:2px solid;
+  text-transform:uppercase;white-space:nowrap}
+.line.gi .who{color:var(--gi);border-color:var(--gi)}
+.line.gary .who{color:var(--gary);border-color:var(--gary)}
+.line.supes .who{color:var(--supes);border-color:var(--supes)}
+.line.brainiac .who{color:var(--brainiac);border-color:var(--brainiac)}
+.line.brain .who{color:var(--crayon);border-color:var(--crayon)}
+.line p{margin:0;font-family:Georgia,serif;font-size:15px}
+.prompt{font-size:18px;text-transform:uppercase;letter-spacing:1px;margin:14px 0 10px}
 .dots{letter-spacing:8px;color:var(--pencil);font-size:12px;margin-bottom:8px}
 .dots b{color:var(--crayon)}
-
-/* Verdict buttons */
+/* CHARACTERIZED CHOICES */
+.pchoice{display:block;width:100%;text-align:left;background:var(--ink);
+  color:var(--bone);border:2px solid var(--bone);padding:12px 14px;margin:10px 0;
+  font:inherit;cursor:pointer}
+.pchoice:hover{background:var(--bone);color:var(--ink)}
+.pchoice .persona{font-family:Georgia,serif;font-size:16px;display:block}
+.pchoice .factual{display:block;font-size:11px;letter-spacing:1px;color:var(--pencil);
+  text-transform:uppercase;margin-top:4px}
+.pchoice:hover .factual{color:var(--ink)}
+.free{border-style:dashed;color:var(--pencil)}
+.summary{font-size:15px;margin:8px 0}
+.quote{font-family:Georgia,serif;font-style:italic;border-left:3px solid var(--crayon);
+  padding-left:10px;margin:12px 0;font-size:15px}
+.quote small{display:block;font-style:normal;color:var(--pencil);font-size:11px;
+  letter-spacing:1px;margin-top:4px}
 .verdicts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-.verdicts button{padding:24px 8px;font:800 18px/1.3 inherit;letter-spacing:1px;
-  cursor:pointer;border:3px solid;background:var(--ink);transition:all 0.15s}
+.verdicts button{padding:20px 8px;font:800 16px/1.3 inherit;letter-spacing:1px;
+  cursor:pointer;border:3px solid;background:var(--ink)}
 #vheaven{color:var(--gold);border-color:var(--gold)}
 #vhell{color:var(--crayon);border-color:var(--crayon)}
-#vheaven:hover{background:var(--gold);color:var(--ink)}
-#vhell:hover{background:var(--crayon);color:var(--ink)}
-
-/* Court record vs staging */
+#vheaven:hover,#vheaven.pre{background:var(--gold);color:var(--ink)}
+#vhell:hover,#vhell.pre{background:var(--crayon);color:var(--ink)}
 details.program{border:1px dashed var(--pencil);padding:10px;margin:12px 0;
   font-size:13px;color:var(--pencil)}
-details.program summary{cursor:pointer}
 details.program table{width:100%;border-collapse:collapse;margin-top:6px}
 details.program td{border:1px solid var(--pencil);padding:5px;vertical-align:top}
-
-/* FILE SCREEN */
 .nuancebox{border:1px dashed var(--pencil);padding:10px 12px;margin:12px 0}
 .nlabel{font-size:11px;letter-spacing:2px;color:var(--pencil);margin-bottom:6px}
 .nrow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;
   font-size:10px;color:var(--pencil);margin:4px 0;text-transform:uppercase;letter-spacing:1px}
 input[type=range]{width:100%}
 textarea{width:100%;background:var(--ink);color:var(--bone);
-  border:2px solid var(--bone);padding:12px;font:inherit;min-height:100px;resize:vertical}
+  border:2px solid var(--bone);padding:12px;font:inherit;min-height:90px}
 .chips{margin:8px 0}
 .chip{display:inline-block;border:1px solid var(--pencil);color:var(--pencil);
   padding:6px 10px;margin:3px;cursor:pointer;font-size:12px;letter-spacing:1px}
 .chip:hover{border-color:var(--bone);color:var(--bone)}
 .rewardline{color:var(--pencil);font-size:13px;margin-top:6px}
-
-/* Card modal popup */
-.card-modal{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:1000;
-  display:none;align-items:center;justify-content:center;padding:20px}
-.card-modal.on{display:flex;animation:fadeUp 0.3s ease-out}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.card-inner{max-width:400px;width:100%;position:relative}
-.card-inner svg{width:100%;height:auto;display:block;border:3px solid var(--bone)}
-.card-close{position:absolute;top:-40px;right:0;background:none;border:none;
-  color:var(--bone);font-size:28px;cursor:pointer;padding:8px}
-.card-stats{text-align:center;margin:16px 0;color:var(--pencil);font-size:13px}
-.card-actions{display:flex;gap:10px;margin-top:16px}
-.card-actions button{flex:1}
-
-/* Scratch reveal overlay */
-.scratch-area{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:90%;display:flex;gap:8px;justify-content:center}
-.scratch-box{background:var(--pencil);padding:12px 16px;cursor:pointer;
-  font:800 14px/1 inherit;letter-spacing:2px;text-transform:uppercase;
-  user-select:none;border:2px solid var(--bone);color:var(--ink)}
-.scratch-box.revealed{background:transparent;color:var(--gold);border-color:var(--gold)}
-.scratch-skip{position:absolute;bottom:20px;right:20px;background:var(--ink);
-  border:1px solid var(--pencil);color:var(--pencil);padding:6px 12px;
-  font-size:11px;letter-spacing:1px;cursor:pointer}
-.scratch-skip:hover{color:var(--bone);border-color:var(--bone)}
-
-/* Chalkboard ending */
-.chalkboard{background:#1a2e1a;border:4px solid #3d5c3d;padding:20px;margin:16px 0;
-  font:italic 18px/1.5 'Marker Felt','Comic Sans MS',cursive;color:#d4e8c4;
-  text-align:center;transform:rotate(-0.5deg)}
-.chalkboard::before{content:'EVIL BRAIN WRITES:';display:block;
-  font:800 10px/1 -apple-system,Arial,sans-serif;letter-spacing:3px;
-  color:#8fa87f;margin-bottom:10px}
-
+.shiftline{color:var(--gold);font-size:12px;margin-top:4px}
+/* CARD MODAL */
+#modal{position:fixed;inset:0;background:rgba(14,14,14,.92);display:none;
+  align-items:flex-start;justify-content:center;z-index:50;overflow-y:auto;
+  padding:24px 12px 40px}
+#modal.on{display:flex}
+.modalcard{width:min(560px,96vw)}
+.cardstage{position:relative;transition:transform .25s;cursor:zoom-in;
+  transform-origin:top center}
+.cardstage.zoom{transform:scale(1.22);cursor:zoom-out}
+.cardstage svg{width:100%;height:auto;display:block;border:2px solid var(--bone)}
+.foil{position:absolute;touch-action:none;cursor:crosshair}
+.modalbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.modalbtns .go,.modalbtns .ghost{margin-top:0}
+/* MINIGAME (mining moments only) */
+.mg{border:2px dashed var(--crayon);padding:14px;margin:14px 0}
+.mg .mlabel{font-size:11px;letter-spacing:2px;color:var(--crayon);
+  text-transform:uppercase;margin-bottom:8px}
+.mg input[type=text]{width:100%;background:var(--ink);color:var(--bone);
+  border:1px solid var(--pencil);padding:8px;font:inherit;margin:4px 0}
+.wordcard{font-size:20px;text-align:center;padding:16px;border:2px solid var(--bone);
+  margin:8px 0;letter-spacing:1px;text-transform:uppercase}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pair button{padding:12px;font:700 13px/1 inherit;cursor:pointer;
+  background:var(--ink);color:var(--bone);border:2px solid var(--bone)}
+.bucket{border:2px dashed var(--pencil);padding:8px;min-height:44px;margin:6px 0;font-size:12px}
+.mchip{display:inline-block;border:1px solid var(--bone);padding:5px 9px;margin:3px;
+  cursor:pointer;font-size:12px}
+.mchip.sel{background:var(--bone);color:var(--ink)}
 footer{color:var(--pencil);font-size:11px;text-align:center;padding:16px;
   border-top:1px solid var(--pencil);margin-top:24px}
 small.demo{color:var(--crayon)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;
+  background:var(--bone);color:var(--ink);padding:10px 16px;font-size:13px;
+  letter-spacing:1px;z-index:60;display:none}
 </style>
 </head>
 <body>
@@ -199,1003 +164,1177 @@ small.demo{color:var(--crayon)}
 <section id="home" class="screen on">
   <div class="videobox" id="videobox">DAILY EPISODE</div>
   <div class="epirow" id="epirow"></div>
-  <div class="searchwrap">
-    <input id="q" placeholder="Search the casefile, or paste a URL to file a new case"
-      autocomplete="off">
-  </div>
-  <div id="qhint">Try: hospital AI · police surveillance · algorithm denies benefits</div>
+  <input id="q" placeholder="Search the casefile, or paste a URL to file a new case" autocomplete="off">
+  <div id="qhint"></div>
   <div id="results"></div>
 </section>
 
-<!-- ============ 1. CASE FILE - THE COLD OPEN ============ -->
+<!-- ============ 1. CASE FILE + STAGE ============ -->
 <section id="s-case" class="screen">
   <div class="dots"><b>&#9679;</b> &#9675; &#9675; &#9675; &#9675; &#9675;</div>
-
-  <!-- Scene staging visualization -->
-  <div class="scene-stage">
-    <div class="scene-art" id="scene-art-case"></div>
-    <div class="scene-curtain"></div>
-    <div class="scene-label" id="scene-label-case">THE STAGING</div>
+  <div class="art" id="a-case"></div>
+  <div><span class="badge" id="c-src"></span><span class="badge" id="c-impact"></span>
+    <span class="badge" id="c-faction"></span></div>
+  <h2 class="prompt" id="c-title"></h2>
+  <p class="summary" id="c-summary"></p>
+  <div class="quote" id="c-quote" style="display:none"></div>
+  <p class="meta"><a id="c-link" target="_blank" style="color:var(--bone)">Primary source &rarr;</a></p>
+  <div class="direction">The staging</div>
+  <p class="narr" id="c-setting"></p>
+  <div class="line gi"><span class="who">GI</span><p id="c-coldopen"></p></div>
+  <details class="program"><summary>De-escalation note (stakes staged, facts intact)</summary>
+    <table id="c-deesc"></table></details>
+  <div class="nuancebox">
+    <div class="nlabel">FIRST IMPRESSIONS (optional)</div>
+    <div class="nrow"><span>Safety</span><input type="range" id="nb0" min="0" max="100" value="50"><span>Surveillance</span></div>
+    <div class="nrow"><span>Privacy</span><input type="range" id="nb1" min="0" max="100" value="50"><span>Data brokering</span></div>
+    <div class="nrow"><span>Benefit</span><input type="range" id="nb2" min="0" max="100" value="50"><span>Harm</span></div>
   </div>
-
-  <!-- Stage direction: the setting -->
-  <div class="stage-direction" id="stage-setting"></div>
-
-  <!-- GI reads the record - cold open -->
-  <div class="dialogue">
-    <div class="dialogue-line">
-      <div class="char-avatar gi">GI</div>
-      <div class="char-speech">
-        <div class="char-name gi">GI reads the record</div>
-        <div class="char-text" id="cold-open"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Case metadata -->
-  <div style="margin:16px 0">
-    <span class="badge" id="c-src"></span>
-    <span class="badge" id="c-impact"></span>
-    <span class="badge" id="c-faction"></span>
-  </div>
-
-  <h2 style="margin:8px 0;font-size:18px;letter-spacing:1px" id="c-title"></h2>
-  <p style="font-size:14px;color:var(--pencil);margin:4px 0" id="c-summary"></p>
-
-  <div id="c-quote-wrap" style="display:none">
-    <div style="font-family:Georgia,serif;font-style:italic;font-size:15px;
-      border-left:3px solid var(--crayon);padding-left:12px;margin:12px 0">
-      <span id="c-quote"></span>
-      <small style="display:block;font-style:normal;color:var(--pencil);
-        font-size:11px;letter-spacing:1px;margin-top:4px">— FROM THE RECORD</small>
-    </div>
-  </div>
-
-  <p style="font-size:12px;margin:8px 0">
-    <a id="c-link" target="_blank" style="color:var(--pencil)">Read the primary source →</a>
-  </p>
-
-  <details class="program"><summary>Court record vs. our staging</summary>
-    <table id="c-deesc"></table>
-  </details>
-
-  <button class="go" onclick="enterStage()">Enter the scene →</button>
+  <button class="go" onclick="show('s-who')">Raise the curtain &rarr;</button>
 </section>
 
-<!-- ============ 2. WHO - THE ACTOR REVEALS ============ -->
+<!-- ============ 2. WHO ============ -->
 <section id="s-who" class="screen">
   <div class="dots">&#9679; <b>&#9679;</b> &#9675; &#9675; &#9675; &#9675;</div>
-
-  <div class="scene-stage">
-    <div class="scene-art" id="scene-art-who"></div>
-    <div class="scene-curtain"></div>
-    <div class="scene-label">ACT I: THE ACTOR</div>
-  </div>
-
-  <div class="dialogue">
-    <div class="dialogue-line">
-      <div class="char-avatar gi">GI</div>
-      <div class="char-speech">
-        <div class="char-name gi">GI</div>
-        <div class="char-text" id="gi-intro"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="choice-prompt">Who drove this case?</div>
+  <div class="art" id="a-who"></div>
+  <div class="direction">Act I: three figures claim the stage</div>
+  <div class="line gi"><span class="who">GI</span><p id="w-gi"></p></div>
+  <div id="w-brainiac"></div>
+  <div class="prompt">Who is really running this show?</div>
   <div id="ch-who"></div>
 </section>
 
-<!-- ============ 3. ACTION - GARY DEMONSTRATES ============ -->
+<!-- ============ 3. ACTION ============ -->
 <section id="s-action" class="screen">
   <div class="dots">&#9679; &#9679; <b>&#9679;</b> &#9675; &#9675; &#9675;</div>
-
-  <div class="scene-stage">
-    <div class="scene-art" id="scene-art-action"></div>
-    <div class="scene-curtain"></div>
-    <div class="scene-label">ACT II: THE ACT</div>
-  </div>
-
-  <!-- The actor's reveal from previous choice -->
-  <div class="stage-direction" id="who-reveal-text"></div>
-
-  <div class="dialogue">
-    <div class="dialogue-line">
-      <div class="char-avatar gary">G</div>
-      <div class="char-speech">
-        <div class="char-name gary">Gary</div>
-        <div class="char-text" id="gary-intro"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="choice-prompt" id="action-prompt">What did they do?</div>
+  <div class="art" id="a-action"></div>
+  <div class="direction">Act II: the act itself</div>
+  <div class="line gi"><span class="who">GI</span><p id="carry-who"></p></div>
+  <div class="line gary"><span class="who">Gary</span><p id="b-gary"></p></div>
+  <div class="prompt" id="p-action"></div>
   <div id="ch-action"></div>
 </section>
 
-<!-- ============ 4. WHOM - SUPES SPEAKS FOR THEM ============ -->
+<!-- ============ 4. WHOM ============ -->
 <section id="s-whom" class="screen">
   <div class="dots">&#9679; &#9679; &#9679; <b>&#9679;</b> &#9675; &#9675;</div>
-
-  <div class="scene-stage">
-    <div class="scene-art" id="scene-art-whom"></div>
-    <div class="scene-curtain"></div>
-    <div class="scene-label">ACT III: THE AFFECTED</div>
-  </div>
-
-  <!-- The action demo from previous choice -->
-  <div class="stage-direction" id="action-demo-text"></div>
-
-  <div class="dialogue">
-    <div class="dialogue-line">
-      <div class="char-avatar supes">S</div>
-      <div class="char-speech">
-        <div class="char-name supes">Supes</div>
-        <div class="char-text" id="supes-intro"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="choice-prompt" id="whom-prompt">Who bears the weight?</div>
+  <div class="art" id="a-whom"></div>
+  <div class="direction">Act III: the house lights sweep the audience</div>
+  <div class="line gary"><span class="who">Gary</span><p id="carry-action"></p></div>
+  <div class="line supes"><span class="who">Supes</span><p id="b-supes"></p></div>
+  <div class="prompt" id="p-whom"></div>
   <div id="ch-whom"></div>
 </section>
 
 <!-- ============ 5. VERDICT ============ -->
 <section id="s-verdict" class="screen">
   <div class="dots">&#9679; &#9679; &#9679; &#9679; <b>&#9679;</b> &#9675;</div>
-
-  <div class="scene-stage">
-    <div class="scene-art" id="scene-art-verdict"></div>
-    <div class="scene-curtain"></div>
-    <div class="scene-label">THE VERDICT</div>
-  </div>
-
-  <!-- The whom reveal from previous choice -->
-  <div class="stage-direction" id="whom-reveal-text"></div>
-
-  <div style="border:3px solid var(--bone);padding:16px;margin:16px 0;text-align:center">
-    <div style="font-size:12px;letter-spacing:2px;color:var(--pencil);margin-bottom:8px">THE CHAIN</div>
-    <div style="font:800 16px/1.4 inherit;letter-spacing:1px" id="v-triple"></div>
-  </div>
-
-  <div class="dialogue">
-    <div class="dialogue-line">
-      <div class="char-avatar brain">🧠</div>
-      <div class="char-speech">
-        <div class="char-name brain">Evil Brain</div>
-        <div class="char-text">The record is complete. The audience will now render judgment. Is this <em>heaven</em>... or <em>hell</em>?</div>
-      </div>
-    </div>
-  </div>
-
+  <div class="art" id="a-verdict"></div>
+  <div class="line supes"><span class="who">Supes</span><p id="carry-whom"></p></div>
+  <div id="v-brainiacs"></div>
+  <h2 class="prompt" id="v-triple" style="border:2px solid var(--bone);padding:12px"></h2>
+  <div class="prompt">You write the ending. Nobody votes for you.</div>
   <div class="verdicts">
-    <button id="vheaven" onclick="verdict('heaven')">😇<br>HEAVEN</button>
-    <button id="vhell" onclick="verdict('hell')">😈<br>HELL</button>
-  </div>
-  <div style="text-align:center;color:var(--pencil);font-size:11px;letter-spacing:1px;margin-top:8px">
-    Nobody votes for you.
+    <button id="vheaven" onclick="verdict('heaven')">&#128519; HEAVEN</button>
+    <button id="vhell" onclick="verdict('hell')">&#128520; HELL</button>
   </div>
 </section>
 
-<!-- ============ 6. FILE (ending + notes combined) ============ -->
+<!-- ============ 6. FINALE + NOTES (one screen) ============ -->
 <section id="s-file" class="screen">
   <div class="dots">&#9679; &#9679; &#9679; &#9679; &#9679; <b>&#9679;</b></div>
-
-  <div class="scene-stage">
-    <div class="scene-art" id="scene-art-ending"></div>
-    <div class="scene-curtain"></div>
-    <div class="scene-label" id="ending-label">THE ENDING</div>
-  </div>
-
-  <!-- The theatrical ending -->
-  <div class="dialogue">
-    <div class="dialogue-line">
-      <div class="char-avatar brain">🧠</div>
-      <div class="char-speech">
-        <div class="char-name brain">Evil Brain narrates the ending</div>
-        <div class="char-text" id="ending-text"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Chalkboard lesson -->
-  <div class="chalkboard" id="chalkboard"></div>
-
-  <h3 style="font-size:14px;letter-spacing:2px;margin:24px 0 8px">CASE NOTES (OPTIONAL)</h3>
+  <div class="art" id="a-ending"></div>
+  <p class="narr" id="ending-text"></p>
+  <div class="line brain"><span class="who">Evil Brain</span><p id="ending-brain"></p></div>
+  <h2 class="prompt">Case notes</h2>
   <div class="chips" id="tagchips"></div>
-  <textarea id="notes" oninput="noteMeter()" placeholder="What did you notice? Tap tags above or write your own."></textarea>
-  <div class="rewardline" id="notemeter">10+ characters starts earning coins.</div>
-
+  <textarea id="notes" oninput="noteMeter()" placeholder="What did you notice? Tap tags or write your own."></textarea>
+  <div class="rewardline" id="notemeter">Optional. 10+ characters starts earning.</div>
   <div class="nuancebox">
-    <div class="nlabel">YOUR READING</div>
+    <div class="nlabel">SECOND READ</div>
     <div class="nrow"><span>Safety</span><input type="range" id="na0" min="0" max="100" value="50"><span>Surveillance</span></div>
     <div class="nrow"><span>Privacy</span><input type="range" id="na1" min="0" max="100" value="50"><span>Data brokering</span></div>
     <div class="nrow"><span>Benefit</span><input type="range" id="na2" min="0" max="100" value="50"><span>Harm</span></div>
   </div>
-
-  <button class="go" onclick="mint()">Mint your card →</button>
+  <button class="go" onclick="mint()">Mint the card &rarr;</button>
 </section>
 
 </main>
 
-<!-- CARD MODAL POPUP -->
-<div class="card-modal" id="cardModal">
-  <div class="card-inner">
-    <button class="card-close" onclick="closeCard()">×</button>
-    <div id="cardsvg"></div>
-    <div class="scratch-area" id="scratchArea">
-      <div class="scratch-box" onclick="revealStat(this,'atk')">ATK</div>
-      <div class="scratch-box" onclick="revealStat(this,'def')">DEF</div>
-      <div class="scratch-box" onclick="revealStat(this,'rarity')">RARITY</div>
+<!-- ============ CARD MODAL ============ -->
+<div id="modal">
+  <div class="modalcard">
+    <div><span class="stamp">Case closed</span></div>
+    <div class="cardstage" id="cardstage" onclick="toggleZoom(event)">
+      <div id="cardsvg"></div>
     </div>
-    <button class="scratch-skip" onclick="revealAll()">Reveal all</button>
-    <div class="card-stats" id="cardStats"></div>
-    <div class="card-actions">
-      <button class="ghost" onclick="closeCard();startNext()">Open another case</button>
-      <button class="go" onclick="closeCard()">Done</button>
+    <button class="ghost" id="revealall" onclick="revealAll()">Reveal everything (skip scratching)</button>
+    <div class="rewardline" id="m-rewards"></div>
+    <div class="rewardline" id="m-collective"></div>
+    <div class="shiftline" id="m-shift"></div>
+    <div class="modalbtns">
+      <button class="go" onclick="closeModal(true)">Return to the casefile</button>
+      <button class="ghost" onclick="closeModal(false);startNext()">Open another case</button>
     </div>
   </div>
 </div>
-
+<div class="toast" id="toast"></div>
 <footer>Faction is decided by human votes only. The registry takes no position.<br>
 De-escalation stages the stakes, never the facts.</footer>
-
 <script>
 /* ================= CONFIG ================= */
 const CONFIG = {
-  SUPABASE_URL: "https://aslcrwmbdtvimjrexxzw.supabase.co",
-  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls",
-  VIDEO_EMBED: "",
-  EPISODES: [],
+  SUPABASE_URL: "",            // e.g. https://aslcrwmbdtvimjrexxzw.supabase.co
+  SUPABASE_ANON_KEY: "",
+  VIDEO_EMBED: "",             // e.g. https://www.youtube.com/embed/XXXX
+  EPISODES: [],                // [{title:"EP 12: The Chips Incident", url:"..."}]
   FN: n => CONFIG.SUPABASE_URL + "/functions/v1/" + n,
 };
 const DEMO = !CONFIG.SUPABASE_URL;
 document.getElementById('demoflag').textContent = DEMO ? "DEMO MODE" : "";
-
-/* State */
-let CASE = null, PICK = {free:{}}, VOTE = null, CARD_DATA = null;
-let _allCases = null;
-
-/* Anonymous play id */
 function anonId(){
-  try{
-    let id = localStorage.getItem('ucar_anon');
-    if(!id){ id = crypto.randomUUID(); localStorage.setItem('ucar_anon', id); }
+  try{ let id=localStorage.getItem('ucar_anon');
+    if(!id){id=crypto.randomUUID();localStorage.setItem('ucar_anon',id);}
     return id;
   }catch(e){ return crypto.randomUUID(); }
 }
+function toast(msg){const t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600);}
 
-/* ================= UTILITIES ================= */
-const esc = s => String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const setText = (id,t) => { document.getElementById(id).textContent = t; };
+/* ================= COMEDY MODULE =================
+   [COPY] Owner-replaceable banks. Rules encoded here and enforced by
+   design: personas describe ROLES and SYSTEMS, never named individuals.
+   The FACTUAL label is always shown and is the ONLY thing submitted;
+   personas are presentation. Satire targets systems, policies, and
+   corporate speak. */
+const PERSONAS = {
+  who: [
+    [/police|sheriff|law enforcement|officers/i,
+      ["badge-holders with a brand-new gadget",
+       "a department that skipped the questions part of the demo",
+       "the precinct that bought confidence by the pound"]],
+    [/commission|council|board|legislat|agency|administration|city|county|state/i,
+      ["well-meaning bureaucrats with one rubber stamp between them",
+       "micromanagers trying to save a penny",
+       "a committee that approved it to end the meeting"]],
+    [/clearview|vendor|inc|corp|labs|technolog|startup|company|workday|axon|flock/i,
+      ["a vendor whose brochure is also a subscription form",
+       "savvy geniuses allegedly saving the world",
+       "a startup that read half a whitepaper twice"]],
+    [/hospital|clinic|health|medical|care team|nurse/i,
+      ["night-shift lifesavers who actually read their own memos",
+       "an institution that kept a human in the loop on purpose"]],
+    [/school|district|university|education/i,
+      ["administrators trying to childproof physics",
+       "a school board that outsourced its eyesight"]],
+    [/\bai\b|system|algorithm|model|scanner|detector|software/i,
+      ["a very confident machine that has never been outside",
+       "an unblinking employee of the month, every month",
+       "a spreadsheet that got promoted to judgment"]],
+    [/employer|hr|hiring|recruiter/i,
+      ["a hundred managers who never looked inside the box",
+       "efficiency enthusiasts with a stopwatch and no mirror"]],
+  ],
+  whom: [
+    [/student|school|teen|kid/i,
+      ["kids who just wanted lunch",
+       "teenagers doing absolutely nothing unusual"]],
+    [/photo|scraped|public|billions|residents|citizens/i,
+      ["everyone who ever posted a photo",
+       "the general public, unbriefed and unpaid"]],
+    [/applicant|job|candidate|seeker|over 40|workers/i,
+      ["applicants with decades on the clock",
+       "people whose afternoons of hope fit in one PDF"]],
+    [/patient|admitted|icu/i,
+      ["patients sleeping through their own rescue",
+       "people whose best night is the uneventful one"]],
+    [/driver|vehicle|plate/i,
+      ["drivers who signed up for roads, not rosters"]],
+    [/suspect|unsolved/i,
+      ["maybes in a lineup of maybes"]],
+  ],
+  action: [
+    [/search|scan|recogni|match/i, "rifles through"],
+    [/flag|alert|detect/i, "points dramatically at"],
+    [/deny|reject|screen|filter|auto/i, "stamps THANKS ANYWAY on"],
+    [/monitor|watch|track|surveil/i, "stares unblinking at"],
+    [/summon|call|dispatch/i, "hits the EVERYONE, NOW button about"],
+    [/predict|score|assess/i, "does confident math about"],
+    [/help|assist|warn|save|catch/i, "quietly runs interference for"],
+  ],
+};
+const BRAINIAC_CAST = [
+  "a Brainiac in a homemade lab coat", "three Brainiacs sharing one clipboard",
+  "a Brainiac who peer-reviews napkins", "a retired Brainiac who saw this coming in 1987",
+  "a Brainiac with a conspiracy corkboard, mostly correct",
+  "a first-week Brainiac taking notes in crayon",
+  "a Brainiac who read the terms of service, once, for a dare",
+  "a Brainiac holding a sign that just says CITATIONS?"];
+const BRAINIAC_LINES = {
+  who: ["\u201CWhen they said agents, I genuinely hoped for trench coats.\u201D",
+    "\u201CSomebody trained this thing. The thing did not consent to the metaphor.\u201D",
+    "\u201CFollow the procurement. It's always the procurement.\u201D",
+    "\u201CI've seen this movie. The projector was also the villain.\u201D"],
+  verdict: ["\u201CFor the record, 'working as designed' is doing a lot of work.\u201D",
+    "\u201CThe algorithm has bias. To be fair, so does my aunt at Thanksgiving.\u201D",
+    "\u201CIt's called deep learning because of how deep the lawsuits will be.\u201D",
+    "\u201CEfficiency without empathy is just fast.\u201D",
+    "\u201CThe best algorithm is the one that knows when to ask a human.\u201D",
+    "\u201CComputer vision: now the camera has opinions.\u201D"],
+};
+function rng(seed){let x=0;for(const ch of String(seed))x=(x*31+ch.charCodeAt(0))>>>0;
+  return ()=>{x^=x<<13;x>>>=0;x^=x>>>17;x^=x<<5;x>>>=0;return x/0xffffffff};}
+function pick(r,arr){return arr[Math.floor(r()*arr.length)];}
+function persona(kind, factual, seed){
+  const r=rng(seed+factual);
+  for(const [re,opts] of PERSONAS[kind]||[]){
+    if(re.test(factual)) return typeof opts==='string'?opts:pick(r,opts);
+  }
+  return kind==='action'?'gets to work on':pick(r,[
+    "an outfit with a plan and a budget","a name on a purchase order",
+    "someone very sure about all this"]);
+}
+function actionPersona(factual, seed){
+  const r=rng(seed+factual);
+  for(const [re,flair] of PERSONAS.action){ if(re.test(factual)) return flair; }
+  return pick(r,["performs, with confidence,","demonstrates, at scale,"]);
+}
+function brainiacLine(beat, seed, n=1){
+  const r=rng(seed+beat);
+  const cast=[...BRAINIAC_CAST].sort(()=>r()-0.5);
+  const lines=[...(BRAINIAC_LINES[beat]||BRAINIAC_LINES.verdict)].sort(()=>r()-0.5);
+  return cast.slice(0,n).map((c,i)=>({cast:c, line:lines[i%lines.length]}));
+}
+
+/* ================= SCENE ENGINE =================
+   Detailed layered SVG: banded sky + propaganda rays + halftone + grain,
+   category set pieces, the cast (GI, Gary, Supes, Evil Brain, Brainiac
+   extras), props by keyword, beat compositions, mood grading. Seeded per
+   case so every case looks different. If CASE.art_url exists (future
+   image pipeline), it replaces the illustration. */
+const PALETTES=[
+  {sky:['#171512','#1e1a14','#26201a'], accent:'#c9a84c'},
+  {sky:['#121517','#161c20','#1b2328'], accent:'#7da3b8'},
+  {sky:['#171217','#1d161e','#241b26'], accent:'#9a86b8'},
+  {sky:['#121712','#171e16','#1d261b'], accent:'#8aa06b'},
+  {sky:['#181312','#211815','#2a1d18'], accent:'#c07a4a'},
+];
+function sceneDefs(id){
+  return '<defs>'
+   +'<filter id="grain'+id+'"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 0.93 0 0 0 0 0.90 0 0 0 0 0.84 0 0 0 0.05 0"/><feComposite operator="over" in2="SourceGraphic"/></filter>'
+   +'<pattern id="dots'+id+'" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="#EDE6D6" opacity="0.10"/></pattern>'
+   +'<radialGradient id="vig'+id+'" cx="50%" cy="42%" r="75%"><stop offset="62%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.55"/></radialGradient>'
+   +'</defs>';
+}
+/* --- cast figures (x,y = feet center; s = scale) --- */
+function figGI(x,y,s,pose){ // angular, beret, clipboard
+  const arm = pose==='point' ? '<line x1="8" y1="-58" x2="42" y2="-70" stroke="#EDE6D6" stroke-width="6"/>'
+    : '<line x1="8" y1="-58" x2="20" y2="-34" stroke="#EDE6D6" stroke-width="6"/><rect x="14" y="-40" width="16" height="20" fill="none" stroke="#EDE6D6" stroke-width="3"/>';
+  return '<g transform="translate('+x+','+y+') scale('+s+')" style="color:#6b7d5a">'
+   +'<line x1="-8" y1="0" x2="-8" y2="-34" stroke="#EDE6D6" stroke-width="7"/>'
+   +'<line x1="8" y1="0" x2="8" y2="-34" stroke="#EDE6D6" stroke-width="7"/>'
+   +'<rect x="-16" y="-70" width="32" height="38" fill="#EDE6D6"/>'
+   +'<rect x="-16" y="-70" width="32" height="8" fill="currentColor"/>'
+   +'<line x1="-8" y1="-58" x2="-24" y2="-40" stroke="#EDE6D6" stroke-width="6"/>'+arm
+   +'<circle cx="0" cy="-80" r="11" fill="#EDE6D6"/>'
+   +'<path d="M-13 -86 L13 -86 L9 -94 L-9 -94 Z" fill="currentColor"/>'
+   +'<rect x="-4" y="-83" width="9" height="2.5" fill="#0E0E0E"/>'
+   +'</g>';
+}
+function figGary(x,y,s,pose){ // round optimist, goggles up, arms wide/demo
+  const arms = pose==='demo'
+    ? '<path d="M-14 -52 Q -34 -60 -40 -44" fill="none" stroke="#EDE6D6" stroke-width="6"/><path d="M14 -52 Q 34 -66 44 -58" fill="none" stroke="#EDE6D6" stroke-width="6"/>'
+    : '<path d="M-14 -52 Q -32 -46 -36 -34" fill="none" stroke="#EDE6D6" stroke-width="6"/><path d="M14 -52 Q 32 -46 36 -34" fill="none" stroke="#EDE6D6" stroke-width="6"/>';
+  return '<g transform="translate('+x+','+y+') scale('+s+')" style="color:#4a7d9c">'
+   +'<line x1="-7" y1="0" x2="-7" y2="-30" stroke="#EDE6D6" stroke-width="7"/>'
+   +'<line x1="7" y1="0" x2="7" y2="-30" stroke="#EDE6D6" stroke-width="7"/>'
+   +'<ellipse cx="0" cy="-50" rx="19" ry="22" fill="#EDE6D6"/>'
+   +'<rect x="-19" y="-46" width="38" height="7" fill="currentColor"/>'+arms
+   +'<circle cx="0" cy="-80" r="12" fill="#EDE6D6"/>'
+   +'<path d="M-12 -88 A 12 8 0 0 1 12 -88" fill="none" stroke="currentColor" stroke-width="4"/>'
+   +'<circle cx="-8" cy="-92" r="4" fill="none" stroke="currentColor" stroke-width="2.5"/>'
+   +'<circle cx="8" cy="-92" r="4" fill="none" stroke="currentColor" stroke-width="2.5"/>'
+   +'</g>';
+}
+function figSupes(x,y,s){ // cape, chest mark, fists on hips
+  return '<g transform="translate('+x+','+y+') scale('+s+')" style="color:#c9a84c">'
+   +'<path d="M-16 -66 L -30 -6 L -10 -14 Z" fill="currentColor" opacity="0.85"/>'
+   +'<line x1="-8" y1="0" x2="-8" y2="-32" stroke="#EDE6D6" stroke-width="7"/>'
+   +'<line x1="8" y1="0" x2="8" y2="-32" stroke="#EDE6D6" stroke-width="7"/>'
+   +'<path d="M-15 -68 L15 -68 L11 -32 L-11 -32 Z" fill="#EDE6D6"/>'
+   +'<path d="M0 -60 L8 -46 L-8 -46 Z" fill="currentColor"/>'
+   +'<path d="M-15 -62 Q -26 -54 -22 -44 L -14 -48" fill="#EDE6D6"/>'
+   +'<path d="M15 -62 Q 26 -54 22 -44 L 14 -48" fill="#EDE6D6"/>'
+   +'<circle cx="0" cy="-79" r="11" fill="#EDE6D6"/>'
+   +'<path d="M-11 -84 Q 0 -92 11 -84 L 11 -80 L -11 -80 Z" fill="currentColor"/>'
+   +'</g>';
+}
+function figBrain(x,y,s){ // brain in jar on wheeled pedestal
+  return '<g transform="translate('+x+','+y+') scale('+s+')">'
+   +'<circle cx="-12" cy="0" r="6" fill="none" stroke="#EDE6D6" stroke-width="3"/>'
+   +'<circle cx="12" cy="0" r="6" fill="none" stroke="#EDE6D6" stroke-width="3"/>'
+   +'<rect x="-20" y="-26" width="40" height="22" fill="#EDE6D6"/>'
+   +'<rect x="-16" y="-64" width="32" height="38" rx="6" fill="none" stroke="#EDE6D6" stroke-width="3.5"/>'
+   +'<path d="M-10 -50 q4 -10 10 -4 q6 -8 10 2 q6 2 0 8 q-2 6 -8 4 q-6 4 -10 -2 q-6 -2 -2 -8" fill="#C1121F"/>'
+   +'<line x1="-16" y1="-30" x2="16" y2="-30" stroke="#EDE6D6" stroke-width="2.5"/>'
+   +'</g>';
+}
+function figBrainiac(x,y,s,seed){ // varied little extras
+  const r=rng(seed);
+  const hat=r()>0.5, coat=r()>0.4, sign=r()>0.65;
+  return '<g transform="translate('+x+','+y+') scale('+s+')" style="color:#9a86b8">'
+   +'<line x1="-5" y1="0" x2="-5" y2="-20" stroke="#EDE6D6" stroke-width="5"/>'
+   +'<line x1="5" y1="0" x2="5" y2="-20" stroke="#EDE6D6" stroke-width="5"/>'
+   +(coat?'<path d="M-11 -46 L11 -46 L14 -20 L-14 -20 Z" fill="#EDE6D6"/>'
+         :'<rect x="-10" y="-46" width="20" height="26" fill="#EDE6D6"/>')
+   +'<circle cx="0" cy="-54" r="8" fill="#EDE6D6"/>'
+   +(hat?'<rect x="-9" y="-64" width="18" height="5" fill="currentColor"/><rect x="-5" y="-72" width="10" height="9" fill="currentColor"/>'
+        :'<path d="M-8 -58 Q 0 -66 8 -58" fill="none" stroke="currentColor" stroke-width="3"/>')
+   +(sign?'<rect x="10" y="-56" width="22" height="15" fill="none" stroke="#EDE6D6" stroke-width="2.5"/><line x1="14" y1="-49" x2="28" y2="-49" stroke="#EDE6D6" stroke-width="2"/>':'')
+   +'</g>';
+}
+/* --- category set pieces --- */
+function setPieces(cat, r, accent){
+  const g=[];
+  if(/Surveil/i.test(cat)){
+    g.push('<rect x="560" y="70" width="10" height="110" fill="#EDE6D6" opacity="0.9"/>'
+      +'<rect x="530" y="46" width="70" height="34" fill="none" stroke="#EDE6D6" stroke-width="4"/>'
+      +'<ellipse cx="565" cy="63" rx="20" ry="11" fill="none" stroke="'+accent+'" stroke-width="4"/>'
+      +'<circle cx="565" cy="63" r="5" fill="'+accent+'"/>');
+    for(let i=0;i<3;i++){const x=80+i*60;
+      g.push('<line x1="'+x+'" y1="180" x2="'+x+'" y2="110" stroke="#EDE6D6" stroke-width="4" opacity="0.8"/>'
+        +'<rect x="'+(x-9)+'" y="98" width="18" height="12" fill="#EDE6D6" opacity="0.8"/>'
+        +'<line x1="'+(x+9)+'" y1="104" x2="'+(x+34)+'" y2="118" stroke="'+accent+'" stroke-width="2" opacity="0.6"/>');}
+  } else if(/Health/i.test(cat)){
+    for(let i=0;i<3;i++){const x=90+i*70;
+      g.push('<rect x="'+x+'" y="150" width="52" height="14" fill="#EDE6D6" opacity="0.85"/>'
+        +'<rect x="'+x+'" y="128" width="10" height="24" fill="#EDE6D6" opacity="0.85"/>'
+        +'<path d="M'+(x+18)+' 140 q8 -10 14 0" fill="none" stroke="'+accent+'" stroke-width="3"/>');}
+    g.push('<rect x="540" y="60" width="90" height="60" fill="none" stroke="#EDE6D6" stroke-width="4"/>'
+      +'<polyline points="548,96 566,96 574,78 584,110 592,90 622,90" fill="none" stroke="'+accent+'" stroke-width="3"/>'
+      +'<rect x="574" y="30" width="22" height="22" fill="'+accent+'"/><rect x="580" y="24" width="10" height="34" fill="'+accent+'"/>');
+  } else if(/Autom/i.test(cat)){
+    g.push('<rect x="60" y="150" width="420" height="10" fill="#EDE6D6" opacity="0.9"/>'
+      +'<circle cx="90" cy="166" r="7" fill="none" stroke="#EDE6D6" stroke-width="3"/>'
+      +'<circle cx="240" cy="166" r="7" fill="none" stroke="#EDE6D6" stroke-width="3"/>'
+      +'<circle cx="400" cy="166" r="7" fill="none" stroke="#EDE6D6" stroke-width="3"/>'
+      +'<path d="M520 150 L520 90 L560 90" fill="none" stroke="#EDE6D6" stroke-width="8"/>'
+      +'<rect x="552" y="82" width="34" height="20" fill="'+accent+'"/>'
+      +'<text x="569" y="97" text-anchor="middle" font-family="Arial" font-weight="800" font-size="9" fill="#0E0E0E">NO</text>');
+    for(let i=0;i<4;i++)g.push('<rect x="'+(110+i*80)+'" y="136" width="30" height="14" fill="'+accent+'" opacity="0.85"/>');
+  } else if(/Educ|School/i.test(cat)){
+    for(let i=0;i<5;i++)g.push('<rect x="'+(70+i*44)+'" y="104" width="34" height="76" fill="none" stroke="#EDE6D6" stroke-width="3"/>'
+      +'<line x1="'+(76+i*44)+'" y1="122" x2="'+(98+i*44)+'" y2="122" stroke="#EDE6D6" stroke-width="2"/>');
+    g.push('<rect x="560" y="52" width="46" height="30" fill="none" stroke="#EDE6D6" stroke-width="4"/>'
+      +'<circle cx="583" cy="67" r="9" fill="none" stroke="'+accent+'" stroke-width="3.5"/><circle cx="583" cy="67" r="3.5" fill="'+accent+'"/>');
+  } else { // Prediction / default: obelisk chart + antenna
+    g.push('<polyline points="80,168 150,120 210,142 300,84 380,110" fill="none" stroke="'+accent+'" stroke-width="5"/>'
+      +'<path d="M300 84 h26 v20" fill="none" stroke="'+accent+'" stroke-width="4"/>'
+      +'<line x1="560" y1="180" x2="560" y2="70" stroke="#EDE6D6" stroke-width="5"/>'
+      +'<path d="M540 86 q20 -18 40 0" fill="none" stroke="#EDE6D6" stroke-width="3"/>'
+      +'<path d="M532 96 q28 -28 56 0" fill="none" stroke="#EDE6D6" stroke-width="2.5" opacity="0.7"/>');
+  }
+  return g.join('');
+}
+/* --- keyword props --- */
+function propFor(text, accent){
+  const t=(text||'').toLowerCase();
+  if(/chip|snack/.test(t)) return '<g transform="translate(360,150)">'
+    +'<path d="M-16 -34 L16 -34 L22 6 L-22 6 Z" fill="'+accent+'"/>'
+    +'<path d="M-16 -34 L16 -34 L12 -44 L-12 -44 Z" fill="#EDE6D6"/>'
+    +'<text x="0" y="-8" text-anchor="middle" font-family="Arial" font-weight="800" font-size="10" fill="#0E0E0E">CHIPS</text></g>';
+  if(/album|photo|face/.test(t)) return '<g transform="translate(360,152)">'
+    +'<rect x="-34" y="-58" width="68" height="58" fill="#EDE6D6"/>'
+    +'<line x1="0" y1="-58" x2="0" y2="0" stroke="#0E0E0E" stroke-width="3"/>'
+    +'<rect x="-26" y="-48" width="18" height="16" fill="'+accent+'"/>'
+    +'<rect x="8" y="-48" width="18" height="16" fill="'+accent+'"/>'
+    +'<rect x="-26" y="-26" width="18" height="16" fill="'+accent+'" opacity="0.7"/>'
+    +'<rect x="8" y="-26" width="18" height="16" fill="'+accent+'" opacity="0.7"/></g>';
+  if(/stamp|reject|resume|conveyor/.test(t)) return '<g transform="translate(360,150)">'
+    +'<path d="M-6 -60 L-6 -30 L-26 -30 L-26 -18 L26 -18 L26 -30 L6 -30 L6 -60 Z" fill="#EDE6D6"/>'
+    +'<rect x="-30" y="-14" width="60" height="10" fill="'+accent+'"/></g>';
+  if(/monitor|vitals|lamp/.test(t)) return '<g transform="translate(360,150)">'
+    +'<rect x="-30" y="-52" width="60" height="40" fill="none" stroke="#EDE6D6" stroke-width="4"/>'
+    +'<polyline points="-22,-30 -10,-30 -4,-44 4,-20 10,-32 22,-32" fill="none" stroke="'+accent+'" stroke-width="3"/></g>';
+  return '';
+}
+/* --- the compositor --- */
+function scene(seed, beat, opts={}){
+  if(window.CASE && CASE.art_url && beat!=='card'){
+    return '<img src="'+esc(CASE.art_url)+'" style="width:100%;display:block" alt="">';
+  }
+  const id=(seed+beat).replace(/[^a-z0-9]/gi,'').slice(-8);
+  const r=rng(seed+beat);
+  const pal=PALETTES[Math.floor(rng(seed)()*PALETTES.length)];
+  const mood=opts.mood||'flat';
+  const accent = mood==='hell' ? '#C1121F' : mood==='heaven' ? '#c9a84c' : pal.accent;
+  const H=300,W=720;
+  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'+sceneDefs(id);
+  // banded sky
+  const bands=pal.sky;
+  bands.forEach((c,i)=>{s+='<rect x="0" y="'+(i*62)+'" width="'+W+'" height="'+(64+r()*8)+'" fill="'+c+'"/>';});
+  s+='<rect x="0" y="180" width="'+W+'" height="'+(H-180)+'" fill="'+bands[0]+'"/>';
+  // sun/moon + propaganda rays
+  const cx=170+r()*380, cy=52+r()*30;
+  const nRays=14+Math.floor(r()*8);
+  for(let i=0;i<nRays;i++){const a=(i/nRays)*Math.PI*2;
+    s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+Math.cos(a)*520).toFixed(0)+'" y2="'
+      +(cy+Math.sin(a)*520).toFixed(0)+'" stroke="'+accent+'" stroke-width="'
+      +(1.5+r()*2.5).toFixed(1)+'" opacity="0.14"/>';}
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(20+r()*10).toFixed(0)+'" fill="'+accent+'" opacity="0.9"/>';
+  s+='<rect x="0" y="0" width="'+W+'" height="120" fill="url(#dots'+id+')"/>';
+  // ground line
+  s+='<line x1="0" y1="180" x2="'+W+'" y2="180" stroke="#EDE6D6" stroke-width="2" opacity="0.5"/>';
+  const cat=(window.CASE&&CASE.category)||'Prediction';
+  const caseText=window.CASE?(CASE.title+' '+CASE.summary):'';
+  // beat compositions
+  if(beat==='case'){
+    s+=setPieces(cat,r,accent);
+    s+=figGI(150,238,0.85,'clip')+figGary(360,240,0.85,'wide')+figSupes(570,238,0.85);
+    s+='<rect x="200" y="200" width="320" height="34" fill="#0E0E0E" stroke="'+accent+'" stroke-width="3"/>'
+      +'<text x="360" y="223" text-anchor="middle" font-family="Arial" font-weight="800" font-size="16" letter-spacing="4" fill="'+accent+'">CASE FILE</text>';
+  }
+  if(beat==='who'){
+    for(let i=0;i<3;i++){const x=180+i*180;
+      s+='<path d="M'+x+' 40 L'+(x-56)+' 210 L'+(x+56)+' 210 Z" fill="'+accent+'" opacity="0.12"/>'
+        +'<rect x="'+(x-40)+'" y="210" width="80" height="16" fill="#EDE6D6" opacity="0.85"/>'
+        +'<g opacity="0.92"><circle cx="'+x+'" cy="168" r="14" fill="#0E0E0E" stroke="#EDE6D6" stroke-width="3"/>'
+        +'<rect x="'+(x-18)+'" y="182" width="36" height="28" fill="#0E0E0E" stroke="#EDE6D6" stroke-width="3"/></g>'
+        +'<text x="'+x+'" y="246" text-anchor="middle" font-family="Arial" font-weight="800" font-size="12" fill="'+accent+'">?</text>';}
+    s+=figGI(70,262,0.9,'point');
+  }
+  if(beat==='action'){
+    s+=setPieces(cat,r,accent);
+    s+=propFor(caseText,accent);
+    s+=figGary(300,246,1.05,'demo');
+    s+='<path d="M330 150 q40 -26 78 -6" fill="none" stroke="'+accent+'" stroke-width="3" stroke-dasharray="6 6"/>'
+      +'<path d="M326 168 q52 -12 96 8" fill="none" stroke="'+accent+'" stroke-width="2.5" stroke-dasharray="5 7" opacity="0.7"/>';
+  }
+  if(beat==='whom'){
+    for(let i=0;i<10;i++){const x=70+i*64+r()*14, sc=0.5+r()*0.25;
+      s+=figBrainiac(x,240+r()*10,sc,seed+'crowd'+i);}
+    s+=figSupes(360,262,1.0);
+  }
+  if(beat==='verdict'){
+    s+='<rect x="0" y="0" width="360" height="180" fill="#c9a84c" opacity="0.10"/>'
+      +'<rect x="360" y="0" width="360" height="180" fill="#C1121F" opacity="0.12"/>'
+      +'<line x1="360" y1="0" x2="360" y2="180" stroke="#EDE6D6" stroke-width="2" stroke-dasharray="6 8" opacity="0.6"/>';
+    for(let i=0;i<8;i++)s+=figBrainiac(90+i*76,252,0.55,seed+'aud'+i);
+    s+=figBrain(360,236,0.9);
+  }
+  if(beat==='ending'){
+    s+=setPieces(cat,r,accent);
+    s+=figBrain(560,242,1.0);
+    const lesson=(opts.lesson||'').toUpperCase().slice(0,46);
+    s+='<rect x="60" y="70" width="330" height="110" fill="#141b14" stroke="#EDE6D6" stroke-width="5"/>'
+      +'<rect x="60" y="70" width="330" height="110" fill="url(#dots'+id+')"/>'
+      +'<text x="225" y="112" text-anchor="middle" font-family="Georgia" font-style="italic" font-size="15" fill="#EDE6D6">'+esc(lesson.slice(0,26))+'</text>'
+      +(lesson.length>26?'<text x="225" y="136" text-anchor="middle" font-family="Georgia" font-style="italic" font-size="15" fill="#EDE6D6">'+esc(lesson.slice(26))+'</text>':'')
+      +'<line x1="60" y1="180" x2="390" y2="180" stroke="#EDE6D6" stroke-width="5"/>'
+      +figGI(430,244,0.7,'clip')+figSupes(480,244,0.7);
+    if(mood==='hell') s+='<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#C1121F" opacity="0.10"/>';
+    if(mood==='heaven') s+='<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#c9a84c" opacity="0.10"/>';
+  }
+  if(beat==='card'){
+    s+=setPieces(cat,r,accent);
+    s+=figGI(140,240,0.8,'clip')+figGary(360,242,0.85,'demo')+figSupes(580,240,0.8);
+    s+=propFor(caseText,accent);
+    // ornate corners
+    const c='M0 26 L0 0 L26 0';
+    s+='<g stroke="'+accent+'" stroke-width="5" fill="none">'
+      +'<path d="M14 40 L14 14 L40 14"/><path d="M706 40 L706 14 L680 14"/>'
+      +'<path d="M14 260 L14 286 L40 286"/><path d="M706 260 L706 286 L680 286"/></g>';
+  }
+  // grain + vignette + frame
+  s+='<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="url(#vig'+id+')"/>'
+    +'<rect x="0" y="0" width="'+W+'" height="'+H+'" filter="url(#grain'+id+')" fill="none"/>'
+    +'<rect x="6" y="6" width="'+(W-12)+'" height="'+(H-12)+'" fill="none" stroke="'+accent+'" stroke-width="3"/>'
+    +'<rect x="14" y="14" width="'+(W-28)+'" height="'+(H-28)+'" fill="none" stroke="#EDE6D6" stroke-width="1.5" opacity="0.6"/>'
+    +'</svg>';
+  return s;
+}
+
+/* ================= DEMO CASES (structure = extract-worker output) ===== */
+/* [COPY] Placeholder voice; final lines are OWNER. */
+const DEMO_CASES = [{
+  id:"demo-1", raw_title:"Cobb County approves Clearview AI contract",
+  title:"County police adopt face-search database", category:"Surveillance",
+  summary:"Cobb County commissioners approved a 3-year contract giving police access to Clearview AI's face-matching database of billions of scraped public images, at $18,000 per year, after a six-month pilot.",
+  article_quote:"In seven seconds, and we'd been working the case for years.",
+  source_url:"https://www.atlantanewsfirst.com/2022/12/15/new-contract-with-facial-recognition-tech-company-raises-privacy-concerns-cobb-county/",
+  source_tier:1, impact:4, heaven_votes:9, hell_votes:21, faction:"hell", valence:-2,
+  created_at:new Date(Date.now()-2*864e5).toISOString(),
+  extraction:{
+    who_choices:["Cobb County Police","County commissioners","Clearview AI"],
+    action_choices:["searches faces of","matches suspects against","runs face recognition on"],
+    whom_choices:["billions of scraped photos","residents and the public","unsolved case suspects"],
+    reenactment:{
+      setting:"Case staging: a cardboard county courthouse. GI has arranged five rubber stamps on a folding table marked COMMISSION. Gary wheels in a photo album the size of a refrigerator, labeled EVERY FACE (PROBABLY YOURS). Supes stands with a cutout crowd of ordinary people.",
+      cold_open:"The record shows a detective with a blurry photo and three lost years. The album found a match in seven seconds. The five stamps came down as one. Supes counted the faces inside and stopped counting at four billion.",
+      who_reveals:[
+        "GI points to the desk with the badge: they hold the album now. Custody is the whole ballgame, and the receipt is already missing.",
+        "GI points to the five stamps: they approved it in one motion. Asked who decided, the stamps point at each other.",
+        "GI points to the vendor's brochure: the album never forgets, it says. The brochure is also a subscription form."],
+      action_demos:[
+        "Gary demonstrates: {WHO} holds a photo up to the album, which glows and burps out forty maybes. Gary calls this a feature, quietly.",
+        "Gary demonstrates: {WHO} lines up six nearly identical faces and lets the album tap one. It taps confidently. It has been wrong before. It does not dwell.",
+        "Gary demonstrates: {WHO} points a cardboard camera at the audience and every face slides into the album with a wet thwip. Nobody signed anything."],
+      whom_reveals:[
+        "Supes opens the album gently: four billion school photos wave back. None of them remember posing for this. Supes waves back anyway.",
+        "Supes walks the crowd across the stage: a jogger, a grandma, a barista. The album photocopies each in passing. The grandma notices. Supes takes her statement.",
+        "Supes stands beside a silhouette labeled UNSOLVED. The album points at it. Then at a different one. Then back. Supes writes down both."],
+      endings:{
+        heaven:"{WHO} keeps the album behind glass, checks it twice, and a three-year-old cold case finally closes. The grandma gets a formal apology card. Evil Brain, at the chalkboard: the lesson is an off switch that works, and a human who uses it.",
+        hell:"The album grows a second volume, then a third. {WHO} stops asking it questions and starts taking its suggestions. The jogger's photo sits in a folder she will never see. Evil Brain, at the chalkboard, writes one word: MORE."},
+      deescalations:[
+        {real:"police face-recognition search of billions of scraped images", cartoon:"a refrigerator-sized photo album that hums when it is confident"},
+        {real:"5-0 commission vote approving an $18,000/year contract", cartoon:"five rubber stamps coming down as one"},
+        {real:"public images scraped without consent", cartoon:"faces sliding into the album with a wet thwip"}]},
+    story:{gi:"Tactical assessment: a database this size has no off switch. Plan for that.",
+      gary:"The pilot worked great. Pilots always work great. That's what makes them pilots.",
+      supes:"Nobody in that album was asked. Somebody should ask. I'll wait."}}
+},{
+  id:"demo-2", raw_title:"Hospital deploys AI sepsis early-warning system",
+  title:"Hospital AI flags sepsis hours earlier", category:"Healthcare",
+  summary:"A regional hospital network deployed a machine-learning early-warning system that monitors vitals and lab results to flag sepsis risk hours before clinical presentation, with nurses reviewing every alert.",
+  article_quote:null,
+  source_url:"https://example.org/hospital-sepsis-ai",
+  source_tier:2, impact:4, heaven_votes:26, hell_votes:4, faction:"heaven", valence:2,
+  created_at:new Date(Date.now()-12*864e5).toISOString(),
+  extraction:{
+    who_choices:["Hospital network","Clinical AI system","Care teams"],
+    action_choices:["flags sepsis risk for","monitors vitals of","alerts nurses about"],
+    whom_choices:["admitted patients","at-risk patients","ICU candidates"],
+    reenactment:{
+      setting:"Case staging: a cardboard ward at 3 AM. GI has taped ninety paper monitors to the wall. Gary plays the AI, wearing a desk lamp as a hat. Supes sits with the patient cutouts, who are all asleep.",
+      cold_open:"The record shows one monitor changing pitch by a half-step. No human ear caught it. Gary's lamp snapped on six hours before anything looked wrong. A note was passed. A nurse looked with human eyes. That is the entire incident, and that is the point.",
+      who_reveals:[
+        "GI gestures at the whole ward: the building bought it, trained on it, and wrote the rule that a human checks first. Institutions get credit when they earn it.",
+        "GI points at Gary's lamp: it watches ninety monitors without blinking. It cannot blink. This is the one job where that helps.",
+        "GI points to the nurses' station: whatever the lamp says, a person looks before anything happens. That handshake is the whole architecture."],
+      action_demos:[
+        "Gary demonstrates: {WHO} circles a squiggle on bed four's chart that nobody else rated. The squiggle gets a note. The note gets a human.",
+        "Gary demonstrates: {WHO} stares at ninety monitors at once, unblinking, unbothered, slightly smug about it.",
+        "Gary demonstrates: {WHO} tugs a sleeve. Gently. Twice. Rule one: the sleeve gets tugged, the human decides."],
+      whom_reveals:[
+        "Supes watches the patients snore: the best night of their lives is the one where nothing happened. Nobody claps for prevented disasters. Supes claps quietly.",
+        "Supes sits with bed four, who feels fine and will not feel fine in six hours. Tonight, someone already knows that.",
+        "Supes checks the wings: a cutout in an ICU gown waits there, hoping to stay in the wings. Tonight it does."],
+      endings:{
+        heaven:"{WHO} {ACTION} {WHOM} at 3 AM, a nurse checks, antibiotics hang six hours early, and bed four goes home Tuesday complaining about the food. Evil Brain, at the chalkboard: this worked because a human was load-bearing. Copy the whole sentence.",
+        hell:"The notes multiply until the nurse stops reading them. The lamp beeps into the void. When every bed is bed four, no bed is. Evil Brain, at the chalkboard: an alarm nobody answers is just a clock."},
+      deescalations:[
+        {real:"ML model continuously monitoring vitals and lab results", cartoon:"Gary in a desk-lamp hat staring at ninety paper monitors"},
+        {real:"early sepsis alert routed to nursing staff", cartoon:"a passed note and a gentle sleeve tug"},
+        {real:"clinical review of every alert before intervention", cartoon:"rule one: a human looks with human eyes first"}]},
+    story:{gi:"Probability of humans ignoring the alert: nonzero. Keep the nurse. That's an order.",
+      gary:"It works because a human checks it. Write that down. Frame it, even.",
+      supes:"The patients this catches will never know. That's the good kind of invisible."}}
+},{
+  id:"demo-3", raw_title:"Workday AI hiring screening discrimination suit proceeds",
+  title:"Hiring algorithm screens millions of applicants", category:"Automation",
+  summary:"A federal court allowed a collective action to proceed alleging an AI-powered applicant screening system used by hundreds of employers discriminated against applicants over 40, with hundreds of millions of applications processed.",
+  article_quote:null,
+  source_url:"https://example.org/hiring-ai-suit",
+  source_tier:1, impact:5, heaven_votes:2, hell_votes:3, faction:"unaligned", valence:-1,
+  created_at:new Date(Date.now()-30*864e5).toISOString(),
+  extraction:{
+    who_choices:["Workday screening AI","Hundreds of employers","The vendor"],
+    action_choices:["auto-rejects","scores and filters","screens out"],
+    whom_choices:["applicants over 40","millions of job seekers","qualified candidates"],
+    reenactment:{
+      setting:"Case staging: a mailroom drawn in forced perspective, stadium-sized. GI has installed a conveyor belt feeding a robot arm with a stamp that says THANKS ANYWAY. Gary oils the arm. Supes stands at the end of the belt with a very large box of rejected scrolls.",
+      cold_open:"The record shows a man who mailed his resume with both hands and a little kiss for luck. Four seconds on the belt. THANKS ANYWAY. He got the rejection before he got home. He applied ninety-nine more times. A judge leaned in.",
+      who_reveals:[
+        "GI points to the arm: it insists it has no opinions. It was merely told what a good resume smells like, by someone who left no forwarding address.",
+        "GI sweeps a hand across a hundred lit office windows: each one points at the arm. We just bought it, they say in unison, and the windows go dark.",
+        "GI holds up the vendor's manual: four pages. Page four is blank. Uptime, however, is excellent."],
+      action_demos:[
+        "Gary demonstrates: {WHO} stamps THANKS ANYWAY in a steady drumbeat while the belt speeds up. The drumbeat does not change when the resumes do. Gary needs to sit down.",
+        "Gary demonstrates: {WHO} weighs each scroll on a scale with a hidden thumb on it. Gary looks for the thumb's owner. The scale has no complaints department.",
+        "Gary demonstrates: {WHO} slides a velvet rope across the belt. Some scrolls duck under. Nobody can say how they knew to duck."],
+      whom_reveals:[
+        "Supes stands with the scrolls that have little gray mustaches drawn on: decades of experience, routed to a chute labeled OVERQUALIFIED, PROBABLY. Supes un-droops one mustache at a time.",
+        "Supes pans out: the belt is fed by a river of scrolls past the horizon, each with a name tag and an afternoon of hope stapled on.",
+        "Supes lines up cutouts in graduation caps, work boots, and chef hats, comparing identical stamps. Identical is either fair or the opposite of fair. The judge is still leaning in."],
+      endings:{
+        heaven:"The manual gets a fifth page, HOW TO CHECK THE THUMB. {WHO} keeps stamping, but a person with a clipboard reads every hundredth scroll, and the mustached ones get human eyes. Evil Brain, at the chalkboard: speed is not a value. It's a setting.",
+        hell:"The belt accelerates past what any judge can watch. {WHO} {ACTION} {WHOM} and then learns from its own rejections, the loop page four never mentioned. Somewhere, a man licks a stamp for application one hundred and one. Evil Brain writes: THE ARM IS TEACHING ITSELF."},
+      deescalations:[
+        {real:"automated rejection of job applications at scale", cartoon:"a robot arm with a THANKS ANYWAY stamp on a conveyor belt"},
+        {real:"alleged age discrimination against applicants over 40", cartoon:"scrolls with little gray mustaches routed to a side chute"},
+        {real:"federal collective action allowed to proceed", cartoon:"a judge's chair, very high, leaning in"}]},
+    story:{gi:"The rejection letter was signed by nobody. That was the design. Note it.",
+      gary:"We optimized time-to-reject. Mission accomplished, I guess. I need to sit down.",
+      supes:"Every one of those applications was a person's afternoon of hope."}}
+},{
+  id:"demo-4", raw_title:"School AI gun detection flags student's bag of chips",
+  title:"School AI mistakes chips for a gun", category:"Surveillance",
+  summary:"A Maryland high school's AI gun detection system flagged a student's empty snack bag as a weapon. Police responded; the student was confronted at gunpoint and handcuffed before officers confirmed the object was a bag of chips.",
+  article_quote:"confronted at gunpoint and handcuffed by police",
+  source_url:"https://example.org/school-ai-chips",
+  source_tier:2, impact:5, heaven_votes:2, hell_votes:2, faction:"unaligned", valence:-2,
+  created_at:new Date(Date.now()-4*864e5).toISOString(),
+  extraction:{
+    who_choices:["School security AI","The high school","Responding police"],
+    action_choices:["misidentifies snacks of","flags as armed","summons officers on"],
+    whom_choices:["a student with chips","students in the hallway","teenagers after practice"],
+    reenactment:{
+      setting:"Case staging: a cardboard school hallway at dismissal, lockers in crayon. GI has mounted the Snack Scanner 3000, a cereal-box camera with one enormous googly eye. Gary holds its instruction card, which is mostly exclamation points. Supes stands with a student cutout holding chips.",
+      cold_open:"The record shows a student finishing his chips. The googly eye locked on. The alert went out as WEAPON, and everything downstream believed it, fast and armed. By the time human eyes reached the object, it was, and had always been, a snack.",
+      who_reveals:[
+        "GI taps the scanner: it has never seen a gun. It has seen four thousand snacks and remains unconvinced about all of them. Confidence without eyesight, GI notes, is a threat model.",
+        "GI points at the school: someone bought the eye, mounted the eye, and wired it straight to the loudest possible response. The school points at the eye. The eye points at lunch.",
+        "GI nods at the responders: they were told ARMED. They arrived for ARMED. The system upstream spent their trust like it was free."],
+      action_demos:[
+        "Gary demonstrates: {WHO} studies the bag from six angles and stamps it DEFINITELY A WEAPON, PROBABLY. Gary checks the confidence score. It is very confident. Gary sits down.",
+        "Gary demonstrates: {WHO} trips the alert and the hallway lights go red. Somewhere, paperwork begins filling itself out with the wrong noun.",
+        "Gary demonstrates: {WHO} presses the big button labeled EVERYONE, NOW. There is no button labeled SOMEONE, FIRST."],
+      whom_reveals:[
+        "Supes stands with the student, holding the most famous snack in the district, who did nothing else. He had homework tonight. Now he has a story he didn't ask for. Supes stays until his hands stop shaking.",
+        "Supes watches the hallway cutouts press against the lockers, quietly hiding their own snacks. A lesson nobody meant to teach is still a lesson.",
+        "Supes checks the team in jerseys, granola bars half-raised, doing the math on which snacks are legal now."],
+      endings:{
+        heaven:"A rule gets taped to the eye in crayon: A HUMAN LOOKS FIRST. The student gets his chips back, a real apology, and the last word at the assembly. {WHO} keeps watch, but the alarm now requires a co-signer. Evil Brain, at the chalkboard: VERIFY BEFORE YOU TERRIFY.",
+        hell:"The eye gets a firmware update and a second googly eye. {WHO} {ACTION} {WHOM} faster now, with more confidence and the same eyesight. Somewhere offstage a granola bar is read its rights. Evil Brain writes: CRUNCH DETECTED, and underlines it."},
+      deescalations:[
+        {real:"student confronted at gunpoint and handcuffed by police", cartoon:"asked very sternly to wait in the beanbag corner while his chips are bagged as evidence"},
+        {real:"AI gun detection flagged a bag of chips as a weapon", cartoon:"the Snack Scanner 3000 blaring CRUNCH DETECTED through a party horn"},
+        {real:"armed police response to an automated alert", cartoon:"everyone arriving at once via the cardboard phone marked EMERGENCIES AND ALSO SNACKS"}]},
+    story:{gi:"Tactical read: 99.7% probability those were chips. The crinkle signature was unmistakable.",
+      gary:"The system worked exactly as designed. The design thought lunch was a threat.",
+      supes:"Someone should ask the kid how his week went. Nobody will. So I will."}}
+}];
+
+/* ================= STATE + ROUTER ================= */
+let CASE=null, PICK={free:{}}, VOTE=null, PENDING_VOTE=null;
+const CACHE=new Map(); DEMO_CASES.forEach(c=>CACHE.set(c.id,c));
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.getElementById(id).classList.add('on');
   window.scrollTo(0,0);
 }
-function goHome(){ CASE=null; show('home'); }
-
-/* Template fill: {WHO} {ACTION} {WHOM} */
-const fill = (t,ctx) => String(t||'')
-  .replaceAll('{WHO}',ctx.WHO||'the actor')
-  .replaceAll('{ACTION}',ctx.ACTION||'acts on')
-  .replaceAll('{WHOM}',ctx.WHOM||'everyone');
-
-/* ================= SCENE ART GENERATOR ================= */
-function rng(seed){
-  let x=0;
-  for(const ch of String(seed)) x=(x*31+ch.charCodeAt(0))>>>0;
-  return ()=>{x^=x<<13;x>>>=0;x^=x>>>17;x^=x<<5;x>>>=0;return x/0xffffffff;};
+function goHome(){ closeModal(false); show('home'); renderResults(currentQuery()); }
+function startNext(){
+  const pool=[...CACHE.values()];
+  openCase(pool[Math.floor(Math.random()*pool.length)].id);
 }
 
-/* Generate detailed scene art from art_prompt */
-function generateSceneArt(seed, artPrompt, mood){
-  const r = rng(seed);
-  const baseInk = mood==='hell' ? 'var(--crayon)'
-                : mood==='heaven' ? 'var(--gold)'
-                : 'var(--bone)';
-  const wash = mood==='hell' ? 'rgba(193,18,31,0.12)'
-             : mood==='heaven' ? 'rgba(201,168,76,0.10)'
-             : 'rgba(237,230,214,0.04)';
-
-  // Parse art prompt for scene elements
-  const words = (artPrompt||'').toLowerCase().split(/[\s,]+/);
-  const hasEye = words.some(w=>['eye','watch','surveillance','camera','scan'].includes(w));
-  const hasChain = words.some(w=>['chain','lock','blockchain','immutable'].includes(w));
-  const hasMedical = words.some(w=>['hospital','medical','health','patient','nurse'].includes(w));
-  const hasData = words.some(w=>['data','algorithm','code','digital','computer'].includes(w));
-  const hasNature = words.some(w=>['weather','storm','cloud','rain','fire','tree','forest'].includes(w));
-  const hasBuilding = words.some(w=>['building','office','school','court','city'].includes(w));
-
-  // Build SVG layers
-  let svg = `<svg viewBox="0 0 720 405" xmlns="http://www.w3.org/2000/svg">`;
-  svg += `<rect width="720" height="405" fill="var(--ink)"/>`;
-  svg += `<rect width="720" height="405" fill="${wash}"/>`;
-
-  // Background rays/atmosphere
-  const rayCount = 8 + Math.floor(r()*8);
-  for(let i=0;i<rayCount;i++){
-    const a = (i/rayCount)*Math.PI*2;
-    const cx = 360 + (r()-0.5)*200;
-    const cy = 200 + (r()-0.5)*100;
-    svg += `<line x1="${cx}" y1="${cy}"
-      x2="${cx+Math.cos(a)*500}" y2="${cy+Math.sin(a)*500}"
-      stroke="${baseInk}" stroke-width="${1+r()*2}" opacity="${0.1+r()*0.15}"/>`;
-  }
-
-  // Horizon line
-  svg += `<line x1="0" y1="280" x2="720" y2="280" stroke="${baseInk}" stroke-width="2" opacity="0.3"/>`;
-
-  // Ground texture
-  for(let i=0;i<20;i++){
-    const x = r()*720;
-    const w = 20+r()*80;
-    svg += `<line x1="${x}" y1="${280+r()*60}" x2="${x+w}" y2="${285+r()*55}"
-      stroke="${baseInk}" stroke-width="1" opacity="${0.15+r()*0.2}"/>`;
-  }
-
-  // Scene-specific elements based on art_prompt keywords
-  if(hasEye){
-    // Surveillance eye
-    const ex = 360+r()*100-50, ey = 140+r()*40;
-    svg += `<g transform="translate(${ex},${ey})">
-      <ellipse cx="0" cy="0" rx="${60+r()*20}" ry="${30+r()*10}" fill="none" stroke="${baseInk}" stroke-width="4"/>
-      <circle cx="0" cy="0" r="${18+r()*8}" fill="${baseInk}"/>
-      <circle cx="${3+r()*4}" cy="${-3-r()*4}" r="${5+r()*3}" fill="var(--ink)"/>
-      ${r()>0.5?'<line x1="-80" y1="0" x2="-40" y2="0" stroke="'+baseInk+'" stroke-width="2"/>':''}
-      ${r()>0.5?'<line x1="40" y1="0" x2="80" y2="0" stroke="'+baseInk+'" stroke-width="2"/>':''}
-    </g>`;
-  }
-
-  if(hasChain){
-    // Chain links
-    for(let i=0;i<5;i++){
-      const cx = 120+i*120+r()*40;
-      const cy = 180+r()*60;
-      svg += `<ellipse cx="${cx}" cy="${cy}" rx="25" ry="16" fill="none" stroke="${baseInk}" stroke-width="4"/>`;
-      if(i<4) svg += `<line x1="${cx+25}" y1="${cy}" x2="${cx+95}" y2="${cy+r()*20-10}" stroke="${baseInk}" stroke-width="2"/>`;
-    }
-  }
-
-  if(hasMedical){
-    // Medical cross + heartbeat
-    const mx = 320+r()*80;
-    svg += `<g transform="translate(${mx},150)">
-      <rect x="-8" y="-30" width="16" height="60" fill="${baseInk}"/>
-      <rect x="-30" y="-8" width="60" height="16" fill="${baseInk}"/>
-    </g>`;
-    // Heartbeat line
-    svg += `<polyline points="80,200 160,200 200,160 240,240 280,200 400,200"
-      fill="none" stroke="${baseInk}" stroke-width="3" opacity="0.5"/>`;
-  }
-
-  if(hasData){
-    // Binary/data streams
-    for(let col=0;col<8;col++){
-      const x = 80+col*80;
-      for(let row=0;row<6;row++){
-        if(r()>0.6){
-          svg += `<text x="${x}" y="${50+row*30}" fill="${baseInk}" font-family="monospace"
-            font-size="12" opacity="${0.2+r()*0.3}">${r()>0.5?'1':'0'}</text>`;
-        }
-      }
-    }
-  }
-
-  if(hasNature){
-    // Clouds or trees
-    for(let i=0;i<4;i++){
-      const cx = 100+i*160+r()*60;
-      const cy = 80+r()*40;
-      svg += `<ellipse cx="${cx}" cy="${cy}" rx="${40+r()*30}" ry="${20+r()*15}"
-        fill="none" stroke="${baseInk}" stroke-width="2" opacity="0.3"/>`;
-    }
-  }
-
-  if(hasBuilding){
-    // Silhouette buildings
-    for(let i=0;i<5;i++){
-      const bx = 50+i*140+r()*40;
-      const bw = 60+r()*40;
-      const bh = 80+r()*100;
-      svg += `<rect x="${bx}" y="${280-bh}" width="${bw}" height="${bh}"
-        fill="${baseInk}" opacity="0.15"/>`;
-      // Windows
-      for(let wy=0;wy<Math.floor(bh/25);wy++){
-        for(let wx=0;wx<Math.floor(bw/20);wx++){
-          if(r()>0.4){
-            svg += `<rect x="${bx+8+wx*18}" y="${285-bh+10+wy*22}" width="8" height="10"
-              fill="${baseInk}" opacity="${0.3+r()*0.3}"/>`;
-          }
-        }
-      }
-    }
-  }
-
-  // Decorative frame
-  svg += `<rect x="12" y="12" width="696" height="381" fill="none" stroke="${baseInk}" stroke-width="3"/>`;
-  svg += `<rect x="20" y="20" width="680" height="365" fill="none" stroke="${baseInk}" stroke-width="1" opacity="0.5"/>`;
-
-  // Corner ornaments
-  const corners = [[30,30],[690,30],[30,375],[690,375]];
-  corners.forEach(([cx,cy])=>{
-    svg += `<circle cx="${cx}" cy="${cy}" r="4" fill="${baseInk}"/>`;
-  });
-
-  svg += `</svg>`;
-  return svg;
+/* ================= HOME ================= */
+function renderHome(){
+  const vb=document.getElementById('videobox');
+  if(CONFIG.VIDEO_EMBED){vb.innerHTML='<iframe src="'+CONFIG.VIDEO_EMBED+'" allowfullscreen loading="lazy"></iframe>';}
+  const row=document.getElementById('epirow'); row.innerHTML='';
+  const eps=CONFIG.EPISODES.length?CONFIG.EPISODES:
+    [{title:'Episode feed: OWNER links daily shorts here',url:'#'}];
+  for(const e of eps){const a=document.createElement('a');a.className='epi';
+    a.href=e.url;a.target=e.url==='#'?'':'_blank';a.textContent=e.title;row.appendChild(a);}
+  document.getElementById('qhint').textContent=
+    'Try: face database \u00B7 chips \u00B7 hiring \u00B7 sepsis';
 }
 
-/* ================= HOME: SEARCH + RESULTS ================= */
-async function loadAllCases(){
-  if(_allCases) return _allCases;
-  const r = await fetch(CONFIG.FN('search-cases'),{method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
-    body:JSON.stringify({})});
-  const d = await r.json();
-  _allCases = d.results || [];
-  return _allCases;
-}
-
-function scoreCase(c, q){
-  const ql = q.toLowerCase();
-  const words = ql.split(/\s+/).filter(w=>w.length>2);
-  let score = 0;
-  const t = ((c.title||'')+(c.raw_title||'')+(c.summary||'')+
-    (c.extraction?.summary||'')+(c.extraction?.article_quote||'')).toLowerCase();
-  for(const w of words){
-    if(t.includes(w)) score += 10;
-  }
-  if((c.title||'').toLowerCase().includes(ql)) score += 50;
-  // Boost recent
-  if(c.created_at){
-    const age = (Date.now()-new Date(c.created_at).getTime())/(1000*60*60*24);
-    if(age < 7) score += 20;
-    else if(age < 30) score += 10;
-  }
-  return score;
-}
-
-let _searchTimeout = null;
-document.getElementById('q').addEventListener('input', e=>{
-  clearTimeout(_searchTimeout);
-  _searchTimeout = setTimeout(()=>runSearch(e.target.value), 80);
+/* ============ REALTIME SEARCH (instant local, top-up remote) ============ */
+let topupTimer=null, webToken=0;
+function currentQuery(){return document.getElementById('q').value.trim();}
+document.getElementById('q').addEventListener('input',()=>{
+  const q=currentQuery();
+  renderResults(q);                       // instant, from cache
+  clearTimeout(topupTimer);
+  if(!isURL(q)) topupTimer=setTimeout(()=>topUp(q),200);   // fast path
 });
-
-async function runSearch(raw){
-  const q = raw.trim();
-  const host = document.getElementById('results');
-
-  // URL detection
-  if(/^https?:\/\//i.test(q)){
-    renderFilePrompt(q, host);
-    return;
-  }
-
-  // Load all cases for instant filtering
-  const all = await loadAllCases();
-
-  if(!q){
-    // Show all, newest first
-    host.innerHTML = '';
-    all.slice(0,20).forEach(c=>host.appendChild(hitCard(c)));
-    return;
-  }
-
-  // Score and rank
-  const scored = all.map(c=>({c, score:scoreCase(c,q)})).filter(x=>x.score>0);
-  scored.sort((a,b)=>b.score-a.score);
-
-  host.innerHTML = '';
-  scored.slice(0,15).forEach(({c})=>host.appendChild(hitCard(c)));
-
-  // If few results, offer web search
-  if(scored.length < 3 && q.length > 5){
-    const div = document.createElement('div');
-    div.className = 'divider';
-    div.textContent = 'SEARCH THE WEB FOR NEW CASES';
-    host.appendChild(div);
-
-    const btn = document.createElement('button');
-    btn.className = 'ghost';
-    btn.textContent = 'Search news for "'+q+'"';
-    btn.onclick = ()=>webSearch(q, host);
-    host.appendChild(btn);
-  }
+document.getElementById('q').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const q=currentQuery();
+    if(isURL(q)) return; webHunt(q);}     // web only on explicit Enter
+});
+function isURL(s){return /^https?:\/\/\S+\.\S+/.test(s);}
+function rankLocal(q){
+  const needle=q.toLowerCase();
+  const all=[...CACHE.values()];
+  if(!needle) return all.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  return all.map(c=>{
+    const hay=(c.title+' '+(c.summary||'')+' '+(c.article_quote||'')).toLowerCase();
+    let score=-1; const idx=hay.indexOf(needle);
+    if(idx>=0) score=1000-idx;
+    else { const words=needle.split(/\s+/).filter(w=>w.length>3);
+      score=words.reduce((a,w)=>a+(hay.includes(w)?40:0),0)-1; }
+    return [score,c];
+  }).filter(([s])=>s>=0).sort((a,b)=>b[0]-a[0]||(b[1].impact||0)-(a[1].impact||0))
+    .map(([,c])=>c);
 }
-
-async function webSearch(q, host){
-  const r = await fetch(CONFIG.FN('search-cases'),{method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
-    body:JSON.stringify({q, web:true})});
-  const d = await r.json();
-  if(d.web_results?.length){
-    for(const w of d.web_results){
-      const el = document.createElement('div');
-      el.className = 'webhit';
-      el.innerHTML = '<div>'+esc(w.title)+'</div><div class="meta">'+esc(w.domain||'')+'</div>';
-      const b = document.createElement('button');
-      b.className = 'ghost';
-      b.textContent = 'File this into the queue';
-      b.onclick = ()=>fileURL(w.url);
-      el.appendChild(b);
+async function topUp(q){
+  if(DEMO||!q) return;
+  try{
+    const r=await fetch(CONFIG.FN('search-cases'),{method:'POST',
+      headers:{'Content-Type':'application/json',
+        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
+      body:JSON.stringify({q})});                 // fast path, no web
+    const data=await r.json();
+    (data.results||[]).forEach(c=>CACHE.set(c.id,c));
+    if(currentQuery()===q) renderResults(q);
+  }catch(e){}
+}
+async function webHunt(q){
+  const token=++webToken;
+  renderResults(q, {hunting:true});
+  let web=[];
+  if(DEMO){ web=q?[{title:'(Demo) Live web prospects for "'+q+'" appear here when deployed',
+    url:'#',domain:'gdelt + google news via edge function'}]:[]; }
+  else{
+    try{const r=await fetch(CONFIG.FN('search-cases'),{method:'POST',
+      headers:{'Content-Type':'application/json',
+        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
+      body:JSON.stringify({q, web:true})});
+      const data=await r.json();
+      (data.results||[]).forEach(c=>CACHE.set(c.id,c));
+      web=data.web_results||[];
+    }catch(e){}
+  }
+  if(token===webToken) renderResults(q,{web});
+}
+function renderResults(q, opts={}){
+  const host=document.getElementById('results'); host.innerHTML='';
+  if(isURL(q)) return renderFilePrompt(q,host);
+  const local=rankLocal(q);
+  local.slice(0,20).forEach(c=>host.appendChild(hitCard(c)));
+  const incomplete = q && local.length<3;
+  if(incomplete){
+    // Mining moment: this is the ONLY place minigames appear (plus after
+    // filing a URL). Never on case closed, never in a full result list.
+    host.appendChild(minigamePanel('Thin file. While we hunt, feed the graph:'));
+    const hunt=document.createElement('button'); hunt.className='ghost';
+    hunt.textContent='Hunt the web for "'+q+'" \u2192';
+    hunt.onclick=()=>webHunt(q);
+    if(!opts.web&&!opts.hunting) host.appendChild(hunt);
+  }
+  if(opts.hunting){const d=document.createElement('div');d.className='divider';
+    d.textContent='HUNTING THE WEB\u2026';host.appendChild(d);}
+  if(opts.web&&opts.web.length){
+    const d=document.createElement('div');d.className='divider';
+    d.textContent='FROM THE WEB (not yet in the record)';host.appendChild(d);
+    for(const w of opts.web){
+      const el=document.createElement('div');el.className='webhit';
+      el.innerHTML='<div>'+esc(w.title)+'</div><div class="meta">'+esc(w.domain||'')+'</div>';
+      if(w.url!=='#'){const b=document.createElement('button');b.className='ghost';
+        b.textContent='File this into the queue';b.onclick=()=>fileURL(w.url);
+        el.appendChild(b);}
       host.appendChild(el);
     }
   }
 }
-
 function hitCard(c){
-  const total = (c.heaven_votes||0)+(c.hell_votes||0);
-  const pct = total ? Math.round(100*c.heaven_votes/total) : 0;
-  const isNew = c.created_at && (Date.now()-new Date(c.created_at).getTime() < 7*24*60*60*1000);
-
-  const el = document.createElement('div');
-  el.className = 'hit';
-  el.innerHTML = (isNew ? '<span class="badge" style="background:var(--crayon);color:var(--bone)">NEW</span>' : '')
-    + '<span class="badge '+(c.faction||'unaligned')+'">'+(c.faction||'UNALIGNED').toUpperCase()+'</span>'
-    + '<span class="badge">IMPACT '+'★'.repeat(c.impact||1)+'</span>'
-    + '<h3>'+esc(c.title||c.raw_title)+'</h3>'
-    + '<div class="sum">'+esc(c.extraction?.summary||c.summary||'')+'</div>'
-    + (c.extraction?.article_quote ? '<div class="qt">\"'+esc(c.extraction.article_quote)+'\"</div>' : '')
-    + '<div class="meta">'+total+' VERDICTS · '+pct+'% HEAVEN</div>'
-    + '<div class="votebar"><i style="width:'+pct+'%"></i></div>'
-    + '<div class="quickvote">'
-    + '<button class="qv heaven" onclick="event.stopPropagation();quickVote(\''+c.id+'\',\'heaven\',this)">😇</button>'
-    + '<button class="qv hell" onclick="event.stopPropagation();quickVote(\''+c.id+'\',\'hell\',this)">😈</button>'
-    + '</div>';
-  el.onclick = ()=>openCase(c.id);
+  const total=(c.heaven_votes||0)+(c.hell_votes||0);
+  const pct=total?Math.round(100*c.heaven_votes/total):0;
+  const isNew=c.created_at&&(Date.now()-new Date(c.created_at))<7*864e5;
+  const el=document.createElement('div');el.className='hit';
+  el.innerHTML='<div class="qv">'
+    +'<button title="lean heaven, then walk the case">\u{1F47C}</button>'
+    +'<button title="lean hell, then walk the case">\u{1F608}</button></div>'
+    +'<span class="badge '+(c.faction||'unaligned')+'">'+(c.faction||'unaligned').toUpperCase()+'</span>'
+    +'<span class="badge">IMPACT '+'\u2605'.repeat(c.impact||1)+'</span>'
+    +(isNew?'<span class="badge new">NEW</span>':'')
+    +'<h3>'+esc(c.title||c.raw_title)+'</h3>'
+    +'<div class="sum">'+esc(c.summary||'')+'</div>'
+    +(c.article_quote?'<div class="qt">\u201C'+esc(c.article_quote)+'\u201D</div>':'')
+    +'<div class="meta">'+total+' VERDICTS'+(total?' \u00B7 '+pct+'% HEAVEN':'')+'</div>'
+    +'<div class="votebar"><i style="width:'+pct+'%"></i></div>';
+  const [bh,be]=el.querySelectorAll('.qv button');
+  bh.onclick=e=>{e.stopPropagation();PENDING_VOTE='heaven';
+    toast('Leaning Heaven. Walk the case to file it.');openCase(c.id);};
+  be.onclick=e=>{e.stopPropagation();PENDING_VOTE='hell';
+    toast('Leaning Hell. Walk the case to file it.');openCase(c.id);};
+  el.onclick=()=>{PENDING_VOTE=null;openCase(c.id);};
   return el;
 }
-
-async function quickVote(caseId, faction, btn){
-  btn.disabled = true;
-  btn.textContent = '✓';
-  try{
-    await fetch(CONFIG.FN('submit-verdict'),{method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
-      body:JSON.stringify({case_id:caseId,who:'quick',action:'quick',whom:'quick',faction_vote:faction,notes:''})});
-    if(_allCases){
-      const c = _allCases.find(x=>x.id===caseId);
-      if(c){ faction==='heaven' ? c.heaven_votes++ : c.hell_votes++; }
-    }
-  }catch(e){}
+function renderFilePrompt(url,host){
+  const el=document.createElement('div');el.className='webhit';
+  el.innerHTML='<div>File a new case from this source?</div><div class="meta">'+esc(url)+'</div>';
+  const b=document.createElement('button');b.className='go';b.textContent='File it \u2192';
+  b.onclick=()=>fileURL(url);el.appendChild(b);host.appendChild(el);
 }
-
-function renderFilePrompt(url, host){
-  host.innerHTML = '';
-  const el = document.createElement('div');
-  el.className = 'webhit';
-  el.innerHTML = '<div>File a new case from this source?</div><div class="meta">'+esc(url)+'</div>';
-  const b = document.createElement('button');
-  b.className = 'go';
-  b.textContent = 'File it →';
-  b.onclick = ()=>fileURL(url);
-  el.appendChild(b);
-  host.appendChild(el);
-}
-
 async function fileURL(url){
-  const r = await fetch(CONFIG.FN('file-case'),{method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
-    body:JSON.stringify({url})});
-  const d = await r.json();
-  alert(d.ok ? 'Filed. The steward will extract and queue it for review.' : (d.error||'Could not file.'));
+  if(DEMO){toast('DEMO: deploys to the staged queue when configured.');return;}
+  try{
+    const r=await fetch(CONFIG.FN('file-case'),{method:'POST',
+      headers:{'Content-Type':'application/json',
+        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
+      body:JSON.stringify({url})});
+    const d=await r.json();
+    toast(d.ok?'Filed. The steward will prefill it for review.':(d.error||'Could not file.'));
+    if(d.ok){ // purposeful mining moment: one instrument while the queue works
+      const host=document.getElementById('results');
+      host.prepend(minigamePanel('Filed. While the steward reads it:'));
+    }
+  }catch(e){toast('Could not reach the registry.');}
 }
 
-/* ================= PLAY FLOW ================= */
+/* ================= CASE FLOW ================= */
 async function openCase(id){
-  let c = (_allCases||[]).find(x=>x.id===id);
-  if(!c){
-    const r = await fetch(CONFIG.FN('search-cases'),{method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
+  let c=CACHE.get(id);
+  if(!c&&!DEMO){
+    const r=await fetch(CONFIG.FN('search-cases'),{method:'POST',
+      headers:{'Content-Type':'application/json',
+        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
       body:JSON.stringify({id})});
-    c = ((await r.json()).results||[])[0];
+    c=((await r.json()).results||[])[0];
+    if(c)CACHE.set(c.id,c);
   }
-  if(!c) return;
-
-  CASE = c;
-  PICK = {free:{}};
-  VOTE = null;
-
-  const ex = c.extraction || {};
-  const re = ex.reenactment || {};
-
-  // Scene 1: Case file with cold open
-  document.getElementById('scene-art-case').innerHTML =
-    generateSceneArt(c.id+'case', ex.art_prompt, 'flat');
-  document.getElementById('scene-label-case').textContent = 'CASE: '+(c.category||'UNKNOWN').toUpperCase();
-
-  // Setting as stage direction
-  setText('stage-setting', re.setting || 'The stage is set. The players await.');
-
-  // Cold open narration
-  setText('cold-open', re.cold_open || ex.summary || c.summary || '');
-
-  // Metadata
-  setText('c-src', c.source_tier===1 ? 'PRIMARY SOURCE' : 'REPORTED');
-  setText('c-impact', 'IMPACT '+'★'.repeat(c.impact||1));
-  const fBadge = document.getElementById('c-faction');
-  fBadge.textContent = (c.faction||'UNALIGNED').toUpperCase();
-  fBadge.className = 'badge '+(c.faction||'unaligned');
-
-  setText('c-title', c.title || c.raw_title);
-  setText('c-summary', ex.summary || c.summary || '');
-
-  const qWrap = document.getElementById('c-quote-wrap');
-  const quote = ex.article_quote || c.article_quote;
-  if(quote){
-    setText('c-quote', '"'+quote+'"');
-    qWrap.style.display = 'block';
-  } else {
-    qWrap.style.display = 'none';
-  }
-
-  document.getElementById('c-link').href = c.source_url || '#';
-
-  // De-escalation table
-  const deTable = document.getElementById('c-deesc');
-  deTable.innerHTML = '<tr><td><b>COURT RECORD</b></td><td><b>OUR STAGING</b></td></tr>'
-    + (re.deescalations||[]).map(d=>'<tr><td>'+esc(d.real)+'</td><td>'+esc(d.cartoon)+'</td></tr>').join('');
-
+  if(!c||!c.extraction)return toast('Case not ready yet.');
+  window.CASE=CASE=c; PICK={free:{}}; VOTE=null;
+  const re=c.extraction.reenactment||{};
+  document.getElementById('a-case').innerHTML=scene(c.id,'case');
+  setText('c-title',c.title||c.raw_title);
+  setText('c-summary',c.summary||'');
+  const qEl=document.getElementById('c-quote');
+  if(c.article_quote){qEl.innerHTML='\u201C'+esc(c.article_quote)+'\u201D<small>FROM THE RECORD</small>';
+    qEl.style.display='block';}else qEl.style.display='none';
+  setText('c-src',c.source_tier===1?'FIRST-PARTY SOURCE':'REPORTED');
+  setText('c-impact','IMPACT '+'\u2605'.repeat(c.impact||1));
+  const f=document.getElementById('c-faction');
+  f.textContent=(c.faction||'unaligned').toUpperCase();
+  f.className='badge '+(c.faction||'unaligned');
+  document.getElementById('c-link').href=c.source_url;
+  setText('c-setting',re.setting||'');
+  setText('c-coldopen','\u201C'+(re.cold_open||'The record is open.')+'\u201D');
+  document.getElementById('c-deesc').innerHTML=
+    '<tr><td><b>COURT RECORD</b></td><td><b>OUR STAGING</b></td></tr>'
+    +((re.deescalations||[]).map(d=>'<tr><td>'+esc(d.real)+'</td><td>'+esc(d.cartoon)+'</td></tr>').join(''));
+  [0,1,2].forEach(i=>{document.getElementById('nb'+i).value=50;});
+  // WHO prep
+  document.getElementById('a-who').innerHTML=scene(c.id,'who');
+  setText('w-gi','\u201C'+((c.extraction.story||{}).gi||'Assessment pending.')+'\u201D');
+  const wb=brainiacLine('who',c.id,1)[0];
+  document.getElementById('w-brainiac').innerHTML=
+    '<div class="line brainiac"><span class="who">Brainiac</span><p><i>'
+    +esc(wb.cast)+':</i> '+wb.line+'</p></div>';
+  renderChoices('who',c.extraction.who_choices,i=>{PICK.whoReveal=(re.who_reveals||[])[i]||'';});
   show('s-case');
 }
-
-function enterStage(){
-  const ex = CASE.extraction || {};
-  const re = ex.reenactment || {};
-  const story = ex.story || {};
-
-  // WHO screen
-  document.getElementById('scene-art-who').innerHTML =
-    generateSceneArt(CASE.id+'who', ex.art_prompt, 'flat');
-
-  // GI's intro line
-  setText('gi-intro', story.gi || 'Tactical assessment: observe carefully.');
-
-  // Render WHO choices with their theatrical reveals as hints
-  renderTheatricalChoices('who', ex.who_choices, re.who_reveals);
-
-  show('s-who');
-}
-
-function renderTheatricalChoices(slot, options, reveals){
-  const host = document.getElementById('ch-'+slot);
-  host.innerHTML = '';
-
-  // Shuffle order for position-bias control
-  const indices = [0,1,2].sort(()=>Math.random()-0.5);
-
-  for(const i of indices){
-    if(!options[i]) continue;
-    const btn = document.createElement('button');
-    btn.className = 'choice';
-    btn.innerHTML = esc(options[i]);
-    // Add hint from reveal if available
-    if(reveals && reveals[i]){
-      const hint = reveals[i].split('.')[0]; // First sentence as hint
-      if(hint.length < 100){
-        btn.innerHTML += '<small>'+esc(hint)+'</small>';
-      }
-    }
-    btn.onclick = ()=>selectChoice(slot, i, options[i], reveals?reveals[i]:null);
-    host.appendChild(btn);
+function renderChoices(slot,options,onIndex){
+  const host=document.getElementById('ch-'+slot);host.innerHTML='';
+  const idx=[0,1,2].sort(()=>Math.random()-0.5);   // position-bias control
+  for(const i of idx){
+    const factual=options[i];
+    const b=document.createElement('button');b.className='pchoice';
+    const flavored = slot==='action'
+      ? actionPersona(factual,CASE.id)+' \u2026'+factual.split(' ').slice(-2).join(' ')
+      : persona(slot,factual,CASE.id+i);
+    b.innerHTML='<span class="persona">'+esc(flavored)+'</span>'
+      +'<span class="factual">On the record: '+esc(factual)+'</span>';
+    b.onclick=()=>{PICK[slot]=factual;if(onIndex)onIndex(i);advance(slot);};
+    host.appendChild(b);
   }
-
-  // Free text option
-  const free = document.createElement('button');
-  free.className = 'choice free';
-  free.textContent = 'None of these. Say it my way →';
-  free.onclick = ()=>{
-    const v = prompt('In your own words:');
-    if(v && v.trim()){
-      selectChoice(slot, -1, v.trim(), null);
-      PICK.free[slot] = true;
-    }
-  };
-  host.appendChild(free);
+  const f=document.createElement('button');f.className='pchoice free';
+  f.innerHTML='<span class="persona">None of these. Say it your way \u2192</span>'
+    +'<span class="factual">Your words go on the record</span>';
+  f.onclick=()=>{const v=prompt('In your own words:');
+    if(v&&v.trim()){PICK[slot]=v.trim();PICK.free[slot]=true;
+      if(onIndex)onIndex(-1);advance(slot);}};
+  host.appendChild(f);
 }
-
-function selectChoice(slot, index, value, reveal){
-  PICK[slot] = value;
-  PICK[slot+'Index'] = index;
-  PICK[slot+'Reveal'] = reveal;
-  advanceStage(slot);
-}
-
-function advanceStage(slot){
-  const ex = CASE.extraction || {};
-  const re = ex.reenactment || {};
-  const story = ex.story || {};
-
-  if(slot === 'who'){
-    // Show WHO reveal then move to ACTION
-    document.getElementById('scene-art-action').innerHTML =
-      generateSceneArt(CASE.id+'action', ex.art_prompt, 'flat');
-
-    // The reveal text for the chosen actor
-    const revealText = PICK.whoReveal
-      ? fill(PICK.whoReveal, {WHO:PICK.who})
-      : PICK.who + ' steps into the record.';
-    setText('who-reveal-text', revealText);
-
-    // Gary's line
-    setText('gary-intro', story.gary || 'The technology worked exactly as designed. That\'s either good or terrifying.');
-
-    // Action prompt
-    setText('action-prompt', PICK.who + ' does what?');
-
-    // Render action choices
-    renderTheatricalChoices('action', ex.action_choices, re.action_demos);
-
+const fill=(t,c)=>String(t||'')
+  .replaceAll('{WHO}',c.WHO||'the actor')
+  .replaceAll('{ACTION}',c.ACTION||'acts on')
+  .replaceAll('{WHOM}',c.WHOM||'everyone');
+function advance(slot){
+  const re=CASE.extraction.reenactment||{},st=CASE.extraction.story||{};
+  if(slot==='who'){
+    document.getElementById('a-action').innerHTML=scene(CASE.id,'action');
+    setText('carry-who','\u201C'+(fill(PICK.whoReveal,{})||PICK.who+' steps into the record.')+'\u201D');
+    setText('b-gary','\u201C'+(st.gary||'Let me show you how it works. Worked. Works.')+'\u201D');
+    setText('p-action',PICK.who+' does what, exactly?');
+    renderChoices('action',CASE.extraction.action_choices,i=>{
+      PICK.actionDemo=(re.action_demos||[])[i]||'';});
     show('s-action');
-
-  } else if(slot === 'action'){
-    // Show ACTION demo then move to WHOM
-    document.getElementById('scene-art-whom').innerHTML =
-      generateSceneArt(CASE.id+'whom', ex.art_prompt, 'flat');
-
-    // The demo text for the chosen action
-    const demoText = PICK.actionReveal
-      ? fill(PICK.actionReveal, {WHO:PICK.who, ACTION:PICK.action})
-      : PICK.who + ' ' + PICK.action + '.';
-    setText('action-demo-text', demoText);
-
-    // Supes' line
-    setText('supes-intro', story.supes || 'Someone always bears the weight. Let\'s see who.');
-
-    // Whom prompt
-    setText('whom-prompt', PICK.who + ' ' + PICK.action + '... whom?');
-
-    // Render whom choices
-    renderTheatricalChoices('whom', ex.whom_choices, re.whom_reveals);
-
+  } else if(slot==='action'){
+    document.getElementById('a-whom').innerHTML=scene(CASE.id,'whom');
+    setText('carry-action','\u201C'+(fill(PICK.actionDemo,{WHO:PICK.who})||PICK.who+' '+PICK.action+'.')+'\u201D');
+    setText('b-supes','\u201C'+(st.supes||'Somebody should check on the people in this story.')+'\u201D');
+    setText('p-whom','And who is this really happening to?');
+    renderChoices('whom',CASE.extraction.whom_choices,i=>{
+      PICK.whomReveal=(re.whom_reveals||[])[i]||'';});
     show('s-whom');
-
-  } else if(slot === 'whom'){
-    // Show WHOM reveal then move to VERDICT
-    document.getElementById('scene-art-verdict').innerHTML =
-      generateSceneArt(CASE.id+'verdict', ex.art_prompt, 'flat');
-
-    // The reveal text for the affected
-    const revealText = PICK.whomReveal
-      ? fill(PICK.whomReveal, {WHO:PICK.who, ACTION:PICK.action, WHOM:PICK.whom})
-      : PICK.whom + ' bear the weight.';
-    setText('whom-reveal-text', revealText);
-
-    // The triple
-    setText('v-triple', PICK.who + ' → ' + PICK.action + ' → ' + PICK.whom);
-
+  } else {
+    PICK.nuance_before=[0,1,2].map(i=>Number(document.getElementById('nb'+i).value));
+    document.getElementById('a-verdict').innerHTML=scene(CASE.id,'verdict');
+    setText('carry-whom','\u201C'+(fill(PICK.whomReveal,{WHO:PICK.who,ACTION:PICK.action})||'')+'\u201D');
+    const vb=brainiacLine('verdict',CASE.id+PICK.who,2);
+    document.getElementById('v-brainiacs').innerHTML=vb.map(b=>
+      '<div class="line brainiac"><span class="who">Brainiac</span><p><i>'
+      +esc(b.cast)+':</i> '+b.line+'</p></div>').join('');
+    setText('v-triple',PICK.who+' \u2192 '+PICK.action+' \u2192 '+PICK.whom);
+    const h=document.getElementById('vheaven'),e=document.getElementById('vhell');
+    h.classList.toggle('pre',PENDING_VOTE==='heaven');
+    e.classList.toggle('pre',PENDING_VOTE==='hell');
     show('s-verdict');
   }
 }
-
-function verdict(faction){
-  VOTE = faction;
-  const ex = CASE.extraction || {};
-  const re = ex.reenactment || {};
-
-  // Ending scene
-  document.getElementById('scene-art-ending').innerHTML =
-    generateSceneArt(CASE.id+'ending'+faction, ex.art_prompt, faction);
-  document.getElementById('ending-label').textContent =
-    faction==='heaven' ? 'THE WARM ENDING' : 'THE COLD ENDING';
-
-  // Get the ending text and extract chalkboard lesson
-  const endingRaw = (re.endings||{})[faction] || '';
-  const filled = fill(endingRaw, {WHO:PICK.who, ACTION:PICK.action, WHOM:PICK.whom});
-
-  // Split out the chalkboard lesson if present
-  const chalkMatch = filled.match(/Evil Brain[^:]*:\s*['""]?([^'""]+)['""]?\.?$/i);
-  let mainText = filled;
-  let chalkText = '';
-  if(chalkMatch){
-    mainText = filled.replace(/Evil Brain[^:]*:\s*['""]?[^'""]+['""]?\.?$/i, '').trim();
-    chalkText = chalkMatch[1];
-  }
-
-  setText('ending-text', mainText);
-  setText('chalkboard', chalkText || 'The record speaks for itself.');
-
-  // Build tags
+function verdict(f){
+  VOTE=f; PENDING_VOTE=null;
+  const re=CASE.extraction.reenactment||{};
+  const ending=fill((re.endings||{})[f]||'',{WHO:PICK.who,ACTION:PICK.action,WHOM:PICK.whom});
+  // Evil Brain chalkboard line: the sentence containing "Evil Brain", or the last one
+  const parts=ending.split(/(?<=[.!?])\s+/);
+  const brainIdx=parts.findIndex(p=>/evil brain/i.test(p));
+  const brainLine=brainIdx>=0?parts.splice(brainIdx).join(' '):'';
+  const lesson=(brainLine.match(/:(.*)$/)||[,''])[1].trim()||brainLine;
+  document.getElementById('a-ending').innerHTML=
+    scene(CASE.id,'ending',{mood:f,lesson});
+  setText('ending-text',parts.join(' '));
+  setText('ending-brain',brainLine?'\u201C'+brainLine.replace(/^.*?chalkboard[:,]?\s*/i,'')+'\u201D'
+    :'\u201CClass dismissed. The database remembers.\u201D');
   buildTags();
-  document.getElementById('notes').value = '';
-  noteMeter();
-
+  document.getElementById('notes').value='';noteMeter();
+  [0,1,2].forEach(i=>{document.getElementById('na'+i).value=PICK.nuance_before[i];});
   show('s-file');
 }
-
 function buildTags(){
-  const host = document.getElementById('tagchips');
-  host.innerHTML = '';
-  const ex = CASE.extraction || {};
-
-  const tags = new Set();
-  if(CASE.category) tags.add(CASE.category);
-  tags.add(PICK.who);
-  tags.add((PICK.action||'').split(' ')[0]);
-  (ex.tech_types||[]).forEach(t=>tags.add(t));
-  (ex.data_types||[]).forEach(t=>tags.add(t));
-  ['no consent','human oversight missing','worked as designed','needs an off switch',
-   'human was load-bearing'].forEach(t=>tags.add(t));
-
+  const host=document.getElementById('tagchips');host.innerHTML='';
+  const tags=new Set();
+  if(CASE.category)tags.add(CASE.category);
+  tags.add(PICK.who);tags.add((PICK.action||'').split(' ')[0]);
+  (CASE.tech_types||[]).forEach(t=>tags.add(t));
+  (CASE.data_types||[]).forEach(t=>tags.add(t));
+  ['no consent','human oversight missing','worked as designed',
+   'needs an off switch','human was load-bearing'].forEach(t=>tags.add(t));
   for(const t of [...tags].filter(Boolean).slice(0,10)){
-    const c = document.createElement('span');
-    c.className = 'chip';
-    c.textContent = t;
-    c.onclick = ()=>{
-      const n = document.getElementById('notes');
-      n.value = (n.value ? n.value.trimEnd()+' ' : '') + '#'+t.replace(/\s+/g,'-')+' ';
-      noteMeter();
-      n.focus();
-    };
+    const c=document.createElement('span');c.className='chip';c.textContent=t;
+    c.onclick=()=>{const n=document.getElementById('notes');
+      n.value=(n.value?n.value.trimEnd()+' ':'')+'#'+t.replace(/\s+/g,'-')+' ';
+      noteMeter();n.focus();};
     host.appendChild(c);
   }
 }
-
 function noteMeter(){
-  const n = document.getElementById('notes').value.length;
-  const coins = n>=200 ? 25 : n>=100 ? 15 : n>=50 ? 10 : n>=10 ? 5 : 0;
-  setText('notemeter', n+' characters · '+(coins ? 'earns '+coins+' coins' : '10+ characters starts earning'));
+  const n=document.getElementById('notes').value.length;
+  const coins=n>=200?25:n>=100?15:n>=50?10:n>=10?5:0;
+  setText('notemeter',n+' characters \u00B7 '+(coins?('earns '+coins+' coins'):'10+ characters starts earning'));
 }
 
-/* ================= CARD MINTING ================= */
-function deriveCard(impact, valence, tier){
-  const v = Math.max(-2, Math.min(2, valence||0));
-  return {
-    atk: impact*2 + (v<0 ? -v : 0),
-    def: impact + (v>0 ? v : 0) + (tier===1 ? 1 : 0),
-    rarity: impact>=5 ? 'LEGENDARY' : impact===4 ? 'RARE' : impact===3 ? 'UNCOMMON' : 'COMMON'
-  };
+/* ================= MINT: CARD MODAL ================= */
+function deriveCard(impact,valence,tier){
+  const v=Math.max(-2,Math.min(2,valence||0));
+  return {atk:impact*2+(v<0?-v:0),def:impact+(v>0?v:0)+(tier===1?1:0),
+    rarity:impact>=5?'legendary':impact===4?'rare':impact===3?'uncommon':'common'};
 }
-
 async function mint(){
-  const notes = document.getElementById('notes').value;
-  const nuance = [0,1,2].map(i=>Number(document.getElementById('na'+i).value));
-
+  const notes=document.getElementById('notes').value;
+  PICK.nuance_after=[0,1,2].map(i=>Number(document.getElementById('na'+i).value));
   let resp;
-  try{
-    const r = await fetch(CONFIG.FN('submit-verdict'),{method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
-      body:JSON.stringify({
-        case_id:CASE.id, who:PICK.who, action:PICK.action, whom:PICK.whom,
-        who_free:!!PICK.free.who, action_free:!!PICK.free.action, whom_free:!!PICK.free.whom,
-        faction_vote:VOTE, notes, nuance_after:nuance
-      })});
-    resp = await r.json();
-  }catch(e){
-    // Fallback for demo
-    const total = (CASE.heaven_votes||0)+(CASE.hell_votes||0)+1;
-    const s = deriveCard(CASE.impact, CASE.extraction?.valence, CASE.source_tier);
-    resp = {
-      card:{card_name:CASE.title, faction_at_mint:VOTE, ...s},
-      rewards:{coins:notes.length>=200?25:notes.length>=100?15:notes.length>=50?10:notes.length>=10?5:0, rep:3},
-      collective:{heaven_pct:Math.round(100*(CASE.heaven_votes+(VOTE==='heaven'?1:0))/total), votes:total}
-    };
-  }
-
-  CARD_DATA = resp;
-  renderCardModal(resp);
-  document.getElementById('cardModal').classList.add('on');
-}
-
-function renderCardModal(resp){
-  const c = resp.card;
-  const faction = c.faction_at_mint || 'unaligned';
-  const ink = faction==='hell' ? 'var(--crayon)' : faction==='heaven' ? 'var(--gold)' : 'var(--bone)';
-
-  // Card SVG
-  const artSvg = generateSceneArt(CASE.id+'card', CASE.extraction?.art_prompt, faction);
-
-  document.getElementById('cardsvg').innerHTML = `
-    <svg viewBox="0 0 360 500" xmlns="http://www.w3.org/2000/svg">
-      <rect width="360" height="500" fill="var(--ink)"/>
-      <rect x="6" y="6" width="348" height="488" fill="none" stroke="${ink}" stroke-width="4"/>
-      <g transform="translate(15,15) scale(0.46)">${artSvg.replace(/<\/?svg[^>]*>/g,'')}</g>
-      <text x="180" y="230" text-anchor="middle" fill="${ink}" font-family="Arial"
-        font-weight="800" font-size="11" letter-spacing="3">${faction.toUpperCase()}</text>
-      <text x="180" y="260" text-anchor="middle" fill="var(--bone)" font-family="Arial"
-        font-weight="800" font-size="14" letter-spacing="1">${esc((c.card_name||'').toUpperCase().slice(0,36))}</text>
-      <line x1="30" y1="275" x2="330" y2="275" stroke="${ink}" stroke-width="1"/>
-      <text x="180" y="300" text-anchor="middle" fill="var(--pencil)" font-family="Georgia"
-        font-style="italic" font-size="11">${esc(PICK.who)} → ${esc(PICK.action)} → ${esc(PICK.whom)}</text>
-      <rect x="30" y="420" width="80" height="50" fill="var(--ink)" stroke="${ink}" stroke-width="2"/>
-      <text x="70" y="442" text-anchor="middle" fill="var(--bone)" font-family="Arial" font-weight="800" font-size="10">ATK</text>
-      <text x="70" y="462" text-anchor="middle" fill="${ink}" font-family="Arial" font-weight="800" font-size="20" id="card-atk">?</text>
-      <rect x="140" y="420" width="80" height="50" fill="var(--ink)" stroke="${ink}" stroke-width="2"/>
-      <text x="180" y="442" text-anchor="middle" fill="var(--bone)" font-family="Arial" font-weight="800" font-size="10">DEF</text>
-      <text x="180" y="462" text-anchor="middle" fill="${ink}" font-family="Arial" font-weight="800" font-size="20" id="card-def">?</text>
-      <rect x="250" y="420" width="80" height="50" fill="var(--ink)" stroke="${ink}" stroke-width="2"/>
-      <text x="290" y="442" text-anchor="middle" fill="var(--bone)" font-family="Arial" font-weight="800" font-size="10">RARITY</text>
-      <text x="290" y="460" text-anchor="middle" fill="${ink}" font-family="Arial" font-weight="800" font-size="11" id="card-rarity">?</text>
-    </svg>`;
-
-  // Reset scratch boxes
-  document.querySelectorAll('.scratch-box').forEach(b=>{
-    b.classList.remove('revealed');
-    b.textContent = b.getAttribute('onclick').includes('atk') ? 'ATK'
-                  : b.getAttribute('onclick').includes('def') ? 'DEF' : 'RARITY';
-  });
-  document.getElementById('scratchArea').style.display = 'flex';
-  document.querySelector('.scratch-skip').style.display = 'block';
-
-  // Stats
-  document.getElementById('cardStats').innerHTML =
-    (resp.rewards ? `+${resp.rewards.coins} coins · +${resp.rewards.rep} rep` : '') +
-    (resp.collective ? ` · ${resp.collective.votes} total verdicts · ${resp.collective.heaven_pct}% heaven` : '');
-}
-
-function revealStat(el, stat){
-  if(el.classList.contains('revealed')) return;
-  el.classList.add('revealed');
-  const c = CARD_DATA.card;
-  if(stat==='atk'){
-    el.textContent = '⚔ '+c.atk;
-    document.getElementById('card-atk').textContent = c.atk;
-  } else if(stat==='def'){
-    el.textContent = '🛡 '+c.def;
-    document.getElementById('card-def').textContent = c.def;
+  if(DEMO){
+    if(VOTE==='heaven')CASE.heaven_votes++;else CASE.hell_votes++;
+    const total=CASE.heaven_votes+CASE.hell_votes;
+    const s=deriveCard(CASE.impact,CASE.valence,CASE.source_tier);
+    resp={card:{card_name:CASE.title,faction_at_mint:CASE.faction,...s},
+      rewards:{coins:(notes.length>=200?25:notes.length>=100?15:notes.length>=50?10:notes.length>=10?5:0),
+        rep:3+Math.min(10,Math.floor(notes.length/50)*2)+(Object.keys(PICK.free).length?2:0)},
+      collective:{heaven_pct:Math.round(100*CASE.heaven_votes/total),votes:total}};
   } else {
-    el.textContent = c.rarity;
-    document.getElementById('card-rarity').textContent = c.rarity;
+    const r=await fetch(CONFIG.FN('submit-verdict'),{method:'POST',
+      headers:{'Content-Type':'application/json',
+        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
+      body:JSON.stringify({case_id:CASE.id,who:PICK.who,action:PICK.action,whom:PICK.whom,
+        who_free:!!PICK.free.who,action_free:!!PICK.free.action,whom_free:!!PICK.free.whom,
+        faction_vote:VOTE,notes,
+        nuance_before:PICK.nuance_before,nuance_after:PICK.nuance_after})});
+    resp=await r.json();
+    if(resp.error){toast(resp.error);return;}
   }
-  // Check if all revealed
-  if(document.querySelectorAll('.scratch-box.revealed').length === 3){
-    document.getElementById('scratchArea').style.display = 'none';
-    document.querySelector('.scratch-skip').style.display = 'none';
+  openModal(resp);
+}
+/* Card SVG: art on top, ALWAYS visible. Foils cover only three zones:
+   stats row, triple line, quote block. */
+const FOIL_ZONES=[
+  {id:'f-stats', x:30, y:328, w:660, h:44, label:'STATS'},
+  {id:'f-triple',x:60, y:378, w:600, h:30, label:'THE RECORD'},
+  {id:'f-quote', x:60, y:414, w:600, h:44, label:'FROM THE RECORD'},
+];
+function openModal(resp){
+  const c=resp.card,f=c.faction_at_mint||'unaligned';
+  const ink=f==='hell'?'#C1121F':f==='heaven'?'#c9a84c':'#EDE6D6';
+  const art=scene(CASE.id,'card',{mood:f}).replace(/<\/?svg[^>]*>/g,'');
+  const hasQuote=!!CASE.article_quote;
+  document.getElementById('cardsvg').innerHTML=
+    '<svg viewBox="0 0 720 470" xmlns="http://www.w3.org/2000/svg">'
+    +'<rect width="720" height="470" fill="#0E0E0E"/>'
+    +'<rect x="8" y="8" width="704" height="454" fill="none" stroke="'+ink+'" stroke-width="6"/>'
+    +'<g transform="translate(0,14) scale(1,0.93)">'+art+'</g>'
+    +'<text x="360" y="312" text-anchor="middle" fill="#EDE6D6" font-family="Arial" font-weight="800" font-size="23" letter-spacing="2">'
+    +esc((c.card_name||'').toUpperCase().slice(0,42))+'</text>'
+    +'<text x="46" y="358" fill="#EDE6D6" font-family="Arial" font-weight="800" font-size="26">\u2694 '+c.atk+'</text>'
+    +'<text x="674" y="358" text-anchor="end" fill="#EDE6D6" font-family="Arial" font-weight="800" font-size="26">\u26E8 '+c.def+'</text>'
+    +'<text x="360" y="356" text-anchor="middle" fill="'+ink+'" font-family="Arial" font-size="14" letter-spacing="4">'+c.rarity.toUpperCase()+'</text>'
+    +'<text x="360" y="398" text-anchor="middle" fill="#7a7263" font-family="Arial" font-size="13" letter-spacing="1">'
+    +esc((PICK.who+' \u2192 '+PICK.action+' \u2192 '+PICK.whom).slice(0,80))+'</text>'
+    +(hasQuote
+      ?'<text x="360" y="434" text-anchor="middle" fill="#EDE6D6" font-family="Georgia" font-style="italic" font-size="14">\u201C'
+        +esc(CASE.article_quote.slice(0,78))+'\u201D</text>'
+        +'<text x="360" y="452" text-anchor="middle" fill="#7a7263" font-family="Arial" font-size="10" letter-spacing="2">FROM THE RECORD</text>'
+      :'')
+    +'</svg>';
+  setText('m-rewards','+'+resp.rewards.coins+' coins \u00B7 +'+resp.rewards.rep+' rep'
+    +(Object.keys(PICK.free).length?' (your own words bonus)':''));
+  setText('m-collective',resp.collective.votes+' verdicts \u00B7 '
+    +resp.collective.heaven_pct+'% chose the warm ending');
+  const deltas=PICK.nuance_after.map((v,i)=>v-PICK.nuance_before[i]);
+  const AX=['Safety vs Surveillance','Privacy vs Data brokering','Benefit vs Harm'];
+  const big=deltas.map((d,i)=>[Math.abs(d),d,i]).sort((a,b)=>b[0]-a[0])[0];
+  setText('m-shift',big[0]>=8
+    ?'The case moved your read '+big[0]+' points on '+AX[big[2]]+'.'
+    :'Your read held steady.');
+  document.getElementById('modal').classList.add('on');
+  document.getElementById('cardstage').classList.remove('zoom');
+  requestAnimationFrame(placeFoils);
+}
+function placeFoils(){
+  document.querySelectorAll('.foil').forEach(x=>x.remove());
+  const stage=document.getElementById('cardstage');
+  const svg=stage.querySelector('svg');
+  if(!svg||!svg.clientWidth){requestAnimationFrame(placeFoils);return;}
+  const scale=svg.clientWidth/720;
+  const hasQuote=!!CASE.article_quote;
+  for(const z of FOIL_ZONES){
+    if(z.id==='f-quote'&&!hasQuote)continue;
+    const cv=document.createElement('canvas');cv.className='foil';cv.id=z.id;
+    const dpr=window.devicePixelRatio||1;
+    const w=z.w*scale,h=z.h*scale;
+    cv.style.left=(z.x*scale)+'px';cv.style.top=(z.y*scale)+'px';
+    cv.style.width=w+'px';cv.style.height=h+'px';
+    cv.width=w*dpr;cv.height=h*dpr;
+    const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+    ctx.fillStyle='#181818';ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle='#C1121F';ctx.lineWidth=2;ctx.strokeRect(2,2,w-4,h-4);
+    ctx.fillStyle='#C1121F';ctx.font='700 11px Arial';ctx.textAlign='center';
+    ctx.fillText('SCRATCH \u00B7 '+z.label,w/2,h/2+4);
+    let down=false,area=0;const total=w*h;
+    const pos=e=>{const r=cv.getBoundingClientRect();
+      const p=e.touches?e.touches[0]:e;return[p.clientX-r.left,p.clientY-r.top];};
+    const scr=(x,y)=>{ctx.globalCompositeOperation='destination-out';
+      ctx.beginPath();ctx.arc(x,y,14,0,Math.PI*2);ctx.fill();
+      area+=Math.PI*14*14*0.5;
+      if(area>total*0.5){cv.style.transition='opacity .3s';cv.style.opacity='0';
+        setTimeout(()=>cv.remove(),320);}};
+    cv.onmousedown=e=>{e.stopPropagation();down=true;scr(...pos(e));};
+    cv.onmousemove=e=>{if(down)scr(...pos(e));};
+    window.addEventListener('mouseup',()=>down=false);
+    cv.addEventListener('touchstart',e=>{e.stopPropagation();down=true;scr(...pos(e));e.preventDefault();},{passive:false});
+    cv.addEventListener('touchmove',e=>{if(down){scr(...pos(e));e.preventDefault();}},{passive:false});
+    stage.appendChild(cv);
   }
 }
-
-function revealAll(){
-  document.querySelectorAll('.scratch-box').forEach(b=>{
-    const stat = b.getAttribute('onclick').includes('atk') ? 'atk'
-               : b.getAttribute('onclick').includes('def') ? 'def' : 'rarity';
-    revealStat(b, stat);
-  });
+function revealAll(){document.querySelectorAll('.foil').forEach(x=>x.remove());}
+function toggleZoom(e){
+  if(e.target.classList.contains('foil'))return;
+  document.getElementById('cardstage').classList.toggle('zoom');
+}
+function closeModal(home){
+  document.getElementById('modal').classList.remove('on');
+  document.querySelectorAll('.foil').forEach(x=>x.remove());
+  if(home){show('home');renderResults(currentQuery());toast('Card filed to your collection.');}
 }
 
-function closeCard(){
-  document.getElementById('cardModal').classList.remove('on');
-  goHome();
-}
-
-function startNext(){
-  document.getElementById('cardModal').classList.remove('on');
-  // Pick a random case
-  if(_allCases && _allCases.length){
-    const other = _allCases.filter(c=>c.id!==CASE?.id);
-    if(other.length){
-      const next = other[Math.floor(Math.random()*other.length)];
-      openCase(next.id);
-      return;
-    }
+/* ============ MINIGAMES (mining moments ONLY) ============ */
+async function postSignal(sig,box){
+  let n=0;
+  if(sig.game==='inkblot'){const w=sig.words.filter(x=>x.length>1);n=w.length+w.length*(w.length-1)/2;}
+  if(sig.game==='wordrun')n=sig.collected.length+sig.avoided.length;
+  if(sig.game==='sticky')n=sig.placements.length;
+  if(sig.game==='trivia')n=1;
+  if(!DEMO){
+    fetch(CONFIG.FN('minigame-signal'),{method:'POST',
+      headers:{'Content-Type':'application/json',
+        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
+      body:JSON.stringify(sig)}).catch(()=>{});
   }
-  goHome();
+  box.innerHTML='<div class="mlabel">SIGNAL FILED</div>'
+    +n+' edges \u2192 the graph. +3 coins. Flat rate: answers are data, never a score.';
+}
+function minigamePanel(label){
+  const games=[gInkblot,gWordrun,gSticky,gTrivia];
+  const box=document.createElement('div');box.className='mg';
+  const head=document.createElement('div');head.className='mlabel';
+  head.textContent=label;box.appendChild(head);
+  games[Math.floor(Math.random()*games.length)](box);
+  return box;
+}
+function gInkblot(box){
+  const seed='blob-'+Math.floor(Math.random()*99999);
+  const r=rng(seed);const pts=[];
+  for(let i=0;i<10;i++){const a=i/10*2*Math.PI;const rad=32+r()*38;
+    pts.push([100+Math.cos(a)*rad,66+Math.sin(a)*rad*0.8]);}
+  box.insertAdjacentHTML('beforeend',
+    '<svg viewBox="0 0 200 132" style="width:55%;display:block;margin:0 auto">'
+    +'<path d="M'+pts.map(p=>p.map(x=>x.toFixed(1)).join(',')).join(' L ')
+    +' Z" fill="#EDE6D6" opacity="0.9"/></svg>'
+    +'<input type="text" id="ib-'+seed+'" placeholder="three words, comma separated">');
+  const b=document.createElement('button');b.className='ghost';b.textContent='File it';
+  b.onclick=()=>{const words=document.getElementById('ib-'+seed).value
+    .split(',').map(w=>w.trim()).filter(Boolean).slice(0,3);
+    if(words.length<2)return toast('At least two words.');
+    postSignal({game:'inkblot',blob_seed:seed,words},box);};
+  box.appendChild(b);
+}
+function gWordrun(box){
+  const cat=(window.CASE&&CASE.category)||'Surveillance';
+  const rel=['camera','database','consent','warrant','biometric','watchlist','alert','audit'];
+  const noise=['sandwich','umbrella','trombone','pelican','casserole','doily','yodeling','wallpaper'];
+  const deck=[...rel.slice(0,5),...noise.slice(0,5)].sort(()=>Math.random()-0.5);
+  let i=0;const collected=[],avoided=[];
+  box.insertAdjacentHTML('beforeend','<div class="rewardline">Context: <b>'+esc(cat)
+    +'</b>. Collect what belongs. Dodge what does not.</div>'
+    +'<div class="wordcard" id="wr-w"></div>'
+    +'<div class="pair"><button id="wr-c">COLLECT</button><button id="wr-d">DODGE</button></div>'
+    +'<div class="rewardline" id="wr-n"></div>');
+  const next=()=>{if(i>=deck.length)
+      return postSignal({game:'wordrun',case_category:cat,collected,avoided},box);
+    box.querySelector('#wr-w').textContent=deck[i];
+    box.querySelector('#wr-n').textContent=(i+1)+' of '+deck.length;};
+  box.querySelector('#wr-c').onclick=()=>{collected.push(deck[i]);i++;next();};
+  box.querySelector('#wr-d').onclick=()=>{avoided.push(deck[i]);i++;next();};
+  next();
+}
+function gSticky(box){
+  const concepts=['license plate readers','sepsis alerts','resume filters',
+    'wildfire detection','face databases','loan scoring'].sort(()=>Math.random()-0.5).slice(0,4);
+  const buckets=['PANOPTICON','GOOD WORKS','COMPUTER SAYS NO'];
+  let sel=null;const placements=[];
+  box.insertAdjacentHTML('beforeend','<div class="rewardline">Tap a note, then its arc.</div>'
+    +'<div id="st-chips"></div>'
+    +buckets.map((b,i)=>'<div class="bucket" data-b="'+b+'"><b>'+b+'</b> <span id="st-b'+i+'"></span></div>').join(''));
+  const chips=box.querySelector('#st-chips');
+  concepts.forEach(c=>{const ch=document.createElement('span');ch.className='mchip';
+    ch.textContent=c;ch.onclick=()=>{box.querySelectorAll('.mchip').forEach(x=>x.classList.remove('sel'));
+      ch.classList.add('sel');sel=ch;};chips.appendChild(ch);});
+  box.querySelectorAll('.bucket').forEach((bk,i)=>{
+    bk.onclick=()=>{if(!sel)return;
+      placements.push({concept:sel.textContent,bucket:bk.dataset.b});
+      box.querySelector('#st-b'+i).appendChild(sel);
+      sel.classList.remove('sel');sel.onclick=null;sel=null;
+      if(placements.length===concepts.length)
+        postSignal({game:'sticky',placements},box);};});
+}
+const TRIVIA=[
+ {id:'t-consent',q:'Under most US law, scraping public photos for a face database requires the subject\u2019s consent.',a:false},
+ {id:'t-fnr',q:'Studies have found face recognition error rates differ across demographic groups.',a:true},
+ {id:'t-hitl',q:'"Human in the loop" guarantees a person actually reviewed the decision.',a:false}];
+function gTrivia(box){
+  const t=TRIVIA[Math.floor(Math.random()*TRIVIA.length)];
+  box.insertAdjacentHTML('beforeend','<p style="font-size:14px">'+esc(t.q)+'</p>'
+    +'<div class="pair"><button id="tv-t">TRUE</button><button id="tv-f">FALSE</button></div>'
+    +'<div class="rewardline">Confidence: <span id="tv-cl">75%</span></div>'
+    +'<input type="range" id="tv-c" min="50" max="100" value="75" style="width:100%">');
+  box.querySelector('#tv-c').oninput=e=>box.querySelector('#tv-cl').textContent=e.target.value+'%';
+  const answer=v=>postSignal({game:'trivia',question_id:t.id,correct:v===t.a,
+    confidence:Number(box.querySelector('#tv-c').value)/100},box);
+  box.querySelector('#tv-t').onclick=()=>answer(true);
+  box.querySelector('#tv-f').onclick=()=>answer(false);
 }
 
-/* ================= INIT ================= */
-loadAllCases().then(cases=>{
-  const host = document.getElementById('results');
-  cases.slice(0,15).forEach(c=>host.appendChild(hitCard(c)));
-});
+/* helpers */
+function setText(id,t){document.getElementById(id).textContent=t}
+function esc(t){const d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML}
+renderHome();renderResults('');
 
-// Video embed
-if(CONFIG.VIDEO_EMBED){
-  document.getElementById('videobox').innerHTML =
-    '<iframe src="'+CONFIG.VIDEO_EMBED+'" allowfullscreen></iframe>';
-}
-
-// Episodes
-if(CONFIG.EPISODES.length){
-  const row = document.getElementById('epirow');
-  CONFIG.EPISODES.forEach(ep=>{
-    const a = document.createElement('a');
-    a.className = 'epi';
-    a.href = ep.url;
-    a.target = '_blank';
-    a.textContent = ep.title;
-    row.appendChild(a);
-  });
-}
 </script>
 </body>
 </html>
