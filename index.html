@@ -54,10 +54,13 @@ button.ghost{width:100%;margin-top:8px;background:var(--ink);color:var(--bone);
 .hit .qt{font-family:Georgia,serif;font-style:italic;font-size:13px;color:var(--pencil);
   border-left:3px solid var(--crayon);padding-left:8px;margin:8px 0 4px}
 .hit .meta{font-size:11px;color:var(--pencil);letter-spacing:1px}
+.srclink{color:var(--bone);text-decoration:none;font-weight:700}
+.srclink:hover{text-decoration:underline}
 .qv{position:absolute;top:10px;right:10px;display:flex;gap:6px}
 .qv button{background:var(--ink);border:1px solid var(--pencil);color:var(--bone);
-  font-size:16px;padding:4px 8px;cursor:pointer}
-.qv button:hover{border-color:var(--bone)}
+  font-size:16px;padding:4px 8px;cursor:pointer;transition:all .15s}
+.qv button:hover{border-color:var(--bone);transform:scale(1.1)}
+.qv button:disabled{opacity:0.5;cursor:default;transform:none}
 .votebar{height:7px;background:var(--crayon);margin-top:8px;position:relative}
 .votebar i{position:absolute;left:0;top:0;bottom:0;background:var(--gold)}
 .divider{color:var(--pencil);font-size:11px;letter-spacing:3px;text-transform:uppercase;
@@ -320,6 +323,14 @@ function anonId(){
 function toast(msg){const t=document.getElementById('toast');
   t.textContent=msg;t.style.display='block';
   clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600);}
+
+// Truncate quote cleanly at word boundary with ellipsis
+function truncQuote(s, max=78){
+  if(!s || s.length <= max) return s||'';
+  // Find last space before max, truncate there, add ellipsis
+  const cut = s.slice(0, max).lastIndexOf(' ');
+  return (cut > max/2 ? s.slice(0, cut) : s.slice(0, max-3)) + '...';
+}
 
 /* ================= COMEDY MODULE =================
    [COPY] Owner-replaceable banks. Rules encoded here and enforced by
@@ -1267,23 +1278,56 @@ function hitCard(c){
   const isNew=c.created_at&&(Date.now()-new Date(c.created_at))<7*864e5;
   const el=document.createElement('div');el.className='hit';
   el.innerHTML='<div class="qv">'
-    +'<button title="lean heaven, then walk the case">\u{1F47C}</button>'
-    +'<button title="lean hell, then walk the case">\u{1F608}</button></div>'
+    +'<button class="qv-heaven" title="Vote Heaven">\u{1F47C}</button>'
+    +'<button class="qv-hell" title="Vote Hell">\u{1F608}</button></div>'
     +'<span class="badge '+(c.faction||'unaligned')+'">'+(c.faction||'unaligned').toUpperCase()+'</span>'
     +'<span class="badge">IMPACT '+'\u2605'.repeat(c.impact||1)+'</span>'
     +(isNew?'<span class="badge new">NEW</span>':'')
     +'<h3>'+esc(c.title||c.raw_title)+'</h3>'
     +'<div class="sum">'+esc(c.summary||'')+'</div>'
-    +(c.article_quote?'<div class="qt">\u201C'+esc(c.article_quote)+'\u201D</div>':'')
-    +'<div class="meta">'+total+' VERDICTS'+(total?' \u00B7 '+pct+'% HEAVEN':'')+'</div>'
+    +(c.article_quote?'<div class="qt">\u201C'+esc(truncQuote(c.article_quote,120))+'\u201D</div>':'')
+    +'<div class="meta">'+total+' VERDICTS'+(total?' \u00B7 '+pct+'% HEAVEN':'')
+    +(c.source_url?'<a href="'+esc(c.source_url)+'" target="_blank" class="srclink" onclick="event.stopPropagation()"> \u00B7 SOURCE \u2197</a>':'')
+    +'</div>'
     +'<div class="votebar"><i style="width:'+pct+'%"></i></div>';
-  const [bh,be]=el.querySelectorAll('.qv button');
-  bh.onclick=e=>{e.stopPropagation();PENDING_VOTE='heaven';
-    toast('Leaning Heaven. Walk the case to file it.');openCase(c.id);};
-  be.onclick=e=>{e.stopPropagation();PENDING_VOTE='hell';
-    toast('Leaning Hell. Walk the case to file it.');openCase(c.id);};
+  const bh=el.querySelector('.qv-heaven'), be=el.querySelector('.qv-hell');
+  bh.onclick=e=>{e.stopPropagation();quickVote(c.id,'heaven',el);};
+  be.onclick=e=>{e.stopPropagation();quickVote(c.id,'hell',el);};
   el.onclick=()=>{PENDING_VOTE=null;openCase(c.id);};
   return el;
+}
+
+// Quick vote directly from card list - no game required
+async function quickVote(caseId, vote, cardEl){
+  const btn = cardEl.querySelector(vote==='heaven'?'.qv-heaven':'.qv-hell');
+  btn.disabled=true; btn.textContent='\u23F3';
+  try{
+    const r=await fetch(CONFIG.FN('submit-verdict'),{method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
+      body:JSON.stringify({case_id:caseId,verdict:vote,anon_id:anonId(),quick:true})});
+    if(!r.ok) throw new Error('Vote failed');
+    const data=await r.json();
+    // Update local cache
+    const c=CACHE.get(caseId);
+    if(c){
+      if(vote==='heaven') c.heaven_votes=(c.heaven_votes||0)+1;
+      else c.hell_votes=(c.hell_votes||0)+1;
+      CACHE.set(caseId,c);
+    }
+    btn.textContent=vote==='heaven'?'\u2705':'\u2705';
+    toast(vote==='heaven'?'Voted Heaven \u{1F47C}':'Voted Hell \u{1F608}');
+    // Update votebar
+    const total=(c?.heaven_votes||0)+(c?.hell_votes||0);
+    const pct=total?Math.round(100*(c?.heaven_votes||0)/total):0;
+    const bar=cardEl.querySelector('.votebar i');
+    if(bar) bar.style.width=pct+'%';
+    const meta=cardEl.querySelector('.meta');
+    if(meta) meta.innerHTML=meta.innerHTML.replace(/\d+ VERDICTS/,total+' VERDICTS').replace(/\d+% HEAVEN/,pct+'% HEAVEN');
+  }catch(e){
+    btn.textContent=vote==='heaven'?'\u{1F47C}':'\u{1F608}';
+    btn.disabled=false;
+    toast('Vote failed - try the full case');
+  }
 }
 function renderFilePrompt(url,host){
   const el=document.createElement('div');el.className='webhit';
@@ -1626,7 +1670,7 @@ function openModal(resp){
     +esc((PICK.who+' \u2192 '+PICK.action+' \u2192 '+PICK.whom).slice(0,80))+'</text>'
     +(hasQuote
       ?'<text x="360" y="434" text-anchor="middle" fill="#EDE6D6" font-family="Georgia" font-style="italic" font-size="14">\u201C'
-        +esc(CASE.article_quote.slice(0,78))+'\u201D</text>'
+        +esc(truncQuote(CASE.article_quote,78))+'\u201D</text>'
         +'<text x="360" y="452" text-anchor="middle" fill="#7a7263" font-family="Arial" font-size="10" letter-spacing="2">FROM THE RECORD</text>'
       :'')
     +'</svg>';

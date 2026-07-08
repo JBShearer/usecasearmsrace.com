@@ -80,8 +80,15 @@ Deno.serve(async (req) => {
       .eq("status", "live")
       .order("created_at", { ascending: false })
       .limit(100);
+
+    // Hydrate article_quote from extraction if missing
+    const results = (data ?? []).map(c => ({
+      ...c,
+      article_quote: c.article_quote || c.extraction?.article_quote || null
+    }));
+
     return new Response(JSON.stringify({
-      results: data ?? [],
+      results,
       error: error?.message,
       ms: Date.now() - t0,
     }), { headers: { ...CORS, "Content-Type": "application/json" } });
@@ -107,8 +114,14 @@ Deno.serve(async (req) => {
       .or(`title.ilike.%${fastQ}%,raw_title.ilike.%${fastQ}%,summary.ilike.%${fastQ}%`)
       .limit(20);
 
+    // Hydrate article_quote from extraction if missing
+    const results = (data ?? []).map(c => ({
+      ...c,
+      article_quote: c.article_quote || c.extraction?.article_quote || null
+    }));
+
     return new Response(JSON.stringify({
-      results: data ?? [],
+      results,
       web_results: [],
       ms: Date.now() - t0,
     }), { headers: { ...CORS, "Content-Type": "application/json" } });
