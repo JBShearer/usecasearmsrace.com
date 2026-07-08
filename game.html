@@ -642,6 +642,63 @@ main {
   margin-right: 4px;
 }
 
+/* Modifier chips (smaller, secondary tags) */
+.modifier-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+}
+.modifier-chip {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-dim);
+  transition: all 0.2s;
+}
+.modifier-chip:hover {
+  border-color: var(--brain);
+  color: var(--text);
+}
+.modifier-chip.selected {
+  background: var(--brain);
+  border-color: var(--brain);
+  color: white;
+}
+.modifier-chip.entity-type {
+  border-color: var(--purple);
+}
+.modifier-chip.entity-type.selected {
+  background: var(--purple);
+  border-color: var(--purple);
+}
+.modifier-chip.manner {
+  border-color: var(--brain);
+}
+.modifier-chip.context {
+  border-color: var(--heaven);
+}
+.modifier-chip.context.selected {
+  background: var(--heaven);
+  border-color: var(--heaven);
+  color: var(--bg);
+}
+.modifier-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-right: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    SCRATCH CARD REVEAL
    ═══════════════════════════════════════════════════════════════ */
@@ -2175,17 +2232,26 @@ main {
       <div class="tag-chips" id="who-tags">
         <!-- Tags injected by JS -->
       </div>
+      <div class="modifier-chips" id="who-modifiers" style="display:none">
+        <!-- WHO modifiers: entity type, specifics -->
+      </div>
 
       <!-- ACTION Tags -->
       <div class="tag-section-label">⚡ What ACTION?</div>
       <div class="tag-chips" id="action-tags">
         <!-- Tags injected by JS -->
       </div>
+      <div class="modifier-chips" id="action-modifiers" style="display:none">
+        <!-- ACTION modifiers: manner adverbs -->
+      </div>
 
       <!-- WHOM Tags -->
       <div class="tag-section-label">🎯 To WHOM?</div>
       <div class="tag-chips" id="whom-tags">
         <!-- Tags injected by JS -->
+      </div>
+      <div class="modifier-chips" id="whom-modifiers" style="display:none">
+        <!-- WHOM modifiers: role, context -->
       </div>
 
       <!-- Triple progress display -->
@@ -4632,6 +4698,9 @@ function renderGameStep() {
   `).join('');
   document.getElementById('who-tags').innerHTML = whoTagsHtml;
 
+  // Render WHO modifiers
+  renderModifiers('who', currentArticle);
+
   // Render ACTION tags from semantic parser
   const actionChoices = currentArticle.choices?.action || [];
   const actionTagsHtml = actionChoices.map(choice => `
@@ -4642,6 +4711,9 @@ function renderGameStep() {
   `).join('');
   document.getElementById('action-tags').innerHTML = actionTagsHtml;
 
+  // Render ACTION modifiers
+  renderModifiers('action', currentArticle);
+
   // Render WHOM tags from semantic parser
   const whomChoices = currentArticle.choices?.whom || [];
   const whomTagsHtml = whomChoices.map(choice => `
@@ -4651,6 +4723,9 @@ function renderGameStep() {
     </div>
   `).join('');
   document.getElementById('whom-tags').innerHTML = whomTagsHtml;
+
+  // Render WHOM modifiers
+  renderModifiers('whom', currentArticle);
 
   // Update triple progress
   const progress = document.getElementById('triple-progress');
@@ -4703,6 +4778,12 @@ function selectTag(category, tag) {
   picks[category] = tag;
   playSfx('select');
 
+  // Show modifiers for this category after tag is selected
+  const modifierEl = document.getElementById(`${category}-modifiers`);
+  if (modifierEl && picks[category]) {
+    modifierEl.style.display = 'flex';
+  }
+
   // Re-render to update UI
   renderGameStep();
 
@@ -4710,6 +4791,161 @@ function selectTag(category, tag) {
   if (picks.who && picks.action && picks.whom) {
     playSfx('complete');
   }
+}
+
+// Modifier system state
+let selectedModifiers = {
+  who: [],      // Entity types and specifics (e.g., "government", "ATF")
+  action: [],   // Manner adverbs (e.g., "secretly", "automatically")
+  whom: []      // Context modifiers (e.g., "HIDTA", "vulnerable populations")
+};
+
+// Render modifiers for a category
+function renderModifiers(category, article) {
+  const container = document.getElementById(`${category}-modifiers`);
+  if (!container) return;
+
+  // Extract potential modifiers from article text
+  const modifiers = extractModifiers(category, article);
+
+  if (modifiers.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+
+  const html = modifiers.map(mod => `
+    <span class="modifier-chip ${mod.type} ${selectedModifiers[category].includes(mod.label) ? 'selected' : ''}"
+          onclick="toggleModifier('${category}', '${escAttr(mod.label)}')">
+      ${escHtml(mod.label)}
+    </span>
+  `).join('');
+
+  container.innerHTML = `<span class="modifier-label">Add context:</span>${html}`;
+
+  // Only show if main tag is selected
+  container.style.display = picks[category] ? 'flex' : 'none';
+}
+
+// Extract modifiers from article based on category
+function extractModifiers(category, article) {
+  const text = `${article.title || ''} ${article.description || ''}`.toLowerCase();
+  const modifiers = [];
+
+  if (category === 'who') {
+    // Entity type modifiers
+    const entityTypes = [
+      { pattern: /government|federal|state|agency|municipal/i, label: 'government', type: 'entity-type' },
+      { pattern: /company|corporation|startup|enterprise|commercial/i, label: 'commercial', type: 'entity-type' },
+      { pattern: /university|research|academic|lab/i, label: 'research', type: 'entity-type' },
+      { pattern: /hospital|medical|healthcare|clinic/i, label: 'healthcare', type: 'entity-type' },
+      { pattern: /military|defense|army|navy|pentagon/i, label: 'military', type: 'entity-type' },
+      { pattern: /police|law enforcement|fbi|atf|dea/i, label: 'law enforcement', type: 'entity-type' }
+    ];
+
+    entityTypes.forEach(et => {
+      if (et.pattern.test(text)) modifiers.push(et);
+    });
+
+    // Specific entity names (extracted from text)
+    const specificEntities = extractNamedEntities(text, 'org');
+    specificEntities.forEach(name => {
+      if (name.length > 2 && name.length < 20) {
+        modifiers.push({ label: name, type: 'specific' });
+      }
+    });
+  }
+
+  if (category === 'action') {
+    // Manner adverbs
+    const mannerPatterns = [
+      { pattern: /secret|covert|hidden/i, label: 'secretly', type: 'manner' },
+      { pattern: /automat|machine|algorithm/i, label: 'automatically', type: 'manner' },
+      { pattern: /system|continuous|ongoing/i, label: 'systematically', type: 'manner' },
+      { pattern: /accident|unintend|mistake/i, label: 'accidentally', type: 'manner' },
+      { pattern: /experiment|pilot|test/i, label: 'experimentally', type: 'manner' },
+      { pattern: /real.?time|instant|immediate/i, label: 'in real-time', type: 'manner' }
+    ];
+
+    mannerPatterns.forEach(mp => {
+      if (mp.pattern.test(text)) modifiers.push(mp);
+    });
+  }
+
+  if (category === 'whom') {
+    // Context/affected group modifiers
+    const contextPatterns = [
+      { pattern: /student|school|education/i, label: 'students', type: 'context' },
+      { pattern: /patient|medical|health/i, label: 'patients', type: 'context' },
+      { pattern: /employee|worker|staff/i, label: 'workers', type: 'context' },
+      { pattern: /citizen|public|population/i, label: 'the public', type: 'context' },
+      { pattern: /criminal|suspect|offender/i, label: 'suspects', type: 'context' },
+      { pattern: /immigrant|border|migration/i, label: 'immigrants', type: 'context' },
+      { pattern: /child|minor|youth/i, label: 'minors', type: 'context' },
+      { pattern: /vulnerable|disadvantaged|marginalized/i, label: 'vulnerable groups', type: 'context' }
+    ];
+
+    contextPatterns.forEach(cp => {
+      if (cp.pattern.test(text)) modifiers.push(cp);
+    });
+
+    // Specific programs/contexts (like HIDTA)
+    const programPatterns = [
+      { pattern: /hidta|drug traffi/i, label: 'HIDTA', type: 'specific' },
+      { pattern: /hipaa|health privacy/i, label: 'HIPAA-protected', type: 'specific' },
+      { pattern: /ferpa|student privacy/i, label: 'FERPA-protected', type: 'specific' }
+    ];
+
+    programPatterns.forEach(pp => {
+      if (pp.pattern.test(text)) modifiers.push(pp);
+    });
+  }
+
+  return modifiers.slice(0, 6); // Limit to 6 modifiers
+}
+
+// Simple named entity extraction (looks for capitalized phrases)
+function extractNamedEntities(text, type) {
+  const entities = [];
+
+  // Look for acronyms and capitalized names
+  const acronymMatch = text.match(/\b[A-Z]{2,6}\b/g) || [];
+  acronymMatch.forEach(a => {
+    if (!['AI', 'ML', 'THE', 'AND', 'FOR'].includes(a)) {
+      entities.push(a);
+    }
+  });
+
+  return [...new Set(entities)].slice(0, 3);
+}
+
+// Toggle a modifier on/off
+function toggleModifier(category, label) {
+  const idx = selectedModifiers[category].indexOf(label);
+  if (idx >= 0) {
+    selectedModifiers[category].splice(idx, 1);
+  } else {
+    selectedModifiers[category].push(label);
+  }
+
+  playSfx('select');
+  renderModifiers(category, currentArticle);
+}
+
+// Get full triple with modifiers as formatted string
+function getTripleWithModifiers() {
+  const who = selectedModifiers.who.length > 0
+    ? `${selectedModifiers.who.join(', ')} ${picks.who}`
+    : picks.who;
+
+  const action = selectedModifiers.action.length > 0
+    ? `${selectedModifiers.action.join(' ')} ${picks.action}`
+    : picks.action;
+
+  const whom = selectedModifiers.whom.length > 0
+    ? `${picks.whom} (${selectedModifiers.whom.join(', ')})`
+    : picks.whom;
+
+  return { who, action, whom };
 }
 
 function selectChoice(choice) {
