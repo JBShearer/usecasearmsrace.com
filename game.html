@@ -1719,6 +1719,43 @@ main {
   color: var(--hell);
 }
 
+/* Comedy style tags */
+.comedy-tags {
+  margin-top: 16px;
+  text-align: center;
+}
+.comedy-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  display: block;
+  margin-bottom: 8px;
+}
+.comedy-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+.comedy-chip {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 11px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  transition: all 0.2s;
+}
+.comedy-chip:hover {
+  border-color: var(--purple);
+  color: var(--text);
+}
+.comedy-chip.selected {
+  background: var(--purple);
+  border-color: var(--purple);
+  color: white;
+}
+
 .search-status {
   margin-top: 12px;
   font-size: 12px;
@@ -2321,6 +2358,28 @@ main {
               <button class="quality-btn evil" id="source-evil-btn" onclick="rateSource('evil')">
                 😈 Suspicious
               </button>
+            </div>
+
+            <!-- Comedy style tags -->
+            <div class="comedy-tags">
+              <span class="comedy-label">🎭 Comedy style:</span>
+              <div class="comedy-chips" id="comedy-chips">
+                <button class="comedy-chip" onclick="tagComedy('semantic')" title="Double meanings (agent = AI/tax/secret)">
+                  🔀 Dual Meaning
+                </button>
+                <button class="comedy-chip" onclick="tagComedy('surprise')" title="Unexpected twist at the end">
+                  😲 Surprise
+                </button>
+                <button class="comedy-chip" onclick="tagComedy('escalation')" title="Building absurdity">
+                  📈 Escalation
+                </button>
+                <button class="comedy-chip" onclick="tagComedy('juxtaposition')" title="Comparing incomparable things">
+                  ⚖️ Juxtaposition
+                </button>
+                <button class="comedy-chip" onclick="tagComedy('nonSequitur')" title="Random pivot">
+                  🎲 Non-Sequitur
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -5346,6 +5405,21 @@ function showDiscoveryScene() {
   document.getElementById('source-good-btn').classList.remove('selected');
   document.getElementById('source-evil-btn').classList.remove('selected');
 
+  // Reset comedy style buttons
+  document.querySelectorAll('.comedy-chip').forEach(chip => chip.classList.remove('selected'));
+  selectedComedyStyles = [];
+
+  // Auto-detect and highlight suggested comedy styles
+  const suggestedStyle = detectBestComedyType({
+    who: currentArticle.title || '',
+    action: currentArticle.description || '',
+    whom: currentArticle.category || ''
+  });
+  const suggestedChip = document.querySelector(`.comedy-chip[onclick*="${suggestedStyle}"]`);
+  if (suggestedChip) {
+    suggestedChip.style.boxShadow = '0 0 8px var(--purple)'; // Hint this is detected
+  }
+
   // Generate case-specific art
   generateCaseArt(currentArticle);
 
@@ -5359,6 +5433,38 @@ function rateSource(quality) {
   document.getElementById('source-good-btn').classList.toggle('selected', quality === 'good');
   document.getElementById('source-evil-btn').classList.toggle('selected', quality === 'evil');
   playSfx('confirm');
+}
+
+// Comedy style tagging (multi-select)
+let selectedComedyStyles = [];
+function tagComedy(style) {
+  const idx = selectedComedyStyles.indexOf(style);
+  if (idx >= 0) {
+    selectedComedyStyles.splice(idx, 1);
+  } else {
+    selectedComedyStyles.push(style);
+  }
+
+  // Update UI
+  document.querySelectorAll('.comedy-chip').forEach(chip => {
+    const chipStyle = chip.getAttribute('onclick').match(/tagComedy\('(\w+)'\)/)?.[1];
+    chip.classList.toggle('selected', selectedComedyStyles.includes(chipStyle));
+    chip.style.boxShadow = ''; // Clear auto-detect highlight
+  });
+
+  playSfx('select');
+}
+
+// Get comedy beats for story generation based on tagged styles
+function getTaggedComedyBeat(triple) {
+  if (selectedComedyStyles.length === 0) {
+    // No tags - use auto-detection
+    return generateComedyBeat(triple);
+  }
+
+  // Use the first tagged style
+  const style = selectedComedyStyles[0];
+  return generateComedyBeat(triple, style);
 }
 
 // Generate case-specific placeholder art
