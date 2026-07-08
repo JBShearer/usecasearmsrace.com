@@ -121,6 +121,21 @@ textarea{width:100%;background:var(--ink);color:var(--bone);
 .chip:hover{border-color:var(--bone);color:var(--bone)}
 .rewardline{color:var(--pencil);font-size:13px;margin-top:6px}
 .shiftline{color:var(--gold);font-size:12px;margin-top:4px}
+/* SLOT MACHINE GENERATOR */
+.gen-box{background:var(--ink);border:4px solid var(--bone);padding:30px;max-width:500px;text-align:center}
+.gen-box h2{margin:0 0 20px;letter-spacing:4px;color:var(--gold)}
+.slot-machine{display:flex;gap:10px;justify-content:center;margin:20px 0}
+.slot{width:120px;height:60px;border:3px solid var(--bone);display:flex;align-items:center;justify-content:center;
+  overflow:hidden;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.slot span{animation:slot-spin 0.1s linear infinite}
+.slot span.landed{animation:none;color:var(--gold);font-size:13px}
+@keyframes slot-spin{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+.gen-title{font-size:13px;color:var(--pencil);margin:10px 0;max-height:40px;overflow:hidden}
+.gen-status{margin:15px 0 10px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--bone)}
+.gen-bar{background:#1a1a1a;height:8px;border:1px solid var(--bone)}
+.gen-progress{height:100%;background:var(--gold);width:0;transition:width 0.3s}
+.webhit.featured{border-color:var(--gold);background:rgba(201,168,76,0.05)}
+.webhit.featured .go{background:var(--gold);color:var(--ink)}
 /* CARD MODAL */
 #modal{position:fixed;inset:0;background:rgba(14,14,14,.92);display:none;
   align-items:flex-start;justify-content:center;z-index:50;overflow-y:auto;
@@ -1181,6 +1196,33 @@ function renderResults(q, opts={}){
   if(isURL(q)) return renderFilePrompt(q,host);
 
   const local=rankLocal(q);
+  const web=opts.web||lastWebResults;
+  const hasLocalMatches = local.length >= 3;
+
+  // If we have web results and local is thin, show web FIRST
+  if(q && web.length && !hasLocalMatches){
+    const d=document.createElement('div');d.className='divider';
+    d.textContent='FRESH FROM THE WEB';
+    host.appendChild(d);
+    for(const w of web){
+      const el=document.createElement('div');el.className='webhit featured';
+      el.innerHTML='<div>'+esc(w.title)+'</div><div class="meta">'+esc(w.domain||'')+'</div>';
+      if(w.url&&w.url!=='#'){
+        const b=document.createElement('button');b.className='go';
+        b.textContent='⚡ GENERATE CARD NOW';
+        b.onclick=()=>instantGenerate(w.url, w.title);
+        el.appendChild(b);
+      }
+      host.appendChild(el);
+    }
+    if(local.length>0){
+      const d2=document.createElement('div');d2.className='divider';
+      d2.textContent='FROM THE REGISTRY';
+      host.appendChild(d2);
+    }
+  }
+
+  // Show local results
   local.slice(0,20).forEach(c=>host.appendChild(hitCard(c)));
 
   // Show streaming indicator while hunting
@@ -1192,11 +1234,10 @@ function renderResults(q, opts={}){
     host.appendChild(stream);
   }
 
-  // Show web results if we have them
-  const web=opts.web||lastWebResults;
-  if(q && web.length){
+  // If local has good matches, web results go at bottom
+  if(q && web.length && hasLocalMatches){
     const d=document.createElement('div');d.className='divider';
-    d.textContent='FROM THE WEB (file to add to registry)';
+    d.textContent='ALSO FROM THE WEB';
     host.appendChild(d);
     for(const w of web){
       const el=document.createElement('div');el.className='webhit';
@@ -1246,6 +1287,125 @@ function renderFilePrompt(url,host){
   const b=document.createElement('button');b.className='go';b.textContent='File it \u2192';
   b.onclick=()=>fileURL(url);el.appendChild(b);host.appendChild(el);
 }
+
+/* === INSTANT GENERATE: Slot machine loader while generating in real-time === */
+async function instantGenerate(url, title){
+  // Show slot machine modal
+  const modal = document.createElement('div');
+  modal.id='gen-modal';
+  modal.innerHTML=`
+    <div class="gen-box">
+      <h2>\u26a1 GENERATING CARD</h2>
+      <div class="slot-machine">
+        <div class="slot" id="slot-who"><span>WHO?</span></div>
+        <div class="slot" id="slot-action"><span>DOES WHAT?</span></div>
+        <div class="slot" id="slot-whom"><span>TO WHOM?</span></div>
+      </div>
+      <div class="gen-title">${esc(title||'Analyzing article...')}</div>
+      <div class="gen-status" id="gen-status">Fetching article...</div>
+      <div class="gen-bar"><div class="gen-progress" id="gen-progress"></div></div>
+    </div>
+  `;
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999';
+  document.body.appendChild(modal);
+
+  // Spin animation
+  const spinSlot = (id, values, interval=150) => {
+    const slot = document.getElementById(id);
+    let i = 0;
+    return setInterval(()=>{
+      slot.innerHTML = '<span>'+values[i%values.length]+'</span>';
+      i++;
+    }, interval);
+  };
+  const whoSpin = spinSlot('slot-who', ['Government?','Corporation?','Platform?','Agency?','Hospital?','School?','Police?']);
+  const actionSpin = spinSlot('slot-action', ['Deploys?','Monitors?','Denies?','Flags?','Screens?','Tracks?','Predicts?'], 180);
+  const whomSpin = spinSlot('slot-whom', ['Citizens?','Patients?','Students?','Workers?','Residents?','Users?','Applicants?'], 200);
+
+  const setStatus = (s) => { document.getElementById('gen-status').textContent = s; };
+  const setProgress = (p) => { document.getElementById('gen-progress').style.width = p+'%'; };
+
+  try {
+    setProgress(10);
+    setStatus('Filing case...');
+
+    // File the URL to get it in the system
+    const fileRes = await fetch(CONFIG.FN('file-case'),{method:'POST',
+      headers:{'Content-Type':'application/json',
+        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
+      body:JSON.stringify({url, instant:true})});
+    const fileData = await fileRes.json();
+
+    if(!fileData.ok){
+      throw new Error(fileData.error || 'Could not file');
+    }
+    setProgress(30);
+    setStatus('Extracting triple...');
+
+    // Poll for extraction completion
+    const caseId = fileData.case_id;
+    let attempts = 0;
+    let caseData = null;
+
+    while(attempts < 30){ // 30 seconds max
+      await new Promise(r=>setTimeout(r,1000));
+      attempts++;
+      setProgress(30 + Math.min(attempts*2, 50));
+
+      const checkRes = await fetch(CONFIG.FN('search-cases'),{method:'POST',
+        headers:{'Content-Type':'application/json',
+          'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
+        body:JSON.stringify({id:caseId})});
+      const checkData = await checkRes.json();
+      caseData = (checkData.results||[])[0];
+
+      if(caseData?.extraction){
+        // We have extraction! Stop the slots
+        clearInterval(whoSpin);
+        clearInterval(actionSpin);
+        clearInterval(whomSpin);
+
+        const ex = caseData.extraction;
+        document.getElementById('slot-who').innerHTML = '<span class="landed">'+esc(ex.who_choices?.[0]||'??')+'</span>';
+        setProgress(85);
+        await new Promise(r=>setTimeout(r,300));
+        document.getElementById('slot-action').innerHTML = '<span class="landed">'+esc(ex.action_choices?.[0]||'??')+'</span>';
+        setProgress(92);
+        await new Promise(r=>setTimeout(r,300));
+        document.getElementById('slot-whom').innerHTML = '<span class="landed">'+esc(ex.whom_choices?.[0]||'??')+'</span>';
+        setProgress(100);
+        setStatus('CARD READY!');
+
+        await new Promise(r=>setTimeout(r,800));
+        modal.remove();
+
+        // Cache and open the case
+        CACHE.set(caseData.id, caseData);
+        openCase(caseData.id);
+        return;
+      }
+
+      // Update status with fun messages
+      const statuses = ['Reading article...','Identifying actors...','Extracting actions...','Finding affected parties...','Generating story...','Almost there...'];
+      setStatus(statuses[Math.min(attempts-1, statuses.length-1)]);
+    }
+
+    // Timeout - still processing in background
+    clearInterval(whoSpin);clearInterval(actionSpin);clearInterval(whomSpin);
+    setStatus('Queued for processing. Check back soon!');
+    await new Promise(r=>setTimeout(r,2000));
+    modal.remove();
+    toast('Case filed. Processing may take a minute.');
+
+  } catch(e) {
+    clearInterval(whoSpin);clearInterval(actionSpin);clearInterval(whomSpin);
+    setStatus('Error: '+(e.message||'Unknown error'));
+    await new Promise(r=>setTimeout(r,2000));
+    modal.remove();
+    toast(e.message||'Could not generate card');
+  }
+}
+
 async function fileURL(url){
   if(DEMO){toast('DEMO: deploys to the staged queue when configured.');return;}
   try{

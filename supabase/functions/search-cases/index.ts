@@ -1,403 +1,125 @@
-// Supabase Edge Function: search-cases
-// Multi-source news/content discovery with parallel fetching and deduplication
+// search-cases: the search engine endpoint. Hot path has ZERO external
+// APIs: query embedding runs on the edge runtime's local gte-small model,
+// then one SQL function does structured filters + HNSW similarity together.
+// Structured slots accept free text; resolution happens in SQL.
 
-import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { embed } from "../steward.ts";
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "https://usecasearmsrace.com",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  "Access-Control-Max-Age": "86400",
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-anon-id",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
 };
 
-interface SearchRequest {
-  query: string;
-  who?: string;
-  action?: string;
-  whom?: string;
-}
+const supa = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+);
 
-interface Article {
-  title: string;
-  url: string;
-  source: string;
-  snippet: string;
-  via: string;
-  published?: string;
-}
+// Server-side web fan-out: GDELT DOC + Google News RSS IN PARALLEL.
+// Results are PROSPECTS, returned under web_results, never mixed into the record.
+async function webSearch(q: string): Promise<
+  { title: string; url: string; domain: string; published: string }[]> {
+  const out: { title: string; url: string; domain: string; published: string }[] = [];
+  const enc = encodeURIComponent;
 
-interface SearchResponse {
-  articles: Article[];
-  meta?: {
-    query: string;
-    sources_queried: string[];
-    duration_ms: number;
-  };
-}
+  // Fire BOTH requests in parallel with aggressive timeouts
+  const gdeltPromise = fetch("https://api.gdeltproject.org/api/v2/doc/doc?query="
+    + enc(q + " sourcelang:english")
+    + "&mode=artlist&maxrecords=5&timespan=30d&format=json",
+    { signal: AbortSignal.timeout(2500) })
+    .then(async r => {
+      if (!r.ok) return [];
+      const data = await r.json();
+      return (data.articles ?? []).slice(0, 5).map((a: { title?: string; url?: string; domain?: string; seendate?: string }) => ({
+        title: a.title ?? "", url: a.url ?? "",
+        domain: a.domain ?? "", published: a.seendate ?? ""
+      }));
+    })
+    .catch(() => []);
 
-// Timeout wrapper for fetch with 5 second limit
-async function fetchWithTimeout(
-  url: string,
-  options: RequestInit = {},
-  timeoutMs = 5000
-): Promise<Response> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const googlePromise = fetch("https://news.google.com/rss/search?q=" + enc(q)
+    + "&hl=en-US&gl=US&ceid=US:en", { signal: AbortSignal.timeout(2500) })
+    .then(async r => {
+      if (!r.ok) return [];
+      const xml = await r.text();
+      const items = xml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
+      return items.slice(0, 5).map((it: string) => {
+        const t = (it.match(/<title>([\s\S]*?)<\/title>/) ?? [])[1] ?? "";
+        const l = (it.match(/<link>([\s\S]*?)<\/link>/) ?? [])[1] ?? "";
+        const s = (it.match(/<source url="([^"]*)"/) ?? [])[1] ?? "";
+        return { title: t.replace(/<[^>]*>/g, ""), url: l, domain: s, published: "" };
+      }).filter((x: { url: string }) => x.url);
+    })
+    .catch(() => []);
 
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    });
-    return response;
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
+  // Wait for both in parallel - max 2.5s instead of 8s
+  const [gdelt, google] = await Promise.all([gdeltPromise, googlePromise]);
+  out.push(...gdelt, ...google);
 
-// Google News RSS search
-async function searchGoogleNews(query: string): Promise<Article[]> {
-  const articles: Article[] = [];
-  try {
-    const encodedQuery = encodeURIComponent(query);
-    const url = `https://news.google.com/rss/search?q=${encodedQuery}&hl=en-US&gl=US&ceid=US:en`;
-
-    const response = await fetchWithTimeout(url);
-    if (!response.ok) return articles;
-
-    const xml = await response.text();
-
-    // Parse RSS items using regex (lightweight for edge)
-    const itemRegex = /<item>([\s\S]*?)<\/item>/g;
-    const titleRegex = /<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/;
-    const linkRegex = /<link>(.*?)<\/link>/;
-    const pubDateRegex = /<pubDate>(.*?)<\/pubDate>/;
-    const sourceRegex = /<source[^>]*>(.*?)<\/source>/;
-
-    let match;
-    while ((match = itemRegex.exec(xml)) !== null && articles.length < 8) {
-      const item = match[1];
-
-      const titleMatch = item.match(titleRegex);
-      const linkMatch = item.match(linkRegex);
-      const pubDateMatch = item.match(pubDateRegex);
-      const sourceMatch = item.match(sourceRegex);
-
-      const title = titleMatch?.[1] || titleMatch?.[2] || "";
-      const url = linkMatch?.[1] || "";
-      const sourceName = sourceMatch?.[1] || "Google News";
-
-      if (title && url) {
-        articles.push({
-          title: decodeHtmlEntities(title),
-          url,
-          source: sourceName,
-          snippet: "",
-          via: "googlenews",
-          published: pubDateMatch?.[1] || undefined,
-        });
-      }
-    }
-  } catch (error) {
-    console.error("Google News error:", error);
-  }
-  return articles;
-}
-
-// Reddit JSON API search
-async function searchReddit(query: string): Promise<Article[]> {
-  const articles: Article[] = [];
-  try {
-    const encodedQuery = encodeURIComponent(`${query} AI`);
-    const url = `https://www.reddit.com/search.json?q=${encodedQuery}&sort=relevance&limit=5`;
-
-    const response = await fetchWithTimeout(url, {
-      headers: {
-        "User-Agent": "UseCaseArmsRace/1.0 (research aggregator)",
-      },
-    });
-    if (!response.ok) return articles;
-
-    const data = await response.json();
-    const posts = data?.data?.children || [];
-
-    for (const post of posts.slice(0, 5)) {
-      const d = post.data;
-      if (!d.title || !d.permalink) continue;
-
-      articles.push({
-        title: d.title,
-        url: d.url || `https://www.reddit.com${d.permalink}`,
-        source: `r/${d.subreddit}`,
-        snippet: d.selftext?.slice(0, 200) || "",
-        via: "reddit",
-        published: d.created_utc
-          ? new Date(d.created_utc * 1000).toISOString()
-          : undefined,
-      });
-    }
-  } catch (error) {
-    console.error("Reddit error:", error);
-  }
-  return articles;
-}
-
-// Hacker News via Algolia API
-async function searchHackerNews(query: string): Promise<Article[]> {
-  const articles: Article[] = [];
-  try {
-    const encodedQuery = encodeURIComponent(query);
-    const url = `https://hn.algolia.com/api/v1/search?query=${encodedQuery}&tags=story&hitsPerPage=5`;
-
-    const response = await fetchWithTimeout(url);
-    if (!response.ok) return articles;
-
-    const data = await response.json();
-    const hits = data?.hits || [];
-
-    for (const hit of hits.slice(0, 5)) {
-      if (!hit.title) continue;
-
-      const articleUrl =
-        hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`;
-
-      articles.push({
-        title: hit.title,
-        url: articleUrl,
-        source: "Hacker News",
-        snippet: hit.story_text?.slice(0, 200) || "",
-        via: "hackernews",
-        published: hit.created_at || undefined,
-      });
-    }
-  } catch (error) {
-    console.error("Hacker News error:", error);
-  }
-  return articles;
-}
-
-// arXiv API search
-async function searchArxiv(query: string): Promise<Article[]> {
-  const articles: Article[] = [];
-  try {
-    const encodedQuery = encodeURIComponent(query);
-    const url = `http://export.arxiv.org/api/query?search_query=all:${encodedQuery}&start=0&max_results=5&sortBy=relevance`;
-
-    const response = await fetchWithTimeout(url);
-    if (!response.ok) return articles;
-
-    const xml = await response.text();
-
-    // Parse Atom feed entries
-    const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
-    const titleRegex = /<title>([\s\S]*?)<\/title>/;
-    const linkRegex = /<id>(.*?)<\/id>/;
-    const summaryRegex = /<summary>([\s\S]*?)<\/summary>/;
-    const publishedRegex = /<published>(.*?)<\/published>/;
-
-    let match;
-    while ((match = entryRegex.exec(xml)) !== null && articles.length < 5) {
-      const entry = match[1];
-
-      const titleMatch = entry.match(titleRegex);
-      const linkMatch = entry.match(linkRegex);
-      const summaryMatch = entry.match(summaryRegex);
-      const publishedMatch = entry.match(publishedRegex);
-
-      const title = titleMatch?.[1]?.replace(/\s+/g, " ").trim() || "";
-      const url = linkMatch?.[1] || "";
-      const summary = summaryMatch?.[1]?.replace(/\s+/g, " ").trim() || "";
-
-      if (title && url) {
-        articles.push({
-          title,
-          url,
-          source: "arXiv",
-          snippet: summary.slice(0, 200),
-          via: "arxiv",
-          published: publishedMatch?.[1] || undefined,
-        });
-      }
-    }
-  } catch (error) {
-    console.error("arXiv error:", error);
-  }
-  return articles;
-}
-
-// Wikipedia API search
-async function searchWikipedia(query: string): Promise<Article[]> {
-  const articles: Article[] = [];
-  try {
-    const encodedQuery = encodeURIComponent(query);
-    const url = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodedQuery}&format=json&srlimit=5&origin=*`;
-
-    const response = await fetchWithTimeout(url);
-    if (!response.ok) return articles;
-
-    const data = await response.json();
-    const results = data?.query?.search || [];
-
-    for (const result of results.slice(0, 5)) {
-      if (!result.title) continue;
-
-      const pageUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(
-        result.title.replace(/ /g, "_")
-      )}`;
-
-      // Strip HTML tags from snippet
-      const snippet = (result.snippet || "")
-        .replace(/<[^>]*>/g, "")
-        .slice(0, 200);
-
-      articles.push({
-        title: result.title,
-        url: pageUrl,
-        source: "Wikipedia",
-        snippet,
-        via: "wikipedia",
-        published: result.timestamp || undefined,
-      });
-    }
-  } catch (error) {
-    console.error("Wikipedia error:", error);
-  }
-  return articles;
-}
-
-// Helper to decode HTML entities
-function decodeHtmlEntities(text: string): string {
-  return text
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&apos;/g, "'");
-}
-
-// Build search query from structured input
-function buildQuery(params: SearchRequest): string {
-  const parts: string[] = [];
-
-  if (params.query) {
-    parts.push(params.query);
-  }
-
-  // Append structured NVN (Noun-Verb-Noun) components if provided
-  if (params.who) parts.push(params.who);
-  if (params.action) parts.push(params.action);
-  if (params.whom) parts.push(params.whom);
-
-  return parts.join(" ").trim() || "artificial intelligence";
-}
-
-// Deduplicate articles by URL
-function deduplicateArticles(articles: Article[]): Article[] {
   const seen = new Set<string>();
-  const unique: Article[] = [];
-
-  for (const article of articles) {
-    // Normalize URL for deduplication
-    const normalizedUrl = article.url
-      .toLowerCase()
-      .replace(/^https?:\/\//, "")
-      .replace(/\/$/, "");
-
-    if (!seen.has(normalizedUrl) && article.title && article.url) {
-      seen.add(normalizedUrl);
-      unique.push(article);
-    }
-  }
-
-  return unique;
+  return out.filter((r) => r.url && !seen.has(r.url) && seen.add(r.url)).slice(0, 8);
 }
 
-serve(async (req: Request): Promise<Response> => {
-  // Handle CORS preflight
-  if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: CORS_HEADERS,
-    });
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  const b = req.method === "POST" ? await req.json() : {};
+  const t0 = Date.now();
+
+  // Direct case fetch for the play flow
+  if (b.id) {
+    const { data } = await supa.from("cases").select("*").eq("id", b.id)
+      .in("status", ["live", "under_review"]).limit(1);
+    return new Response(JSON.stringify({ results: data ?? [], ms: Date.now() - t0 }),
+      { headers: { ...CORS, "Content-Type": "application/json" } });
   }
 
-  // Only accept POST
-  if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-    });
+  // Fast path for realtime typing: ILIKE only, no embedding, no web
+  // unless explicitly requested AND local results are thin.
+  const fastQ = String(b.q ?? "").trim();
+  if (fastQ && !b.who && !b.action && !b.whom && !b.deep) {
+    const { data } = await supa.from("cases")
+      .select("id, title, raw_title, summary, article_quote, category, faction, impact, heaven_votes, hell_votes, source_url, source_tier, tech_types, data_types, extraction, created_at")
+      .eq("status", "live")
+      .or(`title.ilike.%${fastQ}%,raw_title.ilike.%${fastQ}%,summary.ilike.%${fastQ}%`)
+      .limit(20);
+    let web_results: unknown[] = [];
+    if (b.web && (data?.length ?? 0) < 3 && fastQ.length > 5) {
+      web_results = await webSearch(fastQ.slice(0, 120));
+    }
+    return new Response(JSON.stringify({
+      results: data ?? [], web_results, ms: Date.now() - t0,
+    }), { headers: { ...CORS, "Content-Type": "application/json" } });
   }
 
-  const startTime = Date.now();
+  let whoId = null, actionId = null, whomId = null, vec = null;
+  const jobs: Promise<void>[] = [];
+  if (b.who) jobs.push(supa.rpc("resolve_entity", { q: String(b.who) })
+    .then((r) => { whoId = r.data; }));
+  if (b.action) jobs.push(supa.rpc("resolve_action", { q: String(b.action) })
+    .then((r) => { actionId = r.data; }));
+  if (b.whom) jobs.push(supa.rpc("resolve_entity", { q: String(b.whom) })
+    .then((r) => { whomId = r.data; }));
+  if (b.q) jobs.push(embed(String(b.q)).then((v) => { vec = JSON.stringify(v); }));
+  await Promise.all(jobs);
 
-  try {
-    const body: SearchRequest = await req.json();
-    const query = buildQuery(body);
-
-    // Execute all searches in parallel
-    const [googleNews, reddit, hackerNews, arxiv, wikipedia] =
-      await Promise.allSettled([
-        searchGoogleNews(query),
-        searchReddit(query),
-        searchHackerNews(query),
-        searchArxiv(query),
-        searchWikipedia(query),
-      ]);
-
-    // Collect results from successful sources
-    const allArticles: Article[] = [];
-    const sourcesQueried: string[] = [];
-
-    if (googleNews.status === "fulfilled") {
-      allArticles.push(...googleNews.value);
-      sourcesQueried.push("googlenews");
-    }
-    if (reddit.status === "fulfilled") {
-      allArticles.push(...reddit.value);
-      sourcesQueried.push("reddit");
-    }
-    if (hackerNews.status === "fulfilled") {
-      allArticles.push(...hackerNews.value);
-      sourcesQueried.push("hackernews");
-    }
-    if (arxiv.status === "fulfilled") {
-      allArticles.push(...arxiv.value);
-      sourcesQueried.push("arxiv");
-    }
-    if (wikipedia.status === "fulfilled") {
-      allArticles.push(...wikipedia.value);
-      sourcesQueried.push("wikipedia");
-    }
-
-    // Deduplicate and limit results
-    const articles = deduplicateArticles(allArticles).slice(0, 15);
-
-    const response: SearchResponse = {
-      articles,
-      meta: {
-        query,
-        sources_queried: sourcesQueried,
-        duration_ms: Date.now() - startTime,
-      },
-    };
-
-    return new Response(JSON.stringify(response), {
-      status: 200,
-      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.error("Search error:", error);
-    return new Response(
-      JSON.stringify({
-        error: "Search failed",
-        message: error instanceof Error ? error.message : "Unknown error",
-      }),
-      {
-        status: 500,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-      }
-    );
+  const { data, error } = await supa.rpc("search_cases", {
+    p_who: whoId, p_action: actionId, p_whom: whomId,
+    p_embedding: vec,
+    p_faction: ["heaven", "hell", "unaligned"].includes(b.faction)
+      ? b.faction : null,
+    p_limit: Math.min(50, Number(b.limit) || 20),
+  });
+  if (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...CORS, "Content-Type": "application/json" } });
   }
+  let web_results: unknown[] = [];
+  if (b.web && b.q && (data?.length ?? 0) < 5) {
+    web_results = await webSearch(String(b.q).slice(0, 120));
+  }
+  return new Response(JSON.stringify({
+    results: data, web_results, ms: Date.now() - t0,
+    resolved: { who: whoId, action: actionId, whom: whomId },
+  }), { headers: { ...CORS, "Content-Type": "application/json" } });
 });
