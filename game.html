@@ -798,8 +798,8 @@ function renderCard(resp){
   setText('m-shift', big[0]>=8
     ?'The case moved your read '+big[0]+' points on '+AX[big[2]]+'.'
     :'Your read held steady.');
-  const after=document.getElementById('mg-after');
-  after.innerHTML=''; after.appendChild(inlineMinigame());
+  // Minigames only during search, not after case completion
+  document.getElementById('mg-after').innerHTML='';
 }
 /* Scratch: sized after the screen is visible; auto-reveals at 55%. */
 function initScratch(){
