@@ -1197,11 +1197,11 @@ function renderResults(q, opts={}){
   if(isURL(q)) return renderFilePrompt(q,host);
 
   const local=rankLocal(q);
-  const web=opts.web||lastWebResults;
-  const hasLocalMatches = local.length >= 3;
+  const web=opts.web||[];  // Only use fresh web results passed in opts
+  const showWebFirst = web.length > 0;  // Web at top when we have fresh results
 
-  // If we have web results and local is thin, show web FIRST
-  if(q && web.length && !hasLocalMatches){
+  // Show web results FIRST when they just arrived
+  if(q && showWebFirst){
     const d=document.createElement('div');d.className='divider';
     d.textContent='FRESH FROM THE WEB';
     host.appendChild(d);
@@ -1227,7 +1227,7 @@ function renderResults(q, opts={}){
   local.slice(0,20).forEach(c=>host.appendChild(hitCard(c)));
 
   // Show streaming indicator while hunting
-  if(opts.streaming && q.length>=2){
+  if(opts.streaming && q.length>=2 && !showWebFirst){
     const stream=document.createElement('div');
     stream.className='divider';
     stream.innerHTML='SEARCHING <span class="dots-anim"><span>.</span><span>.</span><span>.</span></span>';
@@ -1235,12 +1235,12 @@ function renderResults(q, opts={}){
     host.appendChild(stream);
   }
 
-  // If local has good matches, web results go at bottom
-  if(q && web.length && hasLocalMatches){
+  // Show cached web results at bottom if no fresh ones
+  if(q && !showWebFirst && lastWebResults.length){
     const d=document.createElement('div');d.className='divider';
     d.textContent='ALSO FROM THE WEB';
     host.appendChild(d);
-    for(const w of web){
+    for(const w of lastWebResults){
       const el=document.createElement('div');el.className='webhit';
       el.innerHTML='<div>'+esc(w.title)+'</div><div class="meta">'+esc(w.domain||'')+'</div>';
       if(w.url&&w.url!=='#'){
