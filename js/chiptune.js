@@ -2,6 +2,8 @@
 // EVIL BRAIN LABS - Pre-Composed Chiptune Audio Engine
 // Memorable 8-bit melodies with seamless looping
 // NES-era inspired game music
+// ADAPTIVE VOLUME: fades for video, rises on inactivity,
+// goes soft when attentive, builds near narrative climax
 // ═══════════════════════════════════════════════════════════════
 
 class ChiptuneEngine {
@@ -13,6 +15,36 @@ class ChiptuneEngine {
     this.currentMood = 'menu';
     this.schedulerInterval = null;
     this.patternIndex = 0;
+
+    // Adaptive volume system
+    this.baseVolume = 0.3;        // Normal max volume
+    this.currentVolume = 0.1;     // Start soft
+    this.targetVolume = 0.15;     // Where we're heading
+    this.volumeFadeInterval = null;
+    this.lastInteraction = Date.now();
+    this.inactivityCheckInterval = null;
+    this.videoPlaying = false;
+    this.narrativePhase = 'idle';  // idle, discovery, extraction, complication, verdict, mint
+
+    // Volume levels for different states
+    this.volumeLevels = {
+      videoPlaying: 0.05,          // Very quiet when video is playing
+      attentive: 0.12,             // Soft when user is actively engaged
+      idle: 0.2,                   // Medium when browsing
+      inactive: 0.25,              // Louder when user seems away
+      climax: 0.3,                 // Full volume for dramatic moments
+      muted: 0
+    };
+
+    // Narrative arc volume curve
+    this.narrativeVolumes = {
+      idle: 0.15,
+      discovery: 0.18,             // Slight rise for intro
+      extraction: 0.12,            // Soft during choices (thinking)
+      complication: 0.22,          // Building tension
+      verdict: 0.28,               // Near climax
+      mint: 0.3                    // Celebration/climax
+    };
 
     // Pre-composed melodic loops for each mood
     // Note format: [midiNote, durationInBeats] or [0, duration] for rest
@@ -600,6 +632,145 @@ class ChiptuneEngine {
         break;
     }
   }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ADAPTIVE VOLUME SYSTEM
+  // ═══════════════════════════════════════════════════════════════
+
+  // Start the adaptive volume system
+  startAdaptiveVolume() {
+    // Smooth volume fading (runs every 100ms)
+    this.volumeFadeInterval = setInterval(() => {
+      this.smoothVolumeTransition();
+    }, 100);
+
+    // Check for inactivity (runs every 5 seconds)
+    this.inactivityCheckInterval = setInterval(() => {
+      this.checkInactivity();
+    }, 5000);
+
+    // Listen for user interactions
+    ['click', 'keydown', 'mousemove', 'touchstart', 'scroll'].forEach(event => {
+      document.addEventListener(event, () => this.onUserInteraction(), { passive: true });
+    });
+
+    // Watch for video play/pause
+    this.watchVideos();
+  }
+
+  // Smoothly transition to target volume
+  smoothVolumeTransition() {
+    if (!this.masterGain || this.isMuted) return;
+
+    const diff = this.targetVolume - this.currentVolume;
+    if (Math.abs(diff) < 0.005) {
+      this.currentVolume = this.targetVolume;
+    } else {
+      // Ease toward target (faster fade down, slower fade up)
+      const rate = diff < 0 ? 0.15 : 0.08;
+      this.currentVolume += diff * rate;
+    }
+
+    this.masterGain.gain.setValueAtTime(this.currentVolume, this.audioCtx.currentTime);
+  }
+
+  // Set target volume with optional immediate flag
+  setTargetVolume(level, immediate = false) {
+    this.targetVolume = Math.max(0, Math.min(this.baseVolume, level));
+
+    if (immediate && this.masterGain) {
+      this.currentVolume = this.targetVolume;
+      this.masterGain.gain.setValueAtTime(this.currentVolume, this.audioCtx.currentTime);
+    }
+  }
+
+  // Called when user interacts
+  onUserInteraction() {
+    this.lastInteraction = Date.now();
+
+    // If video isn't playing, set to attentive level
+    if (!this.videoPlaying) {
+      this.setTargetVolume(this.narrativeVolumes[this.narrativePhase] || this.volumeLevels.attentive);
+    }
+  }
+
+  // Check if user has been inactive
+  checkInactivity() {
+    if (this.videoPlaying) return;
+
+    const inactiveTime = Date.now() - this.lastInteraction;
+
+    if (inactiveTime > 60000) {
+      // Over 1 minute inactive - rise to full idle volume
+      this.setTargetVolume(this.volumeLevels.inactive);
+    } else if (inactiveTime > 30000) {
+      // Over 30 seconds - medium volume
+      this.setTargetVolume(this.volumeLevels.idle);
+    }
+  }
+
+  // Watch for video elements playing
+  watchVideos() {
+    // Check for iframes (YouTube embeds) and video elements
+    const checkVideoState = () => {
+      const iframes = document.querySelectorAll('iframe[src*="youtube"], iframe[src*="vimeo"]');
+      const videos = document.querySelectorAll('video');
+
+      // For now, assume video is playing if daily show section is expanded
+      const dailyShow = document.getElementById('daily-show');
+      const isExpanded = dailyShow && !dailyShow.classList.contains('collapsed');
+
+      // Also check if any video element is actually playing
+      let videoActuallyPlaying = false;
+      videos.forEach(v => {
+        if (!v.paused && !v.ended) videoActuallyPlaying = true;
+      });
+
+      const wasPlaying = this.videoPlaying;
+      this.videoPlaying = isExpanded || videoActuallyPlaying;
+
+      // Volume change on video state change
+      if (this.videoPlaying && !wasPlaying) {
+        this.setTargetVolume(this.volumeLevels.videoPlaying);
+      } else if (!this.videoPlaying && wasPlaying) {
+        this.setTargetVolume(this.narrativeVolumes[this.narrativePhase] || this.volumeLevels.attentive);
+      }
+    };
+
+    // Check periodically
+    setInterval(checkVideoState, 1000);
+
+    // Also listen for daily show toggle
+    const dailyShow = document.getElementById('daily-show');
+    if (dailyShow) {
+      const observer = new MutationObserver(checkVideoState);
+      observer.observe(dailyShow, { attributes: true, attributeFilter: ['class'] });
+    }
+  }
+
+  // Set narrative phase (called from game.html during story progression)
+  setNarrativePhase(phase) {
+    this.narrativePhase = phase;
+
+    if (!this.videoPlaying) {
+      const targetVol = this.narrativeVolumes[phase] || this.volumeLevels.attentive;
+      this.setTargetVolume(targetVol);
+    }
+
+    console.log(`🎵 Narrative phase: ${phase}, target volume: ${this.narrativeVolumes[phase]}`);
+  }
+
+  // Stop adaptive volume system
+  stopAdaptiveVolume() {
+    if (this.volumeFadeInterval) {
+      clearInterval(this.volumeFadeInterval);
+      this.volumeFadeInterval = null;
+    }
+    if (this.inactivityCheckInterval) {
+      clearInterval(this.inactivityCheckInterval);
+      this.inactivityCheckInterval = null;
+    }
+  }
 }
 
 // Global instance
@@ -608,5 +779,6 @@ window.chiptuneEngine = new ChiptuneEngine();
 // Auto-init on first user interaction
 document.addEventListener('click', function initAudio() {
   window.chiptuneEngine.init();
+  window.chiptuneEngine.startAdaptiveVolume();
   document.removeEventListener('click', initAudio);
 }, { once: true });

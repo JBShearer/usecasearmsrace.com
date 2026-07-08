@@ -2736,11 +2736,12 @@ async function startExtraction(caseId) {
   // Fetch full case with ALL fields
   const { data: c, error } = await sb
     .from('use_cases')
-    .select('id, title, description, url, category, source_url, evil_votes, good_votes')
+    .select('*')
     .eq('id', caseId)
     .single();
 
   if (error || !c) {
+    console.error('Error loading case:', error);
     alert('Could not load case');
     return;
   }
@@ -2751,7 +2752,7 @@ async function startExtraction(caseId) {
     title: c.title,                              // REAL headline from database
     description: c.description || '',            // FULL description - NO truncation
     source: c.category || 'AI',                  // Category as source label
-    url: c.url || c.source_url || null,          // Source URL for "Read Full Article"
+    url: c.url || null,                          // Source URL for "Read Full Article"
     category: c.category || 'AI',
     choices: generateMockChoices(c)              // Generate smart choices from real text
   };
@@ -2959,6 +2960,7 @@ function selectChoice(choice) {
 // Scene 1: THE DISCOVERY - Brain introduces the case
 function showDiscoveryScene() {
   setMusicMood('menu');  // 🎵 Mysterious introduction music
+  if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('discovery');
 
   // Generate Brain's introduction
   const brainText = generateStoryText('discovery', 'brain', {
@@ -2975,6 +2977,7 @@ function showDiscoveryScene() {
 function continueFromDiscovery() {
   playSfx('confirm');
   setMusicMood('extraction');  // 🎵 Back to tense extraction music
+  if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('extraction');
   showScreen('game');
   renderGameStep();
 }
@@ -2982,6 +2985,7 @@ function continueFromDiscovery() {
 // Scene 2: THE COMPLICATION - GI, Gary, and Supes debate the extraction
 function showComplicationScene() {
   setMusicMood('verdict');  // 🎵 Dramatic reveal music
+  if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('complication');
 
   // Generate all three Brainiac reactions
   const giText = generateStoryText('complication', 'gi', {
@@ -3066,6 +3070,7 @@ function continueFromVerdictStory() {
 // ═══════════════════════════════════════════════════════════════
 function showVerdictScreen() {
   setMusicMood('verdict');  // 🎵 Suspenseful music
+  if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('verdict');
 
   document.getElementById('verdict-source').textContent = currentArticle.source;
   document.getElementById('verdict-title').textContent = currentArticle.title;
@@ -3136,6 +3141,7 @@ function skipNotes() {
 // ═══════════════════════════════════════════════════════════════
 function showMintScreen() {
   setMusicMood('mint');  // 🎵 Triumphant fanfare music
+  if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('mint');
   playSfx('mint');  // 🎵 Slot machine win sound
 
   // Build card name from triple
@@ -3218,6 +3224,7 @@ function calculateRarity() {
 
 function continuePlaying() {
   setMusicMood('browse');  // 🎵 Back to chill browse music
+  if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('idle');
   showScreen('home');
   loadTrendingCases();
 }
