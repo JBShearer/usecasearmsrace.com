@@ -1131,7 +1131,7 @@ function navScene(delta){
   jumpToScene(currentSceneIdx+delta);
 }
 
-// Swipe detection for mobile
+// Swipe detection for mobile - swipe right to go back/home
 let touchStartX=0, touchStartY=0;
 document.addEventListener('touchstart',e=>{
   touchStartX=e.touches[0].clientX;
@@ -1141,9 +1141,14 @@ document.addEventListener('touchend',e=>{
   if(!CASE) return; // Only in case view
   const dx=e.changedTouches[0].clientX-touchStartX;
   const dy=e.changedTouches[0].clientY-touchStartY;
-  if(Math.abs(dx)>80 && Math.abs(dx)>Math.abs(dy)*1.5){
-    if(dx>0 && currentSceneIdx>0) navScene(-1);
-    else if(dx<0 && currentSceneIdx<maxVisitedIdx) navScene(1);
+  // Swipe threshold: 60px horizontal, mostly horizontal
+  if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.2){
+    if(dx>0){
+      // Swipe right = go back, or home if on first scene
+      if(currentSceneIdx>0) navScene(-1);
+      else goHome();
+    }
+    // No forward swipe - must make choices to advance
   }
 });
 
