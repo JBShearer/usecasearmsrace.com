@@ -1563,6 +1563,37 @@ main {
   display: block;
 }
 
+/* Scene art for story screens */
+.scene-art-container {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  transition: all 0.5s ease;
+}
+.scene-art-container.mood-evil {
+  border-color: var(--hell);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+.scene-art-container.mood-good {
+  border-color: var(--heaven);
+  box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+}
+.scene-art {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: filter 0.5s ease;
+}
+.scene-art.mood-evil {
+  filter: sepia(20%) saturate(150%) hue-rotate(-10deg);
+}
+.scene-art.mood-good {
+  filter: brightness(110%) saturate(90%);
+}
+
 .case-facts {
   text-align: center;
   padding: 16px;
@@ -2238,9 +2269,16 @@ main {
       <div class="story-scene">
         <div class="scene-header">
           <span class="scene-badge">Scene 2</span>
-          <span class="scene-title">THE COMPLICATION</span>
+          <span class="scene-title">THE ACTION</span>
         </div>
         <div class="scene-content">
+          <!-- Scene art that shifts based on mood -->
+          <div class="scene-art-container" id="complication-art-container">
+            <svg id="complication-art" viewBox="0 0 300 150" class="scene-art">
+              <rect fill="#1A1817" width="300" height="150"/>
+            </svg>
+          </div>
+
           <div class="minion-reactions">
             <div class="story-character">
               <div class="character-avatar brainiac-gi">🎖️</div>
@@ -2289,6 +2327,13 @@ main {
           <span class="scene-title">THE VERDICT</span>
         </div>
         <div class="scene-content">
+          <!-- Verdict scene art -->
+          <div class="scene-art-container" id="verdict-art-container">
+            <svg id="verdict-art" viewBox="0 0 300 150" class="scene-art">
+              <rect fill="#1A1817" width="300" height="150"/>
+            </svg>
+          </div>
+
           <div class="verdict-result">
             <div class="verdict-icon" id="verdict-story-icon">😇</div>
             <div class="verdict-label" id="verdict-story-label">HEAVEN</div>
@@ -4920,7 +4965,7 @@ function continueFromDiscovery() {
   renderGameStep();
 }
 
-// Scene 2: THE COMPLICATION - GI, Gary, and Supes debate the extraction
+// Scene 2: THE COMPLICATION (now called THE ACTION) - GI, Gary, and Supes debate
 function showComplicationScene() {
   setMusicMood('verdict');  // 🎵 Dramatic reveal music
   if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('complication');
@@ -4957,7 +5002,102 @@ function showComplicationScene() {
     <span class="picked">[${picks.whom}]</span>
   `;
 
+  // Generate mood-appropriate scene art
+  generateSceneArt('complication', currentArticle, picks);
+
   showScreen('story-complication');
+}
+
+// Generate scene art that shifts based on mood/picks
+function generateSceneArt(scene, article, selectedPicks) {
+  const container = document.getElementById(`${scene}-art-container`);
+  const svg = document.getElementById(`${scene}-art`);
+  if (!container || !svg) return;
+
+  const category = (article?.category || 'unknown').toLowerCase();
+
+  // Calculate mood from picks - more negative verbs = more evil feeling
+  const negativeVerbs = ['surveils', 'monitors', 'tracks', 'denies', 'rejects', 'predicts', 'flags', 'restricts'];
+  const positiveVerbs = ['assists', 'helps', 'protects', 'detects', 'improves', 'enables', 'supports'];
+
+  let mood = 'neutral';
+  if (selectedPicks?.action) {
+    const verb = selectedPicks.action.toLowerCase();
+    if (negativeVerbs.some(v => verb.includes(v))) mood = 'evil';
+    if (positiveVerbs.some(v => verb.includes(v))) mood = 'good';
+  }
+
+  // Apply mood classes
+  container.classList.remove('mood-evil', 'mood-good');
+  svg.classList.remove('mood-evil', 'mood-good');
+  if (mood !== 'neutral') {
+    container.classList.add(`mood-${mood}`);
+    svg.classList.add(`mood-${mood}`);
+  }
+
+  // Scene-specific art based on action and mood
+  const scenes = {
+    complication: {
+      evil: {
+        icon: '😈',
+        elements: ['supervillains', 'courtroom', 'judgment'],
+        accent: '#D42B1E',
+        description: 'The case takes a dark turn...'
+      },
+      good: {
+        icon: '⚖️',
+        elements: ['balance', 'fairness', 'deliberation'],
+        accent: '#4ADE80',
+        description: 'Examining all perspectives...'
+      },
+      neutral: {
+        icon: '🔍',
+        elements: ['investigation', 'evidence', 'analysis'],
+        accent: '#A855F7',
+        description: 'Processing the evidence...'
+      }
+    },
+    verdict: {
+      evil: {
+        icon: '🔥',
+        elements: ['flames', 'judgment', 'doom'],
+        accent: '#EF4444',
+        description: 'TO HELL!'
+      },
+      good: {
+        icon: '✨',
+        elements: ['light', 'redemption', 'hope'],
+        accent: '#4ADE80',
+        description: 'ABSOLVED!'
+      },
+      neutral: {
+        icon: '⚖️',
+        elements: ['scales', 'balance', 'verdict'],
+        accent: '#888888',
+        description: 'The verdict awaits...'
+      }
+    }
+  };
+
+  const sceneData = scenes[scene]?.[mood] || scenes[scene]?.neutral;
+  if (!sceneData) return;
+
+  // Generate SVG art
+  svg.innerHTML = `
+    <defs>
+      <radialGradient id="${scene}-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="${sceneData.accent}" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="#1A1817" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect fill="#1A1817" width="300" height="150"/>
+    <circle cx="150" cy="75" r="80" fill="url(#${scene}-glow)"/>
+    <rect fill="${sceneData.accent}" x="0" y="0" width="300" height="3" opacity="0.8"/>
+    <rect fill="${sceneData.accent}" x="0" y="147" width="300" height="3" opacity="0.8"/>
+    <text x="150" y="70" fill="${sceneData.accent}" text-anchor="middle" font-size="40">${sceneData.icon}</text>
+    <text x="150" y="100" fill="#888" text-anchor="middle" font-size="11">${sceneData.description}</text>
+    <text x="150" y="125" fill="#666" text-anchor="middle" font-size="9">${sceneData.elements.join(' • ')}</text>
+  `;
 }
 
 function continueFromComplication() {
@@ -4985,6 +5125,9 @@ function showVerdictStoryScene() {
   const labelEl = document.getElementById('verdict-story-label');
   labelEl.textContent = currentFaction.toUpperCase();
   labelEl.className = 'verdict-label ' + currentFaction;
+
+  // Generate verdict scene art
+  generateSceneArt('verdict', currentArticle, { action: currentFaction === 'heaven' ? 'helps' : 'harms' });
 
   // Show the triple
   document.getElementById('verdict-story-triple').innerHTML = `
