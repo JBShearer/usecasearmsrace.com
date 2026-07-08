@@ -51,6 +51,12 @@ button.ghost{width:100%;margin-top:8px;background:var(--ink);color:var(--bone);
 .hit .meta{font-size:11px;color:var(--pencil);letter-spacing:1px}
 .votebar{height:7px;background:var(--crayon);margin-top:8px;position:relative}
 .votebar i{position:absolute;left:0;top:0;bottom:0;background:var(--gold)}
+.quickvote{display:flex;gap:8px;margin-top:10px}
+.qv{background:none;border:2px solid;padding:6px 16px;font-size:18px;cursor:pointer;flex:1}
+.qv.heaven{border-color:var(--gold);color:var(--gold)}
+.qv.hell{border-color:var(--crayon);color:var(--crayon)}
+.qv:hover{opacity:0.7}
+.qv:disabled{opacity:0.4;cursor:default}
 .divider{color:var(--pencil);font-size:11px;letter-spacing:3px;text-transform:uppercase;
   border-bottom:1px dashed var(--pencil);padding-bottom:4px;margin:18px 0 6px}
 .webhit{border:1px dashed var(--pencil);padding:12px;margin:10px 0}
@@ -561,17 +567,37 @@ async function doSearch(){
 function hitCard(c){
   const total=(c.heaven_votes||0)+(c.hell_votes||0);
   const pct=total?Math.round(100*c.heaven_votes/total):0;
+  const isNew = c.created_at && (Date.now() - new Date(c.created_at).getTime() < 7*24*60*60*1000);
   const el=document.createElement('div'); el.className='hit';
-  el.innerHTML='<span class="badge '+(c.faction||'unaligned')+'">'
+  el.innerHTML=(isNew?'<span class="badge" style="background:var(--crayon);color:var(--bone)">NEW</span>':'')
+    +'<span class="badge '+(c.faction||'unaligned')+'">'
     +(c.faction||'unaligned').toUpperCase()+'</span>'
     +'<span class="badge">IMPACT '+'\u2605'.repeat(c.impact||1)+'</span>'
     +'<h3>'+esc(c.title||c.raw_title)+'</h3>'
-    +'<div class="sum">'+esc(c.summary||'')+'</div>'
-    +(c.article_quote?'<div class="qt">\u201C'+esc(c.article_quote)+'\u201D</div>':'')
-    +'<div class="meta">'+total+' VERDICTS</div>'
-    +'<div class="votebar"><i style="width:'+pct+'%"></i></div>';
+    +'<div class="sum">'+esc(c.summary||c.extraction?.summary||'')+'</div>'
+    +(c.extraction?.article_quote||c.article_quote?'<div class="qt">\u201C'+esc(c.extraction?.article_quote||c.article_quote)+'\u201D</div>':'')
+    +'<div class="meta">'+total+' VERDICTS \u2022 '+pct+'% HEAVEN</div>'
+    +'<div class="votebar"><i style="width:'+pct+'%"></i></div>'
+    +'<div class="quickvote">'
+    +'<button class="qv heaven" onclick="event.stopPropagation();quickVote(\''+c.id+'\',\'heaven\',this)">\u{1F607}</button>'
+    +'<button class="qv hell" onclick="event.stopPropagation();quickVote(\''+c.id+'\',\'hell\',this)">\u{1F608}</button>'
+    +'</div>';
   el.onclick=()=>openCase(c.id);
   return el;
+}
+async function quickVote(caseId, faction, btn){
+  btn.disabled=true; btn.textContent='\u2713';
+  if(DEMO) return;
+  try{
+    await fetch(CONFIG.FN('submit-verdict'),{method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
+      body:JSON.stringify({case_id:caseId,who:'quick',action:'quick',whom:'quick',faction_vote:faction,notes:''})});
+    // Update cache
+    if(_allCases){
+      const c=_allCases.find(x=>x.id===caseId);
+      if(c){ faction==='heaven'?c.heaven_votes++:c.hell_votes++; }
+    }
+  }catch(e){}
 }
 function renderFilePrompt(url, host){
   host.innerHTML='';
