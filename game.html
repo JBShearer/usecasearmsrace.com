@@ -4045,6 +4045,243 @@ const COMEDY_FORMULAS = {
   }
 };
 
+// ═══════════════════════════════════════════════════════════════
+// HUMOR GUIDE - Formulaic Comedy Generation & De-escalation
+// The Evil Brain's Official Comedy Style Manual
+// ═══════════════════════════════════════════════════════════════
+
+const HUMOR_GUIDE = {
+  // CORE PRINCIPLE: We're satirizing AI ethics, not attacking people
+  // The target is always SYSTEMS, POLICIES, and CORPORATE SPEAK - never individuals
+
+  toneRules: {
+    // What we DO
+    allowed: [
+      'Mock corporate PR language and doublespeak',
+      'Satirize tech overconfidence and hype',
+      'Point out absurd logical conclusions',
+      'Use dual meanings of AI terminology',
+      'Compare tech to mundane equivalents',
+      'Highlight unintended consequences',
+      'Celebrate whistleblowers and accountability'
+    ],
+    // What we NEVER do
+    forbidden: [
+      'Mock victims of AI harms',
+      'Punch down at marginalized groups',
+      'Dismiss legitimate privacy concerns',
+      'Make light of actual human suffering',
+      'Attack specific individuals by name',
+      'Promote conspiracy theories',
+      'Generate content that could radicalize'
+    ]
+  },
+
+  // COMEDY STRUCTURE: The 3-beat pattern
+  // Beat 1: Setup (neutral observation)
+  // Beat 2: Escalation (absurd but logical extension)
+  // Beat 3: Payoff (surprise twist OR de-escalating lesson)
+  structure: {
+    discovery: 'setup',      // "Here's what happened..."
+    who: 'setup',            // "These are the actors..."
+    action: 'escalation',    // "And this is what they did..."
+    whom: 'escalation',      // "...to these people..."
+    verdict: 'payoff'        // "And the lesson is..."
+  },
+
+  // DE-ESCALATION PATTERNS
+  // After delivering a harsh truth, soften with wisdom
+  deEscalation: {
+    // When the verdict is HELL (evil), don't leave people hopeless
+    hell: {
+      patterns: [
+        { harsh: 'This is surveillance dystopia.', soft: 'But awareness is the first step. You saw it. You named it. That matters.' },
+        { harsh: 'The algorithm is biased.', soft: 'And now you know to ask: who built it, and who does it hurt?' },
+        { harsh: 'Your data was harvested.', soft: 'Knowledge is power. Next time, you can opt out - or demand better.' },
+        { harsh: 'The system failed.', soft: 'But systems can be changed. People like you are why they eventually do.' },
+        { harsh: 'This violates privacy.', soft: 'Naming the problem is how we start fixing it. Stay curious, stay critical.' }
+      ],
+      generators: [
+        (triple) => `Yes, ${triple.who} ${triple.action} ${triple.whom}. But now you've documented it. That's step one.`,
+        (triple) => `It's not great that ${triple.who} does this. But you knowing? That's how accountability starts.`,
+        (triple) => `${triple.whom} deserved better. And by tagging this case, you're building the record that proves it.`,
+        (triple) => `Evil Brain sees all the bad stuff. But Evil Brain's MINIONS - that's you - are the solution.`,
+        (triple) => `This case goes in the HELL pile. But every case we tag is one more data point for the good guys.`
+      ]
+    },
+    // When the verdict is HEAVEN (good), acknowledge complexity
+    heaven: {
+      patterns: [
+        { positive: 'This AI helps!', nuance: 'And it works because humans designed it carefully. That's the difference.' },
+        { positive: 'Technology solving real problems.', nuance: 'Proof that AI can be a force for good - when we choose to make it so.' },
+        { positive: 'A win for the good guys.', nuance: 'Let's learn what made this work, so we can do it again.' }
+      ],
+      generators: [
+        (triple) => `${triple.who} got it right with ${triple.whom}. Study this. Copy this. This is how it's done.`,
+        (triple) => `A HEAVEN card! ${triple.who} proves AI CAN be ethical. Screenshot this for the doubters.`,
+        (triple) => `${triple.whom} benefits, ${triple.who} wins, nobody loses. This is the template.`,
+        (triple) => `Not every AI story is a horror story. Some are instruction manuals for doing it RIGHT.`
+      ]
+    }
+  },
+
+  // COMEDY FORMULAS - Templates for generating humor
+  formulas: {
+    // THE TRIPLE CALLBACK
+    // Setup: [WHO] [ACTION] [WHOM]
+    // Callback: Reference each part with increasing absurdity
+    tripleCallback: (triple) => {
+      const whoJoke = `First, ${triple.who} showed up. Red flag number one.`;
+      const actionJoke = `Then they decided to "${triple.action}". Red flag number two through twelve.`;
+      const whomJoke = `And the lucky winners? ${triple.whom}. They didn't even enter a contest!`;
+      return { whoJoke, actionJoke, whomJoke };
+    },
+
+    // THE CORPORATE TRANSLATOR
+    // Take PR speak and translate to plain English
+    corporateTranslator: {
+      'improve user experience': 'collect more data',
+      'enhance safety': 'add surveillance',
+      'streamline processes': 'replace humans with bots',
+      'leverage AI capabilities': 'do something questionable automatically',
+      'data-driven decisions': 'let the algorithm blame someone',
+      'proactive risk assessment': 'pre-judge people',
+      'optimize engagement': 'make it more addictive',
+      'personalized recommendations': 'we know everything about you',
+      translate: function(corporateSpeak) {
+        const lower = corporateSpeak.toLowerCase();
+        for (const [corp, plain] of Object.entries(this)) {
+          if (typeof plain === 'string' && lower.includes(corp)) {
+            return `"${corporateSpeak}" - translation: "${plain}"`;
+          }
+        }
+        return `"${corporateSpeak}" - translation: "something they don't want to explain in simple terms"`;
+      }
+    },
+
+    // THE SCALE ABSURDITY
+    // Take a reasonable thing and extrapolate to dystopia
+    scaleAbsurdity: (action) => {
+      const scales = [
+        { scale: 'once', reaction: 'Fine, whatever.' },
+        { scale: 'sometimes', reaction: 'Getting weird.' },
+        { scale: 'constantly', reaction: 'Okay this is a problem.' },
+        { scale: 'automatically, 24/7', reaction: 'DYSTOPIA ALERT.' },
+        { scale: 'and then selling the results', reaction: 'Capitalism has entered the chat.' }
+      ];
+      return scales.map(s => `${action} ${s.scale}? ${s.reaction}`).join(' ');
+    },
+
+    // THE REASONABLE PERSON TEST
+    // Would a normal person find this creepy?
+    reasonablePersonTest: (triple) => {
+      const scenarios = [
+        `Imagine explaining this to your grandma: "So ${triple.who} ${triple.action} ${triple.whom}..." She'd hit you with her purse.`,
+        `First date conversation: "I work for ${triple.who}. We ${triple.action} ${triple.whom}." There is no second date.`,
+        `Tell a five-year-old: "${triple.who} ${triple.action} ${triple.whom}." Even THEY know that's weird.`,
+        `Job interview: "My last company ${triple.action} ${triple.whom}." Security escorts you out.`
+      ];
+      return randomFrom(scenarios);
+    },
+
+    // THE TIME TRAVELER TEST
+    // Explain this to someone from the past
+    timeTravelerTest: (triple) => {
+      return `Explaining to a time traveler from 1990: "So there's this invisible worldwide network, and ${triple.who} uses it to ${triple.action} ${triple.whom}..." They'd check you into an asylum.`;
+    }
+  },
+
+  // CHARACTER COMEDY STYLES
+  // Each character has a distinct comedy voice
+  characterVoices: {
+    gi: {
+      style: 'military deadpan',
+      patterns: [
+        'Tactical assessment: {observation}. Recommendation: {action}. Probability of humans listening: 3%.',
+        'Intel report: {situation}. This is either genius or disaster. History suggests disaster.',
+        'Situation normal: all fouled up. The AI is working perfectly. That\'s the problem.'
+      ],
+      apply: function(observation) {
+        const pattern = randomFrom(this.patterns);
+        return pattern.replace('{observation}', observation)
+                     .replace('{situation}', observation)
+                     .replace('{action}', 'panic quietly');
+      }
+    },
+    gary: {
+      style: 'tech bro optimism meets reality',
+      patterns: [
+        'From a technical perspective, {observation}. From a human perspective, yikes.',
+        'The algorithm is working exactly as designed. The design is the problem.',
+        'We trained it on the entire internet. We are shocked - SHOCKED - that it learned from the internet.'
+      ],
+      apply: function(observation) {
+        const pattern = randomFrom(this.patterns);
+        return pattern.replace('{observation}', observation);
+      }
+    },
+    supes: {
+      style: 'empathetic but direct',
+      patterns: [
+        '{observation}. Someone should ask the affected humans how they feel. Nobody will, but someone should.',
+        'The stakeholders weren\'t consulted. The stakeholders are usually the last to know.',
+        '{observation}. In related news, trust in institutions continues its speedrun to zero.'
+      ],
+      apply: function(observation) {
+        const pattern = randomFrom(this.patterns);
+        return pattern.replace('{observation}', observation);
+      }
+    },
+    brain: {
+      style: 'evil genius with a conscience',
+      patterns: [
+        'Even Evil Brain thinks this is too much. And I tried to steal the moon that one time.',
+        '{observation}. This is why I went into ETHICAL evil-doing.',
+        'Minions! {observation}. Write this down. This is a case study in what NOT to do.',
+        'You know it\'s bad when the villain is uncomfortable. {observation}.'
+      ],
+      apply: function(observation) {
+        const pattern = randomFrom(this.patterns);
+        return pattern.replace('{observation}', observation);
+      }
+    }
+  },
+
+  // Generate de-escalating humor for a verdict
+  generateDeEscalation: function(triple, verdict) {
+    const pool = this.deEscalation[verdict];
+    if (!pool) return '';
+
+    // 50% chance of pattern, 50% chance of generator
+    if (Math.random() < 0.5 && pool.patterns) {
+      const p = randomFrom(pool.patterns);
+      return verdict === 'hell' ? `${p.harsh} ${p.soft}` : `${p.positive} ${p.nuance}`;
+    } else if (pool.generators) {
+      const gen = randomFrom(pool.generators);
+      return gen(triple);
+    }
+    return '';
+  },
+
+  // Generate character commentary with their comedy style
+  generateCharacterComment: function(character, observation, triple) {
+    const voice = this.characterVoices[character];
+    if (!voice) return observation;
+
+    return voice.apply(observation);
+  },
+
+  // Apply the reasonable person test
+  applyReasonablePersonTest: function(triple) {
+    return this.formulas.reasonablePersonTest(triple);
+  },
+
+  // Translate corporate speak
+  translateCorporateSpeak: function(text) {
+    return this.formulas.corporateTranslator.translate(text);
+  }
+};
+
 // Detect best comedy type based on content
 function detectBestComedyType(triple) {
   const text = `${triple.who} ${triple.action} ${triple.whom}`.toLowerCase();
@@ -5615,10 +5852,10 @@ async function loadTrendingCases() {
   }
 
   try {
-    // Fetch with semantic fields for richer display
+    // Fetch basic fields (semantic fields may not exist yet - migration pending)
     const { data: cases, error } = await sb
       .from('use_cases')
-      .select('id, title, category, evil_votes, good_votes, subject, verb, object, summary, description, story_arc')
+      .select('id, title, category, evil_votes, good_votes, description')
       .in('status', ['active', 'approved'])
       .order('evil_votes', { ascending: false })
       .limit(10);
@@ -5631,30 +5868,17 @@ async function loadTrendingCases() {
     }
 
     container.innerHTML = cases.map(c => {
-      // Build semantic triple if available
-      const hasTriple = c.subject && c.verb && c.object;
-      const tripleHtml = hasTriple
-        ? `<div class="case-card-triple"><span class="who">${escHtml(c.subject)}</span> → <span class="action">${escHtml(c.verb)}</span> → <span class="whom">${escHtml(c.object)}</span></div>`
-        : '';
-
-      // Summary or snippet
-      const blurb = c.summary || c.description || '';
+      // Summary or snippet (semantic fields not available until migration)
+      const blurb = c.description || '';
       const blurbHtml = blurb
         ? `<div class="case-card-blurb">${escHtml(blurb.slice(0, 120))}${blurb.length > 120 ? '...' : ''}</div>`
-        : '';
-
-      // Story arc badge if available
-      const arcBadge = c.story_arc
-        ? `<span class="case-arc-badge ${c.story_arc}">${STORY_ARC_TYPES[c.story_arc]?.icon || '📖'}</span>`
         : '';
 
       return `
         <div class="case-card" onclick="startExtraction('${c.id}')">
           <div class="case-card-header">
             <div class="case-card-title">${escHtml(c.title)}</div>
-            ${arcBadge}
           </div>
-          ${tripleHtml}
           ${blurbHtml}
           <div class="case-card-meta">
             <span class="case-category">${escHtml(c.category || 'Uncategorized')}</span>
@@ -7446,11 +7670,18 @@ function generateTripleSceneArt(step, article) {
   `;
 }
 
-// Generate character comments based on case context
+// Generate character comments based on case context - uses HUMOR_GUIDE
 function generateCharacterComment(step, character, article) {
   const category = (article?.category || 'AI').toLowerCase();
   const title = article?.title || 'this case';
 
+  // Use HUMOR_GUIDE character voices when available
+  if (HUMOR_GUIDE?.characterVoices?.[character]) {
+    const observation = getStepObservation(step, category, title);
+    return HUMOR_GUIDE.characterVoices[character].apply(observation);
+  }
+
+  // Fallback comments
   const comments = {
     who: {
       gi: [
@@ -7477,6 +7708,16 @@ function generateCharacterComment(step, character, article) {
 
   const pool = comments[step]?.[character] || ['Analyzing the situation...'];
   return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// Helper: Get observation for character comedy
+function getStepObservation(step, category, title) {
+  const observations = {
+    who: `${category} case, title "${title.slice(0, 25)}..."`,
+    action: `they're doing something to people`,
+    whom: `someone is on the receiving end of this`
+  };
+  return observations[step] || 'something is happening here';
 }
 
 // Show the verdict screen after all picks are made
