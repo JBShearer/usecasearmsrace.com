@@ -217,17 +217,11 @@ small.demo{color:var(--crayon)}
   </div>
 </section>
 
-<!-- ============ 5b. ENDING ============ -->
-<section id="s-ending" class="screen">
-  <div class="dots">&#9679; &#9679; &#9679; &#9679; <b>&#9679;</b> &#9675;</div>
-  <div class="art" id="a-ending"></div>
-  <p class="carry" id="ending-text"></p>
-  <button class="go" onclick="show('s-file')">File the case &rarr;</button>
-</section>
-
-<!-- ============ 6. FILE ============ -->
+<!-- ============ 6. FILE (combined ending + notes) ============ -->
 <section id="s-file" class="screen">
   <div class="dots">&#9679; &#9679; &#9679; &#9679; &#9679; <b>&#9679;</b></div>
+  <div class="art" id="a-ending"></div>
+  <p class="carry" id="ending-text"></p>
   <h2 class="prompt">Case notes</h2>
   <div class="chips" id="tagchips"></div>
   <textarea id="notes" oninput="noteMeter()" placeholder="What did you notice? Tap tags above or write your own."></textarea>
@@ -775,7 +769,7 @@ function verdict(f){
   buildTags();
   document.getElementById('notes').value=''; noteMeter();
   [0,1,2].forEach(i=>{document.getElementById('na'+i).value=PICK.nuance_before[i];});
-  show('s-ending');
+  show('s-file');
 }
 function buildTags(){
   const host=document.getElementById('tagchips'); host.innerHTML='';
