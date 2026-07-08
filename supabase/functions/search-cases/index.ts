@@ -75,21 +75,27 @@ Deno.serve(async (req) => {
       { headers: { ...CORS, "Content-Type": "application/json" } });
   }
 
-  // Fast path for realtime typing: ILIKE only, no embedding, no web
-  // unless explicitly requested AND local results are thin.
+  // Fast path for realtime typing: ILIKE only, no embedding
+  // DB and web search run IN PARALLEL for speed
   const fastQ = String(b.q ?? "").trim();
   if (fastQ && !b.who && !b.action && !b.whom && !b.deep) {
-    const { data } = await supa.from("cases")
+    // Fire DB and web in parallel - don't wait for DB to decide on web
+    const dbPromise = supa.from("cases")
       .select("id, title, raw_title, summary, article_quote, category, faction, impact, heaven_votes, hell_votes, source_url, source_tier, tech_types, data_types, extraction, created_at")
       .eq("status", "live")
       .or(`title.ilike.%${fastQ}%,raw_title.ilike.%${fastQ}%,summary.ilike.%${fastQ}%`)
       .limit(20);
-    let web_results: unknown[] = [];
-    if (b.web && (data?.length ?? 0) < 3 && fastQ.length > 5) {
-      web_results = await webSearch(fastQ.slice(0, 120));
-    }
+
+    const webPromise = (b.web && fastQ.length > 3)
+      ? webSearch(fastQ.slice(0, 120))
+      : Promise.resolve([]);
+
+    const [dbResult, web_results] = await Promise.all([dbPromise, webPromise]);
+
     return new Response(JSON.stringify({
-      results: data ?? [], web_results, ms: Date.now() - t0,
+      results: dbResult.data ?? [],
+      web_results,
+      ms: Date.now() - t0,
     }), { headers: { ...CORS, "Content-Type": "application/json" } });
   }
 

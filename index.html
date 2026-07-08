@@ -1135,35 +1135,30 @@ function rankLocal(q){
     .map(x=>x.c);
 }
 
-// Parallel search: hit DB and web sources simultaneously
+// Fast search: single call, streams results
 async function parallelSearch(q, token){
   if(DEMO||!q||q.length<2) return;
   const headers={'Content-Type':'application/json',
     'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY};
 
-  // Fire both requests in parallel
-  const dbPromise=fetch(CONFIG.FN('search-cases'),{method:'POST',headers,
-    body:JSON.stringify({q})}).then(r=>r.json()).catch(()=>({results:[]}));
-
-  // Only hit web if query is substantial
-  const webPromise=q.length>=4
-    ? fetch(CONFIG.FN('search-cases'),{method:'POST',headers,
-        body:JSON.stringify({q,web:true})}).then(r=>r.json()).catch(()=>({web_results:[]}))
-    : Promise.resolve({web_results:[]});
-
-  // Stream results as they arrive
-  dbPromise.then(data=>{
+  // Single call - edge function returns both DB results and web results
+  try {
+    const r = await fetch(CONFIG.FN('search-cases'),{method:'POST',headers,
+      body:JSON.stringify({q, web: q.length >= 4})});
+    const data = await r.json();
     if(token!==searchToken) return;
-    (data.results||[]).forEach(c=>CACHE.set(c.id,c));
-    renderResults(currentQuery(),{streaming:true});
-  });
 
-  webPromise.then(data=>{
-    if(token!==searchToken) return;
+    // Cache DB results
     (data.results||[]).forEach(c=>CACHE.set(c.id,c));
-    lastWebResults=data.web_results||[];
-    renderResults(currentQuery(),{web:lastWebResults});
-  });
+
+    // Update web results and render
+    lastWebResults = data.web_results||[];
+    renderResults(currentQuery(), {web: lastWebResults});
+
+    console.log('Search took', data.ms, 'ms');
+  } catch(e) {
+    console.error('Search failed:', e);
+  }
 }
 
 // Input handler: instant local + parallel remote
