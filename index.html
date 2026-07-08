@@ -83,8 +83,21 @@ button.ghost{width:100%;margin-top:8px;background:var(--ink);color:var(--bone);
 .line.brain .who{color:var(--crayon);border-color:var(--crayon)}
 .line p{margin:0;font-family:Georgia,serif;font-size:15px}
 .prompt{font-size:18px;text-transform:uppercase;letter-spacing:1px;margin:14px 0 10px}
-.dots{letter-spacing:8px;color:var(--pencil);font-size:12px;margin-bottom:8px}
-.dots b{color:var(--crayon)}
+/* SCENE NAVIGATION */
+.scene-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+.scene-nav .back{background:none;border:none;color:var(--bone);font-size:20px;cursor:pointer;padding:4px 8px}
+.scene-nav .back:hover{color:var(--crayon)}
+.scene-nav .dots{margin:0;flex:1;text-align:center;letter-spacing:6px}
+.scene-nav .dots span{cursor:pointer;transition:color .15s}
+.scene-nav .dots span:hover{color:var(--bone)}
+.scene-nav .dots span.active{color:var(--crayon)}
+.scene-nav .dots span.done{color:var(--bone)}
+.scene-nav .arrows{display:flex;gap:4px}
+.scene-nav .arrows button{background:none;border:1px solid var(--pencil);color:var(--bone);
+  font-size:16px;padding:4px 10px;cursor:pointer}
+.scene-nav .arrows button:hover{border-color:var(--bone)}
+.scene-nav .arrows button:disabled{opacity:0.3;cursor:default}
+@media(max-width:600px){.scene-nav .arrows{display:none}}
 /* CHARACTERIZED CHOICES */
 .pchoice{display:block;width:100%;text-align:left;background:var(--ink);
   color:var(--bone);border:2px solid var(--bone);padding:12px 14px;margin:10px 0;
@@ -193,7 +206,7 @@ small.demo{color:var(--crayon)}
 
 <!-- ============ 1. CASE FILE + STAGE ============ -->
 <section id="s-case" class="screen">
-  <div class="dots"><b>&#9679;</b> &#9675; &#9675; &#9675; &#9675; &#9675;</div>
+  <div class="scene-nav"></div>
   <div class="art" id="a-case"></div>
   <div><span class="badge" id="c-src"></span><span class="badge" id="c-impact"></span>
     <span class="badge" id="c-faction"></span></div>
@@ -217,7 +230,7 @@ small.demo{color:var(--crayon)}
 
 <!-- ============ 2. WHO ============ -->
 <section id="s-who" class="screen">
-  <div class="dots">&#9679; <b>&#9679;</b> &#9675; &#9675; &#9675; &#9675;</div>
+  <div class="scene-nav"></div>
   <div class="art" id="a-who"></div>
   <div class="direction">Act I: three figures claim the stage</div>
   <div class="line gi"><span class="who">GI</span><p id="w-gi"></p></div>
@@ -228,7 +241,7 @@ small.demo{color:var(--crayon)}
 
 <!-- ============ 3. ACTION ============ -->
 <section id="s-action" class="screen">
-  <div class="dots">&#9679; &#9679; <b>&#9679;</b> &#9675; &#9675; &#9675;</div>
+  <div class="scene-nav"></div>
   <div class="art" id="a-action"></div>
   <div class="direction">Act II: the act itself</div>
   <div class="line gi"><span class="who">GI</span><p id="carry-who"></p></div>
@@ -239,7 +252,7 @@ small.demo{color:var(--crayon)}
 
 <!-- ============ 4. WHOM ============ -->
 <section id="s-whom" class="screen">
-  <div class="dots">&#9679; &#9679; &#9679; <b>&#9679;</b> &#9675; &#9675;</div>
+  <div class="scene-nav"></div>
   <div class="art" id="a-whom"></div>
   <div class="direction">Act III: the house lights sweep the audience</div>
   <div class="line gary"><span class="who">Gary</span><p id="carry-action"></p></div>
@@ -250,7 +263,7 @@ small.demo{color:var(--crayon)}
 
 <!-- ============ 5. VERDICT ============ -->
 <section id="s-verdict" class="screen">
-  <div class="dots">&#9679; &#9679; &#9679; &#9679; <b>&#9679;</b> &#9675;</div>
+  <div class="scene-nav"></div>
   <div class="art" id="a-verdict"></div>
   <div class="line supes"><span class="who">Supes</span><p id="carry-whom"></p></div>
   <div id="v-brainiacs"></div>
@@ -264,7 +277,7 @@ small.demo{color:var(--crayon)}
 
 <!-- ============ 6. FINALE + NOTES (one screen) ============ -->
 <section id="s-file" class="screen">
-  <div class="dots">&#9679; &#9679; &#9679; &#9679; &#9679; <b>&#9679;</b></div>
+  <div class="scene-nav"></div>
   <div class="art" id="a-ending"></div>
   <p class="narr" id="ending-text"></p>
   <div class="line brain"><span class="who">Evil Brain</span><p id="ending-brain"></p></div>
@@ -1074,12 +1087,79 @@ let CASE=null, PICK={free:{}}, VOTE=null, PENDING_VOTE=null;
 const CACHE=new Map();
 // Only load demo cases when in DEMO mode (no Supabase configured)
 if(DEMO) DEMO_CASES.forEach(c=>CACHE.set(c.id,c));
+
+/* ================= SCENE NAVIGATION ================= */
+const SCENES=['s-case','s-who','s-action','s-whom','s-verdict','s-file'];
+let currentSceneIdx=0, maxVisitedIdx=0;
+
+function sceneNav(){
+  // Build nav HTML with back, dots, arrows
+  const dots=SCENES.map((s,i)=>{
+    const cls=i===currentSceneIdx?'active':i<=maxVisitedIdx?'done':'';
+    return '<span class="'+cls+'" data-idx="'+i+'">●</span>';
+  }).join(' ');
+  return '<div class="scene-nav">'
+    +'<button class="back" onclick="goHome()" title="Back to cases">←</button>'
+    +'<div class="dots">'+dots+'</div>'
+    +'<div class="arrows">'
+    +'<button onclick="navScene(-1)" '+(currentSceneIdx<=0?'disabled':'')+'>‹</button>'
+    +'<button onclick="navScene(1)" '+(currentSceneIdx>=maxVisitedIdx?'disabled':'')+'>›</button>'
+    +'</div></div>';
+}
+
+function updateSceneNavs(){
+  document.querySelectorAll('.scene-nav').forEach(nav=>{
+    nav.outerHTML=sceneNav();
+  });
+  // Re-bind dot clicks
+  document.querySelectorAll('.scene-nav .dots span').forEach(dot=>{
+    dot.onclick=()=>{
+      const idx=parseInt(dot.dataset.idx);
+      if(idx<=maxVisitedIdx) jumpToScene(idx);
+    };
+  });
+}
+
+function jumpToScene(idx){
+  if(idx<0||idx>=SCENES.length||idx>maxVisitedIdx) return;
+  currentSceneIdx=idx;
+  show(SCENES[idx]);
+  updateSceneNavs();
+}
+
+function navScene(delta){
+  jumpToScene(currentSceneIdx+delta);
+}
+
+// Swipe detection for mobile
+let touchStartX=0, touchStartY=0;
+document.addEventListener('touchstart',e=>{
+  touchStartX=e.touches[0].clientX;
+  touchStartY=e.touches[0].clientY;
+},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(!CASE) return; // Only in case view
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  const dy=e.changedTouches[0].clientY-touchStartY;
+  if(Math.abs(dx)>80 && Math.abs(dx)>Math.abs(dy)*1.5){
+    if(dx>0 && currentSceneIdx>0) navScene(-1);
+    else if(dx<0 && currentSceneIdx<maxVisitedIdx) navScene(1);
+  }
+});
+
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.getElementById(id).classList.add('on');
   window.scrollTo(0,0);
+  // Track scene index
+  const idx=SCENES.indexOf(id);
+  if(idx>=0){
+    currentSceneIdx=idx;
+    if(idx>maxVisitedIdx) maxVisitedIdx=idx;
+    updateSceneNavs();
+  }
 }
-function goHome(){ closeModal(false); show('home'); renderResults(currentQuery()); }
+function goHome(){ CASE=null; closeModal(false); show('home'); renderResults(currentQuery()); }
 function startNext(){
   const pool=[...CACHE.values()];
   openCase(pool[Math.floor(Math.random()*pool.length)].id);
@@ -1483,6 +1563,8 @@ async function openCase(id){
   }
   if(!c||!c.extraction)return toast('Case not ready yet.');
   window.CASE=CASE=c; PICK={free:{}}; VOTE=null;
+  // Reset scene navigation
+  currentSceneIdx=0; maxVisitedIdx=0;
   const re=c.extraction.reenactment||{};
   document.getElementById('a-case').innerHTML=scene(c.id,'case');
   setText('c-title',c.title||c.raw_title);
