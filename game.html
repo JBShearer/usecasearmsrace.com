@@ -904,6 +904,169 @@ main {
   gap: 16px;
 }
 
+/* Triple Choice Screens (WHO, ACTION, WHOM) */
+.pick-prompt {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  margin: 16px 0;
+}
+.pick-prompt span {
+  color: var(--brain);
+  font-weight: 700;
+}
+
+.triple-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.triple-choice-btn {
+  padding: 16px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+.triple-choice-btn:hover {
+  border-color: var(--brain);
+  transform: translateX(8px);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+}
+.triple-choice-btn.selected {
+  border-color: var(--brain);
+  background: rgba(168, 85, 247, 0.15);
+  box-shadow: var(--neon-glow);
+}
+
+/* Progress dots */
+.triple-progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+.triple-progress-dots .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 0.3s;
+}
+.triple-progress-dots .dot.active {
+  background: var(--brain);
+  box-shadow: 0 0 10px var(--brain);
+}
+.triple-progress-dots .dot.completed {
+  background: var(--good);
+}
+
+/* Verdict Triple Display */
+.verdict-triple-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.verdict-triple-display .who { color: var(--blue); }
+.verdict-triple-display .action { color: var(--purple); }
+.verdict-triple-display .whom { color: var(--orange); }
+.verdict-triple-display .arrow { color: var(--text-dim); }
+
+/* Verdict Reactions */
+.verdict-reactions .story-character {
+  margin-bottom: 10px;
+}
+.verdict-reactions .character-avatar {
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+}
+.verdict-reactions .story-text {
+  font-size: 12px;
+}
+
+/* Verdict Prompt and Buttons */
+.verdict-prompt {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 20px 0 16px;
+  color: var(--text);
+}
+
+.verdict-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.verdict-btn {
+  flex: 1;
+  max-width: 140px;
+  padding: 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.verdict-btn:hover {
+  transform: scale(1.05);
+}
+.verdict-btn.heaven:hover {
+  border-color: var(--good);
+  box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+}
+.verdict-btn.hell:hover {
+  border-color: var(--bad);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+.verdict-btn.selected.heaven {
+  border-color: var(--good);
+  background: rgba(74, 222, 128, 0.15);
+  box-shadow: 0 0 30px rgba(74, 222, 128, 0.4);
+}
+.verdict-btn.selected.hell {
+  border-color: var(--bad);
+  background: rgba(239, 68, 68, 0.15);
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+}
+
+.verdict-emoji {
+  font-size: 32px;
+}
+.verdict-text {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+.verdict-btn.heaven .verdict-text { color: var(--good); }
+.verdict-btn.hell .verdict-text { color: var(--bad); }
+.verdict-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
 /* Continue Button for Stories */
 .story-continue {
   margin-top: 20px;
@@ -2924,66 +3087,146 @@ main {
       </button>
     </div>
 
-    <!-- STORY SCENE 2: THE COMPLICATION (after extraction, before verdict) -->
-    <div class="story-screen" id="story-complication-screen">
+    <!-- STORY SCENE 2: WHO - Pick the actor -->
+    <div class="story-screen" id="story-who-screen">
       <div class="story-scene">
         <div class="scene-header">
-          <span class="scene-badge">Scene 2</span>
-          <span class="scene-title">THE ACTION</span>
+          <span class="scene-badge">Scene 1 of 3</span>
+          <span class="scene-title">WHO</span>
         </div>
         <div class="scene-content">
-          <!-- Scene art that shifts based on mood -->
-          <div class="scene-art-container" id="complication-art-container">
-            <svg id="complication-art" viewBox="0 0 300 150" class="scene-art">
+          <!-- Scene art -->
+          <div class="scene-art-container" id="who-art-container">
+            <svg id="who-art" viewBox="0 0 300 150" class="scene-art">
               <rect fill="#1A1817" width="300" height="150"/>
             </svg>
           </div>
 
-          <div class="minion-reactions">
-            <div class="story-character">
-              <div class="character-avatar brainiac-gi">🎖️</div>
-              <div class="character-speech">
-                <div class="character-name gi">General "GI" Intelligence</div>
-                <div class="story-text" id="complication-gi-text">
-                  Loading...
-                </div>
-              </div>
-            </div>
-
-            <div class="story-character">
-              <div class="character-avatar brainiac-agi">🤖</div>
-              <div class="character-speech">
-                <div class="character-name agi">AGI Gary</div>
-                <div class="story-text" id="complication-gary-text">
-                  Loading...
-                </div>
-              </div>
-            </div>
-
-            <div class="story-character">
-              <div class="character-avatar brainiac-supes">🦸‍♀️</div>
-              <div class="character-speech">
-                <div class="character-name supes">Super "Supes" Intelligence</div>
-                <div class="story-text" id="complication-supes-text">
-                  Loading...
-                </div>
+          <!-- Character reaction -->
+          <div class="story-character">
+            <div class="character-avatar brainiac-gi">🎖️</div>
+            <div class="character-speech">
+              <div class="character-name gi">General Intelligence</div>
+              <div class="story-text" id="who-gi-text">
+                Who's pulling the strings here? Every case has a prime mover...
               </div>
             </div>
           </div>
 
-          <div class="triple-progress" id="complication-triple"></div>
+          <div class="pick-prompt">Who is the primary actor?</div>
+
+          <!-- 3 Simple choices -->
+          <div class="triple-choices" id="who-choices">
+            <button class="triple-choice-btn" onclick="selectTriple('who', 0)">Loading...</button>
+            <button class="triple-choice-btn" onclick="selectTriple('who', 1)">Loading...</button>
+            <button class="triple-choice-btn" onclick="selectTriple('who', 2)">Loading...</button>
+          </div>
+
+          <!-- Progress indicator -->
+          <div class="triple-progress-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
         </div>
       </div>
-      <button class="story-continue" onclick="continueFromComplication()">
-        Render Judgment →
-      </button>
     </div>
 
-    <!-- STORY SCENE 3: THE VERDICT (after vote, before notes) -->
+    <!-- STORY SCENE 3: ACTION - Pick the verb -->
+    <div class="story-screen" id="story-action-screen">
+      <div class="story-scene">
+        <div class="scene-header">
+          <span class="scene-badge">Scene 2 of 3</span>
+          <span class="scene-title">DOES WHAT</span>
+        </div>
+        <div class="scene-content">
+          <!-- Scene art -->
+          <div class="scene-art-container" id="action-art-container">
+            <svg id="action-art" viewBox="0 0 300 150" class="scene-art">
+              <rect fill="#1A1817" width="300" height="150"/>
+            </svg>
+          </div>
+
+          <!-- Character reaction -->
+          <div class="story-character">
+            <div class="character-avatar brainiac-agi">🤖</div>
+            <div class="character-speech">
+              <div class="character-name agi">AGI Gary</div>
+              <div class="story-text" id="action-gary-text">
+                The action defines the ethics. What exactly are they doing?
+              </div>
+            </div>
+          </div>
+
+          <div class="pick-prompt"><span id="picked-who-display">[WHO]</span> does what?</div>
+
+          <!-- 3 Simple choices -->
+          <div class="triple-choices" id="action-choices">
+            <button class="triple-choice-btn" onclick="selectTriple('action', 0)">Loading...</button>
+            <button class="triple-choice-btn" onclick="selectTriple('action', 1)">Loading...</button>
+            <button class="triple-choice-btn" onclick="selectTriple('action', 2)">Loading...</button>
+          </div>
+
+          <!-- Progress indicator -->
+          <div class="triple-progress-dots">
+            <span class="dot completed"></span>
+            <span class="dot active"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STORY SCENE 4: WHOM - Pick the target -->
+    <div class="story-screen" id="story-whom-screen">
+      <div class="story-scene">
+        <div class="scene-header">
+          <span class="scene-badge">Scene 3 of 3</span>
+          <span class="scene-title">TO WHOM</span>
+        </div>
+        <div class="scene-content">
+          <!-- Scene art -->
+          <div class="scene-art-container" id="whom-art-container">
+            <svg id="whom-art" viewBox="0 0 300 150" class="scene-art">
+              <rect fill="#1A1817" width="300" height="150"/>
+            </svg>
+          </div>
+
+          <!-- Character reaction -->
+          <div class="story-character">
+            <div class="character-avatar brainiac-supes">🦸‍♀️</div>
+            <div class="character-speech">
+              <div class="character-name supes">Super Intelligence</div>
+              <div class="story-text" id="whom-supes-text">
+                The affected parties matter most. Who bears the consequences?
+              </div>
+            </div>
+          </div>
+
+          <div class="pick-prompt"><span id="picked-who-action-display">[WHO] [ACTION]</span> whom?</div>
+
+          <!-- 3 Simple choices -->
+          <div class="triple-choices" id="whom-choices">
+            <button class="triple-choice-btn" onclick="selectTriple('whom', 0)">Loading...</button>
+            <button class="triple-choice-btn" onclick="selectTriple('whom', 1)">Loading...</button>
+            <button class="triple-choice-btn" onclick="selectTriple('whom', 2)">Loading...</button>
+          </div>
+
+          <!-- Progress indicator -->
+          <div class="triple-progress-dots">
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot active"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STORY SCENE: THE VERDICT - Good or Evil? -->
     <div class="story-screen" id="story-verdict-screen">
       <div class="story-scene">
         <div class="scene-header">
-          <span class="scene-badge">Scene 3</span>
+          <span class="scene-badge">Final Scene</span>
           <span class="scene-title">THE VERDICT</span>
         </div>
         <div class="scene-content">
@@ -2994,76 +3237,85 @@ main {
             </svg>
           </div>
 
-          <div class="verdict-result">
-            <div class="verdict-icon" id="verdict-story-icon">😇</div>
-            <div class="verdict-label" id="verdict-story-label">HEAVEN</div>
+          <!-- The complete triple -->
+          <div class="verdict-triple-display" id="verdict-triple-display">
+            <span class="who">[WHO]</span>
+            <span class="arrow">→</span>
+            <span class="action">ACTION</span>
+            <span class="arrow">→</span>
+            <span class="whom">[WHOM]</span>
           </div>
 
-          <div class="story-character">
-            <div class="character-avatar">🧠</div>
-            <div class="character-speech">
-              <div class="character-name">Evil Brain</div>
-              <div class="story-text" id="verdict-brain-text">
-                Loading...
+          <!-- Character reactions -->
+          <div class="minion-reactions verdict-reactions">
+            <div class="story-character">
+              <div class="character-avatar brainiac-gi">🎖️</div>
+              <div class="character-speech">
+                <div class="character-name gi">GI</div>
+                <div class="story-text" id="verdict-gi-text">Tactical assessment...</div>
+              </div>
+            </div>
+            <div class="story-character">
+              <div class="character-avatar brainiac-agi">🤖</div>
+              <div class="character-speech">
+                <div class="character-name agi">Gary</div>
+                <div class="story-text" id="verdict-gary-text">Pattern analysis...</div>
+              </div>
+            </div>
+            <div class="story-character">
+              <div class="character-avatar brainiac-supes">🦸‍♀️</div>
+              <div class="character-speech">
+                <div class="character-name supes">Supes</div>
+                <div class="story-text" id="verdict-supes-text">Ethical evaluation...</div>
               </div>
             </div>
           </div>
 
-          <div class="triple-progress" id="verdict-story-triple"></div>
+          <!-- VERDICT BUTTONS -->
+          <div class="verdict-prompt">Is this use of AI good or evil?</div>
+          <div class="verdict-buttons">
+            <button class="verdict-btn heaven" onclick="submitVerdict('heaven')">
+              <span class="verdict-emoji">😇</span>
+              <span class="verdict-text">HEAVEN</span>
+              <span class="verdict-sub">Good for humanity</span>
+            </button>
+            <button class="verdict-btn hell" onclick="submitVerdict('hell')">
+              <span class="verdict-emoji">😈</span>
+              <span class="verdict-text">HELL</span>
+              <span class="verdict-sub">Harmful potential</span>
+            </button>
+          </div>
 
           <!-- POST-VERDICT NUANCE SLIDERS -->
           <div class="nuance-sliders verdict-nuance" id="verdict-nuance-sliders">
             <div class="nuance-header" onclick="toggleVerdictNuanceSliders()">
-              <span>🔄 Did your view change? Rate again (optional)</span>
+              <span>🔄 Rate the nuance (optional)</span>
               <span class="nuance-toggle" id="verdict-nuance-toggle">▶</span>
             </div>
             <div class="nuance-content" id="verdict-nuance-content" style="display:none">
-              <div class="nuance-comparison" id="nuance-comparison">
-                <!-- Will show first impression vs now -->
-              </div>
-              <!-- Safety vs Surveillance -->
+              <div class="nuance-comparison" id="nuance-comparison"></div>
               <div class="nuance-row">
                 <span class="nuance-left">🛡️ Safety</span>
                 <input type="range" class="nuance-slider" id="verdict-slider-safety-surveillance"
                        min="0" max="100" value="50" oninput="updateVerdictNuance('safety_surveillance', this.value)">
                 <span class="nuance-right">👁️ Surveillance</span>
               </div>
-              <!-- Privacy vs Brokering -->
               <div class="nuance-row">
                 <span class="nuance-left">🔒 Privacy</span>
                 <input type="range" class="nuance-slider" id="verdict-slider-privacy-brokering"
                        min="0" max="100" value="50" oninput="updateVerdictNuance('privacy_brokering', this.value)">
                 <span class="nuance-right">💰 Brokering</span>
               </div>
-              <!-- Edge vs Megadatabase -->
-              <div class="nuance-row">
-                <span class="nuance-left">📱 Edge</span>
-                <input type="range" class="nuance-slider" id="verdict-slider-edge-mega"
-                       min="0" max="100" value="50" oninput="updateVerdictNuance('edge_mega', this.value)">
-                <span class="nuance-right">🏢 Megadatabase</span>
-              </div>
-              <!-- Autonomy vs HITL -->
-              <div class="nuance-row">
-                <span class="nuance-left">🤖 Autonomy</span>
-                <input type="range" class="nuance-slider" id="verdict-slider-autonomy-hitl"
-                       min="0" max="100" value="50" oninput="updateVerdictNuance('autonomy_hitl', this.value)">
-                <span class="nuance-right">👤 HITL</span>
-              </div>
-              <!-- Benefit vs Harm -->
               <div class="nuance-row">
                 <span class="nuance-left">✅ Benefit</span>
                 <input type="range" class="nuance-slider" id="verdict-slider-benefit-harm"
                        min="0" max="100" value="50" oninput="updateVerdictNuance('benefit_harm', this.value)">
                 <span class="nuance-right">❌ Harm</span>
               </div>
-              <div class="nuance-shift-summary" id="nuance-shift-summary"></div>
             </div>
           </div>
         </div>
       </div>
-      <button class="story-continue" onclick="continueFromVerdictStory()">
-        Close the Case →
-      </button>
     </div>
 
     <!-- VERDICT SCREEN (after extraction) -->
@@ -6990,10 +7242,333 @@ function continueFromDiscovery() {
   saveDiscoveryData();
 
   playSfx('confirm');
-  setMusicMood('extraction');  // 🎵 Back to tense extraction music
+  setMusicMood('extraction');
   if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('extraction');
-  showScreen('game');
-  renderGameStep();
+
+  // NEW FLOW: Go to WHO screen (not old game screen)
+  showWhoScreen();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NEW STORY FLOW: WHO → ACTION → WHOM → VERDICT
+// Simple 3-button choices with art and character reactions
+// ═══════════════════════════════════════════════════════════════
+
+// Store the 3 choices for each category (generated from case)
+let tripleOptions = { who: [], action: [], whom: [] };
+
+function showWhoScreen() {
+  // Generate art for WHO scene
+  generateTripleSceneArt('who', currentArticle);
+
+  // Get 3 WHO choices from the generated options
+  const whoChoices = currentArticle.choices?.who || [];
+  tripleOptions.who = whoChoices.slice(0, 3);
+
+  // Populate buttons
+  const container = document.getElementById('who-choices');
+  container.innerHTML = tripleOptions.who.map((choice, i) => `
+    <button class="triple-choice-btn" onclick="selectTriple('who', ${i})">
+      ${escHtml(choice.label)}
+    </button>
+  `).join('');
+
+  // If no choices, show fallback
+  if (tripleOptions.who.length === 0) {
+    container.innerHTML = `
+      <button class="triple-choice-btn" onclick="selectTriple('who', 0)">Government Agency</button>
+      <button class="triple-choice-btn" onclick="selectTriple('who', 1)">Tech Company</button>
+      <button class="triple-choice-btn" onclick="selectTriple('who', 2)">Unknown Actor</button>
+    `;
+    tripleOptions.who = [
+      { label: 'Government Agency' },
+      { label: 'Tech Company' },
+      { label: 'Unknown Actor' }
+    ];
+  }
+
+  // Character comment based on case
+  const giComment = generateCharacterComment('who', 'gi', currentArticle);
+  document.getElementById('who-gi-text').textContent = giComment;
+
+  showScreen('story-who');
+}
+
+function showActionScreen() {
+  // Generate art for ACTION scene
+  generateTripleSceneArt('action', currentArticle);
+
+  // Update the picked WHO display
+  document.getElementById('picked-who-display').textContent = `[${picks.who}]`;
+
+  // Get 3 ACTION choices
+  const actionChoices = currentArticle.choices?.action || [];
+  tripleOptions.action = actionChoices.slice(0, 3);
+
+  // Populate buttons
+  const container = document.getElementById('action-choices');
+  container.innerHTML = tripleOptions.action.map((choice, i) => `
+    <button class="triple-choice-btn" onclick="selectTriple('action', ${i})">
+      ${escHtml(choice.label)}
+    </button>
+  `).join('');
+
+  // Fallback
+  if (tripleOptions.action.length === 0) {
+    container.innerHTML = `
+      <button class="triple-choice-btn" onclick="selectTriple('action', 0)">monitors</button>
+      <button class="triple-choice-btn" onclick="selectTriple('action', 1)">collects data on</button>
+      <button class="triple-choice-btn" onclick="selectTriple('action', 2)">makes decisions about</button>
+    `;
+    tripleOptions.action = [
+      { label: 'monitors' },
+      { label: 'collects data on' },
+      { label: 'makes decisions about' }
+    ];
+  }
+
+  // Character comment
+  const garyComment = generateCharacterComment('action', 'gary', currentArticle);
+  document.getElementById('action-gary-text').textContent = garyComment;
+
+  showScreen('story-action');
+}
+
+function showWhomScreen() {
+  // Generate art for WHOM scene
+  generateTripleSceneArt('whom', currentArticle);
+
+  // Update the picked WHO + ACTION display
+  document.getElementById('picked-who-action-display').textContent = `[${picks.who}] ${picks.action}`;
+
+  // Get 3 WHOM choices
+  const whomChoices = currentArticle.choices?.whom || [];
+  tripleOptions.whom = whomChoices.slice(0, 3);
+
+  // Populate buttons
+  const container = document.getElementById('whom-choices');
+  container.innerHTML = tripleOptions.whom.map((choice, i) => `
+    <button class="triple-choice-btn" onclick="selectTriple('whom', ${i})">
+      ${escHtml(choice.label)}
+    </button>
+  `).join('');
+
+  // Fallback
+  if (tripleOptions.whom.length === 0) {
+    container.innerHTML = `
+      <button class="triple-choice-btn" onclick="selectTriple('whom', 0)">citizens</button>
+      <button class="triple-choice-btn" onclick="selectTriple('whom', 1)">consumers</button>
+      <button class="triple-choice-btn" onclick="selectTriple('whom', 2)">the public</button>
+    `;
+    tripleOptions.whom = [
+      { label: 'citizens' },
+      { label: 'consumers' },
+      { label: 'the public' }
+    ];
+  }
+
+  // Character comment
+  const supesComment = generateCharacterComment('whom', 'supes', currentArticle);
+  document.getElementById('whom-supes-text').textContent = supesComment;
+
+  showScreen('story-whom');
+}
+
+function selectTriple(category, index) {
+  playSfx('select');
+
+  // Get the selected choice
+  const choice = tripleOptions[category][index];
+  picks[category] = choice?.label || 'Unknown';
+
+  // Highlight selected button
+  const container = document.getElementById(`${category}-choices`);
+  container.querySelectorAll('.triple-choice-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === index);
+  });
+
+  // After short delay, go to next screen
+  setTimeout(() => {
+    if (category === 'who') {
+      showActionScreen();
+    } else if (category === 'action') {
+      showWhomScreen();
+    } else if (category === 'whom') {
+      // All picks complete - show verdict
+      playSfx('complete');
+      showStoryVerdictScreen();
+    }
+  }, 400);
+}
+
+// Generate scene art for each triple step
+function generateTripleSceneArt(step, article) {
+  const svg = document.getElementById(`${step}-art`);
+  const container = document.getElementById(`${step}-art-container`);
+  if (!svg || !container) return;
+
+  const category = (article?.category || 'AI').toLowerCase();
+
+  // Different themes per step
+  const themes = {
+    who: {
+      icon: '🏢',
+      accent: '#3B82F6',  // Blue for actors
+      label: 'THE ACTOR'
+    },
+    action: {
+      icon: '⚡',
+      accent: '#A855F7',  // Purple for actions
+      label: 'THE ACTION'
+    },
+    whom: {
+      icon: '👥',
+      accent: '#F59E0B',  // Orange for affected
+      label: 'THE AFFECTED'
+    }
+  };
+
+  const theme = themes[step] || themes.who;
+
+  // Generate procedural art
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="grad-${step}" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:${theme.accent};stop-opacity:0.3"/>
+        <stop offset="100%" style="stop-color:#1A1817;stop-opacity:1"/>
+      </linearGradient>
+    </defs>
+    <rect fill="url(#grad-${step})" width="300" height="150"/>
+    <rect fill="${theme.accent}" x="0" y="0" width="300" height="3" opacity="0.8"/>
+    <text x="150" y="70" fill="${theme.accent}" text-anchor="middle" font-size="40">${theme.icon}</text>
+    <text x="150" y="105" fill="#888" text-anchor="middle" font-size="11" letter-spacing="2">${theme.label}</text>
+    <text x="150" y="125" fill="#555" text-anchor="middle" font-size="9">${category.toUpperCase()}</text>
+  `;
+}
+
+// Generate character comments based on case context
+function generateCharacterComment(step, character, article) {
+  const category = (article?.category || 'AI').toLowerCase();
+  const title = article?.title || 'this case';
+
+  const comments = {
+    who: {
+      gi: [
+        `In ${category} cases, the usual suspects are either government agencies or tech companies. Who's behind "${title.slice(0, 30)}..."?`,
+        `Standard reconnaissance protocol: identify the primary actor first. Is this a state operation or private sector?`,
+        `The WHO matters for accountability. Government actors have different rules than commercial entities.`
+      ]
+    },
+    action: {
+      gary: [
+        `The verb is everything. "Monitor" vs "protect" vs "harvest" - each implies different ethical weight.`,
+        `Processing... The action determines whether this is innovation or invasion. Choose wisely.`,
+        `From a technical perspective, the action reveals the system's true purpose. What are they actually doing?`
+      ]
+    },
+    whom: {
+      supes: [
+        `The affected parties are often the most vulnerable. Who bears the consequences here?`,
+        `Remember: power asymmetry matters. Is this targeting those who can opt out, or those who can't?`,
+        `The "whom" reveals the stakes. Citizens? Patients? Workers? Each group has different vulnerabilities.`
+      ]
+    }
+  };
+
+  const pool = comments[step]?.[character] || ['Analyzing the situation...'];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// Show the verdict screen after all picks are made
+function showStoryVerdictScreen() {
+  setMusicMood('verdict');
+  if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('verdict');
+
+  // Generate verdict art based on picks
+  generateVerdictArt();
+
+  // Show the complete triple
+  const tripleDisplay = document.getElementById('verdict-triple-display');
+  if (tripleDisplay) {
+    tripleDisplay.innerHTML = `
+      <span class="who">[${picks.who}]</span>
+      <span class="arrow">→</span>
+      <span class="action">${picks.action}</span>
+      <span class="arrow">→</span>
+      <span class="whom">[${picks.whom}]</span>
+    `;
+  }
+
+  // Character reactions to the complete triple
+  generateVerdictReactions();
+
+  showScreen('story-verdict');
+}
+
+function generateVerdictArt() {
+  const svg = document.getElementById('verdict-art');
+  if (!svg) return;
+
+  // Art changes based on the action verb
+  const action = (picks.action || '').toLowerCase();
+  const isEvil = ['monitors', 'surveils', 'tracks', 'denies', 'rejects', 'harvests', 'exploits'].some(v => action.includes(v));
+
+  const accent = isEvil ? '#EF4444' : '#4ADE80';
+  const icon = isEvil ? '⚖️' : '✨';
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="verdict-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:${accent};stop-opacity:0.4"/>
+        <stop offset="100%" style="stop-color:#1A1817;stop-opacity:1"/>
+      </linearGradient>
+    </defs>
+    <rect fill="url(#verdict-grad)" width="300" height="150"/>
+    <rect fill="${accent}" x="0" y="0" width="300" height="4"/>
+    <rect fill="${accent}" x="0" y="146" width="300" height="4"/>
+    <text x="150" y="80" fill="${accent}" text-anchor="middle" font-size="48">${icon}</text>
+    <text x="150" y="120" fill="#888" text-anchor="middle" font-size="12" letter-spacing="3">THE VERDICT</text>
+  `;
+}
+
+function generateVerdictReactions() {
+  // Generate character reactions to the completed triple
+  const triple = `${picks.who} ${picks.action} ${picks.whom}`;
+
+  // GI's take
+  const giEl = document.getElementById('verdict-gi-text');
+  if (giEl) {
+    giEl.textContent = `Tactical assessment complete. "${triple}" - now it's time for judgment.`;
+  }
+
+  // Gary's take
+  const garyEl = document.getElementById('verdict-gary-text');
+  if (garyEl) {
+    garyEl.textContent = `The pattern is clear. This is either progress or a cautionary tale. You decide.`;
+  }
+
+  // Supes' take
+  const supesEl = document.getElementById('verdict-supes-text');
+  if (supesEl) {
+    supesEl.textContent = `Every use case shapes the future. Is "${picks.who}" helping or harming "${picks.whom}"?`;
+  }
+}
+
+// Submit the verdict (Heaven or Hell)
+function submitVerdict(verdict) {
+  playSfx('confirm');
+  currentFaction = verdict;
+  selectedVerdict = verdict;
+
+  // Highlight selected button
+  document.querySelectorAll('.verdict-btn').forEach(btn => btn.classList.remove('selected'));
+  document.querySelector(`.verdict-btn.${verdict}`).classList.add('selected');
+
+  // After brief pause, proceed to notes then mint
+  setTimeout(() => {
+    playSfx('complete');
+    showNotesScreen();
+  }, 800);
 }
 
 // Scene 2: THE COMPLICATION (now called THE ACTION) - GI, Gary, and Supes debate
@@ -7579,11 +8154,32 @@ function showScreen(screen) {
   document.getElementById('home-screen').style.display = screen === 'home' ? 'flex' : 'none';
   document.getElementById('game-screen').style.display = screen === 'game' ? 'block' : 'none';
 
-  // Story screens
+  // Story screens - Discovery
   document.getElementById('story-discovery-screen').style.display = screen === 'story-discovery' ? 'flex' : 'none';
   document.getElementById('story-discovery-screen').classList.toggle('active', screen === 'story-discovery');
+
+  // Story screens - WHO, ACTION, WHOM (new triple selection)
+  const whoScreen = document.getElementById('story-who-screen');
+  const actionScreen = document.getElementById('story-action-screen');
+  const whomScreen = document.getElementById('story-whom-screen');
+  if (whoScreen) {
+    whoScreen.style.display = screen === 'story-who' ? 'flex' : 'none';
+    whoScreen.classList.toggle('active', screen === 'story-who');
+  }
+  if (actionScreen) {
+    actionScreen.style.display = screen === 'story-action' ? 'flex' : 'none';
+    actionScreen.classList.toggle('active', screen === 'story-action');
+  }
+  if (whomScreen) {
+    whomScreen.style.display = screen === 'story-whom' ? 'flex' : 'none';
+    whomScreen.classList.toggle('active', screen === 'story-whom');
+  }
+
+  // Story screens - Complication (character debate) - now optional
   document.getElementById('story-complication-screen').style.display = screen === 'story-complication' ? 'flex' : 'none';
   document.getElementById('story-complication-screen').classList.toggle('active', screen === 'story-complication');
+
+  // Story screens - Verdict
   document.getElementById('story-verdict-screen').style.display = screen === 'story-verdict' ? 'flex' : 'none';
   document.getElementById('story-verdict-screen').classList.toggle('active', screen === 'story-verdict');
 
