@@ -2268,6 +2268,311 @@ main {
   color: var(--text);
 }
 
+/* Minigame Mode Selector */
+.minigame-modes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.minigame-mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-elevated);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+.minigame-mode-btn:hover {
+  border-color: var(--brain);
+  box-shadow: 0 0 15px var(--brain-glow);
+}
+.mode-icon {
+  font-size: 24px;
+}
+.mode-name {
+  font-weight: 600;
+  color: var(--text);
+}
+.mode-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* Ink Blot Game */
+.inkblot-container {
+  background: #F5F5F0;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 16px;
+}
+.inkblot-svg {
+  width: 100%;
+  height: auto;
+}
+.inkblot-associations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 16px;
+  min-height: 30px;
+}
+.association-chip {
+  background: var(--purple);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  animation: pop-in 0.2s ease;
+}
+@keyframes pop-in {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+.mining-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.mining-submit.secondary {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* Word Runner Game */
+.runner-arena {
+  position: relative;
+  height: 300px;
+  background: linear-gradient(180deg, #1A1817 0%, #2A2927 100%);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.runner-lanes {
+  display: flex;
+  height: 100%;
+}
+.runner-lane {
+  flex: 1;
+  border-right: 1px dashed var(--border);
+}
+.runner-lane:last-child {
+  border-right: none;
+}
+.runner-player {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  font-size: 32px;
+  transform: translateX(-50%);
+  transition: left 0.15s ease;
+  z-index: 10;
+}
+.runner-word {
+  position: absolute;
+  padding: 6px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--brain);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text);
+  transition: top 0.05s linear;
+  z-index: 5;
+}
+.runner-word.secret-word {
+  background: var(--gold);
+  color: var(--bg);
+  border-color: var(--gold);
+  animation: glow-pulse 1s infinite;
+}
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 5px var(--gold); }
+  50% { box-shadow: 0 0 20px var(--gold); }
+}
+.runner-word.grabbed {
+  animation: grab 0.2s ease forwards;
+}
+@keyframes grab {
+  to { transform: scale(0); opacity: 0; }
+}
+.runner-score {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.runner-collected {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* Perp Game */
+.perp-sketch {
+  margin-bottom: 16px;
+}
+.perp-avatar {
+  font-size: 64px;
+  margin-bottom: 8px;
+}
+.perp-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--hell);
+  letter-spacing: 2px;
+}
+.perp-question {
+  font-size: 16px;
+  color: var(--text);
+  margin-bottom: 12px;
+  font-style: italic;
+}
+.perp-profile {
+  text-align: left;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+.perp-line {
+  font-size: 12px;
+  margin-bottom: 6px;
+  color: var(--text-dim);
+}
+.perp-line b {
+  color: var(--text);
+}
+
+/* Sticky Notes Game */
+.sticky-game .mining-game {
+  max-width: 500px;
+}
+.sticky-canvas {
+  position: relative;
+  height: 350px;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.sticky-note {
+  position: absolute;
+  padding: 8px 12px;
+  background: #FFEB3B;
+  color: #333;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: grab;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+  transition: transform 0.1s;
+  user-select: none;
+}
+.sticky-note:hover {
+  transform: scale(1.1);
+  z-index: 10;
+}
+.sticky-note.dragging {
+  opacity: 0.7;
+  cursor: grabbing;
+}
+.sticky-zone {
+  position: absolute;
+  bottom: 10px;
+  width: 45%;
+  height: 60px;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+.good-zone {
+  left: 2.5%;
+  border-color: var(--heaven);
+}
+.bad-zone {
+  right: 2.5%;
+  border-color: var(--hell);
+}
+.sticky-clusters {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
+/* Card Discovery Notification */
+.card-discovery-notif {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-card);
+  border: 3px solid var(--gold);
+  border-radius: 16px;
+  padding: 24px;
+  z-index: 2000;
+  animation: discovery-pop 0.5s ease;
+  box-shadow: 0 0 60px rgba(255, 215, 0, 0.5);
+}
+@keyframes discovery-pop {
+  0% { transform: translateX(-50%) scale(0); }
+  50% { transform: translateX(-50%) scale(1.1); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+.discovery-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.discovery-icon {
+  font-size: 48px;
+  animation: spin 1s ease;
+}
+@keyframes spin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+.discovery-title {
+  font-size: 14px;
+  color: var(--gold);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.discovery-card {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+.discovery-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+.discovery-rarity {
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+.discovery-rarity.uncommon { background: var(--heaven); color: var(--bg); }
+.discovery-rarity.rare { background: var(--purple); color: white; }
+.discovery-rarity.legendary { background: var(--gold); color: var(--bg); }
+
 /* ═══════════════════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════════════════ */
@@ -3774,23 +4079,639 @@ async function searchAndOpen(query) {
 
 // Mine new cases to database - triggers word association minigame
 async function mineNewCase() {
-  // Start word association minigame to collect user ideas
-  showMiningMinigame();
+  // Show minigame mode selector, then start selected minigame
+  showMinigameSelector();
 }
 
-// Word association minigame during case generation
-function showMiningMinigame() {
-  // Create mining overlay
+// ═══════════════════════════════════════════════════════════════
+// MINING MINIGAMES - Play while inference runs
+// All modes output semantic edges that enrich case generation
+// ═══════════════════════════════════════════════════════════════
+
+const MINIGAME_MODES = {
+  inkblot: {
+    name: '🖤 Ink Blot',
+    description: 'What does this shape remind you of?',
+    icon: '🖤'
+  },
+  wordrunner: {
+    name: '🏃 Word Runner',
+    description: 'Chase words down semantic paths!',
+    icon: '🏃'
+  },
+  perp: {
+    name: '🔍 Describe the Perp',
+    description: 'Build a suspect profile for the AI',
+    icon: '🔍'
+  },
+  stickynotes: {
+    name: '📝 Sticky Notes',
+    description: 'Drag & cluster concepts',
+    icon: '📝'
+  },
+  classic: {
+    name: '💭 Classic',
+    description: 'Answer prompts about AI use cases',
+    icon: '💭'
+  }
+};
+
+// Collected semantic data from minigames
+let minedSemanticData = {
+  nodes: [],
+  edges: [],
+  associations: [],
+  easterEggs: []
+};
+
+// Support cards that can be discovered
+const DISCOVERABLE_CARDS = [
+  { id: 'whistleblower', name: '🛡️ Whistleblower', description: 'Reveals hidden case modifiers', rarity: 'rare' },
+  { id: 'foia', name: '🔍 FOIA Request', description: 'Unlocks embargoed case details', rarity: 'rare' },
+  { id: 'devils_advocate', name: '🎭 Devil\'s Advocate', description: 'Flip any verdict for bonus coins', rarity: 'uncommon' },
+  { id: 'network_effect', name: '🌐 Network Effect', description: 'Double your next combo multiplier', rarity: 'uncommon' },
+  { id: 'rabbit_hole', name: '🕳️ Rabbit Hole', description: 'Teleport to random deep semantic branch', rarity: 'legendary' },
+  { id: 'cheese', name: '🧀 Government Cheese', description: 'Inexplicable. +50 coins.', rarity: 'legendary', easter: true }
+];
+
+function showMinigameSelector() {
   const overlay = document.createElement('div');
   overlay.id = 'mining-overlay';
   overlay.className = 'mining-overlay';
+
+  const modesHtml = Object.entries(MINIGAME_MODES).map(([key, mode]) => `
+    <button class="minigame-mode-btn" onclick="startMinigame('${key}')">
+      <span class="mode-icon">${mode.icon}</span>
+      <span class="mode-name">${mode.name}</span>
+      <span class="mode-desc">${mode.description}</span>
+    </button>
+  `).join('');
+
+  overlay.innerHTML = `
+    <div class="mining-game mode-selector">
+      <div class="mining-header">⛏️ BRAIN MINING</div>
+      <div class="mining-subtitle">Choose your mining style while we search for cases...</div>
+      <div class="minigame-modes">
+        ${modesHtml}
+      </div>
+      <button class="mining-skip" onclick="closeMiningGame()">Cancel</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  startBackgroundGeneration();
+}
+
+function startMinigame(mode) {
+  // Clear selector, show selected minigame
+  const overlay = document.getElementById('mining-overlay');
+  if (!overlay) return;
+
+  window.miningState = {
+    mode,
+    step: 0,
+    answers: [],
+    score: 0,
+    startTime: Date.now()
+  };
+
+  switch(mode) {
+    case 'inkblot':
+      showInkblotGame(overlay);
+      break;
+    case 'wordrunner':
+      showWordRunnerGame(overlay);
+      break;
+    case 'perp':
+      showPerpGame(overlay);
+      break;
+    case 'stickynotes':
+      showStickyNotesGame(overlay);
+      break;
+    case 'classic':
+    default:
+      showClassicMiningGame(overlay);
+      break;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INK BLOT MODE - Abstract shape associations
+// ═══════════════════════════════════════════════════════════════
+
+function generateInkblot() {
+  // Generate symmetrical abstract SVG
+  const shapes = [];
+  const numBlobs = 5 + Math.floor(Math.random() * 5);
+
+  for (let i = 0; i < numBlobs; i++) {
+    const cx = 75 + Math.random() * 50;
+    const cy = 50 + Math.random() * 100;
+    const rx = 10 + Math.random() * 30;
+    const ry = 10 + Math.random() * 40;
+    const rotation = Math.random() * 360;
+
+    // Right side
+    shapes.push(`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" transform="rotate(${rotation} ${cx} ${cy})" fill="#1A1817" opacity="${0.6 + Math.random() * 0.4}"/>`);
+    // Mirror to left
+    shapes.push(`<ellipse cx="${300 - cx}" cy="${cy}" rx="${rx}" ry="${ry}" transform="rotate(${-rotation} ${300-cx} ${cy})" fill="#1A1817" opacity="${0.6 + Math.random() * 0.4}"/>`);
+  }
+
+  return `<svg viewBox="0 0 300 200" class="inkblot-svg">
+    <rect fill="#F5F5F0" width="300" height="200"/>
+    ${shapes.join('')}
+  </svg>`;
+}
+
+function showInkblotGame(overlay) {
+  const inkblot = generateInkblot();
+
+  overlay.innerHTML = `
+    <div class="mining-game inkblot-game">
+      <div class="mining-header">🖤 INK BLOT TEST</div>
+      <div class="mining-subtitle">What AI use case does this remind you of?</div>
+
+      <div class="inkblot-container">
+        ${inkblot}
+      </div>
+
+      <input class="mining-input" id="inkblot-input"
+             placeholder="I see... (organization, action, or concept)"
+             autofocus>
+
+      <div class="inkblot-associations" id="inkblot-associations"></div>
+
+      <div class="mining-progress">
+        <div class="mining-bar" id="mining-bar"></div>
+      </div>
+
+      <div class="mining-actions">
+        <button class="mining-submit" onclick="submitInkblotAnswer()">See it! →</button>
+        <button class="mining-submit secondary" onclick="newInkblot()">🔄 New Blot</button>
+      </div>
+      <button class="mining-skip" onclick="completeMining()">Done Mining</button>
+    </div>
+  `;
+
+  document.getElementById('inkblot-input').focus();
+}
+
+function submitInkblotAnswer() {
+  const input = document.getElementById('inkblot-input');
+  const answer = input.value.trim();
+  if (!answer) return;
+
+  window.miningState.answers.push({ type: 'inkblot', value: answer });
+  window.miningState.score += 10;
+
+  // Show the association
+  const container = document.getElementById('inkblot-associations');
+  container.innerHTML += `<span class="association-chip">${answer}</span>`;
+
+  // Check for easter egg
+  checkForEasterEgg(answer);
+
+  input.value = '';
+  input.focus();
+  playSfx('confirm');
+
+  // Update progress
+  const progress = Math.min(100, window.miningState.answers.length * 20);
+  document.getElementById('mining-bar').style.width = progress + '%';
+}
+
+function newInkblot() {
+  const container = document.querySelector('.inkblot-container');
+  container.innerHTML = generateInkblot();
+  playSfx('select');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WORD RUNNER MODE - Atari-style word chase
+// ═══════════════════════════════════════════════════════════════
+
+const WORD_LANES = {
+  who: ['Government', 'Company', 'Hospital', 'School', 'Police', 'Bank', 'Military', 'Startup'],
+  action: ['monitors', 'predicts', 'denies', 'tracks', 'replaces', 'analyzes', 'flags', 'automates'],
+  whom: ['workers', 'students', 'patients', 'citizens', 'suspects', 'customers', 'immigrants', 'drivers']
+};
+
+const SECRET_WORDS = ['Cheese', 'Potato', 'Bunny', 'Disco', 'Banana'];
+
+function showWordRunnerGame(overlay) {
+  overlay.innerHTML = `
+    <div class="mining-game wordrunner-game">
+      <div class="mining-header">🏃 WORD RUNNER</div>
+      <div class="mining-subtitle">Use ← → to change lanes, SPACE to grab words!</div>
+
+      <div class="runner-arena" id="runner-arena">
+        <div class="runner-lanes">
+          <div class="runner-lane" data-lane="0"></div>
+          <div class="runner-lane" data-lane="1"></div>
+          <div class="runner-lane" data-lane="2"></div>
+        </div>
+        <div class="runner-player" id="runner-player">🏃</div>
+        <div class="runner-collected" id="runner-collected"></div>
+      </div>
+
+      <div class="runner-score">
+        Score: <span id="runner-score">0</span> |
+        Combo: <span id="runner-combo">x1</span> |
+        Chain: <span id="runner-chain"></span>
+      </div>
+
+      <div class="mining-progress">
+        <div class="mining-bar" id="mining-bar"></div>
+      </div>
+
+      <button class="mining-skip" onclick="completeMining()">Done Running</button>
+    </div>
+  `;
+
+  initWordRunner();
+}
+
+function initWordRunner() {
+  window.runnerState = {
+    lane: 1,
+    score: 0,
+    combo: 1,
+    chain: [],
+    words: [],
+    gameLoop: null
+  };
+
+  // Keyboard controls
+  document.addEventListener('keydown', handleRunnerKey);
+
+  // Start spawning words
+  window.runnerState.gameLoop = setInterval(spawnRunnerWord, 1200);
+
+  // Move words down
+  setInterval(moveRunnerWords, 50);
+}
+
+function handleRunnerKey(e) {
+  if (!window.runnerState) return;
+
+  if (e.key === 'ArrowLeft' && window.runnerState.lane > 0) {
+    window.runnerState.lane--;
+    updateRunnerPosition();
+  } else if (e.key === 'ArrowRight' && window.runnerState.lane < 2) {
+    window.runnerState.lane++;
+    updateRunnerPosition();
+  } else if (e.key === ' ') {
+    grabWord();
+    e.preventDefault();
+  }
+}
+
+function updateRunnerPosition() {
+  const player = document.getElementById('runner-player');
+  if (player) {
+    player.style.left = (window.runnerState.lane * 33 + 16) + '%';
+  }
+}
+
+function spawnRunnerWord() {
+  const arena = document.getElementById('runner-arena');
+  if (!arena) {
+    clearInterval(window.runnerState.gameLoop);
+    return;
+  }
+
+  const lane = Math.floor(Math.random() * 3);
+  const categories = ['who', 'action', 'whom'];
+  const category = categories[lane];
+
+  // 5% chance for secret word
+  let word;
+  if (Math.random() < 0.05) {
+    word = SECRET_WORDS[Math.floor(Math.random() * SECRET_WORDS.length)];
+  } else {
+    const words = WORD_LANES[category];
+    word = words[Math.floor(Math.random() * words.length)];
+  }
+
+  const wordEl = document.createElement('div');
+  wordEl.className = 'runner-word';
+  wordEl.dataset.lane = lane;
+  wordEl.dataset.category = category;
+  wordEl.dataset.word = word;
+  wordEl.textContent = word;
+  wordEl.style.left = (lane * 33 + 10) + '%';
+  wordEl.style.top = '0px';
+
+  if (SECRET_WORDS.includes(word)) {
+    wordEl.classList.add('secret-word');
+  }
+
+  arena.appendChild(wordEl);
+  window.runnerState.words.push(wordEl);
+}
+
+function moveRunnerWords() {
+  const toRemove = [];
+
+  window.runnerState?.words?.forEach((wordEl, i) => {
+    const top = parseInt(wordEl.style.top) || 0;
+    wordEl.style.top = (top + 3) + 'px';
+
+    if (top > 280) {
+      wordEl.remove();
+      toRemove.push(i);
+      // Reset combo on miss
+      window.runnerState.combo = 1;
+      document.getElementById('runner-combo').textContent = 'x1';
+    }
+  });
+
+  toRemove.reverse().forEach(i => window.runnerState.words.splice(i, 1));
+}
+
+function grabWord() {
+  const playerLane = window.runnerState.lane;
+
+  // Find word in same lane near bottom
+  const grabbable = window.runnerState.words.find(w => {
+    const lane = parseInt(w.dataset.lane);
+    const top = parseInt(w.style.top);
+    return lane === playerLane && top > 200 && top < 280;
+  });
+
+  if (grabbable) {
+    const word = grabbable.dataset.word;
+    const category = grabbable.dataset.category;
+
+    // Check for secret word
+    if (SECRET_WORDS.includes(word)) {
+      // Easter egg!
+      discoverCard('cheese');
+      window.runnerState.score += 100;
+      playSfx('coin');
+    } else {
+      window.runnerState.score += 10 * window.runnerState.combo;
+      window.runnerState.combo = Math.min(5, window.runnerState.combo + 1);
+      playSfx('confirm');
+    }
+
+    // Add to chain
+    window.runnerState.chain.push({ word, category });
+
+    // Update display
+    document.getElementById('runner-score').textContent = window.runnerState.score;
+    document.getElementById('runner-combo').textContent = 'x' + window.runnerState.combo;
+    document.getElementById('runner-chain').textContent =
+      window.runnerState.chain.slice(-3).map(w => w.word).join(' → ');
+
+    // Store in mining state
+    window.miningState.answers.push({ type: 'runner', word, category });
+    window.miningState.score = window.runnerState.score;
+
+    // Update progress
+    const progress = Math.min(100, window.miningState.answers.length * 10);
+    document.getElementById('mining-bar').style.width = progress + '%';
+
+    // Remove word
+    grabbable.classList.add('grabbed');
+    setTimeout(() => grabbable.remove(), 200);
+    window.runnerState.words = window.runnerState.words.filter(w => w !== grabbable);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DESCRIBE THE PERP MODE - Build AI suspect profile
+// ═══════════════════════════════════════════════════════════════
+
+const PERP_QUESTIONS = [
+  { q: "The algorithm was last seen...", placeholder: "doing what?" },
+  { q: "Witnesses describe it as...", placeholder: "adjective" },
+  { q: "Known associates include...", placeholder: "organization or tech" },
+  { q: "Suspected motive:", placeholder: "efficiency? profit? control?" },
+  { q: "Distinguishing features:", placeholder: "what makes it unique?" },
+  { q: "Victims typically are...", placeholder: "who gets affected?" }
+];
+
+function showPerpGame(overlay) {
+  overlay.innerHTML = `
+    <div class="mining-game perp-game">
+      <div class="mining-header">🔍 DESCRIBE THE PERP</div>
+      <div class="mining-subtitle">Help us build a profile of this AI suspect...</div>
+
+      <div class="perp-sketch">
+        <div class="perp-avatar">🤖</div>
+        <div class="perp-name">UNKNOWN AI SYSTEM</div>
+      </div>
+
+      <div class="perp-question" id="perp-question">${PERP_QUESTIONS[0].q}</div>
+
+      <input class="mining-input" id="perp-input"
+             placeholder="${PERP_QUESTIONS[0].placeholder}"
+             autofocus>
+
+      <div class="perp-profile" id="perp-profile"></div>
+
+      <div class="mining-progress">
+        <div class="mining-bar" id="mining-bar"></div>
+      </div>
+
+      <button class="mining-submit" onclick="submitPerpAnswer()">Add to Profile →</button>
+      <button class="mining-skip" onclick="completeMining()">File Report</button>
+    </div>
+  `;
+
+  document.getElementById('perp-input').focus();
+}
+
+function submitPerpAnswer() {
+  const input = document.getElementById('perp-input');
+  const answer = input.value.trim();
+  if (!answer) return;
+
+  const questionIndex = window.miningState.step;
+  const question = PERP_QUESTIONS[questionIndex];
+
+  window.miningState.answers.push({
+    type: 'perp',
+    question: question.q,
+    answer
+  });
+  window.miningState.step++;
+  window.miningState.score += 15;
+
+  // Add to profile display
+  const profile = document.getElementById('perp-profile');
+  profile.innerHTML += `<div class="perp-line"><b>${question.q}</b> ${answer}</div>`;
+
+  // Check for easter eggs in answers
+  checkForEasterEgg(answer);
+
+  playSfx('confirm');
+
+  // Update progress
+  const progress = (window.miningState.step / PERP_QUESTIONS.length) * 100;
+  document.getElementById('mining-bar').style.width = progress + '%';
+
+  if (window.miningState.step < PERP_QUESTIONS.length) {
+    // Next question
+    const next = PERP_QUESTIONS[window.miningState.step];
+    document.getElementById('perp-question').textContent = next.q;
+    input.placeholder = next.placeholder;
+    input.value = '';
+    input.focus();
+  } else {
+    // Done with profile
+    completeMining();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STICKY NOTES MODE - Drag & cluster concepts
+// ═══════════════════════════════════════════════════════════════
+
+const STICKY_CONCEPTS = [
+  'Privacy', 'Efficiency', 'Control', 'Safety', 'Profit', 'Surveillance',
+  'Automation', 'Bias', 'Consent', 'Transparency', 'Accountability', 'Scale',
+  'Speed', 'Accuracy', 'Fairness', 'Access', 'Power', 'Trust'
+];
+
+function showStickyNotesGame(overlay) {
+  const stickies = STICKY_CONCEPTS.sort(() => Math.random() - 0.5).slice(0, 12);
+
+  const stickiesHtml = stickies.map((concept, i) => `
+    <div class="sticky-note" id="sticky-${i}"
+         style="left: ${10 + (i % 4) * 24}%; top: ${10 + Math.floor(i / 4) * 30}%"
+         draggable="true"
+         ondragstart="startDragSticky(event, ${i})"
+         ondragend="endDragSticky(event)">
+      ${concept}
+    </div>
+  `).join('');
+
+  overlay.innerHTML = `
+    <div class="mining-game sticky-game">
+      <div class="mining-header">📝 STICKY NOTES</div>
+      <div class="mining-subtitle">Drag related concepts together to create clusters!</div>
+
+      <div class="sticky-canvas" id="sticky-canvas"
+           ondragover="event.preventDefault()"
+           ondrop="dropSticky(event)">
+        ${stickiesHtml}
+        <div class="sticky-zone good-zone">👼 GOOD</div>
+        <div class="sticky-zone bad-zone">😈 BAD</div>
+      </div>
+
+      <div class="sticky-clusters" id="sticky-clusters">
+        Clusters formed: <span id="cluster-count">0</span>
+      </div>
+
+      <div class="mining-progress">
+        <div class="mining-bar" id="mining-bar"></div>
+      </div>
+
+      <button class="mining-skip" onclick="completeMining()">Done Clustering</button>
+    </div>
+  `;
+
+  window.stickyState = {
+    clusters: [],
+    positions: {}
+  };
+}
+
+function startDragSticky(e, index) {
+  e.dataTransfer.setData('text/plain', index);
+  e.target.classList.add('dragging');
+}
+
+function endDragSticky(e) {
+  e.target.classList.remove('dragging');
+}
+
+function dropSticky(e) {
+  e.preventDefault();
+  const canvas = document.getElementById('sticky-canvas');
+  const rect = canvas.getBoundingClientRect();
+
+  const index = e.dataTransfer.getData('text/plain');
+  const sticky = document.getElementById(`sticky-${index}`);
+
+  if (sticky) {
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    sticky.style.left = x + '%';
+    sticky.style.top = y + '%';
+
+    // Track position
+    window.stickyState.positions[index] = { x, y, concept: sticky.textContent.trim() };
+
+    // Check for cluster formation (concepts within 15% of each other)
+    detectClusters();
+
+    // Check zone placement
+    if (y > 70) {
+      const zone = x < 50 ? 'good' : 'bad';
+      window.miningState.answers.push({
+        type: 'sticky',
+        concept: sticky.textContent.trim(),
+        zone
+      });
+      window.miningState.score += 5;
+      playSfx('confirm');
+    }
+
+    // Update progress
+    const progress = Math.min(100, Object.keys(window.stickyState.positions).length * 8);
+    document.getElementById('mining-bar').style.width = progress + '%';
+  }
+}
+
+function detectClusters() {
+  const positions = Object.values(window.stickyState.positions);
+  let clusterCount = 0;
+
+  // Simple proximity clustering
+  positions.forEach((p1, i) => {
+    positions.slice(i + 1).forEach(p2 => {
+      const dist = Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+      if (dist < 15) {
+        clusterCount++;
+        // Record the semantic edge
+        window.miningState.answers.push({
+          type: 'cluster',
+          node1: p1.concept,
+          node2: p2.concept
+        });
+      }
+    });
+  });
+
+  document.getElementById('cluster-count').textContent = clusterCount;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLASSIC MODE - Original Q&A prompts
+// ═══════════════════════════════════════════════════════════════
+
+function showClassicMiningGame(overlay) {
+  const prompts = [
+    "What organization might use AI in a surprising way?",
+    "What action could AI take that worries you?",
+    "Who would be most affected by this AI?",
+    "What could go wrong? (one word)",
+    "What could go right? (one word)"
+  ];
+
+  window.miningState.prompts = prompts;
+
   overlay.innerHTML = `
     <div class="mining-game">
-      <div class="mining-header">⛏️ BRAIN MINING</div>
+      <div class="mining-header">💭 BRAIN MINING</div>
       <div class="mining-subtitle">While we search for new cases, let's mine YOUR brain!</div>
 
       <div class="mining-prompt" id="mining-prompt">
-        What organization might use AI in a surprising way?
+        ${prompts[0]}
       </div>
 
       <input class="mining-input" id="mining-input"
@@ -3805,46 +4726,32 @@ function showMiningMinigame() {
         <div class="mining-bar" id="mining-bar"></div>
       </div>
 
-      <button class="mining-submit" onclick="submitMiningAnswer()">Submit →</button>
+      <button class="mining-submit" onclick="submitClassicAnswer()">Submit →</button>
       <button class="mining-skip" onclick="closeMiningGame()">Cancel Mining</button>
     </div>
   `;
 
-  document.body.appendChild(overlay);
-
-  // Start background case generation
-  startBackgroundGeneration();
-
-  // Initialize mining state
-  window.miningState = {
-    step: 0,
-    answers: [],
-    prompts: [
-      "What organization might use AI in a surprising way?",
-      "What action could AI take that worries you?",
-      "Who would be most affected by this AI?",
-      "What could go wrong? (one word)",
-      "What could go right? (one word)"
-    ]
-  };
-
   document.getElementById('mining-input').focus();
 }
 
-function submitMiningAnswer() {
+function submitClassicAnswer() {
   const input = document.getElementById('mining-input');
   const answer = input.value.trim();
 
   if (!answer) return;
 
-  window.miningState.answers.push(answer);
+  window.miningState.answers.push({ type: 'classic', value: answer });
   window.miningState.step++;
+  window.miningState.score += 10;
 
   document.getElementById('mining-count').textContent = window.miningState.answers.length;
 
   // Update progress bar
   const progress = (window.miningState.step / window.miningState.prompts.length) * 100;
   document.getElementById('mining-bar').style.width = progress + '%';
+
+  // Check for easter eggs
+  checkForEasterEgg(answer);
 
   if (window.miningState.step < window.miningState.prompts.length) {
     // Next prompt
@@ -3854,42 +4761,117 @@ function submitMiningAnswer() {
     input.focus();
     playSfx('confirm');
   } else {
-    // Done collecting - submit to generation
+    // Done collecting
     completeMining();
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// EASTER EGGS & CARD DISCOVERY
+// ═══════════════════════════════════════════════════════════════
+
+function checkForEasterEgg(answer) {
+  const lower = answer.toLowerCase();
+
+  // Secret words that unlock cards
+  const triggers = {
+    'cheese': 'cheese',
+    'government cheese': 'cheese',
+    'rabbit hole': 'rabbit_hole',
+    'whistleblower': 'whistleblower',
+    'foia': 'foia',
+    'freedom of information': 'foia'
+  };
+
+  const cardId = triggers[lower];
+  if (cardId) {
+    discoverCard(cardId);
+  }
+}
+
+function discoverCard(cardId) {
+  const card = DISCOVERABLE_CARDS.find(c => c.id === cardId);
+  if (!card) return;
+
+  // Check if already discovered this session
+  if (minedSemanticData.easterEggs.includes(cardId)) return;
+
+  minedSemanticData.easterEggs.push(cardId);
+  window.miningState.score += card.rarity === 'legendary' ? 50 : 25;
+
+  // Show discovery notification
+  const notif = document.createElement('div');
+  notif.className = 'card-discovery-notif';
+  notif.innerHTML = `
+    <div class="discovery-content">
+      <div class="discovery-icon">🎴</div>
+      <div class="discovery-text">
+        <div class="discovery-title">CARD DISCOVERED!</div>
+        <div class="discovery-card">${card.name}</div>
+        <div class="discovery-desc">${card.description}</div>
+        <div class="discovery-rarity ${card.rarity}">${card.rarity.toUpperCase()}</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(notif);
+
+  playSfx('coin');
+
+  setTimeout(() => notif.remove(), 3000);
+
+  // Save to user's collection
+  const discovered = JSON.parse(localStorage.getItem('ucar_discovered_cards') || '[]');
+  if (!discovered.includes(cardId)) {
+    discovered.push(cardId);
+    localStorage.setItem('ucar_discovered_cards', JSON.stringify(discovered));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MINING COMPLETION
+// ═══════════════════════════════════════════════════════════════
+
 async function startBackgroundGeneration() {
-  // TODO: Start actual LLM generation in background
-  // For now, simulate with timeout
   window.miningGenerationComplete = false;
 
+  // TODO: Start actual LLM generation in background
   setTimeout(() => {
     window.miningGenerationComplete = true;
-    // If user is still in minigame, show completion
     const overlay = document.getElementById('mining-overlay');
     if (overlay) {
-      document.getElementById('mining-subtitle').textContent =
-        '✨ New case ready! Finish your thoughts...';
+      const subtitle = overlay.querySelector('.mining-subtitle');
+      if (subtitle) {
+        subtitle.textContent = '✨ New case ready! Finish up when ready...';
+        subtitle.style.color = 'var(--heaven)';
+      }
     }
   }, 5000);
 }
 
 function completeMining() {
+  // Clean up word runner if active
+  if (window.runnerState?.gameLoop) {
+    clearInterval(window.runnerState.gameLoop);
+    document.removeEventListener('keydown', handleRunnerKey);
+  }
+
+  // Award coins based on score
+  const score = window.miningState?.score || 0;
+  const bonus = Math.floor(score / 10);
+  if (bonus > 0) {
+    coins += bonus;
+    updateCoinsDisplay();
+  }
+
   playSfx('coin');
-  coins += 10;  // Bonus for contributing to mining
-  updateCoinsDisplay();
+  console.log('Brain mining complete:', window.miningState);
 
-  console.log('Brain mining complete:', window.miningState.answers);
-
-  // Close overlay
   closeMiningGame();
 
   // If generation complete, show the new case
   if (window.miningGenerationComplete) {
     spinForCase();
   } else {
-    // Wait for generation
     document.getElementById('slot-screen').classList.remove('hidden');
     document.getElementById('slot-message').textContent = 'GENERATING NEW CASE...';
     startSpinning();
@@ -3897,6 +4879,12 @@ function completeMining() {
 }
 
 function closeMiningGame() {
+  // Clean up
+  if (window.runnerState?.gameLoop) {
+    clearInterval(window.runnerState.gameLoop);
+    document.removeEventListener('keydown', handleRunnerKey);
+  }
+
   const overlay = document.getElementById('mining-overlay');
   if (overlay) overlay.remove();
 }
