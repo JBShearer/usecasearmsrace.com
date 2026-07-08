@@ -48,192 +48,227 @@ class ChiptuneEngine {
 
     // Pre-composed melodic loops for each mood
     // Note format: [midiNote, durationInBeats] or [0, duration] for rest
-    // Melodies are 16 beats (4 bars) for seamless looping
+    // Each melody is 16 beats (4 bars of 4/4) for seamless looping
+    // Uses proper chord progressions and memorable melodic hooks
 
     this.melodies = {
-      // MENU: Mysterious detective theme (Phoenix Wright style)
-      // Key: D minor, 110 BPM, 4/4
+      // ═══════════════════════════════════════════════════════════════
+      // MENU: Mysterious spy theme (James Bond meets Phoenix Wright)
+      // Key: E minor, 115 BPM - Iconic minor 2nd motif
+      // Chord progression: Em - C - Am - B7 (i - VI - iv - V7)
+      // ═══════════════════════════════════════════════════════════════
       menu: {
-        tempo: 110,
+        tempo: 115,
         lead: [
-          // Bar 1: Mysterious opening motif
-          [62, 0.5], [65, 0.5], [69, 1], [67, 0.5], [65, 0.5], [62, 1],
-          // Bar 2: Continuation
-          [64, 0.5], [67, 0.5], [71, 1], [69, 0.5], [67, 0.5], [64, 1],
-          // Bar 3: Rising tension
-          [65, 0.5], [69, 0.5], [72, 1], [71, 0.5], [69, 0.5], [65, 1],
-          // Bar 4: Resolution back down
-          [67, 0.5], [64, 0.5], [62, 1.5], [0, 0.5], [62, 0.5], [64, 0.5]
+          // Bar 1: Iconic spy motif (E-F-E, the minor 2nd tension)
+          [64, 0.75], [65, 0.25], [64, 0.5], [0, 0.5], [67, 0.5], [71, 0.5], [67, 0.5], [64, 0.5],
+          // Bar 2: Answer phrase
+          [63, 0.5], [64, 0.5], [67, 1], [64, 0.5], [63, 0.5], [60, 1],
+          // Bar 3: Rising sequence
+          [64, 0.5], [65, 0.25], [64, 0.25], [67, 0.5], [69, 0.5], [71, 0.5], [72, 0.5], [71, 0.5], [69, 0.5],
+          // Bar 4: Resolution with hook repeat
+          [67, 0.5], [64, 0.5], [65, 0.25], [64, 0.75], [0, 0.5], [59, 0.5], [64, 1]
         ],
         bass: [
-          // Root movement D-F-Bb-A (i-III-VI-V in D minor)
-          [38, 2], [38, 2], [41, 2], [41, 2],
-          [46, 2], [46, 2], [45, 2], [45, 2]
+          // Em - C - Am - B7 (classic minor progression)
+          [40, 1], [40, 0.5], [47, 0.5], [40, 1], [40, 0.5], [47, 0.5],
+          [48, 1], [48, 0.5], [55, 0.5], [45, 1], [45, 0.5], [52, 0.5],
+          [40, 1], [40, 0.5], [47, 0.5], [40, 1], [40, 0.5], [47, 0.5],
+          [47, 1], [47, 0.5], [54, 0.5], [47, 1.5], [0, 0.5]
         ],
         harmony: [
-          // Sustained chord tones
-          [57, 4], [60, 4], [58, 4], [57, 4]
+          // Sustained chord pads following progression
+          [55, 2], [59, 2], [55, 2], [57, 2],
+          [55, 2], [59, 2], [54, 2], [56, 2]
         ],
         drums: true
       },
 
-      // EXTRACTION: Tense investigation (building suspense)
-      // Key: A minor, 130 BPM, driving pulse
+      // ═══════════════════════════════════════════════════════════════
+      // EXTRACTION: Tense investigation (Ace Attorney cross-examination)
+      // Key: D minor, 138 BPM - Driving, urgent, thinking music
+      // Progression: Dm - Gm - A7 - Dm (i - iv - V7 - i)
+      // ═══════════════════════════════════════════════════════════════
       extraction: {
-        tempo: 130,
+        tempo: 138,
         lead: [
-          // Bar 1-2: Urgent staccato motif
-          [69, 0.25], [0, 0.25], [69, 0.25], [0, 0.25], [72, 0.5], [71, 0.5], [69, 0.5], [67, 0.5],
-          [69, 0.25], [0, 0.25], [69, 0.25], [0, 0.25], [74, 0.5], [72, 0.5], [71, 0.5], [69, 0.5],
-          // Bar 3-4: Escalating phrase
-          [72, 0.5], [74, 0.5], [76, 0.5], [74, 0.5], [72, 0.5], [71, 0.5], [69, 1],
-          [67, 0.5], [69, 0.5], [71, 0.5], [72, 0.5], [74, 1], [72, 0.5], [71, 0.5]
+          // Bar 1: Urgent repeating motif
+          [62, 0.25], [65, 0.25], [69, 0.25], [65, 0.25], [62, 0.25], [65, 0.25], [69, 0.25], [72, 0.25],
+          // Bar 2: Variation
+          [74, 0.25], [72, 0.25], [69, 0.25], [72, 0.25], [74, 0.5], [72, 0.5], [69, 0.5], [67, 0.5],
+          // Bar 3: Building tension
+          [65, 0.25], [67, 0.25], [69, 0.25], [67, 0.25], [65, 0.25], [67, 0.25], [69, 0.25], [71, 0.25],
+          // Bar 4: Climax and reset
+          [73, 0.5], [71, 0.5], [69, 0.5], [67, 0.5], [65, 0.5], [62, 0.5], [0, 0.5], [60, 0.5]
         ],
         bass: [
-          // Driving bass pulse
-          [45, 0.5], [45, 0.5], [45, 0.5], [45, 0.5], [45, 0.5], [45, 0.5], [45, 0.5], [45, 0.5],
-          [43, 0.5], [43, 0.5], [43, 0.5], [43, 0.5], [43, 0.5], [43, 0.5], [43, 0.5], [43, 0.5],
-          [41, 0.5], [41, 0.5], [41, 0.5], [41, 0.5], [41, 0.5], [41, 0.5], [41, 0.5], [41, 0.5],
-          [40, 0.5], [40, 0.5], [40, 0.5], [40, 0.5], [40, 0.5], [40, 0.5], [40, 0.5], [40, 0.5]
+          // Driving eighth-note pulse
+          [38, 0.5], [38, 0.5], [38, 0.5], [38, 0.5], [38, 0.5], [45, 0.5], [38, 0.5], [45, 0.5],
+          [43, 0.5], [43, 0.5], [43, 0.5], [43, 0.5], [43, 0.5], [50, 0.5], [43, 0.5], [50, 0.5],
+          [45, 0.5], [45, 0.5], [45, 0.5], [45, 0.5], [45, 0.5], [52, 0.5], [45, 0.5], [52, 0.5],
+          [38, 0.5], [38, 0.5], [38, 0.5], [45, 0.5], [38, 1], [0, 0.5], [36, 0.5]
         ],
         harmony: [
-          [57, 2], [55, 2], [53, 2], [52, 2],
-          [57, 2], [55, 2], [53, 2], [52, 2]
+          [57, 2], [60, 2], [58, 2], [57, 2],
+          [57, 2], [60, 2], [61, 2], [57, 2]
         ],
         drums: true,
         fastDrums: true
       },
 
-      // VERDICT: Dramatic reveal moment
-      // Key: E Phrygian, 90 BPM, dramatic pauses
+      // ═══════════════════════════════════════════════════════════════
+      // VERDICT: Dramatic courtroom moment
+      // Key: A Phrygian, 85 BPM - Heavy, dramatic pauses
+      // Progression: Am - Bb - Am - E (i - bII - i - V)
+      // ═══════════════════════════════════════════════════════════════
       verdict: {
-        tempo: 90,
+        tempo: 85,
         lead: [
-          // Bar 1: Dramatic statement
-          [64, 1], [0, 0.5], [67, 0.5], [71, 1], [72, 1],
+          // Bar 1: Dramatic opening statement
+          [69, 1.5], [0, 0.5], [72, 0.5], [74, 0.5], [76, 1],
           // Bar 2: Tension hold
-          [71, 1.5], [0, 0.5], [69, 0.5], [67, 0.5], [64, 1],
-          // Bar 3: Rising drama
-          [65, 0.5], [67, 0.5], [69, 1], [71, 0.5], [72, 0.5], [74, 1],
-          // Bar 4: Resolution with weight
-          [76, 1.5], [74, 0.5], [72, 1], [71, 1]
+          [77, 1], [76, 0.5], [74, 0.5], [72, 1], [0, 1],
+          // Bar 3: Rising to judgment
+          [69, 0.5], [72, 0.5], [74, 0.5], [76, 0.5], [77, 1], [76, 0.5], [74, 0.5],
+          // Bar 4: The verdict drops
+          [76, 2], [74, 1], [72, 1]
         ],
         bass: [
-          // Heavy, deliberate bass
-          [40, 2], [0, 2], [41, 2], [0, 2],
-          [43, 2], [0, 2], [40, 2], [40, 2]
+          // Heavy, deliberate bass with dramatic rests
+          [45, 1.5], [0, 0.5], [45, 1], [0, 1],
+          [46, 1.5], [0, 0.5], [46, 1], [0, 1],
+          [45, 1.5], [0, 0.5], [45, 1], [0, 1],
+          [40, 2], [40, 1], [40, 1]
         ],
         harmony: [
-          // Dramatic sustained chords
-          [52, 4], [53, 4], [55, 4], [52, 4]
+          [60, 2], [64, 2], [61, 2], [64, 2],
+          [60, 2], [64, 2], [56, 2], [64, 2]
         ],
         drums: true,
         slowDrums: true
       },
 
-      // HEAVEN: Triumphant angelic (major key resolution)
-      // Key: C major, 120 BPM, uplifting
+      // ═══════════════════════════════════════════════════════════════
+      // HEAVEN: Triumphant angel choir
+      // Key: G major, 125 BPM - Soaring, uplifting
+      // Progression: G - D - Em - C (I - V - vi - IV) - The "Axis of Awesome"
+      // ═══════════════════════════════════════════════════════════════
       heaven: {
-        tempo: 120,
+        tempo: 125,
         lead: [
-          // Bar 1: Triumphant fanfare
-          [72, 0.5], [74, 0.5], [76, 1], [79, 1], [0, 0.5], [79, 0.25], [81, 0.25],
-          // Bar 2: Angelic melody
-          [84, 1], [83, 0.5], [81, 0.5], [79, 1], [76, 1],
-          // Bar 3: Soaring phrase
-          [79, 0.5], [81, 0.5], [83, 1], [84, 0.5], [83, 0.5], [81, 0.5], [79, 0.5],
+          // Bar 1: Triumphant fanfare hook
+          [67, 0.5], [71, 0.5], [74, 1], [79, 1], [78, 0.5], [79, 0.5],
+          // Bar 2: Angelic soar
+          [83, 1], [81, 0.5], [79, 0.5], [78, 0.5], [79, 0.5], [74, 1],
+          // Bar 3: Call and response
+          [76, 0.5], [78, 0.5], [79, 1], [76, 0.5], [74, 0.5], [71, 0.5], [74, 0.5],
           // Bar 4: Glorious resolution
-          [76, 0.5], [79, 0.5], [84, 1.5], [83, 0.5], [84, 1]
+          [76, 0.5], [74, 0.5], [71, 0.5], [67, 0.5], [74, 1], [79, 1]
         ],
         bass: [
-          // Majestic bass movement C-G-Am-F (I-V-vi-IV)
-          [48, 2], [48, 2], [55, 2], [55, 2],
-          [57, 2], [57, 2], [53, 2], [53, 2]
+          // G - D - Em - C (I - V - vi - IV)
+          [43, 1], [43, 0.5], [47, 0.5], [43, 1], [47, 1],
+          [50, 1], [50, 0.5], [54, 0.5], [52, 1], [52, 0.5], [55, 0.5],
+          [40, 1], [40, 0.5], [44, 0.5], [40, 1], [44, 1],
+          [48, 1], [48, 0.5], [52, 0.5], [48, 1], [48, 1]
         ],
         harmony: [
-          // Heavenly sustained notes
-          [64, 4], [67, 4], [69, 4], [65, 4]
+          [59, 2], [62, 2], [59, 2], [64, 2],
+          [55, 2], [59, 2], [55, 2], [60, 2]
         ],
         drums: true,
         brightArp: true
       },
 
-      // HELL: Ominous doom (minor key, descending)
-      // Key: F# diminished/Phrygian, 140 BPM, relentless
+      // ═══════════════════════════════════════════════════════════════
+      // HELL: Doom and dread (Castlevania style)
+      // Key: E Phrygian dominant, 145 BPM - Relentless descent
+      // Progression: Em - F - G - F - Em (chromatic doom)
+      // ═══════════════════════════════════════════════════════════════
       hell: {
-        tempo: 140,
+        tempo: 145,
         lead: [
-          // Bar 1-2: Descending doom motif
-          [78, 0.5], [77, 0.5], [75, 0.5], [73, 0.5], [72, 0.5], [70, 0.5], [68, 0.5], [66, 0.5],
-          [78, 0.5], [76, 0.5], [73, 0.5], [70, 0.5], [68, 0.5], [66, 0.5], [63, 0.5], [61, 0.5],
-          // Bar 3-4: Chaotic ascending then crash
-          [61, 0.5], [63, 0.5], [66, 0.5], [68, 0.5], [70, 0.5], [73, 0.5], [76, 0.5], [78, 0.5],
-          [78, 0.25], [77, 0.25], [78, 0.25], [77, 0.25], [75, 0.5], [73, 0.5], [70, 1], [66, 1]
+          // Bar 1-2: Descending chromatic doom
+          [76, 0.5], [75, 0.5], [76, 0.5], [72, 0.5], [71, 0.5], [72, 0.5], [68, 0.5], [67, 0.5],
+          [68, 0.5], [64, 0.5], [63, 0.5], [64, 0.5], [60, 1], [0, 0.5], [60, 0.5],
+          // Bar 3-4: Ascending fury then crash
+          [64, 0.5], [67, 0.5], [68, 0.5], [71, 0.5], [72, 0.5], [75, 0.5], [76, 0.5], [79, 0.5],
+          [76, 0.25], [75, 0.25], [76, 0.25], [75, 0.25], [72, 0.5], [68, 0.5], [64, 1]
         ],
         bass: [
-          // Menacing chromatic descent
-          [42, 0.5], [41, 0.5], [40, 0.5], [39, 0.5], [38, 0.5], [37, 0.5], [36, 0.5], [35, 0.5],
-          [42, 0.5], [41, 0.5], [40, 0.5], [39, 0.5], [38, 0.5], [37, 0.5], [36, 0.5], [35, 0.5],
-          [35, 0.5], [36, 0.5], [37, 0.5], [38, 0.5], [39, 0.5], [40, 0.5], [41, 0.5], [42, 0.5],
-          [42, 1], [42, 1], [38, 1], [35, 1]
+          // Menacing chromatic movement
+          [40, 0.5], [40, 0.5], [47, 0.5], [40, 0.5], [41, 0.5], [41, 0.5], [48, 0.5], [41, 0.5],
+          [43, 0.5], [43, 0.5], [50, 0.5], [43, 0.5], [41, 0.5], [41, 0.5], [48, 0.5], [41, 0.5],
+          [40, 0.5], [40, 0.5], [47, 0.5], [40, 0.5], [41, 0.5], [41, 0.5], [43, 0.5], [44, 0.5],
+          [40, 1], [40, 0.5], [0, 0.5], [40, 0.5], [40, 0.5], [40, 1]
         ],
         harmony: [
-          // Dissonant sustained drones
-          [54, 2], [53, 2], [51, 2], [49, 2],
-          [49, 2], [51, 2], [53, 2], [54, 2]
+          [55, 2], [56, 2], [59, 2], [56, 2],
+          [55, 2], [56, 2], [59, 2], [55, 2]
         ],
         drums: true,
         fastDrums: true,
         chaotic: true
       },
 
-      // MINT: Victory fanfare (slot machine win)
-      // Key: G major, 135 BPM, celebratory
+      // ═══════════════════════════════════════════════════════════════
+      // MINT: Victory fanfare (Zelda chest + Mario level clear)
+      // Key: C major, 140 BPM - Celebratory, memorable
+      // Progression: C - G - Am - F (I - V - vi - IV)
+      // ═══════════════════════════════════════════════════════════════
       mint: {
-        tempo: 135,
+        tempo: 140,
         lead: [
-          // Bar 1: Classic victory fanfare opening
-          [67, 0.5], [67, 0.25], [67, 0.25], [67, 0.5], [71, 0.5], [74, 1],
-          // Bar 2: Celebration continues
-          [76, 0.5], [74, 0.5], [71, 0.5], [74, 0.5], [79, 1], [0, 0.5], [79, 0.5],
-          // Bar 3: Triumphant repeat
-          [79, 0.5], [79, 0.25], [79, 0.25], [79, 0.5], [81, 0.5], [83, 0.5], [81, 0.5], [79, 0.5], [76, 0.5],
-          // Bar 4: Grand finale phrase
-          [74, 0.5], [76, 0.5], [79, 1], [83, 1], [79, 0.5], [0, 0.5]
+          // Bar 1: Classic victory fanfare (da-da-da-DAAA!)
+          [72, 0.5], [72, 0.25], [72, 0.25], [72, 0.5], [76, 0.5], [79, 1], [84, 1],
+          // Bar 2: Cascading celebration
+          [83, 0.5], [81, 0.5], [79, 0.5], [76, 0.5], [79, 0.5], [81, 0.5], [84, 1],
+          // Bar 3: Echo the hook
+          [84, 0.5], [84, 0.25], [84, 0.25], [84, 0.5], [83, 0.5], [81, 0.5], [79, 0.5], [76, 1],
+          // Bar 4: Grand finale
+          [79, 0.5], [76, 0.5], [72, 1], [76, 0.5], [79, 0.5], [84, 1]
         ],
         bass: [
-          // Bouncy victory bass G-D-C-D
-          [43, 1], [43, 0.5], [47, 0.5], [50, 1], [50, 0.5], [47, 0.5],
-          [48, 1], [48, 0.5], [52, 0.5], [50, 1], [50, 0.5], [47, 0.5],
-          [43, 1], [43, 0.5], [47, 0.5], [50, 1], [50, 0.5], [47, 0.5],
-          [48, 1], [48, 0.5], [50, 0.5], [43, 1], [43, 1]
+          // Bouncy victory bass
+          [48, 0.5], [48, 0.5], [55, 0.5], [48, 0.5], [55, 0.5], [55, 0.5], [62, 0.5], [55, 0.5],
+          [57, 0.5], [57, 0.5], [64, 0.5], [57, 0.5], [53, 0.5], [53, 0.5], [60, 0.5], [53, 0.5],
+          [48, 0.5], [48, 0.5], [55, 0.5], [48, 0.5], [55, 0.5], [55, 0.5], [62, 0.5], [55, 0.5],
+          [53, 0.5], [53, 0.5], [55, 0.5], [55, 0.5], [48, 1], [48, 1]
         ],
         harmony: [
-          // Bright chord hits
-          [59, 1], [62, 1], [64, 1], [62, 1],
-          [60, 1], [64, 1], [62, 1], [59, 1],
-          [59, 1], [62, 1], [64, 1], [62, 1],
-          [60, 1], [62, 1], [59, 2]
+          [64, 2], [67, 2], [64, 2], [65, 2],
+          [64, 2], [67, 2], [65, 2], [64, 2]
         ],
         drums: true,
         coins: true
       },
 
-      // BROWSE: Relaxed exploration theme
+      // ═══════════════════════════════════════════════════════════════
+      // BROWSE: Chill exploration (Animal Crossing / Stardew vibe)
+      // Key: F major, 95 BPM - Gentle, curious, cozy
+      // Progression: F - Dm - Bb - C (I - vi - IV - V)
+      // ═══════════════════════════════════════════════════════════════
       browse: {
-        tempo: 100,
+        tempo: 95,
         lead: [
-          // Gentle, curious melody
-          [64, 1], [67, 0.5], [69, 0.5], [71, 1], [69, 1],
-          [67, 0.5], [64, 0.5], [62, 1], [64, 1], [0, 1],
-          [67, 1], [69, 0.5], [71, 0.5], [72, 1], [71, 0.5], [69, 0.5],
-          [67, 1], [64, 1], [62, 1], [0, 1]
+          // Bar 1: Gentle opening
+          [65, 1], [69, 0.5], [72, 0.5], [74, 1], [72, 0.5], [69, 0.5],
+          // Bar 2: Curious wandering
+          [70, 1], [69, 0.5], [65, 0.5], [67, 1], [0, 1],
+          // Bar 3: Pleasant discovery
+          [70, 0.5], [72, 0.5], [74, 1], [72, 0.5], [70, 0.5], [69, 1],
+          // Bar 4: Settling back
+          [67, 0.5], [65, 0.5], [64, 0.5], [65, 0.5], [69, 1], [0, 1]
         ],
         bass: [
-          [52, 4], [50, 4], [48, 4], [50, 4]
+          // Gentle walking bass
+          [41, 2], [41, 1], [45, 1],
+          [38, 2], [38, 1], [41, 1],
+          [46, 2], [46, 1], [50, 1],
+          [48, 2], [48, 1], [41, 1]
         ],
         harmony: [
-          [59, 4], [57, 4], [55, 4], [57, 4]
+          [57, 4], [53, 4], [58, 4], [55, 4]
         ],
         drums: false
       }
@@ -493,24 +528,186 @@ class ChiptuneEngine {
     return loopDuration;
   }
 
-  // Start continuous playback
+  // Start continuous playback with proper scheduling
   start(mood = 'menu') {
     if (!this.audioCtx) this.init();
     if (this.isPlaying) this.stop();
 
     this.currentMood = mood;
     this.isPlaying = true;
+    this.nextLoopTime = this.audioCtx.currentTime;
 
-    // Play first loop immediately
-    const loopDuration = this.playLoop(mood);
+    // Schedule first loop
+    this.scheduleLoop();
 
-    if (loopDuration > 0) {
-      // Schedule subsequent loops
-      this.schedulerInterval = setInterval(() => {
-        if (this.isPlaying && !this.isMuted) {
-          this.playLoop(this.currentMood);
+    // Use requestAnimationFrame-based scheduler for precise timing
+    this.scheduleAhead();
+  }
+
+  // Schedule loops ahead of time (look-ahead scheduling)
+  scheduleAhead() {
+    if (!this.isPlaying) return;
+
+    const lookAhead = 0.5; // Schedule 500ms ahead
+    const now = this.audioCtx.currentTime;
+
+    // Schedule any loops that need to start within the look-ahead window
+    while (this.nextLoopTime < now + lookAhead) {
+      this.scheduleLoop();
+    }
+
+    // Check again soon
+    this.schedulerTimeout = setTimeout(() => this.scheduleAhead(), 200);
+  }
+
+  // Schedule a single loop at the precise time
+  scheduleLoop() {
+    if (!this.isPlaying || this.isMuted) return;
+
+    const config = this.melodies[this.currentMood];
+    if (!config) return;
+
+    const beatDuration = 60 / config.tempo;
+
+    // Calculate loop duration from lead melody
+    let leadDuration = 0;
+    config.lead.forEach(note => leadDuration += note[1]);
+    const loopDuration = leadDuration * beatDuration;
+
+    // Play the loop at nextLoopTime
+    this.playLoopAt(this.currentMood, this.nextLoopTime);
+
+    // Schedule next loop
+    this.nextLoopTime += loopDuration;
+  }
+
+  // Play a loop at a specific time (not 'now')
+  playLoopAt(mood, startTime) {
+    if (!this.audioCtx || this.isMuted) return;
+
+    const config = this.melodies[mood];
+    if (!config) return;
+
+    const beatDuration = 60 / config.tempo;
+    let time = startTime;
+
+    // Calculate total loop duration
+    let leadDuration = 0;
+    config.lead.forEach(note => leadDuration += note[1]);
+
+    // --- LEAD MELODY ---
+    time = startTime;
+    config.lead.forEach(note => {
+      const [midiNote, beats] = note;
+      const noteDuration = beats * beatDuration;
+
+      if (midiNote > 0) {
+        const freq = this.midiToFreq(midiNote);
+        if (beats >= 1) {
+          this.createPulseOsc(freq, time, noteDuration * 0.95, 0.1);
+        } else {
+          this.createSquareOsc(freq, time, noteDuration * 0.9, 0.08);
         }
-      }, loopDuration * 1000);
+      }
+      time += noteDuration;
+    });
+
+    // --- BASS LINE ---
+    time = startTime;
+    config.bass.forEach(note => {
+      const [midiNote, beats] = note;
+      const noteDuration = beats * beatDuration;
+
+      if (midiNote > 0) {
+        const freq = this.midiToFreq(midiNote);
+        this.createTriangleOsc(freq, time, noteDuration * 0.95, 0.18);
+      }
+      time += noteDuration;
+    });
+
+    // --- HARMONY/PAD ---
+    time = startTime;
+    config.harmony.forEach(note => {
+      const [midiNote, beats] = note;
+      const noteDuration = beats * beatDuration;
+
+      if (midiNote > 0) {
+        const freq = this.midiToFreq(midiNote);
+        this.createSquareOsc(freq, time, noteDuration * 0.98, 0.04, 5);
+        this.createSquareOsc(freq * 1.005, time, noteDuration * 0.98, 0.03, -5);
+      }
+      time += noteDuration;
+    });
+
+    // --- DRUMS ---
+    if (config.drums) {
+      const numBeats = Math.floor(leadDuration);
+      const isFast = config.fastDrums;
+      const isSlow = config.slowDrums;
+
+      for (let i = 0; i < numBeats; i++) {
+        const beatTime = startTime + i * beatDuration;
+
+        if (isSlow) {
+          if (i % 4 === 0) {
+            this.createTriangleOsc(50, beatTime, 0.2, 0.25);
+            this.createTriangleOsc(40, beatTime + 0.05, 0.15, 0.15);
+          }
+          if (i % 4 === 2) {
+            this.createNoise(beatTime, 0.2, 0.12, 800);
+          }
+        } else if (isFast) {
+          if (i % 2 === 0) {
+            this.createTriangleOsc(55, beatTime, 0.1, 0.22);
+          }
+          if (i % 2 === 1) {
+            this.createNoise(beatTime, 0.08, 0.1, 1200);
+          }
+          this.createNoise(beatTime, 0.03, 0.04, 8000);
+          this.createNoise(beatTime + beatDuration * 0.5, 0.03, 0.03, 8000);
+        } else {
+          if (i % 4 === 0 || i % 4 === 2) {
+            this.createTriangleOsc(60, beatTime, 0.1, 0.2);
+          }
+          if (i % 4 === 1 || i % 4 === 3) {
+            this.createNoise(beatTime, 0.1, 0.08, 1500);
+          }
+          this.createNoise(beatTime + beatDuration * 0.5, 0.04, 0.03, 6000);
+        }
+      }
+
+      if (config.chaotic) {
+        for (let i = 0; i < numBeats; i += 4) {
+          if (i > 0 && i % 8 === 0) {
+            for (let j = 0; j < 4; j++) {
+              this.createTriangleOsc(80 - j * 10, startTime + (i - 1 + j * 0.25) * beatDuration, 0.1, 0.1);
+            }
+          }
+        }
+      }
+
+      if (config.coins) {
+        [0, 3.5, 7, 11, 14.5].forEach(beat => {
+          const coinTime = startTime + beat * beatDuration;
+          this.createSquareOsc(this.midiToFreq(83), coinTime, 0.06, 0.05);
+          this.createSquareOsc(this.midiToFreq(88), coinTime + 0.06, 0.1, 0.05);
+        });
+      }
+    }
+
+    // Bright arpeggio for heaven
+    if (config.brightArp) {
+      const loopDur = leadDuration * beatDuration;
+      const arpNotes = [72, 76, 79, 84, 79, 76];
+      let arpTime = startTime;
+      const arpBeat = beatDuration * 0.25;
+
+      while (arpTime < startTime + loopDur) {
+        arpNotes.forEach((note, i) => {
+          this.createSquareOsc(this.midiToFreq(note), arpTime + i * arpBeat, arpBeat * 0.8, 0.03);
+        });
+        arpTime += arpNotes.length * arpBeat;
+      }
     }
   }
 
@@ -519,17 +716,19 @@ class ChiptuneEngine {
     if (mood === this.currentMood) return;
     this.currentMood = mood;
 
-    // If not playing, don't start
     if (!this.isPlaying) return;
 
-    // Restart with new mood
-    this.stop();
-    this.start(mood);
+    // Let current loop finish, new mood starts next loop
+    // (the scheduleLoop will pick up the new mood)
   }
 
   // Stop playback
   stop() {
     this.isPlaying = false;
+    if (this.schedulerTimeout) {
+      clearTimeout(this.schedulerTimeout);
+      this.schedulerTimeout = null;
+    }
     if (this.schedulerInterval) {
       clearInterval(this.schedulerInterval);
       this.schedulerInterval = null;
