@@ -754,14 +754,15 @@ function scene(seed, beat, opts={}){
   s+='<line x1="0" y1="180" x2="'+W+'" y2="180" stroke="#EDE6D6" stroke-width="2" opacity="0.5"/>';
   // Map arc_type to visual category for set pieces
   const arcType = window.CASE && (CASE.category || CASE.extraction?.arc_type);
+  const caseText = window.CASE ? (CASE.title + ' ' + (CASE.summary || '')) : '';
   const ARC_TO_CAT = {
     'panopticon': 'Surveillance', 'data_harvest': 'Surveillance',
     'computer_says_no': 'Automation', 'rise_of_machines': 'Automation',
     'good_works': 'Healthcare', 'black_box': 'Prediction',
     'minority_report': 'Prediction'
   };
-  const cat = ARC_TO_CAT[arcType] || arcType || caseText || 'Prediction';
-  const caseTextLower=caseText.toLowerCase();
+  const cat = ARC_TO_CAT[arcType] || arcType || 'Prediction';
+  const caseTextLower = caseText.toLowerCase();
   // Enhanced category detection from case text if arc_type is generic
   let visualCat = cat;
   if(!/Surveil|Health|Autom|Educ|Util|Financ|Weather/i.test(cat)){
