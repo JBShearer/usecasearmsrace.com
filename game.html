@@ -1756,6 +1756,90 @@ main {
   color: white;
 }
 
+/* Nuance sliders */
+.nuance-sliders {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+.nuance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-dim);
+  transition: all 0.2s;
+}
+.nuance-header:hover {
+  background: var(--bg-card);
+  color: var(--text);
+}
+.nuance-toggle {
+  transition: transform 0.2s;
+}
+.nuance-toggle.open {
+  transform: rotate(90deg);
+}
+.nuance-content {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+}
+.nuance-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.nuance-left, .nuance-right {
+  font-size: 11px;
+  width: 80px;
+  color: var(--text-dim);
+}
+.nuance-left {
+  text-align: right;
+}
+.nuance-right {
+  text-align: left;
+}
+.nuance-slider {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(to right, var(--heaven), var(--text-dim), var(--hell));
+  border-radius: 3px;
+  cursor: pointer;
+}
+.nuance-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.nuance-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  border: none;
+}
+.nuance-hint {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-align: center;
+  margin-top: 8px;
+  font-style: italic;
+}
+
 .search-status {
   margin-top: 12px;
   font-size: 12px;
@@ -2379,6 +2463,52 @@ main {
                 <button class="comedy-chip" onclick="tagComedy('nonSequitur')" title="Random pivot">
                   🎲 Non-Sequitur
                 </button>
+              </div>
+            </div>
+
+            <!-- Nuance sliders (optional) -->
+            <div class="nuance-sliders" id="nuance-sliders">
+              <div class="nuance-header" onclick="toggleNuanceSliders()">
+                <span>⚖️ Rate the nuance (optional)</span>
+                <span class="nuance-toggle" id="nuance-toggle">▶</span>
+              </div>
+              <div class="nuance-content" id="nuance-content" style="display:none">
+                <!-- Safety vs Surveillance -->
+                <div class="nuance-row">
+                  <span class="nuance-left">🛡️ Safety</span>
+                  <input type="range" class="nuance-slider" id="slider-safety-surveillance"
+                         min="0" max="100" value="50" oninput="updateNuance('safety_surveillance', this.value)">
+                  <span class="nuance-right">👁️ Surveillance</span>
+                </div>
+                <!-- Privacy vs Brokering -->
+                <div class="nuance-row">
+                  <span class="nuance-left">🔒 Privacy</span>
+                  <input type="range" class="nuance-slider" id="slider-privacy-brokering"
+                         min="0" max="100" value="50" oninput="updateNuance('privacy_brokering', this.value)">
+                  <span class="nuance-right">💰 Brokering</span>
+                </div>
+                <!-- Edge vs Megadatabase -->
+                <div class="nuance-row">
+                  <span class="nuance-left">📱 Edge</span>
+                  <input type="range" class="nuance-slider" id="slider-edge-mega"
+                         min="0" max="100" value="50" oninput="updateNuance('edge_mega', this.value)">
+                  <span class="nuance-right">🏢 Megadatabase</span>
+                </div>
+                <!-- Autonomy vs HITL -->
+                <div class="nuance-row">
+                  <span class="nuance-left">🤖 Autonomy</span>
+                  <input type="range" class="nuance-slider" id="slider-autonomy-hitl"
+                         min="0" max="100" value="50" oninput="updateNuance('autonomy_hitl', this.value)">
+                  <span class="nuance-right">👤 HITL</span>
+                </div>
+                <!-- Benefit vs Harm -->
+                <div class="nuance-row">
+                  <span class="nuance-left">✅ Benefit</span>
+                  <input type="range" class="nuance-slider" id="slider-benefit-harm"
+                         min="0" max="100" value="50" oninput="updateNuance('benefit_harm', this.value)">
+                  <span class="nuance-right">❌ Harm</span>
+                </div>
+                <div class="nuance-hint">Your ratings help map the spectrum of perspectives on this case</div>
               </div>
             </div>
           </div>
@@ -5409,6 +5539,9 @@ function showDiscoveryScene() {
   document.querySelectorAll('.comedy-chip').forEach(chip => chip.classList.remove('selected'));
   selectedComedyStyles = [];
 
+  // Reset nuance sliders to center
+  resetNuanceSliders();
+
   // Auto-detect and highlight suggested comedy styles
   const suggestedStyle = detectBestComedyType({
     who: currentArticle.title || '',
@@ -5467,6 +5600,96 @@ function getTaggedComedyBeat(triple) {
   return generateComedyBeat(triple, style);
 }
 
+// ═══════════════════════════════════════════════════════════════
+// NUANCE SLIDERS - Capture spectrum of perspectives
+// ═══════════════════════════════════════════════════════════════
+
+// Nuance dimensions with their meanings
+const NUANCE_DIMENSIONS = {
+  safety_surveillance: { left: 'Safety', right: 'Surveillance', leftIcon: '🛡️', rightIcon: '👁️' },
+  privacy_brokering: { left: 'Privacy', right: 'Brokering', leftIcon: '🔒', rightIcon: '💰' },
+  edge_mega: { left: 'Edge', right: 'Megadatabase', leftIcon: '📱', rightIcon: '🏢' },
+  autonomy_hitl: { left: 'Autonomy', right: 'HITL', leftIcon: '🤖', rightIcon: '👤' },
+  benefit_harm: { left: 'Benefit', right: 'Harm', leftIcon: '✅', rightIcon: '❌' }
+};
+
+// Current slider values (only recorded if changed from 50)
+let nuanceSliders = {};
+
+function toggleNuanceSliders() {
+  const content = document.getElementById('nuance-content');
+  const toggle = document.getElementById('nuance-toggle');
+
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    toggle.classList.add('open');
+  } else {
+    content.style.display = 'none';
+    toggle.classList.remove('open');
+  }
+}
+
+function updateNuance(dimension, value) {
+  const val = parseInt(value);
+
+  // Only track if moved from center (50 = neutral/no opinion)
+  if (val !== 50) {
+    nuanceSliders[dimension] = val;
+  } else {
+    delete nuanceSliders[dimension];
+  }
+
+  // Update slider visual feedback
+  const slider = document.getElementById(`slider-${dimension.replace('_', '-')}`);
+  if (slider) {
+    // Change thumb color based on position
+    const intensity = Math.abs(val - 50) / 50;
+    const color = val < 50 ? `rgba(74, 222, 128, ${intensity})` : `rgba(239, 68, 68, ${intensity})`;
+    slider.style.setProperty('--thumb-glow', color);
+  }
+}
+
+function resetNuanceSliders() {
+  nuanceSliders = {};
+
+  // Reset all sliders to center
+  Object.keys(NUANCE_DIMENSIONS).forEach(dim => {
+    const slider = document.getElementById(`slider-${dim.replace('_', '-')}`);
+    if (slider) slider.value = 50;
+  });
+
+  // Collapse the section
+  const content = document.getElementById('nuance-content');
+  const toggle = document.getElementById('nuance-toggle');
+  if (content) content.style.display = 'none';
+  if (toggle) toggle.classList.remove('open');
+}
+
+// Get nuance interpretation for story generation
+function getNuanceInterpretation() {
+  const interpretations = [];
+
+  for (const [dim, val] of Object.entries(nuanceSliders)) {
+    const config = NUANCE_DIMENSIONS[dim];
+    if (!config) continue;
+
+    const intensity = Math.abs(val - 50);
+    const side = val < 50 ? 'left' : 'right';
+    const label = config[side];
+
+    if (intensity >= 30) {
+      interpretations.push({
+        dimension: dim,
+        leaning: label,
+        intensity: intensity > 40 ? 'strong' : 'moderate',
+        value: val
+      });
+    }
+  }
+
+  return interpretations;
+}
+
 // Generate case-specific placeholder art
 function generateCaseArt(article) {
   const artSvg = document.getElementById('case-art');
@@ -5497,7 +5720,60 @@ function generateCaseArt(article) {
   `;
 }
 
+// Save source rating and comedy tags to backend
+async function saveDiscoveryData() {
+  if (!currentArticle?.id) return;
+
+  const UPDATE_URL = `${SUPABASE_URL}/functions/v1/update-case`;
+
+  try {
+    // Save source quality if rated
+    if (currentSourceQuality) {
+      await fetch(UPDATE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          case_id: currentArticle.id,
+          action: 'rate_source',
+          quality: currentSourceQuality
+        })
+      });
+    }
+
+    // Save comedy tags if selected
+    for (const style of selectedComedyStyles) {
+      await fetch(UPDATE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          case_id: currentArticle.id,
+          action: 'tag_comedy',
+          comedy_style: style
+        })
+      });
+    }
+
+    // Save nuance sliders if used
+    if (Object.keys(nuanceSliders).length > 0) {
+      await fetch(UPDATE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          case_id: currentArticle.id,
+          action: 'set_nuance',
+          nuance: nuanceSliders
+        })
+      });
+    }
+  } catch (err) {
+    console.log('Failed to save discovery data:', err);
+  }
+}
+
 function continueFromDiscovery() {
+  // Save ratings before continuing
+  saveDiscoveryData();
+
   playSfx('confirm');
   setMusicMood('extraction');  // 🎵 Back to tense extraction music
   if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('extraction');
