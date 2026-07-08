@@ -1403,40 +1403,144 @@ main {
   font-weight: bold;
 }
 
-/* Get Lucky button */
-.get-lucky-btn {
+/* Search/Spin unified button */
+.spin-btn {
   background: linear-gradient(135deg, var(--brain), var(--purple));
   border: none;
   border-radius: 6px;
-  padding: 10px 14px;
-  font-size: 18px;
+  padding: 10px 16px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
   box-shadow: 0 2px 8px var(--brain-glow);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: white;
+  font-weight: 500;
 }
-.get-lucky-btn:hover {
-  transform: scale(1.1);
+.spin-btn:hover {
+  transform: scale(1.05);
   box-shadow: 0 4px 16px var(--brain-glow), var(--neon-glow);
 }
-.get-lucky-btn:active {
+.spin-btn:active {
   transform: scale(0.95);
 }
+.spin-btn.spinning {
+  animation: spin-pulse 0.5s infinite;
+}
+@keyframes spin-pulse {
+  0%, 100% { box-shadow: 0 2px 8px var(--brain-glow); }
+  50% { box-shadow: 0 4px 20px var(--brain-glow), var(--neon-glow); }
+}
 
-.get-lucky-mini {
+.search-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+  gap: 10px;
+}
+
+.mine-btn {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
   cursor: pointer;
-  margin-left: auto;
   transition: all 0.2s;
   color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.get-lucky-mini:hover {
+.mine-btn:hover {
   border-color: var(--brain);
   background: var(--bg-card);
   box-shadow: 0 0 10px var(--brain-glow);
+}
+
+/* Discovery screen case art */
+.case-art-container {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+}
+.case-art {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.case-facts {
+  text-align: center;
+  padding: 16px;
+}
+.case-facts-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.case-facts-summary {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-bottom: 12px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.case-facts-meta {
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.source-link {
+  color: var(--brain);
+  text-decoration: none;
+}
+.source-link:hover {
+  text-decoration: underline;
+}
+
+.source-quality {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.quality-label {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.quality-btn {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+.quality-btn.good:hover, .quality-btn.good.selected {
+  border-color: var(--heaven);
+  background: rgba(74, 222, 128, 0.1);
+  color: var(--heaven);
+}
+.quality-btn.evil:hover, .quality-btn.evil.selected {
+  border-color: var(--hell);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--hell);
 }
 
 .search-status {
@@ -1654,7 +1758,40 @@ main {
   color: var(--text-dim);
   text-align: right;
   max-width: 400px;
+  margin-bottom: 8px;
+}
+.notes-rewards {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 12px;
+  max-width: 400px;
+}
+.reward-tier {
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.reward-tier.active {
+  background: rgba(255, 215, 0, 0.15);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.reward-tier.achieved {
+  background: rgba(74, 222, 128, 0.15);
+  border-color: var(--heaven);
+  color: var(--heaven);
+}
+.notes-quality-hint {
+  font-size: 11px;
+  color: var(--purple);
   margin-bottom: 20px;
+  opacity: 0.8;
 }
 .skip-btn {
   background: none;
@@ -1666,6 +1803,106 @@ main {
   padding: 8px 16px;
 }
 .skip-btn:hover {
+  color: var(--text);
+}
+
+/* Mining Minigame Overlay */
+.mining-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fade-in 0.3s ease;
+}
+.mining-game {
+  background: var(--bg-card);
+  border: 2px solid var(--brain);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 40px var(--brain-glow);
+}
+.mining-header {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--brain);
+}
+.mining-subtitle {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+}
+.mining-prompt {
+  font-size: 16px;
+  color: var(--text);
+  margin-bottom: 16px;
+  min-height: 48px;
+}
+.mining-input {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.mining-input:focus {
+  border-color: var(--brain);
+  outline: none;
+  box-shadow: 0 0 10px var(--brain-glow);
+}
+.mining-collected {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+.mining-progress {
+  height: 6px;
+  background: var(--bg-elevated);
+  border-radius: 3px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.mining-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--brain), var(--purple));
+  transition: width 0.3s ease;
+}
+.mining-submit {
+  background: linear-gradient(135deg, var(--brain), var(--purple));
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+  margin-right: 12px;
+}
+.mining-submit:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px var(--brain-glow);
+}
+.mining-skip {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 8px 16px;
+}
+.mining-skip:hover {
   color: var(--text);
 }
 
@@ -1771,14 +2008,22 @@ main {
           <input class="triple-input" id="triple-action" placeholder="action" oninput="handleSearch()">
           <span class="triple-arrow">→</span>
           <input class="triple-input" id="triple-whom" placeholder="whom" oninput="handleSearch()">
-          <button class="get-lucky-btn" onclick="spinForCase()" title="Find a random case">🎰</button>
+          <button class="spin-btn" onclick="smartSpinOrSearch()" title="Search or spin for a random case">
+            <span id="spin-btn-icon">🔍</span>
+            <span id="spin-btn-text">Search</span>
+          </button>
+        </div>
+        <div class="search-actions">
+          <button class="mine-btn" onclick="mineNewCase()" title="Mine a new case to the database">
+            ⛏️ Mine Case
+          </button>
         </div>
         <div class="search-status" id="search-status"></div>
       </div>
 
       <div class="case-feed" id="case-feed">
         <div class="feed-section">
-          <div class="feed-title">🔥 Trending Cases <button class="get-lucky-mini" onclick="spinForCase()">🎰 Get Lucky</button></div>
+          <div class="feed-title">🔥 Trending Cases</div>
           <div id="trending-cases">Loading...</div>
         </div>
         <div class="feed-section" id="web-results" style="display:none">
@@ -1858,28 +2103,45 @@ main {
     <div class="story-screen" id="story-discovery-screen">
       <div class="story-scene">
         <div class="scene-header">
-          <span class="scene-badge">Scene 1</span>
+          <span class="scene-badge">Case File</span>
           <span class="scene-title">THE DISCOVERY</span>
         </div>
         <div class="scene-content">
-          <div class="story-character">
-            <div class="character-avatar">🧠</div>
-            <div class="character-speech">
-              <div class="character-name">Evil Brain</div>
-              <div class="story-text" id="discovery-brain-text">
-                Loading...
-              </div>
-            </div>
+          <!-- Case-specific art placeholder -->
+          <div class="case-art-container" id="case-art-container">
+            <svg id="case-art" viewBox="0 0 300 200" class="case-art">
+              <!-- Placeholder: robots scanning license plates -->
+              <rect fill="#1A1817" width="300" height="200"/>
+              <text x="150" y="100" fill="#888" text-anchor="middle" font-size="14">Case illustration loading...</text>
+            </svg>
           </div>
 
-          <div class="story-case-info">
-            <div class="story-case-title" id="discovery-case-title">Case Title</div>
-            <div class="story-case-meta" id="discovery-case-meta">Source: Unknown</div>
+          <!-- Just the facts -->
+          <div class="case-facts">
+            <div class="case-facts-title" id="discovery-case-title">Case Title</div>
+            <div class="case-facts-summary" id="discovery-case-summary">
+              <!-- Summary will be populated here -->
+            </div>
+            <div class="case-facts-meta">
+              <span id="discovery-case-meta">Source: Unknown</span>
+              <a href="#" id="discovery-source-link" target="_blank" class="source-link">Learn more →</a>
+            </div>
+
+            <!-- Source quality rating -->
+            <div class="source-quality">
+              <span class="quality-label">Rate the source:</span>
+              <button class="quality-btn good" id="source-good-btn" onclick="rateSource('good')">
+                👼 Trustworthy
+              </button>
+              <button class="quality-btn evil" id="source-evil-btn" onclick="rateSource('evil')">
+                😈 Suspicious
+              </button>
+            </div>
           </div>
         </div>
       </div>
       <button class="story-continue" onclick="continueFromDiscovery()">
-        Extract the Truth →
+        Open the Case →
       </button>
     </div>
 
@@ -1990,16 +2252,24 @@ main {
 
     <!-- CASE NOTES SCREEN (real user notes - THE GOLD) -->
     <div class="notes-screen" id="notes-screen">
-      <div class="notes-header">📜 STORY BIBLE ENTRY</div>
-      <div class="notes-subtitle">Add your observations to the archives. Every note becomes canon.</div>
+      <div class="notes-header">📋 CASE NOTES</div>
+      <div class="notes-subtitle">Document your observations. More detail = more braincoin.</div>
 
       <div class="triple-progress" id="notes-triple"></div>
 
       <textarea class="notes-textarea" id="notes-textarea"
-        placeholder="What's the real story here? Connections to other cases? Predictions? Hot takes? Bad ideas welcome - they're worth extra coins."
-        maxlength="500"></textarea>
+        placeholder="What's the real story here? Connections to other cases? Predictions? Hot takes? Wild theories welcome."
+        maxlength="500"
+        oninput="updateNotesProgress()"></textarea>
 
-      <div class="notes-char-count"><span id="notes-count">0</span>/500 <span style="color:var(--gold);margin-left:8px;">💰 +5 coins for notes</span></div>
+      <div class="notes-rewards">
+        <div class="reward-tier" id="reward-tier-1">10+ chars: +5 💰</div>
+        <div class="reward-tier" id="reward-tier-2">50+ chars: +10 💰</div>
+        <div class="reward-tier" id="reward-tier-3">100+ chars: +15 💰</div>
+        <div class="reward-tier" id="reward-tier-4">200+ chars: +25 💰 (max)</div>
+      </div>
+      <div class="notes-char-count"><span id="notes-count">0</span>/500</div>
+      <div class="notes-quality-hint">Quality notes may earn bonus coins later!</div>
 
       <button class="continue-btn" onclick="submitNotes()">
         Seal the Entry →
@@ -2712,8 +2982,212 @@ const SLOT_SYMBOLS = {
 let slotSpinIntervals = [];
 let pendingCase = null;
 
-// Called when user clicks "Get Lucky" button
-async function spinForCase() {
+// Smart search/spin button - fills in partial input or spins random
+async function smartSpinOrSearch() {
+  const who = document.getElementById('triple-who').value.trim();
+  const action = document.getElementById('triple-action').value.trim();
+  const whom = document.getElementById('triple-whom').value.trim();
+  const mainSearch = document.getElementById('search-input').value.trim();
+
+  // Update button to spinning state
+  const btn = document.querySelector('.spin-btn');
+  btn.classList.add('spinning');
+  document.getElementById('spin-btn-icon').textContent = '🎰';
+  document.getElementById('spin-btn-text').textContent = 'Spinning...';
+
+  // If there's any input, search for closest match
+  if (who || action || whom || mainSearch) {
+    // Build search query from available parts
+    const query = [who, action, whom, mainSearch].filter(Boolean).join(' ');
+    await searchAndOpen(query);
+  } else {
+    // No input - spin for random case
+    // Prefer industry over government, org type over specific org
+    await spinForCase({ preferIndustry: true });
+  }
+
+  // Reset button
+  btn.classList.remove('spinning');
+  document.getElementById('spin-btn-icon').textContent = '🔍';
+  document.getElementById('spin-btn-text').textContent = 'Search';
+}
+
+// Search for best match and open it
+async function searchAndOpen(query) {
+  const slotScreen = document.getElementById('slot-screen');
+  const msg = document.getElementById('slot-message');
+
+  // Show slot machine while searching
+  slotScreen.classList.remove('hidden');
+  msg.textContent = 'FINDING BEST MATCH...';
+  startSpinning();
+
+  try {
+    // Search Supabase for matching cases
+    const { data, error } = await sb
+      .from('use_cases')
+      .select('id, title, description, category, evil_votes, good_votes')
+      .or(`title.ilike.%${query}%,description.ilike.%${query}%,category.ilike.%${query}%`)
+      .limit(1);
+
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      const matchedCase = data[0];
+      pendingCase = matchedCase;
+      await stopReelsWithCase(matchedCase);
+      msg.textContent = 'CASE FOUND!';
+      playSfx('coin');
+
+      setTimeout(() => {
+        slotScreen.classList.add('hidden');
+        startExtraction(matchedCase.id);
+      }, 1000);
+    } else {
+      // No match - fall back to random
+      msg.textContent = 'NO EXACT MATCH - GETTING RANDOM...';
+      await new Promise(r => setTimeout(r, 1000));
+      await spinForCase({ preferIndustry: true });
+    }
+  } catch (err) {
+    console.error('Search error:', err);
+    msg.textContent = 'SEARCH FAILED - TRY RANDOM';
+    stopAllReels();
+    setTimeout(() => slotScreen.classList.add('hidden'), 2000);
+  }
+}
+
+// Mine new cases to database - triggers word association minigame
+async function mineNewCase() {
+  // Start word association minigame to collect user ideas
+  showMiningMinigame();
+}
+
+// Word association minigame during case generation
+function showMiningMinigame() {
+  // Create mining overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'mining-overlay';
+  overlay.className = 'mining-overlay';
+  overlay.innerHTML = `
+    <div class="mining-game">
+      <div class="mining-header">⛏️ BRAIN MINING</div>
+      <div class="mining-subtitle">While we search for new cases, let's mine YOUR brain!</div>
+
+      <div class="mining-prompt" id="mining-prompt">
+        What organization might use AI in a surprising way?
+      </div>
+
+      <input class="mining-input" id="mining-input"
+             placeholder="Type your answer..."
+             autofocus>
+
+      <div class="mining-collected" id="mining-collected">
+        Ideas collected: <span id="mining-count">0</span>
+      </div>
+
+      <div class="mining-progress">
+        <div class="mining-bar" id="mining-bar"></div>
+      </div>
+
+      <button class="mining-submit" onclick="submitMiningAnswer()">Submit →</button>
+      <button class="mining-skip" onclick="closeMiningGame()">Cancel Mining</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Start background case generation
+  startBackgroundGeneration();
+
+  // Initialize mining state
+  window.miningState = {
+    step: 0,
+    answers: [],
+    prompts: [
+      "What organization might use AI in a surprising way?",
+      "What action could AI take that worries you?",
+      "Who would be most affected by this AI?",
+      "What could go wrong? (one word)",
+      "What could go right? (one word)"
+    ]
+  };
+
+  document.getElementById('mining-input').focus();
+}
+
+function submitMiningAnswer() {
+  const input = document.getElementById('mining-input');
+  const answer = input.value.trim();
+
+  if (!answer) return;
+
+  window.miningState.answers.push(answer);
+  window.miningState.step++;
+
+  document.getElementById('mining-count').textContent = window.miningState.answers.length;
+
+  // Update progress bar
+  const progress = (window.miningState.step / window.miningState.prompts.length) * 100;
+  document.getElementById('mining-bar').style.width = progress + '%';
+
+  if (window.miningState.step < window.miningState.prompts.length) {
+    // Next prompt
+    document.getElementById('mining-prompt').textContent =
+      window.miningState.prompts[window.miningState.step];
+    input.value = '';
+    input.focus();
+    playSfx('confirm');
+  } else {
+    // Done collecting - submit to generation
+    completeMining();
+  }
+}
+
+async function startBackgroundGeneration() {
+  // TODO: Start actual LLM generation in background
+  // For now, simulate with timeout
+  window.miningGenerationComplete = false;
+
+  setTimeout(() => {
+    window.miningGenerationComplete = true;
+    // If user is still in minigame, show completion
+    const overlay = document.getElementById('mining-overlay');
+    if (overlay) {
+      document.getElementById('mining-subtitle').textContent =
+        '✨ New case ready! Finish your thoughts...';
+    }
+  }, 5000);
+}
+
+function completeMining() {
+  playSfx('coin');
+  coins += 10;  // Bonus for contributing to mining
+  updateCoinsDisplay();
+
+  console.log('Brain mining complete:', window.miningState.answers);
+
+  // Close overlay
+  closeMiningGame();
+
+  // If generation complete, show the new case
+  if (window.miningGenerationComplete) {
+    spinForCase();
+  } else {
+    // Wait for generation
+    document.getElementById('slot-screen').classList.remove('hidden');
+    document.getElementById('slot-message').textContent = 'GENERATING NEW CASE...';
+    startSpinning();
+  }
+}
+
+function closeMiningGame() {
+  const overlay = document.getElementById('mining-overlay');
+  if (overlay) overlay.remove();
+}
+
+// Called when user clicks "Get Lucky" button (now unified with smartSpinOrSearch)
+async function spinForCase(options = {}) {
   const slotScreen = document.getElementById('slot-screen');
   const msg = document.getElementById('slot-message');
 
@@ -4261,21 +4735,78 @@ function finishAndContinue() {
 // STORY SCENES
 // ═══════════════════════════════════════════════════════════════
 
-// Scene 1: THE DISCOVERY - Brain introduces the case
+// Scene 1: THE DISCOVERY - Just the facts, case art, source rating
 function showDiscoveryScene() {
   setMusicMood('menu');  // 🎵 Mysterious introduction music
   if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('discovery');
 
-  // Generate Brain's introduction
-  const brainText = generateStoryText('discovery', 'brain', {
-    title: currentArticle.title
-  });
-
-  document.getElementById('discovery-brain-text').textContent = brainText;
+  // Populate case facts
   document.getElementById('discovery-case-title').textContent = currentArticle.title;
-  document.getElementById('discovery-case-meta').textContent = `Source: ${currentArticle.source} | Category: ${currentArticle.category}`;
+
+  // Summary - use description if no dedicated summary
+  const summary = currentArticle.summary || currentArticle.snippet || currentArticle.description ||
+    `An AI use case involving ${currentArticle.category || 'unknown category'}.`;
+  document.getElementById('discovery-case-summary').textContent = summary;
+
+  // Source info
+  document.getElementById('discovery-case-meta').textContent = `Source: ${currentArticle.source || 'Unknown'} | Category: ${currentArticle.category || 'Uncategorized'}`;
+
+  // Source link
+  const sourceLink = document.getElementById('discovery-source-link');
+  if (currentArticle.url) {
+    sourceLink.href = currentArticle.url;
+    sourceLink.style.display = 'inline';
+  } else {
+    sourceLink.style.display = 'none';
+  }
+
+  // Reset source quality buttons
+  document.getElementById('source-good-btn').classList.remove('selected');
+  document.getElementById('source-evil-btn').classList.remove('selected');
+
+  // Generate case-specific art
+  generateCaseArt(currentArticle);
 
   showScreen('story-discovery');
+}
+
+// Rate the source as trustworthy or suspicious
+let currentSourceQuality = null;
+function rateSource(quality) {
+  currentSourceQuality = quality;
+  document.getElementById('source-good-btn').classList.toggle('selected', quality === 'good');
+  document.getElementById('source-evil-btn').classList.toggle('selected', quality === 'evil');
+  playSfx('confirm');
+}
+
+// Generate case-specific placeholder art
+function generateCaseArt(article) {
+  const artSvg = document.getElementById('case-art');
+  const category = (article.category || 'unknown').toLowerCase();
+
+  // Art themes based on category
+  const themes = {
+    surveillance: { icon: '📷', bg: '#1A1817', accent: '#D42B1E', scene: 'cameras and eyes watching' },
+    automation: { icon: '🤖', bg: '#1A1817', accent: '#4ADE80', scene: 'robotic arms working' },
+    safety: { icon: '🛡️', bg: '#1A1817', accent: '#3B82F6', scene: 'protective shields' },
+    healthcare: { icon: '🏥', bg: '#1A1817', accent: '#EC4899', scene: 'medical symbols' },
+    finance: { icon: '💰', bg: '#1A1817', accent: '#F59E0B', scene: 'coins and graphs' },
+    education: { icon: '📚', bg: '#1A1817', accent: '#8B5CF6', scene: 'books and screens' },
+    military: { icon: '🎖️', bg: '#1A1817', accent: '#EF4444', scene: 'tactical elements' },
+    default: { icon: '🧠', bg: '#1A1817', accent: '#A855F7', scene: 'neural networks' }
+  };
+
+  const theme = themes[category] || themes.default;
+
+  // Simple placeholder SVG with category icon and scene description
+  artSvg.innerHTML = `
+    <rect fill="${theme.bg}" width="300" height="200"/>
+    <rect fill="${theme.accent}" x="0" y="0" width="300" height="4" opacity="0.8"/>
+    <rect fill="${theme.accent}" x="0" y="196" width="300" height="4" opacity="0.8"/>
+    <text x="150" y="90" fill="${theme.accent}" text-anchor="middle" font-size="48">${theme.icon}</text>
+    <text x="150" y="130" fill="#888" text-anchor="middle" font-size="12">${category.toUpperCase()}</text>
+    <text x="150" y="155" fill="#666" text-anchor="middle" font-size="10">${theme.scene}</text>
+  `;
 }
 
 function continueFromDiscovery() {
@@ -4433,14 +4964,54 @@ function submitNotes() {
   const notes = document.getElementById('notes-textarea').value.trim();
   currentUserNotes = notes;
 
-  // BONUS: Notes are gold - give extra coins for contributing to the story bible
-  if (notes.length > 10) {
-    coins += 5;  // Story bible contribution bonus
+  // TIERED REWARDS: More writing = more braincoin
+  let reward = 0;
+  if (notes.length >= 200) {
+    reward = 25;  // Maximum reward
+  } else if (notes.length >= 100) {
+    reward = 15;
+  } else if (notes.length >= 50) {
+    reward = 10;
+  } else if (notes.length >= 10) {
+    reward = 5;
+  }
+
+  if (reward > 0) {
+    coins += reward;
     updateCoinsDisplay();
-    console.log('📜 Story bible entry recorded! +5 coins');
+    console.log(`📋 Case notes recorded! +${reward} coins`);
+  }
+
+  // Queue notes for later quality analysis (TODO: actual Supabase submission)
+  if (notes.length > 20) {
+    console.log('📊 Notes queued for quality analysis - bonus coins may come later!');
   }
 
   showMintScreen();
+}
+
+// Update notes screen character count and reward tiers in real-time
+function updateNotesProgress() {
+  const notes = document.getElementById('notes-textarea').value;
+  const count = notes.length;
+  document.getElementById('notes-count').textContent = count;
+
+  // Highlight achieved reward tiers
+  const tiers = [
+    { id: 'reward-tier-1', min: 10 },
+    { id: 'reward-tier-2', min: 50 },
+    { id: 'reward-tier-3', min: 100 },
+    { id: 'reward-tier-4', min: 200 }
+  ];
+
+  tiers.forEach((tier, i) => {
+    const el = document.getElementById(tier.id);
+    if (!el) return;
+    const isAchieved = count >= tier.min;
+    const isNext = !isAchieved && (i === 0 || count >= tiers[i-1].min);
+    el.classList.toggle('achieved', isAchieved);
+    el.classList.toggle('active', isNext);
+  });
 }
 
 function skipNotes() {
