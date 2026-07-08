@@ -405,7 +405,7 @@ async function doSearch(){
       <h3>${esc(c.title||c.raw_title)}</h3>
       <div class="meta">${esc(c.who_name||'?')} \u2192 ${esc(c.action_verb||'?')} \u2192 ${esc(c.whom_name||'?')} · ${total} votes</div>
       <div class="votebar"><i style="width:${pct}%"></i></div>`;
-    el.onclick=()=>{const found=DEMO_CASES.find(x=>x.id===c.id); if(found) playWith(found); else startPlay();};
+    el.onclick=()=>loadAndPlay(c.id);
     host.appendChild(el);
   }
 }
@@ -416,6 +416,23 @@ const BEATS=['COLD OPEN','ACT I: THE ACTOR','ACT II: THE ACT','ACT III: THE AFFE
 const fill=(t,c)=>t.replaceAll('{WHO}',c.WHO||'the actor')
   .replaceAll('{ACTION}',c.ACTION||'does the thing to')
   .replaceAll('{WHOM}',c.WHOM||'everyone');
+
+async function loadAndPlay(caseId){
+  if(DEMO){
+    const c=DEMO_CASES.find(x=>x.id===caseId);
+    if(c) playWith(c);
+    return;
+  }
+  // Fetch full case data from Supabase
+  try{
+    const r=await fetch(CONFIG.SUPABASE_URL+'/rest/v1/cases?id=eq.'+caseId+'&select=*',{
+      headers:{'apikey':CONFIG.SUPABASE_ANON_KEY,'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY}
+    });
+    const data=await r.json();
+    if(data&&data[0]) playWith(data[0]);
+    else console.error('Case not found:',caseId);
+  }catch(e){console.error('loadAndPlay error:',e);}
+}
 
 async function startPlay(){
   const c=DEMO?DEMO_CASES[demoIdx++%DEMO_CASES.length]:null;
