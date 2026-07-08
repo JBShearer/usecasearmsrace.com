@@ -1139,6 +1139,42 @@ main {
   font-weight: bold;
 }
 
+/* Get Lucky button */
+.get-lucky-btn {
+  background: linear-gradient(135deg, var(--brain), var(--purple));
+  border: none;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px var(--brain-glow);
+}
+.get-lucky-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px var(--brain-glow), var(--neon-glow);
+}
+.get-lucky-btn:active {
+  transform: scale(0.95);
+}
+
+.get-lucky-mini {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: auto;
+  transition: all 0.2s;
+  color: var(--text);
+}
+.get-lucky-mini:hover {
+  border-color: var(--brain);
+  background: var(--bg-card);
+  box-shadow: 0 0 10px var(--brain-glow);
+}
+
 .search-status {
   margin-top: 12px;
   font-size: 12px;
@@ -1471,13 +1507,14 @@ main {
           <input class="triple-input" id="triple-action" placeholder="action" oninput="handleSearch()">
           <span class="triple-arrow">→</span>
           <input class="triple-input" id="triple-whom" placeholder="whom" oninput="handleSearch()">
+          <button class="get-lucky-btn" onclick="spinForCase()" title="Find a random case">🎰</button>
         </div>
         <div class="search-status" id="search-status"></div>
       </div>
 
       <div class="case-feed" id="case-feed">
         <div class="feed-section">
-          <div class="feed-title">🔥 Trending Cases</div>
+          <div class="feed-title">🔥 Trending Cases <button class="get-lucky-mini" onclick="spinForCase()">🎰 Get Lucky</button></div>
           <div id="trending-cases">Loading...</div>
         </div>
         <div class="feed-section" id="web-results" style="display:none">
@@ -1825,10 +1862,7 @@ const SOURCE_ICONS = {
 // INIT
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
-  // Show slot machine loading
-  runSlotMachine();
-
-  // Init Supabase
+  // Init Supabase first
   if (window.supabase) {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
@@ -1850,7 +1884,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     audioBtn.classList.add('muted');
   }
 
-  // Load daily show
+  // Load daily show (background)
   loadDailyShow();
 
   // Restore show collapsed state
@@ -1858,11 +1892,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('daily-show').classList.add('collapsed');
   }
 
-  // Load trending cases
-  await loadTrendingCases();
-
-  // Hide slot machine after loading
-  hideSlotMachine();
+  // Run LOADING slot machine (shows while cases load, then hides)
+  await runLoadingSlotMachine();
 
   // Start background music after a short delay (gives time for user interaction)
   setTimeout(() => {
@@ -1871,54 +1902,230 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// SLOT MACHINE LOADING
+// SLOT MACHINE - "GET LUCKY" DISCOVERY
+// Spins while fetching a random case, then reveals and opens it
+// "One spin might end the world. Or save it."
 // ═══════════════════════════════════════════════════════════════
 const SLOT_SYMBOLS = {
-  who: ['🏢', '🏛️', '🏥', '🏫', '👮', '🤖', '💼', '🎓'],
-  action: ['⚡', '👁️', '🔍', '🎯', '📊', '🔒', '🚫', '✅'],
-  whom: ['👤', '👥', '🧑‍💼', '🧑‍🎓', '🧑‍⚕️', '👶', '🌍', '💰']
+  who: ['🏢', '🏛️', '🏥', '🏫', '👮', '🤖', '💼', '🎓', '🔬', '💰'],
+  action: ['⚡', '👁️', '🔍', '🎯', '📊', '🔒', '🚫', '✅', '🔄', '💥'],
+  whom: ['👤', '👥', '🧑‍💼', '🧑‍🎓', '🧑‍⚕️', '👶', '🌍', '💰', '🏠', '📱']
 };
 
-function runSlotMachine() {
+let slotSpinIntervals = [];
+let pendingCase = null;
+
+// Called when user clicks "Get Lucky" button
+async function spinForCase() {
+  const slotScreen = document.getElementById('slot-screen');
+  const msg = document.getElementById('slot-message');
+
+  // Show slot machine
+  slotScreen.classList.remove('hidden');
+  msg.textContent = 'SEARCHING THE DATABASE...';
+
+  // Start spinning all reels
+  startSpinning();
+
+  // Fetch a random case from database
+  try {
+    const randomCase = await fetchRandomCase();
+
+    if (randomCase) {
+      pendingCase = randomCase;
+
+      // Stop reels one by one with the case data
+      await stopReelsWithCase(randomCase);
+
+      // Show "CASE FOUND" then open it
+      msg.textContent = 'CASE FOUND!';
+      playSfx('coin');
+
+      setTimeout(() => {
+        slotScreen.classList.add('hidden');
+        startExtraction(randomCase.id);
+      }, 1000);
+    } else {
+      // No cases found
+      msg.textContent = 'NO CASES IN DATABASE';
+      setTimeout(() => {
+        slotScreen.classList.add('hidden');
+      }, 2000);
+    }
+  } catch (err) {
+    console.error('Slot machine error:', err);
+    msg.textContent = 'MALFUNCTION!';
+    stopAllReels();
+    setTimeout(() => {
+      slotScreen.classList.add('hidden');
+    }, 2000);
+  }
+}
+
+function startSpinning() {
   const reels = ['reel-1', 'reel-2', 'reel-3'];
   const types = ['who', 'action', 'whom'];
-  let spinCount = 0;
 
-  // Spin each reel
+  // Clear any existing intervals
+  stopAllReels();
+
   reels.forEach((id, i) => {
     const reel = document.getElementById(id);
     const inner = reel.querySelector('.reel-inner');
     const symbols = SLOT_SYMBOLS[types[i]];
 
+    reel.classList.remove('stopped');
+
     // Spin animation
-    const spinInterval = setInterval(() => {
+    const interval = setInterval(() => {
       inner.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-    }, 100);
+    }, 80);
 
-    // Stop after staggered delay
-    setTimeout(() => {
-      clearInterval(spinInterval);
-      reel.classList.add('stopped');
-      inner.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-      spinCount++;
-
-      // Update message as reels stop
-      const msg = document.getElementById('slot-message');
-      if (spinCount === 1) msg.textContent = 'WHO...';
-      if (spinCount === 2) msg.textContent = 'DOES WHAT...';
-      if (spinCount === 3) msg.textContent = 'TO WHOM?';
-    }, 800 + (i * 600));
+    slotSpinIntervals.push(interval);
   });
 }
 
-function hideSlotMachine() {
-  const slot = document.getElementById('slot-screen');
-  const msg = document.getElementById('slot-message');
-  msg.textContent = 'LET\'S PLAY!';
+function stopAllReels() {
+  slotSpinIntervals.forEach(interval => clearInterval(interval));
+  slotSpinIntervals = [];
 
-  setTimeout(() => {
-    slot.classList.add('hidden');
-  }, 500);
+  ['reel-1', 'reel-2', 'reel-3'].forEach(id => {
+    document.getElementById(id)?.classList.add('stopped');
+  });
+}
+
+async function stopReelsWithCase(caseData) {
+  const msg = document.getElementById('slot-message');
+
+  // Parse case to get WHO, ACTION, WHOM hints
+  const title = caseData.title || '';
+  const desc = caseData.description || '';
+
+  // Stop reel 1 (WHO) - show organization icon
+  await delay(600);
+  clearInterval(slotSpinIntervals[0]);
+  document.getElementById('reel-1').classList.add('stopped');
+  document.getElementById('reel-1').querySelector('.reel-inner').textContent = getIconForText(title, 'who');
+  msg.textContent = 'WHO...';
+  playSfx('select');
+
+  // Stop reel 2 (ACTION) - show action icon
+  await delay(600);
+  clearInterval(slotSpinIntervals[1]);
+  document.getElementById('reel-2').classList.add('stopped');
+  document.getElementById('reel-2').querySelector('.reel-inner').textContent = getIconForText(title + ' ' + desc, 'action');
+  msg.textContent = 'DOES WHAT...';
+  playSfx('select');
+
+  // Stop reel 3 (WHOM) - show target icon
+  await delay(600);
+  clearInterval(slotSpinIntervals[2]);
+  document.getElementById('reel-3').classList.add('stopped');
+  document.getElementById('reel-3').querySelector('.reel-inner').textContent = getIconForText(desc, 'whom');
+  msg.textContent = 'TO WHOM?';
+  playSfx('select');
+
+  await delay(400);
+}
+
+function getIconForText(text, type) {
+  const t = text.toLowerCase();
+
+  if (type === 'who') {
+    if (t.includes('police') || t.includes('law enforcement')) return '👮';
+    if (t.includes('hospital') || t.includes('health')) return '🏥';
+    if (t.includes('school') || t.includes('university')) return '🏫';
+    if (t.includes('government') || t.includes('federal')) return '🏛️';
+    if (t.includes('bank') || t.includes('financial')) return '💰';
+    if (t.includes('amazon') || t.includes('google') || t.includes('meta')) return '💼';
+    return '🏢';
+  }
+
+  if (type === 'action') {
+    if (t.includes('surveillance') || t.includes('monitor') || t.includes('track')) return '👁️';
+    if (t.includes('denied') || t.includes('reject') || t.includes('block')) return '🚫';
+    if (t.includes('approved') || t.includes('accept')) return '✅';
+    if (t.includes('scan') || t.includes('recognize') || t.includes('detect')) return '🔍';
+    if (t.includes('predict') || t.includes('score')) return '🎯';
+    if (t.includes('automat')) return '🤖';
+    return '⚡';
+  }
+
+  if (type === 'whom') {
+    if (t.includes('student')) return '🧑‍🎓';
+    if (t.includes('patient')) return '🧑‍⚕️';
+    if (t.includes('employee') || t.includes('worker')) return '🧑‍💼';
+    if (t.includes('child') || t.includes('minor')) return '👶';
+    if (t.includes('citizen') || t.includes('public')) return '👥';
+    if (t.includes('user')) return '📱';
+    return '👤';
+  }
+
+  return '❓';
+}
+
+async function fetchRandomCase() {
+  if (!sb) return null;
+
+  // Get count of available cases
+  const { count } = await sb
+    .from('use_cases')
+    .select('*', { count: 'exact', head: true })
+    .in('status', ['active', 'approved']);
+
+  if (!count || count === 0) return null;
+
+  // Get a random offset
+  const randomOffset = Math.floor(Math.random() * count);
+
+  // Fetch single random case
+  const { data, error } = await sb
+    .from('use_cases')
+    .select('id, title, description, category, url, evil_votes, good_votes')
+    .in('status', ['active', 'approved'])
+    .range(randomOffset, randomOffset)
+    .single();
+
+  if (error) {
+    console.error('Error fetching random case:', error);
+    return null;
+  }
+
+  return data;
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Initial loading slot machine (shows on page load)
+async function runLoadingSlotMachine() {
+  const msg = document.getElementById('slot-message');
+  msg.textContent = 'LOADING CASES...';
+
+  // Quick spin animation during load
+  startSpinning();
+
+  // Wait for cases to load, then reveal and hide
+  await loadTrendingCases();
+
+  // Stop reels with generic reveal
+  const reels = ['reel-1', 'reel-2', 'reel-3'];
+  for (let i = 0; i < 3; i++) {
+    await delay(400);
+    clearInterval(slotSpinIntervals[i]);
+    document.getElementById(reels[i]).classList.add('stopped');
+    if (i === 0) msg.textContent = 'WHO...';
+    if (i === 1) msg.textContent = 'DOES WHAT...';
+    if (i === 2) msg.textContent = 'TO WHOM?';
+    playSfx('select');
+  }
+
+  await delay(500);
+  msg.textContent = 'READY TO PLAY!';
+
+  await delay(800);
+  document.getElementById('slot-screen').classList.add('hidden');
 }
 
 // ═══════════════════════════════════════════════════════════════
