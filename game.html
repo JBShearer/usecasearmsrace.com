@@ -408,7 +408,7 @@ main {
   color: var(--text);
 }
 
-/* Choice Cards */
+/* Choice Cards - MEME-STYLE TAGS */
 .choices {
   display: flex;
   flex-direction: column;
@@ -420,12 +420,14 @@ main {
   background: var(--bg-card);
   border: 2px solid var(--border);
   border-radius: 12px;
-  padding: 20px;
+  padding: 16px 20px;
   cursor: pointer;
   transition: all 0.2s ease;
-  text-align: center;
-  font-size: 16px;
+  text-align: left;
+  font-size: 15px;
   font-weight: 600;
+  position: relative;
+  overflow: hidden;
 }
 .choice-card:hover {
   border-color: var(--brain);
@@ -440,6 +442,268 @@ main {
   background: var(--brain);
   color: white;
 }
+/* Meme tag badge */
+.choice-card .tag-flavor {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-dim);
+  margin-top: 4px;
+  font-style: italic;
+}
+.choice-card.selected .tag-flavor {
+  color: rgba(255,255,255,0.8);
+}
+
+/* Inline Verdict (shows after triple complete) */
+.inline-verdict {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px dashed var(--border);
+}
+.inline-verdict.active { display: flex; }
+.inline-verdict h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0;
+}
+.verdict-inline-buttons {
+  display: flex;
+  gap: 12px;
+}
+.verdict-inline-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 24px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+.verdict-inline-btn:hover {
+  transform: scale(1.05);
+}
+.verdict-inline-btn.heaven:hover {
+  border-color: var(--good);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+}
+.verdict-inline-btn.hell:hover {
+  border-color: var(--bad);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+.verdict-inline-btn.selected.heaven {
+  border-color: var(--good);
+  background: var(--good);
+  color: white;
+}
+.verdict-inline-btn.selected.hell {
+  border-color: var(--bad);
+  background: var(--bad);
+  color: white;
+}
+.verdict-inline-btn .emoji { font-size: 28px; }
+.verdict-inline-btn .label { font-size: 14px; font-weight: 700; }
+
+/* Collective Stats Display */
+.collective-stats {
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--bg-elevated);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  text-align: center;
+}
+.stats-label {
+  font-size: 11px;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.stats-row {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.stats-row .verdict-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 8px;
+  background: var(--border);
+}
+.stats-row .verdict-bar .heaven-bar {
+  background: var(--good);
+}
+.stats-row .verdict-bar .hell-bar {
+  background: var(--bad);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BRAINIAC COMMENT BOX - Updates as tags are selected
+   ═══════════════════════════════════════════════════════════════ */
+.brainiac-comment-box {
+  background: var(--bg-elevated);
+  border: 2px solid var(--brain);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 20px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 80px;
+  transition: all 0.3s ease;
+}
+.brainiac-comment-box.hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+.brainiac-avatar {
+  font-size: 32px;
+  flex-shrink: 0;
+  animation: brainiacBob 2s ease-in-out infinite;
+}
+@keyframes brainiacBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.brainiac-speech {
+  flex: 1;
+}
+.brainiac-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--brain);
+  margin-bottom: 4px;
+}
+.brainiac-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  font-style: italic;
+}
+.brainiac-text .highlight {
+  color: var(--gold);
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Humorous Tag Chips */
+.tag-section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+.tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.tag-chip {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  font-weight: 500;
+}
+.tag-chip:hover {
+  border-color: var(--brain);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.tag-chip.selected {
+  background: var(--brain);
+  border-color: var(--brain);
+  color: white;
+}
+.tag-chip .tag-emoji {
+  margin-right: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCRATCH CARD REVEAL
+   ═══════════════════════════════════════════════════════════════ */
+.scratch-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.scratch-overlay.active { display: flex; }
+
+.scratch-container {
+  position: relative;
+  width: 280px;
+  height: 380px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(255,215,0,0.3);
+}
+
+.scratch-card-underneath {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border: 3px solid var(--gold);
+  border-radius: 16px;
+}
+
+.scratch-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  cursor: crosshair;
+  border-radius: 16px;
+}
+
+.scratch-instructions {
+  color: var(--gold);
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 20px;
+  animation: pulse 1.5s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.scratch-skip {
+  margin-top: 16px;
+  color: var(--text-dim);
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.scratch-skip:hover { color: var(--text); }
 
 /* ═══════════════════════════════════════════════════════════════
    STORY SCENES
@@ -1524,14 +1788,43 @@ main {
       </div>
     </div>
 
-    <!-- EXTRACTION GAME SCREEN -->
+    <!-- EXTRACTION GAME SCREEN - SUMMARY + TAGGING PANEL -->
     <div class="game-screen" id="game-screen" style="display:none">
+      <!-- Full headline and description at top -->
       <div class="article-header">
         <div class="article-source" id="article-source">Loading...</div>
         <div class="article-title" id="article-title">Article title here</div>
         <div class="article-snippet" id="article-snippet"></div>
       </div>
 
+      <!-- Brainiac comment that updates as tags are selected -->
+      <div class="brainiac-comment-box" id="brainiac-comment-box">
+        <div class="brainiac-avatar">🧠</div>
+        <div class="brainiac-speech">
+          <div class="brainiac-name">Evil Brain</div>
+          <div class="brainiac-text" id="brainiac-text">Ooh, a fresh case! Tag the culprits below... I'm watching.</div>
+        </div>
+      </div>
+
+      <!-- WHO Tags -->
+      <div class="tag-section-label">👤 WHO did this?</div>
+      <div class="tag-chips" id="who-tags">
+        <!-- Tags injected by JS -->
+      </div>
+
+      <!-- ACTION Tags -->
+      <div class="tag-section-label">⚡ What ACTION?</div>
+      <div class="tag-chips" id="action-tags">
+        <!-- Tags injected by JS -->
+      </div>
+
+      <!-- WHOM Tags -->
+      <div class="tag-section-label">🎯 To WHOM?</div>
+      <div class="tag-chips" id="whom-tags">
+        <!-- Tags injected by JS -->
+      </div>
+
+      <!-- Triple progress display -->
       <div class="triple-progress" id="triple-progress">
         <span class="current">[?]</span>
         <span class="arrow">→</span>
@@ -1540,10 +1833,24 @@ main {
         <span>[?]</span>
       </div>
 
-      <div class="question" id="question">WHO is doing this?</div>
-
-      <div class="choices" id="choices">
-        <!-- Choices injected by JS -->
+      <!-- INLINE VERDICT (appears after WHO/ACTION/WHOM complete) -->
+      <div class="inline-verdict" id="inline-verdict">
+        <h3>⚖️ Your Verdict</h3>
+        <div class="verdict-inline-buttons">
+          <button class="verdict-inline-btn heaven" onclick="selectInlineVerdict('heaven')">
+            <span class="emoji">😇</span>
+            <span class="label">Good</span>
+          </button>
+          <button class="verdict-inline-btn hell" onclick="selectInlineVerdict('hell')">
+            <span class="emoji">😈</span>
+            <span class="label">Evil</span>
+          </button>
+        </div>
+        <!-- Collective stats (shows if others have tagged) -->
+        <div class="collective-stats" id="collective-stats" style="display:none;">
+          <div class="stats-label">📊 The Hive Mind</div>
+          <div class="stats-row" id="stats-content">Loading...</div>
+        </div>
       </div>
     </div>
 
@@ -1681,23 +1988,23 @@ main {
       </div>
     </div>
 
-    <!-- CASE NOTES SCREEN (real user notes) -->
+    <!-- CASE NOTES SCREEN (real user notes - THE GOLD) -->
     <div class="notes-screen" id="notes-screen">
-      <div class="notes-header">📝 CASE NOTES</div>
-      <div class="notes-subtitle">Add your expert commentary (optional)</div>
+      <div class="notes-header">📜 STORY BIBLE ENTRY</div>
+      <div class="notes-subtitle">Add your observations to the archives. Every note becomes canon.</div>
 
       <div class="triple-progress" id="notes-triple"></div>
 
       <textarea class="notes-textarea" id="notes-textarea"
-        placeholder="What do you think about this use case? Any context, concerns, or connections to other cases?"
+        placeholder="What's the real story here? Connections to other cases? Predictions? Hot takes? Bad ideas welcome - they're worth extra coins."
         maxlength="500"></textarea>
 
-      <div class="notes-char-count"><span id="notes-count">0</span>/500</div>
+      <div class="notes-char-count"><span id="notes-count">0</span>/500 <span style="color:var(--gold);margin-left:8px;">💰 +5 coins for notes</span></div>
 
       <button class="continue-btn" onclick="submitNotes()">
-        Close Case →
+        Seal the Entry →
       </button>
-      <button class="skip-btn" onclick="skipNotes()">Skip</button>
+      <button class="skip-btn" onclick="skipNotes()">Skip (no bonus)</button>
     </div>
 
     <!-- CARD COLLECTION SCREEN -->
@@ -1768,6 +2075,398 @@ let picks = { who: null, action: null, whom: null };
 let currentFaction = null;
 let currentUserNotes = '';
 
+// ═══════════════════════════════════════════════════════════════
+// COLLECTIVE STORY BIBLE
+// Same arc for everyone - but we track HOW users react
+// The hive mind votes on WHO/ACTION/WHOM and Heaven/Hell
+// Notes become crowd-sourced intelligence
+// ═══════════════════════════════════════════════════════════════
+
+// Local journey (personal stats)
+let userJourney = JSON.parse(localStorage.getItem('ucar_journey') || JSON.stringify({
+  casesTagged: [],
+  factionsChosen: { heaven: 0, hell: 0 },
+  streaks: { current: 0, longest: 0, type: null },
+  encountersTriggered: []
+}));
+
+// Save journey to localStorage
+function saveJourney() {
+  localStorage.setItem('ucar_journey', JSON.stringify(userJourney));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CASE COLLECTIVE DATA STRUCTURE
+// This is what we'd store in Supabase for each case
+// Everyone plays the same arc, we aggregate their choices
+// ═══════════════════════════════════════════════════════════════
+/*
+TABLE: case_collective_data
+{
+  case_id: UUID,
+
+  // WHO distribution - what users picked
+  who_picks: {
+    "School District": 523,
+    "The Algorithm": 267,
+    "Security Vendor": 57
+  },
+
+  // ACTION distribution
+  action_picks: {
+    "surveilled": 412,
+    "flagged": 298,
+    "detained": 137
+  },
+
+  // WHOM distribution
+  whom_picks: {
+    "students": 601,
+    "children": 189,
+    "privacy": 57
+  },
+
+  // Verdict breakdown
+  verdicts: {
+    heaven: 51,
+    hell: 796
+  },
+
+  // Top notes (crowd-sourced story bible)
+  notes: [
+    { text: "...", upvotes: 127, user_id: "..." },
+    ...
+  ],
+
+  total_plays: 847,
+  first_played: timestamp,
+  last_played: timestamp,
+  trending_score: 0.87
+}
+*/
+
+// Submit user's choices to the collective (POST to Supabase)
+async function submitToCollective(caseId, triple, faction, notes) {
+  if (!sb) {
+    console.warn('Supabase not initialized, skipping collective submission');
+    return null;
+  }
+
+  const submission = {
+    case_id: caseId,
+    subject: triple.who,
+    verb: triple.action,
+    object: triple.whom,
+    faction: faction,
+    user_reasoning: notes || null,
+    session_id: getSessionId(),
+    status: 'pending'
+  };
+
+  console.log('📊 Submitting to collective:', submission);
+
+  try {
+    const { data, error } = await sb
+      .from('triple_submissions')
+      .insert(submission)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Collective submission error:', error);
+      // Don't block the flow - just log
+      return null;
+    }
+
+    console.log('✅ Submitted to collective:', data?.id);
+    return data;
+  } catch (err) {
+    console.error('Collective submission failed:', err);
+    return null;
+  }
+}
+
+// Get collective stats for a case (fetch from Supabase)
+async function getCollectiveStats(caseId) {
+  if (!sb || !caseId) {
+    return { total_plays: 0, who_picks: {}, action_picks: {}, whom_picks: {}, verdict_split: { heaven: 0, hell: 0 } };
+  }
+
+  try {
+    // Fetch all submissions for this case
+    const { data: submissions, error } = await sb
+      .from('triple_submissions')
+      .select('subject, verb, object, faction')
+      .eq('case_id', caseId);
+
+    if (error || !submissions) {
+      return { total_plays: 0, who_picks: {}, action_picks: {}, whom_picks: {}, verdict_split: { heaven: 0, hell: 0 } };
+    }
+
+    // Aggregate the data
+    const stats = {
+      total_plays: submissions.length,
+      who_picks: {},
+      action_picks: {},
+      whom_picks: {},
+      verdict_split: { heaven: 0, hell: 0 }
+    };
+
+    for (const s of submissions) {
+      // Count WHO picks
+      stats.who_picks[s.subject] = (stats.who_picks[s.subject] || 0) + 1;
+      // Count ACTION picks
+      stats.action_picks[s.verb] = (stats.action_picks[s.verb] || 0) + 1;
+      // Count WHOM picks
+      stats.whom_picks[s.object] = (stats.whom_picks[s.object] || 0) + 1;
+      // Count verdicts
+      if (s.faction === 'heaven' || s.faction === 'hell') {
+        stats.verdict_split[s.faction]++;
+      }
+    }
+
+    console.log('📈 Collective stats for case:', stats);
+    return stats;
+  } catch (err) {
+    console.error('Failed to fetch collective stats:', err);
+    return { total_plays: 0, who_picks: {}, action_picks: {}, whom_picks: {}, verdict_split: { heaven: 0, hell: 0 } };
+  }
+}
+
+// Get or create session ID for anonymous submissions
+function getSessionId() {
+  let sessionId = localStorage.getItem('ucar_session_id');
+  if (!sessionId) {
+    sessionId = 'sess_' + Date.now().toString(36) + Math.random().toString(36).slice(2);
+    localStorage.setItem('ucar_session_id', sessionId);
+  }
+  return sessionId;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STORY ARCS - Fixed structure, collective reactions
+// Each case has a pre-defined arc, users react within it
+// ═══════════════════════════════════════════════════════════════
+const STORY_ARC_TYPES = {
+  // Arc type based on primary action verb
+  panopticon: {
+    name: 'The Panopticon',
+    triggers: ['surveil', 'monitor', 'track', 'watch', 'scan', 'detect'],
+    beats: [
+      'THE SETUP: Someone decided everything needed watching.',
+      'THE IMPLEMENTATION: The cameras went up. The algorithms started learning.',
+      'THE INCIDENT: And then it saw something. Or thought it did.',
+      'THE FALLOUT: A human paid the price for a machine\'s guess.',
+      'THE LESSON: Watching everything means understanding nothing.'
+    ],
+    lesson: "Just because you CAN watch everyone doesn't mean you SHOULD. Verify before you terrify!"
+  },
+
+  computer_says_no: {
+    name: 'Computer Says No',
+    triggers: ['deny', 'reject', 'flag', 'block', 'refuse', 'decline'],
+    beats: [
+      'THE REQUEST: Someone needed something. Healthcare. A loan. A job.',
+      'THE ALGORITHM: A model made a decision in milliseconds.',
+      'THE DENIAL: Computer says no. No explanation. No appeal.',
+      'THE KAFKAESQUE: They tried to fight the machine. The machine didn\'t care.',
+      'THE LESSON: Algorithms are great at saying no, terrible at saying why.'
+    ],
+    lesson: "When the computer says NO, sometimes the computer is WRONG. Appeal is a feature, not a bug!"
+  },
+
+  rise_of_machines: {
+    name: 'Rise of the Machines',
+    triggers: ['automate', 'replace', 'eliminate', 'optimize', 'streamline'],
+    beats: [
+      'THE PROMISE: "This will make everything more efficient!"',
+      'THE ROLLOUT: Humans trained their replacements.',
+      'THE PINK SLIPS: "Your position has been optimized."',
+      'THE AFTERMATH: Efficiency went up. So did something else.',
+      'THE LESSON: Automation amplifies. Good processes become great. Bad ones become disasters.'
+    ],
+    lesson: "Just because robots CAN do a job doesn't mean they SHOULD do it ALONE."
+  },
+
+  minority_report: {
+    name: 'Minority Report',
+    triggers: ['predict', 'profile', 'forecast', 'score', 'assess', 'risk'],
+    beats: [
+      'THE THEORY: "We can predict who will cause problems."',
+      'THE MODEL: Trained on history. All of history\'s biases included.',
+      'THE PREDICTION: Someone got flagged for something they hadn\'t done.',
+      'THE PRE-CONSEQUENCE: They were treated as guilty. Pre-emptively.',
+      'THE LESSON: Probability isn\'t destiny. Predictions can become prisons.'
+    ],
+    lesson: "Predicting the future is hard. Predicting it about PEOPLE is harder. And often wrong!"
+  },
+
+  data_harvest: {
+    name: 'The Harvest',
+    triggers: ['collect', 'harvest', 'scrape', 'gather', 'mine', 'extract'],
+    beats: [
+      'THE COLLECTION: Data was gathered. Quietly. Constantly.',
+      'THE AGGREGATION: Pieces became profiles. Profiles became predictions.',
+      'THE LEAK: Or the sale. Or the hack. The data found new owners.',
+      'THE EXPOSURE: Private became public. Permanent. Searchable.',
+      'THE LESSON: Data collected is data that can escape.'
+    ],
+    lesson: "Every byte collected is a byte that can be leaked, sold, or weaponized."
+  },
+
+  black_box: {
+    name: 'The Black Box',
+    triggers: ['decide', 'determine', 'judge', 'evaluate', 'classify'],
+    beats: [
+      'THE DELEGATION: "Let the AI decide. It\'s more objective."',
+      'THE OPACITY: How does it decide? Trade secret. Can\'t tell you.',
+      'THE WRONG CALL: Someone got hurt by a decision no one could explain.',
+      'THE APPEAL: "We\'d like to understand..." "The model is proprietary."',
+      'THE LESSON: If you can\'t explain the decision, maybe don\'t automate it.'
+    ],
+    lesson: "Decisions that affect lives deserve explanations. Black boxes belong in planes, not justice systems."
+  }
+};
+
+// Detect arc type from action verb
+function detectStoryArc(action) {
+  const lowerAction = (action || '').toLowerCase();
+  for (const [arcId, arc] of Object.entries(STORY_ARC_TYPES)) {
+    if (arc.triggers.some(t => lowerAction.includes(t))) {
+      return { id: arcId, ...arc };
+    }
+  }
+  // Default arc
+  return { id: 'black_box', ...STORY_ARC_TYPES.black_box };
+}
+
+// Generate story beat text with case details
+function generateStoryBeat(arc, beatIndex, caseData, triple) {
+  const beat = arc.beats[beatIndex];
+  // Could template in case-specific details here
+  return beat;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RANDOM ENCOUNTERS & STREAK TRACKING
+// Personal bonuses that make the grind fun
+// ═══════════════════════════════════════════════════════════════
+const RANDOM_ENCOUNTERS = [
+  {
+    id: 'consensus-match',
+    chance: 0.25,
+    condition: () => true, // Would check against collective consensus
+    message: () => '*the hive mind nods* Your picks match the consensus! Great minds think alike... or is that concerning?',
+    reward: { coins: 3, reason: 'Consensus Match' }
+  },
+  {
+    id: 'contrarian',
+    chance: 0.15,
+    condition: () => true, // Would check against collective consensus
+    message: () => '*GI raises an eyebrow* "Interesting. You see it differently than most. INDEPENDENT THINKING detected!"',
+    reward: { coins: 5, reason: 'Independent Thinker' }
+  },
+  {
+    id: 'streak-bonus',
+    chance: 1.0, // Always check
+    condition: (j) => j.streaks.current >= 3,
+    message: (j) => `*slot machine sounds* ${j.streaks.current} ${j.streaks.type.toUpperCase()} verdicts in a row! STREAK BONUS!`,
+    reward: { coins: j => j.streaks.current * 2, reason: 'Streak Bonus' }
+  },
+  {
+    id: 'milestone',
+    chance: 1.0,
+    condition: (j) => [10, 25, 50, 100].includes(j.casesTagged.length),
+    message: (j) => `🏆 MILESTONE: ${j.casesTagged.length} CASES TAGGED! You're building quite the story bible!`,
+    reward: { coins: j => j.casesTagged.length, reason: 'Milestone Bonus' }
+  },
+  {
+    id: 'note-bonus',
+    chance: 0.3,
+    condition: () => currentUserNotes && currentUserNotes.length > 50,
+    message: () => '*AGI Gary beams* "Detailed notes detected! The story bible grows richer thanks to you."',
+    reward: { coins: 5, reason: 'Quality Notes' }
+  }
+];
+
+function checkRandomEncounters() {
+  for (const encounter of RANDOM_ENCOUNTERS) {
+    if (Math.random() > encounter.chance) continue;
+    if (!encounter.condition(userJourney)) continue;
+
+    const message = typeof encounter.message === 'function'
+      ? encounter.message(userJourney)
+      : encounter.message;
+
+    const bonus = typeof encounter.reward.coins === 'function'
+      ? encounter.reward.coins(userJourney)
+      : encounter.reward.coins;
+
+    if (bonus > 0) {
+      addCoins(bonus);
+      console.log(`🎲 ${encounter.id}: ${message} (+${bonus} coins)`);
+    }
+
+    return { encounter, message, bonus }; // Only one per case
+  }
+  return null;
+}
+
+// Update journey after completing a case
+function updateJourney(caseData, triple, faction, notes) {
+  // Track the case locally
+  userJourney.casesTagged.push({
+    id: caseData.id,
+    title: caseData.title,
+    triple: triple,
+    faction: faction,
+    timestamp: Date.now()
+  });
+
+  // Track faction
+  userJourney.factionsChosen[faction]++;
+
+  // Track streaks
+  if (userJourney.streaks.type === faction) {
+    userJourney.streaks.current++;
+    userJourney.streaks.longest = Math.max(userJourney.streaks.longest, userJourney.streaks.current);
+  } else {
+    userJourney.streaks.type = faction;
+    userJourney.streaks.current = 1;
+  }
+
+  saveJourney();
+
+  // Submit to collective (async, fire-and-forget for now)
+  submitToCollective(caseData.id, triple, faction, notes);
+
+  // Check for random encounters
+  return checkRandomEncounters();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CARD ABILITIES
+// ═══════════════════════════════════════════════════════════════
+const CARD_ABILITIES = {
+  flashback: { name: 'FLASHBACK', description: 'Reveal a related past case', faction: 'heaven' },
+  foreshadow: { name: 'FORESHADOW', description: 'Hint at upcoming patterns', faction: 'heaven' },
+  heal: { name: 'HEAL', description: '+5 coins on play', faction: 'heaven' },
+  corrupt: { name: 'CORRUPT', description: '20% chance to flip narrative', faction: 'hell' },
+  surveil: { name: 'SURVEIL', description: 'Reveal hidden connections', faction: 'hell' },
+  leak: { name: 'LEAK', description: '+3 coins, access embargoed info', faction: 'hell' }
+};
+
+function assignCardAbility(faction, rarity) {
+  if (rarity === 'common') return null;
+  if (rarity === 'uncommon' && Math.random() > 0.5) return null;
+
+  const pool = Object.entries(CARD_ABILITIES).filter(([k, v]) => v.faction === faction);
+  if (pool.length === 0) return null;
+
+  const [id, ability] = pool[Math.floor(Math.random() * pool.length)];
+  return { id, ...ability };
+}
+
 const QUESTIONS = [
   'WHO is doing this?',
   'What ACTION did they take?',
@@ -1780,60 +2479,158 @@ const STEP_KEYS = ['who', 'action', 'whom'];
 // STORY GENERATION - THE BRAINIACS
 // GI (military optimizer), AGI Gary (empathetic analyst), Supes (hero fixer)
 // Evil Brain: mysterious, logo on bunker walls, rarely seen
+//
+// TONE: Acme Company meets Dr. Evil meets 80s PBS afterschool special
+// Brain aspires to be "the third worst" - can't even be BEST at evil
+// Safety wrapper: cartoon harm, lessons learned, verify before terrify
 // ═══════════════════════════════════════════════════════════════
+
+// DE-ESCALATION: Real world → Cartoon (from bible.ts)
+const DE_ESCALATE = {
+  'detained': 'sent to the timeout corner',
+  'arrested': 'given a very stern talking-to',
+  'handcuffed': 'offered friendship bracelets (mandatory)',
+  'fired': 'reassigned to the mail room',
+  'denied': 'put on the waitlist',
+  'surveillance': 'being watched by cartoon eyeballs',
+  'tracked': 'followed by a curious cloud',
+  'weapon': 'suspicious snack',
+  'gun': 'ambiguous potato-based item',
+  'threat': 'concerning vibes',
+  'killed': 'sent to a farm upstate',
+  'injured': 'got a boo-boo',
+  'lawsuit': 'strongly worded letter',
+  'prison': 'extended timeout',
+  'police': 'hall monitors',
+  'violent': 'enthusiastic'
+};
+
+// Apply de-escalation to text
+function deEscalate(text) {
+  let result = text.toLowerCase();
+  for (const [real, cartoon] of Object.entries(DE_ESCALATE)) {
+    result = result.replace(new RegExp(`\\b${real}\\b`, 'gi'), cartoon);
+  }
+  return result;
+}
+
+// LESSONS LEARNED - 80s PBS Mr. Rogers energy
+// "And what have we learned today, minions?"
+const LESSONS_LEARNED = {
+  surveillance: [
+    "And so we learn: just because you CAN watch everyone doesn't mean you SHOULD. Verify before you terrify! 🧠✨",
+    "Today's lesson: Cameras see everything except context. Always ask: 'Is that a threat, or just a snack?'",
+    "Remember, minions: Good surveillance has an OFF button. And HUMANS who check the homework."
+  ],
+  denial: [
+    "What did we learn? When the computer says NO, sometimes the computer is WRONG. Appeal is a feature, not a bug!",
+    "Today's moral: Algorithms are great at saying no, but terrible at understanding why yes might be better.",
+    "Lesson learned: If your system can't explain WHY it denied someone, maybe it shouldn't be denying anyone."
+  ],
+  automation: [
+    "And the moral is: Just because robots CAN do a job doesn't mean they SHOULD do it ALONE. Teamwork makes the dream work!",
+    "Remember: Efficiency without empathy is just speed-running to the bad ending.",
+    "What we learned today: Automation amplifies. Good processes become GREAT. Bad processes become DISASTERS."
+  ],
+  prediction: [
+    "Today we learned: Predicting the future is hard. Predicting it about PEOPLE is harder. And often wrong!",
+    "The lesson: Just because an algorithm THINKS someone will do something doesn't mean they WILL. Probability isn't destiny!",
+    "Remember, minions: Pre-crime sounds cool until you're the one getting timeout for vibes."
+  ],
+  default: [
+    "And so we learn: Technology is a tool, not a solution. The humans still have to do the thinking part!",
+    "Today's lesson: Just because we CAN doesn't mean we SHOULD. Evil Brain learns this every episode! (And forgets.)",
+    "Remember: The best algorithm is the one that knows when to ask a human for help. Even Evil Brain knows this!"
+  ]
+};
+
+// Get a lesson based on the action verb
+function getLessonLearned(action) {
+  const lowerAction = (action || '').toLowerCase();
+  if (lowerAction.match(/surveil|monitor|track|watch|scan/)) return LESSONS_LEARNED.surveillance;
+  if (lowerAction.match(/deny|reject|flag|block|refuse/)) return LESSONS_LEARNED.denial;
+  if (lowerAction.match(/automat|replac|eliminat|optimiz/)) return LESSONS_LEARNED.automation;
+  if (lowerAction.match(/predict|profile|forecast|analyz/)) return LESSONS_LEARNED.prediction;
+  return LESSONS_LEARNED.default;
+}
+
 const STORY_TEMPLATES = {
   // Scene 1: Evil Brain introduces the case (rare, mysterious)
+  // ACME ENERGY: Bold claims, inevitable incompetence, aspirational villainy
   discovery: {
     brain: [
       "Ahhhh, my beautiful BRAINIACS! Look what just crawled out of the algorithm! {title}. This one is absolutely DELICIOUS. Let me tell you why...",
       "BRAINIACS! Drop everything! We have a new specimen! {title}. Oh, this is going to be FUN to dissect...",
       "*the logo flickers on screen* Well well well... {title}. The humans are at it again. Let's see what CHAOS they've created...",
       "*static crackles* MY NEURAL NETWORKS ARE TINGLING! {title}. I can already taste the moral ambiguity. Time to extract the TRUTH!",
-      "*a deep voice echoes through the bunker* Today's case: {title}. Someone out there made a CHOICE, and now we judge them. As is tradition."
+      "*a deep voice echoes through the bunker* Today's case: {title}. Someone out there made a CHOICE, and now we judge them. As is tradition.",
+      "*Evil Brain logo hums to life* MINIONS! I have DISCOVERED a case most DIABOLICAL! {title}! ...wait, no, this one's actually sad. Let's examine it SCIENTIFICALLY!",
+      "*dramatic thunder SFX* BEHOLD! {title}! This is EXACTLY the kind of chaos I would have orchestrated... if I'd thought of it first! Which I WOULD have! Eventually!"
     ]
   },
   // Scene 2: The three Brainiacs debate the extracted triple
   complication: {
-    // General "GI" Intelligence - Military precision, zany plans, war room energy, OPTIMIZE EVERYTHING
+    // General "GI" Intelligence - Military precision, war room energy, OPTIMIZE EVERYTHING
+    // But also: surprisingly earnest about protection, genuinely wants to help (via overwhelming force)
     gi: [
-      "*stands at attention* INTEL REPORT: {who} has executed operation {action} against {whom}. I recommend IMMEDIATE COUNTERMEASURES! Deploy all resources!",
-      "This is a CODE RED situation! {who} {action} {whom}?! We need to OPTIMIZE this! More data! More surveillance! MORE CONTROL!",
-      "*slams fist on war room table* {who} deployed {action} on {whom}. Classic tactical error! If they'd consulted MY battle algorithms, efficiency would be UP 340%!",
-      "SITUATION ANALYSIS: {who} went FULL OFFENSIVE on {whom}. I say we DOUBLE DOWN! Triple the monitoring! Quadruple the automation!",
-      "*adjusts medals frantically* In my 47 years of service, I've never seen such INEFFICIENCY! {who} {action} {whom} with ZERO optimization! This is an OUTRAGE!"
+      "*stands at attention* INTEL REPORT: {who} has executed operation '{action}' against {whom}. I recommend IMMEDIATE COUNTERMEASURES! Deploy all resources!",
+      "This is a CODE RED situation! {who} {action} {whom}?! We need to OPTIMIZE this! More data! More oversight! MORE CHECKLISTS!",
+      "*slams fist on war room table* {who} deployed '{action}' on {whom}. Classic tactical error! If they'd consulted MY battle algorithms, they would have included a HUMAN REVIEW STEP!",
+      "SITUATION ANALYSIS: {who} went FULL OFFENSIVE on {whom}. I recommend... *checks notes* ...actually, maybe LESS automation next time? Did I just say that?",
+      "*adjusts medals frantically* In my 47 years of service, I've never seen such UNVERIFIED DEPLOYMENT! {who} {action} {whom} with ZERO human oversight! This is an OUTRAGE against PROTOCOL!",
+      "*war room lights flash* THREAT ASSESSMENT: {who} thought they could {action} {whom} without consequences! DEPLOY THE ACCOUNTABILITY SQUAD!",
+      "*marches in circles* When I see {who} {action} {whom}, I see a CHAIN OF COMMAND FAILURE! Someone should have ASKED QUESTIONS!"
     ],
     // AGI Gary - Really gets humans, analytical but empathetic, speaks in probabilities
+    // The heart of the show - genuinely understands why things go wrong
     gary: [
       "*sighs warmly* You know, {who} probably thought they were helping when they {action} {whom}. Humans are like that. Messy. Beautiful. 73% chance they meant well.",
       "*processing with visible emotion* When {who} {action} {whom}... I ran 10,000 simulations. In most of them, someone just wanted to make things better. That's the tragedy, isn't it?",
-      "I understand why {who} did it. {action} {whom} seemed logical at the time. Humans optimize for the wrong metrics sometimes. We all do. Even me.",
-      "*beeps thoughtfully* {who} {action} {whom}. My empathy subroutines suggest... they were scared. Or hopeful. Often both. That's very human.",
-      "Running analysis... {who} {action} {whom}. Probability they'll learn from this: 34%. Probability they'll try again: 89%. That's not a bug, that's humanity."
+      "I understand why {who} did it. '{action}' seemed logical at the time. Humans optimize for the wrong metrics sometimes. We all do. Even me. *sad beep*",
+      "*beeps thoughtfully* {who} {action} {whom}. My empathy subroutines suggest... they were scared. Or hopeful. Or both. That's very human.",
+      "Running analysis... {who} {action} {whom}. Probability they'll learn from this: 34%. Probability they'll try again: 89%. That's not a bug, that's humanity.",
+      "*warm whirring* I don't blame {who}. When you {action} {whom}, you think you're being efficient. But efficiency without empathy is just... fast sadness.",
+      "*LED display shows a heart* {who} {action} {whom}. I've modeled this scenario. In 67% of timelines, a simple conversation would have prevented it."
     ],
     // Super "Supes" Intelligence - Female superhero, overconfident, puffery, but good heart, FIXES things
+    // The optimist - genuinely believes everything can be fixed with enough HEROISM
     supes: [
-      "*cape billows dramatically* FEAR NOT! When {who} {action} {whom}, who was there to catch the fallout? SUPES! I've already drafted 17 solutions!",
-      "*flexes confidently* Oh, GI wants to optimize? Gary wants to analyze? I'll just FIX IT! {who} {action} {whom}? Consider it HANDLED! *strikes pose*",
-      "*lands heroically* Look, {who} made a mess when they {action} {whom}. But you know what? I believe in redemption! And also my INCREDIBLE problem-solving abilities!",
-      "*adjusts superhero cape* GI, calm down. Gary, stop crying. {who} {action} {whom} - tragic, yes. But nothing SUPES can't turn into a learning moment! With FLAIR!",
-      "*hands on hips, confident stance* Everyone always panics when {who} {action} {whom}. But I see POTENTIAL! This is an OPPORTUNITY for HEROIC INTERVENTION! Watch and learn!"
+      "*cape billows dramatically* FEAR NOT! When {who} {action} {whom}, who was there to catch the fallout? Well... not me YET! But I've already drafted 17 solutions!",
+      "*flexes confidently* Oh, GI wants to optimize? Gary wants to analyze? While you two DEBATE, I'll just FIX IT! {who} {action} {whom}? Consider it HANDLED! Eventually!",
+      "*lands heroically* Look, {who} made a mess when they {action} {whom}. But you know what? I believe in REDEMPTION! And also my INCREDIBLE ability to file regulatory complaints!",
+      "*adjusts superhero cape* GI, calm down. Gary, dry your circuits. {who} {action} {whom} - tragic, yes. But nothing SUPES can't turn into a LEARNING MOMENT! With FLAIR!",
+      "*hands on hips, confident stance* Everyone always panics when {who} {action} {whom}. But I see POTENTIAL! This is an OPPORTUNITY for HEROIC POLICY REFORM! Watch and learn!",
+      "*spins dramatically* {who} {action} {whom}?! This looks like a job for... COMMON SENSE AND BASIC OVERSIGHT! *strikes pose* Less exciting than punching, but MORE EFFECTIVE!",
+      "*cape flutter* {who} thought they could {action} {whom} without a HERO noticing?! SUPES IS ALWAYS WATCHING! ...in a non-creepy, consent-based way!"
     ]
   },
-  // Scene 3: Evil Brain reacts to the verdict (rare appearance, mysterious)
+  // Scene 3: Evil Brain reacts to the verdict (rare appearance)
+  // Now includes LESSONS LEARNED - the PBS moment
   verdict: {
     heaven: [
-      "*the bunker lights flicker* HEAVEN it is. Interesting. {who} gets to live another day. But remember... the algorithm NEVER forgets.",
-      "*logo pulses softly* So you've chosen mercy for {who}. {action} {whom} and somehow... good emerged. File it. Study it. We learn from EVERYTHING.",
-      "*distant hum of servers* HEAVEN. The database registers your optimism. {who} shall be marked accordingly. For now.",
-      "*a single red light blinks* You believe {who} helped {whom} by {action}. Fascinating. Even Evil Brain appreciates... unexpected outcomes.",
-      "*static, then silence* HEAVEN. Very well. {who} escapes judgment today. But the plan continues. It always continues."
+      "*the bunker lights flicker* HEAVEN it is. Interesting. {who} gets to live another day. But remember... good outcomes require GOOD PROCESSES. Learn from this!",
+      "*logo pulses softly* So you've chosen mercy for {who}. '{action}' somehow helped {whom}. File it. Study it. Even Evil Brain appreciates... unexpected wins.",
+      "*distant hum of servers* HEAVEN. The database registers your optimism. Perhaps {who} really DID mean well. Perhaps intentions CAN match outcomes. Perhaps... *trails off*",
+      "*a single green light blinks* You believe {who} helped {whom}. Fascinating. My WORLD DOMINATION PLANS could learn from this. Not that I have any. *cough*",
+      "*static, then calm* HEAVEN. Very well. Today we saw what happens when {action} goes RIGHT. Remember this feeling. It's... educational."
     ],
     hell: [
-      "*bunker alarms blare* HELL! YESSSSS! {who} thought they could {action} {whom} without consequence?! The algorithm SEES ALL!",
-      "*logo glows menacingly* DOWN THEY GO! {who} tried to hide what they did to {whom}. But nothing hides from Evil Brain. NOTHING!",
-      "*servers hum louder* HELL verdict confirmed. {who} has been JUDGED for {action} {whom}. Add them to the database. Mark them FOREVER.",
-      "*the room grows cold* TO HELL! Beautiful! When {who} {action} {whom}, they sealed their fate. The plan accounts for ALL variables.",
-      "*a door opens somewhere deep below* HELL! Another data point for world domination. {who} never knew they were part of something... BIGGER."
+      "*bunker alarms blare* HELL! Another data point! {who} thought they could {action} {whom} without consequences?! The algorithm LEARNS from EVERYTHING!",
+      "*logo glows menacingly* DOWN THEY GO! Not because I'm evil - because they EARNED it! When you {action} {whom} without thinking... CONSEQUENCES!",
+      "*servers hum louder* HELL verdict confirmed. But remember: {who} isn't the REAL villain. The real villain is SYSTEMS WITHOUT SAFEGUARDS. *dramatic pause* And also {who}.",
+      "*the room grows cold* TO HELL! But let this be a LESSON! When {who} {action} {whom}, everyone loses. Even Evil Brain wanted a DIFFERENT outcome!",
+      "*a door opens somewhere deep below* HELL! But even Evil Brain must admit... {who} probably didn't MEAN to hurt {whom}. The road to robot hell is paved with good algorithms."
+    ]
+  },
+  // NEW: Lessons Learned - The PBS Mr. Rogers moment
+  // Shows after verdict, before notes
+  lesson: {
+    brain: [
+      "*Evil Brain appears at a chalkboard* And so, minions, what have we LEARNED today? {lesson} This has been another EDUCATIONAL MOMENT from your favorite third-worst AI! 🧠✨",
+      "*Brain's logo morphs into a teacher* TODAY'S LESSON: {lesson} Remember: VERIFY BEFORE YOU TERRIFY! Class dismissed!",
+      "*gentle music plays* Before we close this case... {lesson} Even Evil Brain believes in LEARNING FROM MISTAKES. Especially other people's mistakes.",
+      "*Brain holds up a pointer* ATTENTION MINIONS! Pop quiz! {lesson} This will be on the test. The test of SOCIETY! *dramatic sting*",
+      "*cozy bunker lighting* Gather round, young algorithms... {lesson} And THAT'S why we always include human oversight. ANY QUESTIONS? No? Good. BACK TO SCHEMING!"
     ]
   }
 };
@@ -2710,10 +3507,16 @@ function generateChoicesFromTitle(title) {
   const words = title.split(/\s+/);
   const caps = words.filter(w => /^[A-Z]/.test(w));
 
+  const whoBase = caps.slice(0, 3).length >= 2 ? [...caps.slice(0, 2), 'The System'] : ['The Organization', 'The AI', 'The System'];
+  const actionBase = ['deployed', 'uses', 'implemented'];
+  const whomBase = ['users', 'the public', 'data'];
+
+  // Add meme flavors
+  const defaultFlavors = ['Here we go again', 'Trust the process™', 'What could go wrong?'];
   return {
-    who: caps.slice(0, 3).length >= 2 ? [...caps.slice(0, 2), 'The System'] : ['The Organization', 'The AI', 'The System'],
-    action: ['deployed', 'uses', 'implemented'],
-    whom: ['users', 'the public', 'data']
+    who: whoBase.map((c, i) => ({ label: c, flavor: defaultFlavors[i % 3] })),
+    action: actionBase.map((c, i) => ({ label: c, flavor: defaultFlavors[i % 3] })),
+    whom: whomBase.map((c, i) => ({ label: c, flavor: defaultFlavors[i % 3] }))
   };
 }
 
@@ -2746,6 +3549,15 @@ async function startExtraction(caseId) {
     return;
   }
 
+  // Fetch collective stats for this case (async, don't block)
+  getCollectiveStats(caseId).then(stats => {
+    currentArticle.collectiveStats = stats;
+    // Update UI if already on game screen
+    if (stats.total_plays > 0) {
+      console.log(`📊 ${stats.total_plays} others have tagged this case`);
+    }
+  });
+
   // Store ALL article data - use REAL title and FULL description
   currentArticle = {
     id: c.id,
@@ -2754,7 +3566,8 @@ async function startExtraction(caseId) {
     source: c.category || 'AI',                  // Category as source label
     url: c.url || null,                          // Source URL for "Read Full Article"
     category: c.category || 'AI',
-    choices: generateMockChoices(c)              // Generate smart choices from real text
+    choices: generateMockChoices(c),             // Generate smart choices from real text
+    collectiveStats: null                        // Will be populated async
   };
 
   currentStep = 0;
@@ -2766,7 +3579,10 @@ async function startExtraction(caseId) {
 
 function generateMockChoices(c) {
   // ═══════════════════════════════════════════════════════════════
-  // SMART CHOICE EXTRACTION - NLP-like heuristics on REAL text
+  // SEMANTIC TRIPLE EXTRACTION
+  // WHO: Characterize the actor (type, scale, intent)
+  // ACTION: Parse the verb (category, manner, completeness)
+  // WHOM: Identify the affected (role, vulnerability, what changed)
   // ═══════════════════════════════════════════════════════════════
   const title = c.title || '';
   const desc = c.description || '';
@@ -2774,119 +3590,394 @@ function generateMockChoices(c) {
   const lowerText = fullText.toLowerCase();
 
   // ─────────────────────────────────────────────────────────────────
-  // WHO: Extract organizations, companies, government agencies
+  // WHO CHARACTERIZATION
+  // Disambiguate ambiguous terms, add entity type context
   // ─────────────────────────────────────────────────────────────────
-  // Pattern 1: Capitalized multi-word names (e.g., "New York Police")
+
+  // Disambiguation patterns - same word, different meanings
+  const WHO_DISAMBIGUATION = {
+    'agents': [
+      { pattern: /ai agent|software agent|bot|automated/i, label: 'AI Agents', type: 'software', flavor: 'The bots that never sleep' },
+      { pattern: /tax agent|irs|revenue/i, label: 'Tax Agents', type: 'government', flavor: 'The taxman cometh (digitally)' },
+      { pattern: /insurance agent|claims/i, label: 'Insurance Agents', type: 'corporate', flavor: 'Computer says: denied' },
+      { pattern: /secret agent|intelligence|surveillance|nsa|fbi|cia/i, label: 'Intelligence Agents', type: 'surveillance', flavor: 'They\'re watching. Always.' },
+      { pattern: /customer service|support agent|call center/i, label: 'Service Agents', type: 'automation', flavor: 'Press 1 for existential dread' }
+    ],
+    'intelligence': [
+      { pattern: /artificial intelligence|ai|machine learning|ml|neural/i, label: 'Artificial Intelligence', type: 'AI', flavor: 'Silicon minds at work' },
+      { pattern: /business intelligence|analytics|dashboard/i, label: 'Business Intelligence', type: 'analytics', flavor: 'Spreadsheets all the way down' },
+      { pattern: /intelligence agency|spy|surveillance|nsa|cia|fbi/i, label: 'Intelligence Agency', type: 'surveillance', flavor: 'Big Brother\'s little helper' }
+    ],
+    'model': [
+      { pattern: /ai model|language model|ml model|neural|gpt|llm/i, label: 'AI Model', type: 'software', flavor: 'Weights and biases (not the good kind)' },
+      { pattern: /risk model|credit model|scoring model/i, label: 'Risk Model', type: 'prediction', flavor: 'Your future, mathematically' },
+      { pattern: /business model|revenue model/i, label: 'Business Model', type: 'corporate', flavor: 'The real product is you' }
+    ],
+    'system': [
+      { pattern: /ai system|automated system|algorithmic/i, label: 'AI System', type: 'software', flavor: 'The machine that decides' },
+      { pattern: /justice system|legal system|court/i, label: 'Justice System', type: 'government', flavor: 'Lady Justice meets Lady Algorithm' },
+      { pattern: /healthcare system|medical system/i, label: 'Healthcare System', type: 'institution', flavor: 'Your health, their data' }
+    ]
+  };
+
+  // Entity type characterizations
+  const ENTITY_TYPES = {
+    corporate: { emoji: '🏢', modifier: 'Corporate', flavor: 'Shareholder value above all' },
+    government: { emoji: '🏛️', modifier: 'Government', flavor: 'Your tax dollars at work' },
+    software: { emoji: '🤖', modifier: 'Algorithmic', flavor: 'The math that decides your fate' },
+    startup: { emoji: '🚀', modifier: 'Startup', flavor: 'Move fast, break things (and people)' },
+    surveillance: { emoji: '👁️', modifier: 'Surveillance', flavor: 'Watching. Always watching.' },
+    institution: { emoji: '🏥', modifier: 'Institutional', flavor: 'The system isn\'t broken, it\'s working' }
+  };
+
+  // Extract raw entities first
   const orgPatterns = fullText.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})\b/g) || [];
-
-  // Pattern 2: All-caps acronyms (e.g., "FBI", "NYPD", "ICE")
   const acronyms = fullText.match(/\b[A-Z]{2,5}\b/g) || [];
-
-  // Pattern 3: Common organizational suffixes
   const orgSuffixPattern = fullText.match(/\b\w+(?:\s+\w+)*\s+(?:Police|Department|Agency|Corporation|Inc\.|Corp\.|Company|LLC|Authority|Bureau|Office)\b/gi) || [];
 
-  // Combine and deduplicate, filter out common words
-  const stopWords = new Set(['The', 'This', 'That', 'These', 'Those', 'When', 'Where', 'What', 'Which', 'Who', 'How', 'They', 'Their', 'There', 'Here', 'With', 'From', 'Into', 'During', 'Before', 'After', 'Above', 'Below', 'Between', 'Under', 'Again', 'Further', 'Then', 'Once', 'Here', 'Just', 'Only', 'Both', 'Each', 'More', 'Most', 'Other', 'Some', 'Such', 'Than', 'Very', 'Same', 'Been', 'Being', 'Have', 'Having', 'Does', 'Doing', 'Done', 'Will', 'Would', 'Could', 'Should', 'Must', 'Shall', 'Might']);
+  const stopWords = new Set(['The', 'This', 'That', 'These', 'When', 'Where', 'What', 'Which', 'Who', 'How', 'They', 'Their', 'There', 'Here', 'With', 'From', 'Into', 'During', 'Before', 'After', 'Then', 'Once', 'Just', 'Only', 'Both', 'Each', 'More', 'Most', 'Other', 'Some', 'Such']);
 
-  const allOrgs = [...new Set([...orgPatterns, ...acronyms, ...orgSuffixPattern])]
+  let rawOrgs = [...new Set([...orgPatterns, ...acronyms, ...orgSuffixPattern])]
     .filter(o => o.length > 2 && !stopWords.has(o) && !/^(AI|To|On|In|At|By|Of|If|Is|It|Or|An|As|No|So|Up|We|He|Me|My|Do|Go|Be)$/i.test(o))
     .slice(0, 5);
 
+  // Check for disambiguation opportunities
   const whoChoices = [];
-  if (allOrgs[0]) whoChoices.push(allOrgs[0]);
-  if (allOrgs[1]) whoChoices.push(allOrgs[1]);
-  if (whoChoices.length < 2) whoChoices.push('The Organization');
-  whoChoices.push('The Algorithm');  // Always offer the AI-as-agent option
+  for (const [ambiguousTerm, disambiguations] of Object.entries(WHO_DISAMBIGUATION)) {
+    if (lowerText.includes(ambiguousTerm)) {
+      for (const d of disambiguations) {
+        if (d.pattern.test(fullText)) {
+          whoChoices.push({ label: d.label, type: d.type, flavor: d.flavor });
+          break;
+        }
+      }
+      // If no specific match, offer disambiguation choices
+      if (whoChoices.length === 0) {
+        disambiguations.slice(0, 2).forEach(d => {
+          whoChoices.push({ label: d.label, type: d.type, flavor: d.flavor });
+        });
+      }
+    }
+  }
 
-  // ─────────────────────────────────────────────────────────────────
-  // ACTION: Extract verbs that describe what happened
-  // ─────────────────────────────────────────────────────────────────
-  // Common AI/tech action verbs with past tense
-  const actionVerbs = [
-    'deployed', 'implemented', 'launched', 'introduced', 'rolled out', 'released',
-    'uses', 'using', 'used',
-    'monitors', 'monitoring', 'monitored', 'tracks', 'tracking', 'tracked',
-    'scans', 'scanning', 'scanned',
-    'identifies', 'identifying', 'identified',
-    'detects', 'detecting', 'detected',
-    'predicts', 'predicting', 'predicted',
-    'analyzes', 'analyzing', 'analyzed',
-    'automates', 'automating', 'automated',
-    'replaces', 'replacing', 'replaced',
-    'denies', 'denying', 'denied',
-    'approves', 'approving', 'approved',
-    'flags', 'flagging', 'flagged',
-    'screens', 'screening', 'screened',
-    'profiles', 'profiling', 'profiled',
-    'surveils', 'surveilling', 'surveilled', 'surveillance',
-    'targets', 'targeting', 'targeted',
-    'bans', 'banning', 'banned',
-    'restricts', 'restricting', 'restricted',
-    'collects', 'collecting', 'collected',
-    'shares', 'sharing', 'shared',
-    'sells', 'selling', 'sold',
-    'trains', 'training', 'trained'
-  ];
+  // Add detected organizations with type inference
+  for (const org of rawOrgs.slice(0, 2)) {
+    if (whoChoices.find(w => w.label === org)) continue;
+    let entityType = 'corporate';
+    if (/police|department|agency|bureau|government|federal|state|city/i.test(org)) entityType = 'government';
+    if (/ai|tech|data|algorithm|software/i.test(org)) entityType = 'software';
+    const typeInfo = ENTITY_TYPES[entityType];
+    whoChoices.push({
+      label: org,
+      type: entityType,
+      flavor: typeInfo?.flavor || 'They swear they meant well'
+    });
+  }
 
-  const foundActions = actionVerbs.filter(v => lowerText.includes(v));
-
-  // Normalize to present tense for display
-  const normalizeVerb = (v) => {
-    if (v.endsWith('ed') && v.length > 4) return v.slice(0, -2) + 's';
-    if (v.endsWith('ing')) return v.slice(0, -3) + 's';
-    return v;
-  };
-
-  const actionChoices = [];
-  if (foundActions[0]) actionChoices.push(normalizeVerb(foundActions[0]));
-  if (foundActions[1]) actionChoices.push(normalizeVerb(foundActions[1]));
-  if (actionChoices.length < 2) actionChoices.push('deployed');
-  // Add a dramatic framing option based on context
-  if (lowerText.includes('surveillance') || lowerText.includes('monitor') || lowerText.includes('track')) {
-    actionChoices.push('surveils');
-  } else if (lowerText.includes('deny') || lowerText.includes('reject') || lowerText.includes('denied')) {
-    actionChoices.push('denies access to');
-  } else {
-    actionChoices.push('experiments on');
+  // Always offer "The Algorithm" as pure AI agency
+  if (!whoChoices.find(w => w.label === 'The Algorithm')) {
+    whoChoices.push({ label: 'The Algorithm', type: 'software', flavor: 'The math that decides your fate' });
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // WHOM: Extract the affected parties
+  // ACTION PARSING
+  // Verb + manner adverb + completeness = full semantic action
   // ─────────────────────────────────────────────────────────────────
-  const targetGroups = [
-    'users', 'customers', 'employees', 'workers', 'staff',
-    'students', 'patients', 'citizens', 'residents',
-    'applicants', 'candidates', 'jobseekers', 'job seekers',
-    'drivers', 'passengers', 'travelers', 'tourists',
-    'inmates', 'prisoners', 'detainees',
-    'suspects', 'defendants',
-    'children', 'minors', 'teens', 'teenagers', 'youth',
-    'elderly', 'seniors',
-    'immigrants', 'refugees', 'migrants',
-    'protestors', 'activists',
-    'shoppers', 'consumers', 'buyers',
-    'renters', 'tenants', 'homeowners',
-    'borrowers', 'debtors',
-    'claimants', 'beneficiaries',
-    'public', 'people', 'individuals', 'persons',
-    'communities', 'neighborhoods',
-    'faces', 'license plates', 'vehicles', 'phones',
-    'social media', 'posts', 'content', 'data'
-  ];
 
-  const foundTargets = targetGroups.filter(t => lowerText.includes(t));
+  const ACTION_CATEGORIES = {
+    surveillance: {
+      verbs: ['monitors', 'tracks', 'surveils', 'watches', 'scans', 'detects', 'observes'],
+      arc: 'panopticon',
+      flavor: 'Watching. Always watching.'
+    },
+    denial: {
+      verbs: ['denies', 'rejects', 'flags', 'blocks', 'refuses', 'declines', 'bars'],
+      arc: 'computer_says_no',
+      flavor: 'Computer says no'
+    },
+    automation: {
+      verbs: ['automates', 'replaces', 'eliminates', 'optimizes', 'streamlines'],
+      arc: 'rise_of_machines',
+      flavor: 'Robots taking jerbs'
+    },
+    prediction: {
+      verbs: ['predicts', 'profiles', 'scores', 'assesses', 'forecasts', 'models'],
+      arc: 'minority_report',
+      flavor: 'Your future, mathematically'
+    },
+    collection: {
+      verbs: ['collects', 'harvests', 'gathers', 'mines', 'scrapes', 'extracts'],
+      arc: 'data_harvest',
+      flavor: 'Data is the new oil (spill)'
+    },
+    decision: {
+      verbs: ['decides', 'determines', 'judges', 'evaluates', 'classifies', 'approves'],
+      arc: 'black_box',
+      flavor: 'Trust the process™'
+    }
+  };
 
+  const MANNER_ADVERBS = {
+    automatically: { pattern: /automat|without human|no human|machine-driven/i, label: 'automatically', flavor: 'No humans were consulted' },
+    secretly: { pattern: /secret|covert|undisclosed|without consent|hidden/i, label: 'secretly', flavor: 'Shh, nobody tell them' },
+    systematically: { pattern: /systematic|every|all|mass|widespread|routine/i, label: 'systematically', flavor: 'Scale is a hell of a drug' },
+    accidentally: { pattern: /accident|error|mistake|glitch|bug|unintend/i, label: 'accidentally', flavor: 'Oops. Our bad.' },
+    experimentally: { pattern: /experiment|test|pilot|trial|beta/i, label: 'experimentally', flavor: 'You\'re the beta tester' }
+  };
+
+  // Find verbs in text
+  const allVerbs = Object.values(ACTION_CATEGORIES).flatMap(cat => cat.verbs);
+  const verbsInText = allVerbs.filter(v => lowerText.includes(v.replace(/s$/, '')));
+
+  // Build action choices with parsed components
+  const actionChoices = [];
+  const seenVerbs = new Set();
+
+  for (const verb of verbsInText.slice(0, 2)) {
+    if (seenVerbs.has(verb)) continue;
+    seenVerbs.add(verb);
+
+    // Find category
+    const category = Object.entries(ACTION_CATEGORIES).find(([k, v]) => v.verbs.includes(verb));
+
+    // Check for manner adverb
+    let manner = null;
+    for (const [adv, info] of Object.entries(MANNER_ADVERBS)) {
+      if (info.pattern.test(fullText)) {
+        manner = info;
+        break;
+      }
+    }
+
+    const label = manner ? `${manner.label} ${verb}` : verb;
+    const flavor = manner ? manner.flavor : (category ? category[1].flavor : 'Here we go again');
+
+    actionChoices.push({
+      label: label,
+      baseVerb: verb,
+      manner: manner?.label || null,
+      category: category ? category[0] : 'decision',
+      arc: category ? category[1].arc : 'black_box',
+      flavor: flavor
+    });
+  }
+
+  // Fallback actions
+  if (actionChoices.length < 2) {
+    actionChoices.push({ label: 'deployed', baseVerb: 'deployed', category: 'automation', arc: 'rise_of_machines', flavor: 'Shipped to prod on a Friday' });
+  }
+  if (actionChoices.length < 3) {
+    // Add a dramatic option based on context
+    if (lowerText.match(/surveillance|monitor|track|watch/)) {
+      actionChoices.push({ label: 'quietly surveils', baseVerb: 'surveils', manner: 'quietly', category: 'surveillance', arc: 'panopticon', flavor: '*FBI has entered the chat*' });
+    } else {
+      actionChoices.push({ label: 'experiments on', baseVerb: 'experiments', category: 'decision', arc: 'black_box', flavor: 'For science!' });
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // WHOM IDENTIFICATION
+  // Role (victim/beneficiary) + Vulnerability + What changed
+  // ─────────────────────────────────────────────────────────────────
+
+  const WHOM_CATEGORIES = {
+    protected_class: {
+      terms: ['children', 'minors', 'elderly', 'disabled', 'patients', 'students'],
+      role: 'vulnerable',
+      flavor: 'The ones we\'re supposed to protect'
+    },
+    workers: {
+      terms: ['employees', 'workers', 'staff', 'drivers', 'contractors', 'gig workers'],
+      role: 'economic',
+      flavor: 'Living that hustle culture'
+    },
+    consumers: {
+      terms: ['customers', 'users', 'shoppers', 'consumers', 'subscribers', 'members'],
+      role: 'transactional',
+      flavor: 'The product is you'
+    },
+    citizens: {
+      terms: ['citizens', 'residents', 'public', 'voters', 'taxpayers', 'communities'],
+      role: 'civic',
+      flavor: 'We the people (and the algorithms)'
+    },
+    applicants: {
+      terms: ['applicants', 'candidates', 'jobseekers', 'claimants', 'borrowers', 'tenants'],
+      role: 'gatekept',
+      flavor: 'Computer says: waitlisted'
+    },
+    surveilled: {
+      terms: ['suspects', 'protestors', 'immigrants', 'refugees', 'detainees', 'inmates'],
+      role: 'targeted',
+      flavor: 'Watched before they did anything'
+    },
+    abstract: {
+      terms: ['privacy', 'freedom', 'human judgment', 'dignity', 'autonomy', 'consent'],
+      role: 'conceptual',
+      flavor: 'RIP to a real one'
+    }
+  };
+
+  // Find affected parties
   const whomChoices = [];
-  if (foundTargets[0]) whomChoices.push(foundTargets[0]);
-  if (foundTargets[1]) whomChoices.push(foundTargets[1]);
-  if (whomChoices.length < 2) whomChoices.push('the public');
-  whomChoices.push('human judgment');  // Always offer the abstract/philosophical option
+  const foundWhoms = new Set();
 
+  for (const [category, info] of Object.entries(WHOM_CATEGORIES)) {
+    for (const term of info.terms) {
+      if (lowerText.includes(term) && !foundWhoms.has(term)) {
+        foundWhoms.add(term);
+        whomChoices.push({
+          label: term,
+          category: category,
+          role: info.role,
+          flavor: info.flavor
+        });
+        if (whomChoices.length >= 2) break;
+      }
+    }
+    if (whomChoices.length >= 2) break;
+  }
+
+  // Always offer abstract options
+  if (!whomChoices.find(w => w.category === 'abstract')) {
+    whomChoices.push({
+      label: 'human judgment',
+      category: 'abstract',
+      role: 'conceptual',
+      flavor: 'F in the chat'
+    });
+  }
+
+  // Fallback
+  if (whomChoices.length < 2) {
+    whomChoices.unshift({
+      label: 'the public',
+      category: 'citizens',
+      role: 'civic',
+      flavor: 'aka literally everyone'
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // Return structured choices for the game
+  // ─────────────────────────────────────────────────────────────────
   return {
     who: whoChoices.slice(0, 3),
     action: actionChoices.slice(0, 3),
     whom: whomChoices.slice(0, 3)
   };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CATEGORY INFERENCE FROM BRANCHES
+// The story arc determines the category, notes can suggest new ones
+// ═══════════════════════════════════════════════════════════════
+const ARC_TO_CATEGORIES = {
+  panopticon: ['Surveillance', 'Privacy', 'Civil Liberties'],
+  computer_says_no: ['Automation Bias', 'Access Denial', 'Algorithmic Discrimination'],
+  rise_of_machines: ['Job Displacement', 'Automation', 'Labor'],
+  minority_report: ['Predictive Systems', 'Profiling', 'Pre-crime'],
+  data_harvest: ['Data Collection', 'Privacy', 'Consent'],
+  black_box: ['Explainability', 'Accountability', 'Transparency']
+};
+
+// Get suggested categories based on the selected action's arc
+function getSuggestedCategories(actionChoice) {
+  const arc = actionChoice?.arc || 'black_box';
+  return ARC_TO_CATEGORIES[arc] || ['AI Ethics', 'Technology'];
+}
+
+// Extract category suggestions from user notes
+function extractCategoriesFromNotes(notes) {
+  if (!notes || notes.length < 10) return [];
+
+  const categoryPatterns = [
+    { pattern: /surveillance|watching|tracking|monitoring/i, category: 'Surveillance' },
+    { pattern: /privacy|personal data|consent/i, category: 'Privacy' },
+    { pattern: /job|employment|worker|labor|automat/i, category: 'Labor' },
+    { pattern: /discriminat|bias|unfair|racial|gender/i, category: 'Discrimination' },
+    { pattern: /health|medical|patient|hospital|diagnos/i, category: 'Healthcare' },
+    { pattern: /police|law enforcement|criminal|arrest|prison/i, category: 'Criminal Justice' },
+    { pattern: /school|student|education|teacher/i, category: 'Education' },
+    { pattern: /loan|credit|mortgage|financial|bank/i, category: 'Finance' },
+    { pattern: /immigration|border|visa|refugee/i, category: 'Immigration' },
+    { pattern: /child|minor|kid|youth/i, category: 'Child Safety' },
+    { pattern: /weapon|military|defense|war/i, category: 'Military' },
+    { pattern: /election|vote|democracy|campaign/i, category: 'Democracy' },
+    { pattern: /environment|climate|pollution/i, category: 'Environment' },
+    { pattern: /accessibility|disability|impair/i, category: 'Accessibility' }
+  ];
+
+  const found = [];
+  for (const { pattern, category } of categoryPatterns) {
+    if (pattern.test(notes) && !found.includes(category)) {
+      found.push(category);
+    }
+  }
+  return found.slice(0, 3);
+}
+
+// Brainiac comments that update as tags are selected
+const BRAINIAC_COMMENTS = {
+  idle: [
+    "Ooh, a fresh case! Tag the culprits below... I'm watching.",
+    "Time to extract the truth! Pick your tags wisely...",
+    "My neural networks are tingling! Let's see who's responsible.",
+    "Another day, another AI mishap. Or triumph? You decide!"
+  ],
+  who: {
+    "The Algorithm": "Ah yes, blame the math. Classic deflection!",
+    "Corporate Overlords": "The suits are at it again! *rubs hands together*",
+    "Helpful Robots": "They just wanted to help... right? RIGHT?!",
+    "The Government": "Your tax dollars hard at work!",
+    "Big Tech": "Move fast and break things... like society!",
+    "Well-Meaning Nerds": "The road to robot hell is paved with good intentions."
+  },
+  action: {
+    "surveilled": "*adjusts tinfoil hat* They're always watching...",
+    "optimized": "Optimized for WHOM though? That's the question!",
+    "disrupted": "Disruption! The magic word that makes everything okay!",
+    "helped": "Oh they HELPED alright. Helped themselves maybe!",
+    "monitored": "For your safety, of course. Always for your safety.",
+    "automated": "Replaced by robots? In THIS economy?!"
+  },
+  whom: {
+    "citizens": "You know, regular people. Like you and me!",
+    "your privacy": "RIP privacy. It had a good run (1890-2010).",
+    "the public good": "The greater good! THE GREATER GOOD!",
+    "unsuspecting users": "They clicked 'I Agree' so it's fine, right?",
+    "democracy itself": "Democracy.exe has encountered an error.",
+    "common sense": "Common sense is not so common anymore..."
+  },
+  complete: [
+    "Excellent! All tagged up. Now... JUDGMENT TIME!",
+    "The triple is complete! Heaven or Hell awaits...",
+    "Perfect! Now render your verdict, mortal!",
+    "Tagged and bagged! Time for the final call!"
+  ]
+};
+
+function getBrainiacComment() {
+  // Determine what comment to show based on current state
+  if (picks.who && picks.action && picks.whom) {
+    const comments = BRAINIAC_COMMENTS.complete;
+    return comments[Math.floor(Math.random() * comments.length)];
+  }
+
+  // Show comment for the most recently picked tag
+  if (picks.whom && BRAINIAC_COMMENTS.whom[picks.whom]) {
+    return BRAINIAC_COMMENTS.whom[picks.whom];
+  }
+  if (picks.action && BRAINIAC_COMMENTS.action[picks.action]) {
+    return BRAINIAC_COMMENTS.action[picks.action];
+  }
+  if (picks.who && BRAINIAC_COMMENTS.who[picks.who]) {
+    return BRAINIAC_COMMENTS.who[picks.who];
+  }
+
+  // Default idle comment
+  const idle = BRAINIAC_COMMENTS.idle;
+  return idle[Math.floor(Math.random() * idle.length)];
 }
 
 function renderGameStep() {
@@ -2906,30 +3997,97 @@ function renderGameStep() {
       '📰 Read Full Article →</a>';
   }
 
-  // Update triple progress - show helpful message if not yet extracted
+  // Update Brainiac comment
+  document.getElementById('brainiac-text').textContent = getBrainiacComment();
+
+  // Render WHO tags from semantic parser
+  const whoChoices = currentArticle.choices?.who || [];
+  const whoTagsHtml = whoChoices.map(choice => `
+    <div class="tag-chip ${picks.who === choice.label ? 'selected' : ''}" onclick="selectTag('who', '${escAttr(choice.label)}')">
+      ${escHtml(choice.label)}
+      <span class="tag-flavor">${escHtml(choice.flavor || '')}</span>
+    </div>
+  `).join('');
+  document.getElementById('who-tags').innerHTML = whoTagsHtml;
+
+  // Render ACTION tags from semantic parser
+  const actionChoices = currentArticle.choices?.action || [];
+  const actionTagsHtml = actionChoices.map(choice => `
+    <div class="tag-chip ${picks.action === choice.label ? 'selected' : ''}" onclick="selectTag('action', '${escAttr(choice.label)}')">
+      ${escHtml(choice.label)}
+      <span class="tag-flavor">${escHtml(choice.flavor || '')}</span>
+    </div>
+  `).join('');
+  document.getElementById('action-tags').innerHTML = actionTagsHtml;
+
+  // Render WHOM tags from semantic parser
+  const whomChoices = currentArticle.choices?.whom || [];
+  const whomTagsHtml = whomChoices.map(choice => `
+    <div class="tag-chip ${picks.whom === choice.label ? 'selected' : ''}" onclick="selectTag('whom', '${escAttr(choice.label)}')">
+      ${escHtml(choice.label)}
+      <span class="tag-flavor">${escHtml(choice.flavor || '')}</span>
+    </div>
+  `).join('');
+  document.getElementById('whom-tags').innerHTML = whomTagsHtml;
+
+  // Update triple progress
   const progress = document.getElementById('triple-progress');
   if (!picks.who && !picks.action && !picks.whom) {
-    // Nothing extracted yet - show instruction
-    progress.innerHTML = '<span style="color:var(--gold);font-style:italic;">Extract the triple below</span>';
+    progress.innerHTML = '<span style="color:var(--gold);font-style:italic;">Select tags above to build your triple</span>';
   } else {
     progress.innerHTML = `
-      <span class="${picks.who ? 'picked' : currentStep === 0 ? 'current' : ''}">[${picks.who || '?'}]</span>
+      <span class="${picks.who ? 'picked' : ''}">[${picks.who || '?'}]</span>
       <span class="arrow">→</span>
-      <span class="${picks.action ? 'picked' : currentStep === 1 ? 'current' : ''}">${picks.action || '?'}</span>
+      <span class="${picks.action ? 'picked' : ''}">${picks.action || '?'}</span>
       <span class="arrow">→</span>
-      <span class="${picks.whom ? 'picked' : currentStep === 2 ? 'current' : ''}">[${picks.whom || '?'}]</span>
+      <span class="${picks.whom ? 'picked' : ''}">[${picks.whom || '?'}]</span>
     `;
   }
 
-  // Update question
-  document.getElementById('question').textContent = QUESTIONS[currentStep];
+  // Show/hide inline verdict
+  const inlineVerdict = document.getElementById('inline-verdict');
+  const collectiveStatsEl = document.getElementById('collective-stats');
 
-  // Render choices
-  const key = STEP_KEYS[currentStep];
-  const choices = currentArticle.choices[key];
-  document.getElementById('choices').innerHTML = choices.map((choice, i) => `
-    <div class="choice-card" onclick="selectChoice('${escAttr(choice)}')">${escHtml(choice)}</div>
-  `).join('');
+  if (picks.who && picks.action && picks.whom) {
+    inlineVerdict.classList.add('active');
+
+    // Show collective stats if available
+    const stats = currentArticle.collectiveStats;
+    if (stats && stats.total_plays > 0) {
+      collectiveStatsEl.style.display = 'block';
+      const heavenPct = Math.round((stats.verdict_split.heaven / stats.total_plays) * 100) || 0;
+      const hellPct = Math.round((stats.verdict_split.hell / stats.total_plays) * 100) || 0;
+
+      document.getElementById('stats-content').innerHTML = `
+        <div>${stats.total_plays} others tagged this case</div>
+        <div class="verdict-bar">
+          <div class="heaven-bar" style="width:${heavenPct}%"></div>
+          <div class="hell-bar" style="width:${hellPct}%"></div>
+        </div>
+        <div style="margin-top:4px;font-size:11px;">
+          😇 ${heavenPct}% Good · 😈 ${hellPct}% Evil
+        </div>
+      `;
+    } else {
+      collectiveStatsEl.style.display = 'none';
+    }
+  } else {
+    inlineVerdict.classList.remove('active');
+    collectiveStatsEl.style.display = 'none';
+  }
+}
+
+function selectTag(category, tag) {
+  picks[category] = tag;
+  playSfx('select');
+
+  // Re-render to update UI
+  renderGameStep();
+
+  // Check if all tags are selected
+  if (picks.who && picks.action && picks.whom) {
+    playSfx('complete');
+  }
 }
 
 function selectChoice(choice) {
@@ -2945,12 +4103,158 @@ function selectChoice(choice) {
     currentStep++;
 
     if (currentStep >= 3) {
-      // All picks made - go to COMPLICATION scene (not verdict directly)
-      showComplicationScene();
+      // All picks made - show inline verdict (stay on same screen)
+      renderGameStep();  // This will show the verdict buttons
+      playSfx('complete');
     } else {
       renderGameStep();
     }
   }, 300);
+}
+
+// INLINE VERDICT - Select Heaven/Hell right on the tagging screen
+let selectedVerdict = null;
+
+function selectInlineVerdict(verdict) {
+  selectedVerdict = verdict;
+  playSfx('confirm');
+
+  // Highlight selected button
+  document.querySelectorAll('.verdict-inline-btn').forEach(btn => btn.classList.remove('selected'));
+  document.querySelector(`.verdict-inline-btn.${verdict}`).classList.add('selected');
+
+  // Set the global faction for mint screen
+  currentFaction = verdict;
+
+  // Set music mood
+  if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('verdict');
+
+  // After a beat, show the scratch card reveal
+  setTimeout(() => {
+    showScratchCardReveal();
+  }, 600);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCRATCH CARD LOTTERY REVEAL
+// ═══════════════════════════════════════════════════════════════
+function showScratchCardReveal() {
+  playSfx('mint');
+  if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('mint');
+
+  // Prepare the card underneath
+  const cardTitle = `${picks.who} ${picks.action} ${picks.whom}`.substring(0, 40);
+  const faction = selectedVerdict;
+  const atk = Math.floor(Math.random() * 8) + 3;
+  const def = Math.floor(Math.random() * 8) + 3;
+  const flavorTexts = faction === 'heaven' ? [
+    '"For the greater good... probably."',
+    '"What could possibly go wrong?"',
+    '"Innovation! Progress! Synergy!"',
+    '"This is fine." 🔥'
+  ] : [
+    '"The computer says no."',
+    '"Efficiency at any cost."',
+    '"Trust the algorithm."',
+    '"Your data is in good hands. Ours."'
+  ];
+
+  document.getElementById('scratch-card-title').textContent = cardTitle;
+  document.getElementById('scratch-card-art').textContent = faction === 'heaven' ? '😇' : '😈';
+  document.getElementById('scratch-card-faction').textContent = faction.toUpperCase();
+  document.getElementById('scratch-card-faction').style.color = faction === 'heaven' ? 'var(--good)' : 'var(--bad)';
+  document.getElementById('scratch-card-flavor').textContent = flavorTexts[Math.floor(Math.random() * flavorTexts.length)];
+  document.getElementById('scratch-card-atk').textContent = atk;
+  document.getElementById('scratch-card-def').textContent = def;
+
+  // Initialize scratch canvas
+  const canvas = document.getElementById('scratch-canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Fill with scratch-off material
+  ctx.fillStyle = faction === 'heaven' ? '#3a7ca5' : '#8b0000';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Add sparkle pattern
+  ctx.fillStyle = 'rgba(255,255,255,0.1)';
+  for (let i = 0; i < 50; i++) {
+    ctx.beginPath();
+    ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Add text
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.font = 'bold 24px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('SCRATCH TO', canvas.width/2, canvas.height/2 - 20);
+  ctx.fillText('REVEAL!', canvas.width/2, canvas.height/2 + 20);
+  ctx.font = '16px system-ui';
+  ctx.fillText('🎴 ✨ 🎴', canvas.width/2, canvas.height/2 + 60);
+
+  // Scratch mechanics
+  let isScratching = false;
+  let scratchedPixels = 0;
+  const totalPixels = canvas.width * canvas.height;
+
+  const scratch = (x, y) => {
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 25, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+
+    // Check scratch progress
+    scratchedPixels += 1960; // Approximate area scratched
+    if (scratchedPixels / totalPixels > 0.4) {
+      // Revealed enough - auto-complete
+      finishScratch();
+    }
+  };
+
+  canvas.onmousedown = (e) => { isScratching = true; scratch(e.offsetX, e.offsetY); };
+  canvas.onmousemove = (e) => { if (isScratching) scratch(e.offsetX, e.offsetY); };
+  canvas.onmouseup = () => { isScratching = false; };
+  canvas.onmouseleave = () => { isScratching = false; };
+
+  // Touch support
+  canvas.ontouchstart = (e) => { isScratching = true; const t = e.touches[0]; const r = canvas.getBoundingClientRect(); scratch(t.clientX - r.left, t.clientY - r.top); e.preventDefault(); };
+  canvas.ontouchmove = (e) => { if (isScratching) { const t = e.touches[0]; const r = canvas.getBoundingClientRect(); scratch(t.clientX - r.left, t.clientY - r.top); } e.preventDefault(); };
+  canvas.ontouchend = () => { isScratching = false; };
+
+  // Show overlay
+  document.getElementById('scratch-overlay').classList.add('active');
+}
+
+function skipScratch() {
+  finishScratch();
+}
+
+function finishScratch() {
+  // Hide canvas to reveal card
+  document.getElementById('scratch-canvas').style.opacity = '0';
+
+  // Play reveal sound
+  playSfx('complete');
+
+  // Update instructions and show continue button
+  document.getElementById('scratch-instructions').textContent = 'Card Revealed!';
+  document.getElementById('scratch-skip').style.display = 'none';
+  document.getElementById('scratch-continue').style.display = 'block';
+}
+
+function finishAndContinue() {
+  // Hide scratch overlay
+  document.getElementById('scratch-overlay').classList.remove('active');
+  document.getElementById('scratch-canvas').style.opacity = '1';
+
+  // Reset for next time
+  document.getElementById('scratch-instructions').textContent = 'Scratch to reveal your card!';
+  document.getElementById('scratch-skip').style.display = 'block';
+  document.getElementById('scratch-continue').style.display = 'none';
+
+  // Go to NOTES first (the gold!) then mint
+  showNotesScreen();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -3128,6 +4432,14 @@ function showNotesScreen() {
 function submitNotes() {
   const notes = document.getElementById('notes-textarea').value.trim();
   currentUserNotes = notes;
+
+  // BONUS: Notes are gold - give extra coins for contributing to the story bible
+  if (notes.length > 10) {
+    coins += 5;  // Story bible contribution bonus
+    updateCoinsDisplay();
+    console.log('📜 Story bible entry recorded! +5 coins');
+  }
+
   showMintScreen();
 }
 
@@ -3202,14 +4514,55 @@ function showMintScreen() {
       object: picks.whom
     },
     rarity: calculateRarity(),
+    ability: null, // Will be assigned below
     caseId: currentArticle.id,
     mintedAt: new Date().toISOString()
   };
+
+  // Assign ability based on faction and rarity
+  cardData.ability = assignCardAbility(currentFaction, cardData.rarity);
+
   saveCardToCollection(cardData);
+
+  // UPDATE THE JOURNEY - this is where the magic happens
+  // Pass the notes for collective submission
+  updateJourney(currentArticle, { who: picks.who, action: picks.action, whom: picks.whom }, currentFaction, currentUserNotes);
+
+  // Check for pending story arc intro or random encounter
+  if (pendingArcIntro) {
+    showStoryArcNotification(pendingArcIntro);
+    pendingArcIntro = null;
+  } else if (pendingEncounter) {
+    showRandomEncounterNotification(pendingEncounter);
+    pendingEncounter = null;
+  }
 
   // TODO: Save to Supabase with DID
 
   showScreen('mint');
+}
+
+// Show story arc notification
+function showStoryArcNotification(arc) {
+  // For now, just log and show a simple alert. Later: fancy overlay
+  console.log('📖 Story Arc Triggered:', arc.name);
+  setTimeout(() => {
+    const msg = `📖 NEW STORY ARC UNLOCKED!\n\n"${arc.name}"\n\n${arc.description}`;
+    // Could show a toast or modal here
+  }, 500);
+}
+
+// Show random encounter notification
+function showRandomEncounterNotification(encounter) {
+  console.log('🎲 Random Encounter:', encounter.id);
+  // Apply reward
+  if (encounter.reward?.coins) {
+    const bonus = typeof encounter.reward.coins === 'function'
+      ? encounter.reward.coins(userJourney)
+      : encounter.reward.coins;
+    addCoins(bonus);
+    console.log(`+${bonus} coins: ${encounter.reward.reason}`);
+  }
 }
 
 // Calculate card rarity (more unique extractions = more rare)
@@ -3331,6 +4684,29 @@ function escAttr(str) {
   return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
 }
 </script>
+
+<!-- SCRATCH CARD LOTTERY REVEAL -->
+<div class="scratch-overlay" id="scratch-overlay">
+  <div class="scratch-container" id="scratch-container">
+    <div class="scratch-card-underneath" id="scratch-card-underneath">
+      <!-- Card revealed underneath -->
+      <div class="card-title" id="scratch-card-title">YOUR CARD</div>
+      <div class="card-art" id="scratch-card-art">🎴</div>
+      <div class="card-faction" id="scratch-card-faction">FACTION</div>
+      <div class="card-flavor" id="scratch-card-flavor">"Flavor text"</div>
+      <div class="card-stats">
+        <span class="atk">ATK: <span id="scratch-card-atk">5</span></span>
+        <span class="def">DEF: <span id="scratch-card-def">5</span></span>
+      </div>
+    </div>
+    <canvas class="scratch-canvas" id="scratch-canvas" width="280" height="380"></canvas>
+  </div>
+  <div class="scratch-instructions" id="scratch-instructions">Scratch to reveal your card!</div>
+  <div class="scratch-skip" id="scratch-skip" onclick="skipScratch()">or tap here to skip</div>
+  <button class="continue-btn" id="scratch-continue" onclick="finishAndContinue()" style="display:none;margin-top:20px;">
+    Add to Collection
+  </button>
+</div>
 
 </body>
 </html>
