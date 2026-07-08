@@ -1342,7 +1342,23 @@ function gTrivia(box){
 /* helpers */
 function setText(id,t){document.getElementById(id).textContent=t}
 function esc(t){const d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML}
+
+/* Initial load: fetch all live cases into cache */
+async function loadAllCases(){
+  if(DEMO) return;
+  try{
+    const r=await fetch(CONFIG.FN('search-cases'),{method:'POST',
+      headers:{'Content-Type':'application/json',
+        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
+      body:JSON.stringify({})});  // empty query = all cases
+    const data=await r.json();
+    (data.results||[]).forEach(c=>CACHE.set(c.id,c));
+    renderResults(currentQuery());
+  }catch(e){ console.error('Failed to load cases:', e); }
+}
+
 renderHome();renderResults('');
+loadAllCases();  // fetch live cases on startup
 
 </script>
 </body>
