@@ -988,6 +988,94 @@ main {
 .card-faction.heaven { color: var(--good); }
 .card-faction.hell { color: var(--bad); }
 
+.card-rarity {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+}
+.card-rarity.common { color: var(--text-dim); }
+.card-rarity.uncommon { color: var(--heaven); }
+.card-rarity.rare { color: var(--purple); }
+.card-rarity.legendary { color: var(--gold); background: rgba(255, 215, 0, 0.1); }
+
+.card-ability {
+  text-align: center;
+  font-size: 9px;
+  color: var(--brain);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* Scratch-off overlay */
+.minted-card-container {
+  position: relative;
+  width: 220px;
+  height: 300px;
+}
+.scratch-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.scratch-overlay.revealed {
+  display: none;
+}
+#scratch-canvas {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  touch-action: none;
+}
+.scratch-hint {
+  position: absolute;
+  bottom: 20px;
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+  pointer-events: none;
+  animation: pulse 2s infinite;
+}
+
+.scratch-options {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+.scratch-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  transition: all 0.2s;
+}
+.scratch-btn.reveal:hover {
+  border-color: var(--brain);
+  box-shadow: 0 0 15px var(--brain-glow);
+}
+.scratch-btn.mystery:hover {
+  border-color: var(--purple);
+  background: rgba(168, 85, 247, 0.1);
+}
+
 /* Reward */
 .mint-reward {
   margin-top: 24px;
@@ -2304,20 +2392,35 @@ main {
       <div class="case-closed-header">📁 CASE CLOSED</div>
       <div class="mint-triple" id="mint-triple-display"></div>
 
-      <div class="minted-card" id="minted-card">
-        <div class="card-title" id="card-title">CARD NAME</div>
-        <div class="card-art" id="card-art">🤖</div>
-        <div class="card-stats">
-          <span class="atk">ATK: <span id="card-atk">5</span></span>
-          <span class="def">DEF: <span id="card-def">3</span></span>
+      <div class="minted-card-container">
+        <div class="minted-card" id="minted-card">
+          <div class="card-title" id="card-title">CARD NAME</div>
+          <div class="card-art" id="card-art">🤖</div>
+          <div class="card-stats">
+            <span class="atk">ATK: <span id="card-atk">5</span></span>
+            <span class="def">DEF: <span id="card-def">3</span></span>
+          </div>
+          <div class="card-flavor" id="card-flavor">"Corporate quote here"</div>
+          <div class="card-faction hell" id="card-faction">HELL</div>
+          <div class="card-rarity" id="card-rarity">COMMON</div>
+          <div class="card-ability" id="card-ability"></div>
         </div>
-        <div class="card-flavor" id="card-flavor">"Corporate quote here"</div>
-        <div class="card-faction hell" id="card-faction">HELL</div>
+
+        <!-- Scratch-off overlay -->
+        <div class="scratch-overlay" id="scratch-overlay">
+          <canvas id="scratch-canvas" width="220" height="300"></canvas>
+          <div class="scratch-hint">Scratch to reveal... or keep it mystery!</div>
+        </div>
+      </div>
+
+      <div class="scratch-options">
+        <button class="scratch-btn reveal" onclick="revealCard()">🎴 Reveal Card</button>
+        <button class="scratch-btn mystery" onclick="keepMystery()">❓ Keep Mystery</button>
       </div>
 
       <div class="mint-reward" id="mint-reward">+25 🧠</div>
 
-      <button class="continue-btn" onclick="continuePlaying()">Next Case →</button>
+      <button class="continue-btn" onclick="continuePlaying()" id="mint-continue" style="display:none">Next Case →</button>
     </div>
 
   </div>
@@ -5093,11 +5196,30 @@ function showMintScreen() {
   // Assign ability based on faction and rarity
   cardData.ability = assignCardAbility(currentFaction, cardData.rarity);
 
-  saveCardToCollection(cardData);
+  // Don't save yet - will save when user reveals or keeps mystery
 
   // UPDATE THE JOURNEY - this is where the magic happens
   // Pass the notes for collective submission
   updateJourney(currentArticle, { who: picks.who, action: picks.action, whom: picks.whom }, currentFaction, currentUserNotes);
+
+  // Store card data for potential reveal
+  window.pendingCardData = cardData;
+
+  // Show rarity and ability on card (but hidden behind scratch)
+  const rarityEl = document.getElementById('card-rarity');
+  rarityEl.textContent = cardData.rarity.toUpperCase();
+  rarityEl.className = 'card-rarity ' + cardData.rarity;
+
+  const abilityEl = document.getElementById('card-ability');
+  if (cardData.ability) {
+    abilityEl.textContent = `⚡ ${cardData.ability.name}`;
+    abilityEl.style.display = 'block';
+  } else {
+    abilityEl.style.display = 'none';
+  }
+
+  // Initialize scratch-off overlay
+  initScratchCard();
 
   // Check for pending story arc intro or random encounter
   if (pendingArcIntro) {
@@ -5111,6 +5233,122 @@ function showMintScreen() {
   // TODO: Save to Supabase with DID
 
   showScreen('mint');
+}
+
+// Initialize scratch card overlay
+function initScratchCard() {
+  const canvas = document.getElementById('scratch-canvas');
+  const ctx = canvas.getContext('2d');
+  const overlay = document.getElementById('scratch-overlay');
+
+  // Reset overlay
+  overlay.classList.remove('revealed');
+  document.querySelector('.scratch-options').style.display = 'flex';
+  document.getElementById('mint-continue').style.display = 'none';
+
+  // Draw the scratch-off coating
+  ctx.fillStyle = '#2A2927';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw "SCRATCH ME" pattern
+  ctx.fillStyle = '#3A3937';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'center';
+  for (let y = 30; y < canvas.height; y += 50) {
+    for (let x = 30; x < canvas.width; x += 80) {
+      ctx.fillText('SCRATCH', x, y);
+      ctx.fillText('★ ★ ★', x, y + 15);
+    }
+  }
+
+  // Draw card rarity hint
+  ctx.font = 'bold 16px system-ui';
+  ctx.fillStyle = '#A855F7';
+  ctx.fillText('🎴 YOUR CARD AWAITS', canvas.width / 2, canvas.height / 2 - 10);
+  ctx.font = '11px system-ui';
+  ctx.fillStyle = '#888';
+  ctx.fillText('Scratch to see stats, type & abilities', canvas.width / 2, canvas.height / 2 + 15);
+
+  // Scratch interaction
+  let isScratching = false;
+  let scratchedPixels = 0;
+  const totalPixels = canvas.width * canvas.height;
+
+  const scratch = (e) => {
+    if (!isScratching) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+    const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+
+    // Scale for canvas resolution
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x * scaleX, y * scaleY, 20, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Track scratched area
+    scratchedPixels += 400; // Approximate pixels per scratch
+
+    // Auto-reveal if scratched enough (>40%)
+    if (scratchedPixels / totalPixels > 0.4) {
+      revealCard();
+    }
+  };
+
+  canvas.onmousedown = () => isScratching = true;
+  canvas.onmouseup = () => isScratching = false;
+  canvas.onmouseleave = () => isScratching = false;
+  canvas.onmousemove = scratch;
+
+  // Touch support
+  canvas.ontouchstart = (e) => { isScratching = true; e.preventDefault(); };
+  canvas.ontouchend = () => isScratching = false;
+  canvas.ontouchmove = (e) => { scratch(e); e.preventDefault(); };
+}
+
+// Reveal the card fully
+function revealCard() {
+  const overlay = document.getElementById('scratch-overlay');
+  overlay.classList.add('revealed');
+  document.querySelector('.scratch-options').style.display = 'none';
+  document.getElementById('mint-continue').style.display = 'block';
+
+  // Mark card as revealed
+  if (window.pendingCardData) {
+    window.pendingCardData.revealed = true;
+    saveCardToCollection(window.pendingCardData);
+  }
+
+  playSfx('coin');
+}
+
+// Keep card as mystery (unrevealed)
+function keepMystery() {
+  const overlay = document.getElementById('scratch-overlay');
+  overlay.classList.add('revealed');
+  document.querySelector('.scratch-options').style.display = 'none';
+  document.getElementById('mint-continue').style.display = 'block';
+
+  // Mark card as mystery (not revealed)
+  if (window.pendingCardData) {
+    window.pendingCardData.revealed = false;
+    window.pendingCardData.mystery = true;
+    saveCardToCollection(window.pendingCardData);
+  }
+
+  // Show mystery effect
+  document.getElementById('card-art').textContent = '❓';
+  document.getElementById('card-atk').textContent = '?';
+  document.getElementById('card-def').textContent = '?';
+  document.getElementById('card-rarity').textContent = 'MYSTERY';
+  document.getElementById('card-rarity').className = 'card-rarity legendary'; // Gold for mystery
+  document.getElementById('card-ability').textContent = '⚡ Unknown Power';
+
+  playSfx('confirm');
 }
 
 // Show story arc notification
