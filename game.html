@@ -142,9 +142,12 @@ small.demo{color:var(--crayon)}
     <h2 id="t-title"></h2>
     <div class="sub" id="t-beat"></div>
   </div>
+  <blockquote id="t-quote" style="border-left:4px solid var(--crayon);padding:12px 16px;margin:16px 0;font-family:Georgia,serif;font-size:18px;font-style:italic;color:var(--bone);background:rgba(255,255,255,0.03)"></blockquote>
+  <p id="t-summary" style="color:var(--pencil);font-size:14px;margin:0 0 16px;line-height:1.5"></p>
+  <div id="t-triple" style="text-align:center;font-size:13px;letter-spacing:1px;color:var(--gold);margin:12px 0;text-transform:uppercase"></div>
+  <a id="t-source" target="_blank" style="color:var(--pencil);font-size:12px;display:block;margin-bottom:16px">→ Read the original source</a>
   <details class="program"><summary>THEATER PROGRAM (what was de-escalated)</summary>
-    <div>The stakes are staged. The facts are not.
-      <a id="t-source" target="_blank" style="color:var(--bone)">Court record &rarr;</a></div>
+    <div>The stakes are staged. The facts are not.</div>
     <table id="t-deesc"></table>
   </details>
   <div id="nuance-before" class="nuancebox">
@@ -446,10 +449,19 @@ function playWith(c){
   CASE=c; PICK={who:null,action:null,whom:null,free:{}}; VOTE=null;
   [0,1,2].forEach(i=>{document.getElementById('nb'+i).value=50;});
   const re=c.extraction.reenactment;
-  setText('t-title', c.title||c.raw_title);
+  const ex=c.extraction;
+  setText('t-title', c.title||ex.nvn_title||c.raw_title);
+  // Quote - the factual anchor
+  const quote=ex.article_quote||c.article_quote;
+  document.getElementById('t-quote').textContent=quote?`"${quote}"`:'"[No quote extracted]"';
+  // Summary
+  document.getElementById('t-summary').textContent=ex.summary||c.summary||'';
+  // Triple preview
+  document.getElementById('t-triple').textContent=
+    (ex.who_choices?.[0]||'?')+' \u2192 '+(ex.action_choices?.[0]||'?')+' \u2192 '+(ex.whom_choices?.[0]||'?');
   document.getElementById('t-source').href=c.source_url;
   document.getElementById('t-deesc').innerHTML=
-    '<tr><td><b>COURT RECORD</b></td><td><b>TONIGHT\u2019S STAGING</b></td></tr>'+
+    '<tr><td><b>COURT RECORD</b></td><td><b>TONIGHT'S STAGING</b></td></tr>'+
     re.deescalations.map(d=>`<tr><td>${esc(d.real)}</td><td>${esc(d.cartoon)}</td></tr>`).join('');
   document.getElementById('script').innerHTML='';
   beat(0);
