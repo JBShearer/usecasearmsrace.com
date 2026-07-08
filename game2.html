@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>USE CASE ARMS RACE</title>
+<style>
+:root{--ink:#0E0E0E;--bone:#EDE6D6;--crayon:#C1121F;--pencil:#7a7263;--gold:#c9a84c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--bone);
+  font:16px/1.5 -apple-system,'Helvetica Neue',Arial,sans-serif}
+header{padding:16px 18px;border-bottom:2px solid var(--bone);
+  display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+h1{margin:0;font-size:18px;letter-spacing:3px;text-transform:uppercase}
+nav button{background:none;border:none;color:var(--pencil);font:600 13px/1 inherit;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;padding:8px 10px}
+nav button.on{color:var(--bone);border-bottom:3px solid var(--crayon)}
+main{max-width:760px;margin:0 auto;padding:20px 16px 80px}
+.tagline{color:var(--pencil);font-size:13px}
+/* SEARCH */
+.slotrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:14px 0}
+.slotrow input,#freeq{width:100%;background:var(--ink);color:var(--bone);
+  border:2px solid var(--bone);padding:12px;font:inherit}
+.slotrow label{font-size:11px;letter-spacing:2px;color:var(--pencil);
+  text-transform:uppercase;display:block;margin-bottom:4px}
+#freeq{margin-top:4px}
+.go{width:100%;margin-top:10px;background:var(--bone);color:var(--ink);
+  border:none;padding:14px;font:700 15px/1 inherit;letter-spacing:2px;
+  text-transform:uppercase;cursor:pointer}
+#latency{color:var(--pencil);font-size:12px;margin:8px 0}
+.hit{border:2px solid var(--bone);padding:14px;margin:10px 0;cursor:pointer}
+.hit h3{margin:0 0 4px;font-size:16px;text-transform:uppercase;letter-spacing:.5px}
+.hit .meta{font-size:12px;color:var(--pencil)}
+.votebar{height:8px;background:var(--crayon);margin-top:8px;position:relative}
+.votebar i{position:absolute;left:0;top:0;bottom:0;background:var(--gold)}
+.badge{display:inline-block;border:1px solid var(--bone);padding:1px 7px;
+  font-size:11px;letter-spacing:1px;margin-right:6px}
+.badge.hell{border-color:var(--crayon);color:var(--crayon)}
+.badge.heaven{border-color:var(--gold);color:var(--gold)}
+/* PLAY */
+.screen{display:none}.screen.on{display:block;animation:snap .12s steps(2)}
+@keyframes snap{from{opacity:0}to{opacity:1}}
+.case-title{font-size:22px;text-transform:uppercase;letter-spacing:1px;margin:8px 0}
+.summary{color:var(--bone)}
+.dots{letter-spacing:6px;color:var(--pencil);margin:10px 0;font-size:13px}
+.dots b{color:var(--crayon)}
+.prompt{font-size:18px;text-transform:uppercase;letter-spacing:1px;margin:16px 0 10px}
+.choice{display:block;width:100%;text-align:left;background:var(--ink);
+  color:var(--bone);border:2px solid var(--bone);padding:14px;margin:8px 0;
+  font:inherit;cursor:pointer}
+.choice:hover{background:var(--bone);color:var(--ink)}
+.free{border-style:dashed;color:var(--pencil)}
+.charline{font-family:Georgia,serif;font-style:italic;color:var(--pencil);
+  margin:14px 0;border-left:3px solid var(--pencil);padding-left:10px}
+.charline b{color:var(--bone);font-style:normal}
+.tripleview{font-size:17px;text-transform:uppercase;letter-spacing:1px;
+  border:2px solid var(--bone);padding:14px;margin:12px 0}
+.verdicts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.verdicts button{padding:22px;font:800 18px/1 inherit;letter-spacing:2px;
+  cursor:pointer;border:3px solid}
+#vheaven{background:var(--ink);color:var(--gold);border-color:var(--gold)}
+#vhell{background:var(--ink);color:var(--crayon);border-color:var(--crayon)}
+.verdicts button:hover{color:var(--ink)}
+#vheaven:hover{background:var(--gold)}#vhell:hover{background:var(--crayon)}
+textarea{width:100%;background:var(--ink);color:var(--bone);
+  border:2px solid var(--bone);padding:12px;font:inherit;min-height:110px}
+.rewardline{color:var(--pencil);font-size:13px;margin-top:6px}
+/* CARD */
+.card{border:4px solid var(--bone);padding:18px;margin:14px 0;position:relative}
+.card.hell{border-color:var(--crayon)}
+.card.heaven{border-color:var(--gold)}
+.card h3{margin:0 0 8px;text-transform:uppercase;font-size:17px;letter-spacing:1px}
+.stats{display:flex;gap:16px;font-size:20px;font-weight:800;margin:8px 0}
+.rarity{letter-spacing:3px;font-size:12px;color:var(--pencil);text-transform:uppercase}
+.rarity.legendary{color:var(--gold)}
+#scratch{position:absolute;inset:0;touch-action:none}
+.stamp{color:var(--crayon);font-weight:800;text-transform:uppercase;
+  letter-spacing:1px;transform:rotate(-2deg);display:inline-block}
+footer{position:fixed;bottom:0;left:0;right:0;background:var(--ink);
+  border-top:1px solid var(--pencil);color:var(--pencil);font-size:11px;
+  text-align:center;padding:8px}
+small.demo{color:var(--crayon)}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Use Case Arms Race</h1>
+  <div class="tagline">Document AI before it documents you. <small class="demo" id="demoflag"></small></div></div>
+  <nav>
+    <button id="nav-search" class="on" onclick="show('search')">Search</button>
+    <button id="nav-play" onclick="startPlay()">Play</button>
+  </nav>
+</header>
+<main>
+
+<!-- ============ SEARCH: the engine ============ -->
+<section id="search" class="screen on">
+  <div class="slotrow">
+    <div><label>Who</label><input id="s-who" placeholder="e.g. government"></div>
+    <div><label>Does what</label><input id="s-action" placeholder="e.g. denies"></div>
+    <div><label>To whom</label><input id="s-whom" placeholder="e.g. applicants"></div>
+  </div>
+  <input id="freeq" placeholder="or ask in plain language: AI that watches drivers">
+  <button class="go" onclick="doSearch()">Search the record</button>
+  <div id="latency"></div>
+  <div id="results"></div>
+</section>
+
+<!-- ============ PLAY: Discovery ============ -->
+<section id="p-discovery" class="screen">
+  <div class="dots"><b>&#9679;</b> &#9675; &#9675; &#9675; &#9675;</div>
+  <div class="badge" id="d-source"></div>
+  <h2 class="case-title" id="d-title"></h2>
+  <p class="summary" id="d-summary"></p>
+  <p class="meta"><a id="d-link" target="_blank" style="color:var(--bone)">Primary source &rarr;</a></p>
+  <button class="go" onclick="show('p-who')">Open the case &rarr;</button>
+</section>
+
+<!-- WHO / ACTION / WHOM share one template -->
+<section id="p-who" class="screen">
+  <div class="dots">&#9679; <b>&#9679;</b> &#9675; &#9675; &#9675;</div>
+  <div class="charline" id="who-char"></div>
+  <div class="prompt">Who is the primary actor?</div>
+  <div id="who-choices"></div>
+</section>
+<section id="p-action" class="screen">
+  <div class="dots">&#9679; &#9679; <b>&#9679;</b> &#9675; &#9675;</div>
+  <div class="charline" id="action-char"></div>
+  <div class="prompt" id="action-prompt"></div>
+  <div id="action-choices"></div>
+</section>
+<section id="p-whom" class="screen">
+  <div class="dots">&#9679; &#9679; &#9679; <b>&#9679;</b> &#9675;</div>
+  <div class="charline" id="whom-char"></div>
+  <div class="prompt" id="whom-prompt"></div>
+  <div id="whom-choices"></div>
+</section>
+
+<!-- Verdict: no suggestion, no stats until voted -->
+<section id="p-verdict" class="screen">
+  <div class="dots">&#9679; &#9679; &#9679; &#9679; <b>&#9679;</b></div>
+  <div class="tripleview" id="v-triple"></div>
+  <div class="prompt">Your verdict. Nobody votes for you.</div>
+  <div class="verdicts">
+    <button id="vheaven" onclick="verdict('heaven')">&#128519; Heaven</button>
+    <button id="vhell" onclick="verdict('hell')">&#128520; Hell</button>
+  </div>
+</section>
+
+<!-- Notes -->
+<section id="p-notes" class="screen">
+  <div class="prompt">What did you notice about this case?</div>
+  <textarea id="notes" oninput="noteMeter()"></textarea>
+  <div class="rewardline" id="notemeter">Optional. 10+ characters starts earning.</div>
+  <button class="go" onclick="mint()">Close the case &rarr;</button>
+</section>
+
+<!-- Mint -->
+<section id="p-mint" class="screen">
+  <div class="prompt"><span class="stamp">Case closed</span></div>
+  <div class="tripleview" id="m-triple"></div>
+  <div class="card" id="m-card">
+    <h3 id="m-name"></h3>
+    <div class="stats"><span id="m-atk"></span><span id="m-def"></span></div>
+    <div class="rarity" id="m-rarity"></div>
+    <div class="rewardline" id="m-collective"></div>
+    <canvas id="scratch"></canvas>
+  </div>
+  <div class="rewardline" id="m-rewards"></div>
+  <button class="go" onclick="startPlay()">Next case &rarr;</button>
+</section>
+
+</main>
+<footer>Faction is decided by human votes only. The registry takes no position.
+Machine verification checks documentation, never virtue.</footer>
+
+<script>
+/* ============ CONFIG ============ */
+const CONFIG = {
+  SUPABASE_URL: "https://aslcrwmbdtvimjrexxzw.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls",
+  FN: (name) => CONFIG.SUPABASE_URL + "/functions/v1/" + name,
+};
+const DEMO = !CONFIG.SUPABASE_URL;
+document.getElementById('demoflag').textContent = DEMO ? "DEMO MODE" : "";
+
+/* Demo cases: real, sourced, pre-extracted (what extract-worker produces).
+   Note what is ABSENT: any faction field. */
+const DEMO_CASES = [{
+  id:"demo-1", raw_title:"Cobb County approves Clearview AI contract",
+  title:"County police adopt face-search database",
+  summary:"Cobb County commissioners approved a 3-year contract giving police access to Clearview AI's face-matching database of billions of scraped public images, at $18,000 per year, after a six-month pilot.",
+  source_url:"https://www.atlantanewsfirst.com/2022/12/15/new-contract-with-facial-recognition-tech-company-raises-privacy-concerns-cobb-county/",
+  source_tier:1, impact:4, heaven_votes:9, hell_votes:21, faction:"hell",
+  valence:-2,
+  extraction:{
+    who_choices:["Cobb County Police","County commissioners","Clearview AI"],
+    action_choices:["searches faces of","matches suspects against","runs face recognition on"],
+    whom_choices:["billions of scraped photos","residents and the public","unsolved case suspects"],
+    story:{gi:"Tactical assessment: a database this size has no off switch.",
+      gary:"The pilot worked great. Pilots always work great.",
+      supes:"Nobody in the database was asked. Somebody should ask."}}
+},{
+  id:"demo-2", raw_title:"Hospital deploys AI sepsis early-warning system",
+  title:"Hospital AI flags sepsis hours earlier",
+  summary:"A regional hospital network deployed a machine-learning early-warning system that monitors vitals and lab results to flag sepsis risk hours before clinical presentation, with nurses reviewing every alert.",
+  source_url:"https://example.org/hospital-sepsis-ai",
+  source_tier:2, impact:4, heaven_votes:26, hell_votes:4, faction:"heaven",
+  valence:2,
+  extraction:{
+    who_choices:["Hospital network","Clinical AI system","Care teams"],
+    action_choices:["flags sepsis risk for","monitors vitals of","alerts nurses about"],
+    whom_choices:["admitted patients","at-risk patients","ICU candidates"],
+    story:{gi:"Probability of humans ignoring the alert: nonzero. Keep the nurse.",
+      gary:"It works because a human checks it. Write that down.",
+      supes:"The patients this catches will never know. That is the good kind of invisible."}}
+},{
+  id:"demo-3", raw_title:"Workday AI hiring screening discrimination suit proceeds",
+  title:"Hiring algorithm screens millions of applicants",
+  summary:"A federal court allowed a collective action to proceed alleging an AI-powered applicant screening system used by hundreds of employers discriminated against applicants over 40, with hundreds of millions of applications processed.",
+  source_url:"https://example.org/hiring-ai-suit",
+  source_tier:1, impact:5, heaven_votes:2, hell_votes:3, faction:"unaligned",
+  valence:-1,
+  extraction:{
+    who_choices:["Workday screening AI","Hundreds of employers","The vendor"],
+    action_choices:["auto-rejects","scores and filters","screens out"],
+    whom_choices:["applicants over 40","millions of job seekers","qualified candidates"],
+    story:{gi:"The rejection letter was signed by nobody. That was the design.",
+      gary:"We optimized time-to-reject. Mission accomplished, I guess.",
+      supes:"Every one of those applications was a person's afternoon of hope."}}
+}];
+let demoIdx = 0;
+
+/* ============ ROUTER ============ */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.getElementById('nav-search').classList.toggle('on', id==='search');
+  document.getElementById('nav-play').classList.toggle('on', id!=='search');
+  window.scrollTo(0,0);
+}
+
+/* ============ SEARCH ============ */
+async function doSearch(){
+  const body={ who:val('s-who'), action:val('s-action'), whom:val('s-whom'),
+    q:val('freeq') };
+  const t0=performance.now();
+  let results;
+  if(DEMO){
+    const q=(body.q+body.who+body.action+body.whom).toLowerCase();
+    results=DEMO_CASES.filter(c=>!q ||
+      (c.title+c.summary+JSON.stringify(c.extraction)).toLowerCase()
+        .split(/\s+/).some(w=>q.includes(w)&&w.length>3) ||
+      (c.title+" "+c.summary).toLowerCase().includes(q.trim()))
+      .map(c=>({...c, who_name:c.extraction.who_choices[0],
+        action_verb:c.extraction.action_choices[0].split(' ')[0],
+        whom_name:c.extraction.whom_choices[1]}));
+    if(!results.length) results=DEMO_CASES.map(c=>({...c,
+      who_name:c.extraction.who_choices[0],
+      action_verb:c.extraction.action_choices[0].split(' ')[0],
+      whom_name:c.extraction.whom_choices[1]}));
+  } else {
+    const r=await fetch(CONFIG.FN('search-cases'),{method:'POST',
+      headers:{'Content-Type':'application/json',
+        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
+      body:JSON.stringify(body)});
+    results=(await r.json()).results||[];
+  }
+  const ms=Math.round(performance.now()-t0);
+  document.getElementById('latency').textContent=
+    results.length+' cases · '+ms+'ms';
+  const host=document.getElementById('results');
+  host.innerHTML='';
+  for(const c of results){
+    const total=(c.heaven_votes||0)+(c.hell_votes||0);
+    const pct=total?Math.round(100*c.heaven_votes/total):0;
+    const el=document.createElement('div');
+    el.className='hit';
+    el.innerHTML=`<span class="badge ${c.faction}">${(c.faction||'unaligned').toUpperCase()}</span>
+      <span class="badge">IMPACT ${'\u2605'.repeat(c.impact||1)}</span>
+      <h3>${esc(c.title||c.raw_title)}</h3>
+      <div class="meta">${esc(c.who_name||'?')} \u2192 ${esc(c.action_verb||'?')} \u2192 ${esc(c.whom_name||'?')}
+       · ${total} votes</div>
+      <div class="votebar"><i style="width:${pct}%"></i></div>`;
+    el.onclick=()=>playCase(c.id);
+    host.appendChild(el);
+  }
+}
+
+/* ============ PLAY FLOW ============ */
+let CASE=null, PICK={who:null,action:null,whom:null,free:{}};
+async function startPlay(){
+  let c;
+  if(DEMO){ c=DEMO_CASES[demoIdx++ % DEMO_CASES.length]; }
+  else {
+    const r=await fetch(CONFIG.FN('next-case'),{headers:{
+      'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY}});
+    c=await r.json();
+  }
+  playWith(c);
+}
+function playCase(id){
+  const c=DEMO?DEMO_CASES.find(x=>x.id===id):null;
+  if(c) playWith(c); else startPlay();
+}
+function playWith(c){
+  CASE=c; PICK={who:null,action:null,whom:null,free:{}};
+  setText('d-title',c.title||c.raw_title);
+  setText('d-summary',c.summary||'');
+  document.getElementById('d-link').href=c.source_url;
+  setText('d-source', c.source_tier===1?'FIRST-PARTY SOURCE':'REPORTED');
+  const st=c.extraction.story||{};
+  document.getElementById('who-char').innerHTML='<b>GI:</b> '+esc(st.gi||'');
+  document.getElementById('action-char').innerHTML='<b>Gary:</b> '+esc(st.gary||'');
+  document.getElementById('whom-char').innerHTML='<b>Supes:</b> '+esc(st.supes||'');
+  renderChoices('who', c.extraction.who_choices);
+  show('p-discovery');
+}
+function renderChoices(slot, options){
+  const host=document.getElementById(slot+'-choices');
+  host.innerHTML='';
+  // Randomized order: kills position bias in the dataset.
+  const shuffled=[...options].sort(()=>Math.random()-0.5);
+  for(const opt of shuffled){
+    const b=document.createElement('button');
+    b.className='choice'; b.textContent=opt;
+    b.onclick=()=>pick(slot,opt,false);
+    host.appendChild(b);
+  }
+  // The mandatory fourth door: free text. Novel entities enter here.
+  const f=document.createElement('button');
+  f.className='choice free'; f.textContent='None of these. Let me say it \u2192';
+  f.onclick=()=>{
+    const v=prompt('In your own words:');
+    if(v&&v.trim()) pick(slot,v.trim(),true);
+  };
+  host.appendChild(f);
+}
+function pick(slot,value,free){
+  PICK[slot]=value; if(free) PICK.free[slot]=true;
+  if(slot==='who'){
+    setText('action-prompt', value+' does what?');
+    renderChoices('action', CASE.extraction.action_choices);
+    show('p-action');
+  } else if(slot==='action'){
+    setText('whom-prompt', PICK.who+' '+value+' whom?');
+    renderChoices('whom', CASE.extraction.whom_choices);
+    show('p-whom');
+  } else {
+    setText('v-triple', PICK.who+' \u2192 '+PICK.action+' \u2192 '+PICK.whom);
+    show('p-verdict');
+  }
+}
+let VOTE=null;
+function verdict(f){ VOTE=f; show('p-notes'); document.getElementById('notes').value=''; noteMeter(); }
+function noteMeter(){
+  const n=document.getElementById('notes').value.length;
+  const coins=n>=200?25:n>=100?15:n>=50?10:n>=10?5:0;
+  setText('notemeter', n+' characters · '+(coins?('earns '+coins+' coins'):'10+ characters starts earning'));
+}
+
+/* ============ MINT (instant, deterministic) ============ */
+function deriveCard(impact,valence,tier){
+  const v=Math.max(-2,Math.min(2,valence||0));
+  const atk=impact*2+(v<0?-v:0);
+  const def=impact+(v>0?v:0)+(tier===1?1:0);
+  const rarity=impact>=5?'legendary':impact===4?'rare':impact===3?'uncommon':'common';
+  return {atk,def,rarity};
+}
+async function mint(){
+  const notes=document.getElementById('notes').value;
+  let resp;
+  if(DEMO){
+    // local vote application with floor(5) + hysteresis semantics
+    if(VOTE==='heaven') CASE.heaven_votes++; else CASE.hell_votes++;
+    const total=CASE.heaven_votes+CASE.hell_votes;
+    const s=deriveCard(CASE.impact,CASE.valence,CASE.source_tier);
+    resp={card:{card_name:CASE.title,faction_at_mint:CASE.faction,
+        atk:s.atk,def:s.def,rarity:s.rarity},
+      rewards:{coins:(notes.length>=200?25:notes.length>=100?15:notes.length>=50?10:notes.length>=10?5:0),
+        rep:3+Math.min(10,Math.floor(notes.length/50)*2)+(Object.keys(PICK.free).length?2:0)},
+      collective:{heaven_pct:Math.round(100*CASE.heaven_votes/total),votes:total}};
+  } else {
+    const r=await fetch(CONFIG.FN('submit-verdict'),{method:'POST',
+      headers:{'Content-Type':'application/json',
+        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
+      body:JSON.stringify({case_id:CASE.id,who:PICK.who,action:PICK.action,
+        whom:PICK.whom,who_free:!!PICK.free.who,action_free:!!PICK.free.action,
+        whom_free:!!PICK.free.whom,faction_vote:VOTE,notes})});
+    resp=await r.json();
+  }
+  const c=resp.card;
+  setText('m-triple', PICK.who+' \u2192 '+PICK.action+' \u2192 '+PICK.whom);
+  setText('m-name', c.card_name);
+  setText('m-atk','\u2694 '+c.atk); setText('m-def','\u26E8 '+c.def);
+  const rar=document.getElementById('m-rarity');
+  rar.textContent=c.rarity; rar.className='rarity '+c.rarity;
+  document.getElementById('m-card').className='card '+(c.faction_at_mint||'unaligned');
+  // Collective stats appear ONLY now, after the vote is committed.
+  setText('m-collective', resp.collective.votes+' verdicts · '
+    +resp.collective.heaven_pct+'% voted Heaven');
+  setText('m-rewards','+'+resp.rewards.coins+' coins · +'+resp.rewards.rep+' rep'
+    +(Object.keys(PICK.free).length?' (free-text bonus)':''));
+  show('p-mint');
+  initScratch();
+}
+/* Scratch theater: the card is already rendered underneath. */
+function initScratch(){
+  const canvas=document.getElementById('scratch');
+  const host=document.getElementById('m-card');
+  canvas.width=host.clientWidth; canvas.height=host.clientHeight;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#111'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#C1121F'; ctx.font='700 15px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('SCRATCH TO REVEAL', canvas.width/2, canvas.height/2);
+  let down=false;
+  const pos=e=>{const r=canvas.getBoundingClientRect();
+    const p=e.touches?e.touches[0]:e; return [p.clientX-r.left,p.clientY-r.top];};
+  const scratch=(x,y)=>{ctx.globalCompositeOperation='destination-out';
+    ctx.beginPath(); ctx.arc(x,y,18,0,Math.PI*2); ctx.fill();};
+  canvas.onmousedown=e=>{down=true;scratch(...pos(e));};
+  canvas.onmousemove=e=>{if(down)scratch(...pos(e));};
+  window.addEventListener('mouseup',()=>down=false);
+  canvas.addEventListener('touchstart',e=>{down=true;scratch(...pos(e));e.preventDefault();});
+  canvas.addEventListener('touchmove',e=>{if(down){scratch(...pos(e));e.preventDefault();}});
+  window.addEventListener('touchend',()=>down=false);
+}
+
+/* helpers */
+function val(id){return document.getElementById(id).value.trim()}
+function setText(id,t){document.getElementById(id).textContent=t}
+function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML}
+doSearch();
+</script>
+</body>
+</html>
