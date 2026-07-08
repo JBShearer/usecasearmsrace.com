@@ -1137,29 +1137,35 @@ function rankLocal(q){
     .map(x=>x.c);
 }
 
-// Fast search: single call, streams results
+// Fast search: TWO parallel calls - DB returns instant, web streams in later
 async function parallelSearch(q, token){
   if(DEMO||!q||q.length<2) return;
   const headers={'Content-Type':'application/json',
     'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY};
 
-  // Single call - edge function returns both DB results and web results
-  try {
-    const r = await fetch(CONFIG.FN('search-cases'),{method:'POST',headers,
-      body:JSON.stringify({q, web: q.length >= 4})});
-    const data = await r.json();
-    if(token!==searchToken) return;
+  // Fire BOTH requests in parallel - don't wait for web
+  const dbCall = fetch(CONFIG.FN('search-cases'),{method:'POST',headers,
+    body:JSON.stringify({q})}).then(r=>r.json()).catch(()=>({results:[]}));
 
-    // Cache DB results
-    (data.results||[]).forEach(c=>CACHE.set(c.id,c));
+  const webCall = q.length >= 4
+    ? fetch(CONFIG.FN('search-cases'),{method:'POST',headers,
+        body:JSON.stringify({q, web_only:true})}).then(r=>r.json()).catch(()=>({web_results:[]}))
+    : Promise.resolve({web_results:[]});
 
-    // Update web results and render
-    lastWebResults = data.web_results||[];
+  // DB returns first (~50ms) - render immediately
+  const dbData = await dbCall;
+  if(token!==searchToken) return;
+  (dbData.results||[]).forEach(c=>CACHE.set(c.id,c));
+  renderResults(currentQuery(), {streaming: true});
+  console.log('DB search took', dbData.ms, 'ms');
+
+  // Web returns later (~2s) - append when ready
+  const webData = await webCall;
+  if(token!==searchToken) return;
+  lastWebResults = webData.web_results||[];
+  if(lastWebResults.length > 0) {
     renderResults(currentQuery(), {web: lastWebResults});
-
-    console.log('Search took', data.ms, 'ms');
-  } catch(e) {
-    console.error('Search failed:', e);
+    console.log('Web search took', webData.ms, 'ms');
   }
 }
 

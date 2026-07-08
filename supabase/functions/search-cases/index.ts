@@ -75,36 +75,41 @@ Deno.serve(async (req) => {
   // Load all cases (empty query) - for initial page load
   const fastQ = String(b.q ?? "").trim();
   if (!fastQ && !b.who && !b.action && !b.whom && !b.deep && !b.id) {
-    const { data } = await supa.from("cases")
-      .select("id, title, raw_title, summary, article_quote, category, faction, impact, heaven_votes, hell_votes, source_url, source_tier, tech_types, data_types, extraction, created_at")
+    const { data, error } = await supa.from("cases")
+      .select("id, title, raw_title, summary, article_quote, description, faction, impact, heaven_votes, hell_votes, source_url, source_tier, tech_types, data_types, extraction, created_at")
       .eq("status", "live")
       .order("created_at", { ascending: false })
       .limit(100);
     return new Response(JSON.stringify({
       results: data ?? [],
+      error: error?.message,
       ms: Date.now() - t0,
     }), { headers: { ...CORS, "Content-Type": "application/json" } });
   }
 
   // Fast path for realtime typing: ILIKE only, no embedding
-  // DB and web search run IN PARALLEL for speed
+  // DB returns IMMEDIATELY - web search is a SEPARATE call
   if (fastQ && !b.who && !b.action && !b.whom && !b.deep) {
-    // Fire DB and web in parallel - don't wait for DB to decide on web
-    const dbPromise = supa.from("cases")
-      .select("id, title, raw_title, summary, article_quote, category, faction, impact, heaven_votes, hell_votes, source_url, source_tier, tech_types, data_types, extraction, created_at")
+    // If web_only flag, just do web search (for second parallel call)
+    if (b.web_only) {
+      const web_results = await webSearch(fastQ.slice(0, 120));
+      return new Response(JSON.stringify({
+        results: [],
+        web_results,
+        ms: Date.now() - t0,
+      }), { headers: { ...CORS, "Content-Type": "application/json" } });
+    }
+
+    // DB search only - returns in <100ms
+    const { data } = await supa.from("cases")
+      .select("id, title, raw_title, summary, article_quote, description, faction, impact, heaven_votes, hell_votes, source_url, source_tier, tech_types, data_types, extraction, created_at")
       .eq("status", "live")
       .or(`title.ilike.%${fastQ}%,raw_title.ilike.%${fastQ}%,summary.ilike.%${fastQ}%`)
       .limit(20);
 
-    const webPromise = (b.web && fastQ.length > 3)
-      ? webSearch(fastQ.slice(0, 120))
-      : Promise.resolve([]);
-
-    const [dbResult, web_results] = await Promise.all([dbPromise, webPromise]);
-
     return new Response(JSON.stringify({
-      results: dbResult.data ?? [],
-      web_results,
+      results: data ?? [],
+      web_results: [],
       ms: Date.now() - t0,
     }), { headers: { ...CORS, "Content-Type": "application/json" } });
   }
