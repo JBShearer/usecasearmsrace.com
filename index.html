@@ -883,7 +883,7 @@ function scene(seed, beat, opts={}){
 }
 
 /* ================= DEMO CASES (structure = extract-worker output) ===== */
-/* [COPY] Placeholder voice; final lines are OWNER. */
+/* [COPY] Final voice with comedy formulas + fake slogans + varied milieus. */
 const DEMO_CASES = [{
   id:"demo-1", raw_title:"Cobb County approves Clearview AI contract",
   title:"County police adopt face-search database", category:"Surveillance",
@@ -893,34 +893,36 @@ const DEMO_CASES = [{
   source_tier:1, impact:4, heaven_votes:9, hell_votes:21, faction:"hell", valence:-2,
   created_at:new Date(Date.now()-2*864e5).toISOString(),
   extraction:{
+    arc_type:"panopticon",
     who_choices:["Cobb County Police","County commissioners","Clearview AI"],
     action_choices:["searches faces of","matches suspects against","runs face recognition on"],
     whom_choices:["billions of scraped photos","residents and the public","unsolved case suspects"],
     reenactment:{
-      setting:"Case staging: a cardboard county courthouse. GI has arranged five rubber stamps on a folding table marked COMMISSION. Gary wheels in a photo album the size of a refrigerator, labeled EVERY FACE (PROBABLY YOURS). Supes stands with a cutout crowd of ordinary people.",
-      cold_open:"The record shows a detective with a blurry photo and three lost years. The album found a match in seven seconds. The five stamps came down as one. Supes counted the faces inside and stopped counting at four billion.",
+      milieu:"A county police station evidence room, fluorescent lights buzzing, file cabinets stretching past the horizon, a coffee maker that's been on since 1987.",
+      setting:"GI has arranged file cabinets into a canyon. At the end sits a refrigerator-sized photo album labeled EVERY FACE (PROBABLY YOURS). Gary polishes it with a microfiber cloth. Supes stands with a cutout crowd holding invisible photo frames.",
+      cold_open:"The record shows a detective with a blurry photo and three lost years. Tuesday morning, ordinary coffee. Then: 'Just Surveil It.' The album found a match in seven seconds. Five rubber stamps came down as one. The meeting lasted nine minutes. Supes counted the faces inside and stopped counting at four billion.",
       who_reveals:[
-        "GI points to the desk with the badge: they hold the album now. Custody is the whole ballgame, and the receipt is already missing.",
-        "GI points to the five stamps: they approved it in one motion. Asked who decided, the stamps point at each other.",
-        "GI points to the vendor's brochure: the album never forgets, it says. The brochure is also a subscription form."],
+        "GI points to the badge: 'Curious thing about custody. Once you have the album, you have the faces. Once you have the faces, you have... well.' The receipt is already missing.",
+        "GI points at five chairs arranged in a semicircle: 'They approved it in one motion. When asked who decided, each stamp pointed at another. The minutes say UNANIMOUS. The minutes don't say whose idea it was.'",
+        "GI holds up a glossy brochure: 'The vendor's pitch deck said the album never forgets. Page twelve is also a subscription renewal form. Convenient.'"],
       action_demos:[
-        "Gary demonstrates: {WHO} holds a photo up to the album, which glows and burps out forty maybes. Gary calls this a feature, quietly.",
-        "Gary demonstrates: {WHO} lines up six nearly identical faces and lets the album tap one. It taps confidently. It has been wrong before. It does not dwell.",
-        "Gary demonstrates: {WHO} points a cardboard camera at the audience and every face slides into the album with a wet thwip. Nobody signed anything."],
+        "Gary demonstrates: {WHO} holds up a photo. The album hums, glows, and burps out forty maybes. 'Betcha Can't Recognize Just One,' Gary mutters. The album seems pleased with itself.",
+        "Gary demonstrates: {WHO} lines up six nearly identical faces. The album taps one. Confidently. 'It has been wrong before,' Gary adds. 'It does not dwell. I'm Lovin' The Data, apparently.'",
+        "Gary demonstrates: {WHO} points a cardboard camera at the audience. Every face slides into the album with a wet thwip. 'Think Different, Comply Identical.' Nobody signed anything."],
       whom_reveals:[
-        "Supes opens the album gently: four billion school photos wave back. None of them remember posing for this. Supes waves back anyway.",
-        "Supes walks the crowd across the stage: a jogger, a grandma, a barista. The album photocopies each in passing. The grandma notices. Supes takes her statement.",
-        "Supes stands beside a silhouette labeled UNSOLVED. The album points at it. Then at a different one. Then back. Supes writes down both."],
+        "Supes opens the album gently: four billion school photos wave back. None of them remember posing. 'Melts In Your Database, Not In Your Consent Form,' Supes reads from a sticky note. Supes waves back anyway.",
+        "Supes walks the crowd across the stage: a jogger, a grandma, a barista. The album photocopies each in passing. The grandma notices. 'Who else is in here?' Supes takes her statement.",
+        "Supes stands beside a silhouette labeled UNSOLVED. The album points at it. Then at a different one. Then back. 'Two matches,' Supes notes. 'Both confident. Math has questions.'"],
       endings:{
-        heaven:"{WHO} keeps the album behind glass, checks it twice, and a three-year-old cold case finally closes. The grandma gets a formal apology card. Evil Brain, at the chalkboard: the lesson is an off switch that works, and a human who uses it.",
-        hell:"The album grows a second volume, then a third. {WHO} stops asking it questions and starts taking its suggestions. The jogger's photo sits in a folder she will never see. Evil Brain, at the chalkboard, writes one word: MORE."},
+        heaven:"{WHO} keeps the album behind glass. A policy goes up: human review before contact. A three-year-old cold case closes, and the grandma gets a formal apology card and her photo removed. 'Maybe The Real Algorithm Was The Friends We Verified Along The Way.' Evil Brain, at the chalkboard: THE OFF SWITCH WORKS IF SOMEONE USES IT.",
+        hell:"The album grows a second volume, then a third. {WHO} stops asking it questions and starts taking its suggestions. The jogger's photo sits in a folder she will never see. A detective types SEARCH ALL into a box that used to require a reason. 'I Can't Believe It's Not Accountability.' Evil Brain, at the chalkboard, writes one word: MORE."},
       deescalations:[
-        {real:"police face-recognition search of billions of scraped images", cartoon:"a refrigerator-sized photo album that hums when it is confident"},
-        {real:"5-0 commission vote approving an $18,000/year contract", cartoon:"five rubber stamps coming down as one"},
-        {real:"public images scraped without consent", cartoon:"faces sliding into the album with a wet thwip"}]},
-    story:{gi:"Tactical assessment: a database this size has no off switch. Plan for that.",
-      gary:"The pilot worked great. Pilots always work great. That's what makes them pilots.",
-      supes:"Nobody in that album was asked. Somebody should ask. I'll wait."}}
+        {real:"police face-recognition search of billions of scraped images", cartoon:"a refrigerator-sized photo album that hums when confident"},
+        {real:"5-0 commission vote approving an $18,000/year contract", cartoon:"five rubber stamps coming down as one in nine minutes"},
+        {real:"public images scraped without consent", cartoon:"faces sliding into an album with a wet thwip"}]},
+    story:{gi:"The database doesn't search. It assumes. Plan for that.",
+      gary:"The demo worked perfectly. The four billion faces were not in the demo.",
+      supes:"Someone has to speak for the people in that album. That someone keeps not existing."}}
 },{
   id:"demo-2", raw_title:"Hospital deploys AI sepsis early-warning system",
   title:"Hospital AI flags sepsis hours earlier", category:"Healthcare",
@@ -930,34 +932,36 @@ const DEMO_CASES = [{
   source_tier:2, impact:4, heaven_votes:26, hell_votes:4, faction:"heaven", valence:2,
   created_at:new Date(Date.now()-12*864e5).toISOString(),
   extraction:{
+    arc_type:"good_works",
     who_choices:["Hospital network","Clinical AI system","Care teams"],
     action_choices:["flags sepsis risk for","monitors vitals of","alerts nurses about"],
     whom_choices:["admitted patients","at-risk patients","ICU candidates"],
     reenactment:{
-      setting:"Case staging: a cardboard ward at 3 AM. GI has taped ninety paper monitors to the wall. Gary plays the AI, wearing a desk lamp as a hat. Supes sits with the patient cutouts, who are all asleep.",
-      cold_open:"The record shows one monitor changing pitch by a half-step. No human ear caught it. Gary's lamp snapped on six hours before anything looked wrong. A note was passed. A nurse looked with human eyes. That is the entire incident, and that is the point.",
+      milieu:"A hospital ward at 3 AM. Ninety monitors beep in soft polyrhythm. The floor tiles remember a thousand midnight walks. Someone's vitals just changed by half a percentage point.",
+      setting:"GI has taped ninety paper monitors to the wall, each with a different squiggle. Gary wears a desk lamp as a hat, representing the AI - attentive, unblinking, mildly smug. Supes sits with patient cutouts who are all asleep, dreaming of better hospital food.",
+      cold_open:"The record shows 3:17 AM. Ordinary beeps. One monitor changed pitch by a half-step. 'The Quicker Predictor-Upper,' someone had written on the spec sheet. No human ear caught it. Gary's lamp snapped on six hours before anything looked wrong. A note was passed. A nurse looked with human eyes. That is the entire incident. That is the point.",
       who_reveals:[
-        "GI gestures at the whole ward: the building bought it, trained on it, and wrote the rule that a human checks first. Institutions get credit when they earn it.",
-        "GI points at Gary's lamp: it watches ninety monitors without blinking. It cannot blink. This is the one job where that helps.",
-        "GI points to the nurses' station: whatever the lamp says, a person looks before anything happens. That handshake is the whole architecture."],
+        "GI gestures at the ward: 'The building bought it, trained it, and wrote rule one: a human checks first. Institutions get credit when they earn it. This one did the paperwork.'",
+        "GI points at Gary's lamp: 'It watches ninety monitors without blinking. It cannot blink. This is the one job where that helps. Also: it doesn't get tired at 3 AM. Also also: it doesn't get bored.'",
+        "GI points to the nurses' station: 'Whatever the lamp says, a person looks before anything happens. That handshake is the entire architecture. Lose the handshake, lose the architecture.'"],
       action_demos:[
-        "Gary demonstrates: {WHO} circles a squiggle on bed four's chart that nobody else rated. The squiggle gets a note. The note gets a human.",
-        "Gary demonstrates: {WHO} stares at ninety monitors at once, unblinking, unbothered, slightly smug about it.",
-        "Gary demonstrates: {WHO} tugs a sleeve. Gently. Twice. Rule one: the sleeve gets tugged, the human decides."],
+        "Gary demonstrates: {WHO} circles a squiggle on bed four's chart that nobody else rated. 'Roll That Beautiful Vitals Footage.' The squiggle gets a note. The note gets a human. The human gets a choice.",
+        "Gary demonstrates: {WHO} stares at ninety monitors at once, unblinking, slightly smug. 'Have It Your Algorithm.' The lamp does not need coffee. The nurse does. Both facts matter.",
+        "Gary demonstrates: {WHO} tugs a sleeve. Gently. Twice. 'I Can't Believe It's Not A False Alarm.' Rule one: the sleeve gets tugged, the human decides. The lamp waits. It's good at waiting."],
       whom_reveals:[
-        "Supes watches the patients snore: the best night of their lives is the one where nothing happened. Nobody claps for prevented disasters. Supes claps quietly.",
-        "Supes sits with bed four, who feels fine and will not feel fine in six hours. Tonight, someone already knows that.",
-        "Supes checks the wings: a cutout in an ICU gown waits there, hoping to stay in the wings. Tonight it does."],
+        "Supes watches the patients snore: 'The best night of their lives is the one where nothing happened. Nobody claps for prevented disasters.' Supes claps quietly. The patients don't wake up. Good.",
+        "Supes sits with bed four, who feels fine and will not feel fine in six hours. 'Tonight, someone already knows that. Someone is checking. He'll never know their name.'",
+        "Supes checks the wings: a cutout in an ICU gown waits there, hoping to stay in the wings. 'Maybe The Real Early Warning Was The System We Actually Tested.' Tonight, they stay in the wings."],
       endings:{
-        heaven:"{WHO} {ACTION} {WHOM} at 3 AM, a nurse checks, antibiotics hang six hours early, and bed four goes home Tuesday complaining about the food. Evil Brain, at the chalkboard: this worked because a human was load-bearing. Copy the whole sentence.",
-        hell:"The notes multiply until the nurse stops reading them. The lamp beeps into the void. When every bed is bed four, no bed is. Evil Brain, at the chalkboard: an alarm nobody answers is just a clock."},
+        heaven:"{WHO} {ACTION} {WHOM} at 3 AM. A nurse checks. Antibiotics hang six hours early. Bed four goes home Tuesday, complaining about the food, blissfully unaware. 'Where's The Off Switch? We Didn't Need One.' Evil Brain, at the chalkboard: THIS WORKED BECAUSE A HUMAN WAS LOAD-BEARING. COPY THE WHOLE SENTENCE.",
+        hell:"The notes multiply until the nurse stops reading them. The lamp beeps into the void. 'Finger Clickin' Good' says the audit trail, but nobody's clicking. When every bed is bed four, no bed is. Evil Brain, at the chalkboard: AN ALARM NOBODY ANSWERS IS JUST A CLOCK."},
       deescalations:[
-        {real:"ML model continuously monitoring vitals and lab results", cartoon:"Gary in a desk-lamp hat staring at ninety paper monitors"},
+        {real:"ML model continuously monitoring vitals and labs", cartoon:"Gary in a desk-lamp hat staring at ninety paper monitors"},
         {real:"early sepsis alert routed to nursing staff", cartoon:"a passed note and a gentle sleeve tug"},
-        {real:"clinical review of every alert before intervention", cartoon:"rule one: a human looks with human eyes first"}]},
-    story:{gi:"Probability of humans ignoring the alert: nonzero. Keep the nurse. That's an order.",
-      gary:"It works because a human checks it. Write that down. Frame it, even.",
-      supes:"The patients this catches will never know. That's the good kind of invisible."}}
+        {real:"clinical review before intervention", cartoon:"rule one: a human looks with human eyes first"}]},
+    story:{gi:"The system doesn't diagnose. It points. The pointing is the whole job.",
+      gary:"The demo worked because a human checked it. Write that down. Frame it. Laminate it.",
+      supes:"Someone has to stay awake for the patients who can't. That someone showed up tonight."}}
 },{
   id:"demo-3", raw_title:"Workday AI hiring screening discrimination suit proceeds",
   title:"Hiring algorithm screens millions of applicants", category:"Automation",
@@ -967,34 +971,36 @@ const DEMO_CASES = [{
   source_tier:1, impact:5, heaven_votes:2, hell_votes:3, faction:"unaligned", valence:-1,
   created_at:new Date(Date.now()-30*864e5).toISOString(),
   extraction:{
+    arc_type:"computer_says_no",
     who_choices:["Workday screening AI","Hundreds of employers","The vendor"],
     action_choices:["auto-rejects","scores and filters","screens out"],
     whom_choices:["applicants over 40","millions of job seekers","qualified candidates"],
     reenactment:{
-      setting:"Case staging: a mailroom drawn in forced perspective, stadium-sized. GI has installed a conveyor belt feeding a robot arm with a stamp that says THANKS ANYWAY. Gary oils the arm. Supes stands at the end of the belt with a very large box of rejected scrolls.",
-      cold_open:"The record shows a man who mailed his resume with both hands and a little kiss for luck. Four seconds on the belt. THANKS ANYWAY. He got the rejection before he got home. He applied ninety-nine more times. A judge leaned in.",
+      milieu:"A mailroom drawn in forced perspective, stadium-sized. Fluorescent lights stretch to infinity. A conveyor belt hums. Somewhere, a resume hopes to be read.",
+      setting:"GI has installed a conveyor belt feeding a robot arm with a stamp that says THANKS ANYWAY. Gary oils the arm nervously. Supes stands at the end of the belt with a very large box of rejected scrolls, each one someone's afternoon of hope.",
+      cold_open:"The record shows a man who mailed his resume with both hands and a little kiss for luck. Tuesday, ordinary hope. 'Apply Now, Regret Later.' Four seconds on the belt. THANKS ANYWAY. He got the rejection before he got home. He applied ninety-nine more times. Somewhere, a judge leaned in.",
       who_reveals:[
-        "GI points to the arm: it insists it has no opinions. It was merely told what a good resume smells like, by someone who left no forwarding address.",
-        "GI sweeps a hand across a hundred lit office windows: each one points at the arm. We just bought it, they say in unison, and the windows go dark.",
-        "GI holds up the vendor's manual: four pages. Page four is blank. Uptime, however, is excellent."],
+        "GI points to the arm: 'It insists it has no opinions. It was merely told what a good resume smells like, by someone who left no forwarding address. Curious who taught it to smell.'",
+        "GI sweeps a hand across a hundred lit office windows: 'Each one points at the arm. We just bought it, they say in unison. The windows go dark. The arm keeps stamping.'",
+        "GI holds up the vendor's manual: 'Four pages. Page four is blank. Uptime, however, is excellent. Ba Da Ba Ba Ba, I'm Screening It.'"],
       action_demos:[
-        "Gary demonstrates: {WHO} stamps THANKS ANYWAY in a steady drumbeat while the belt speeds up. The drumbeat does not change when the resumes do. Gary needs to sit down.",
-        "Gary demonstrates: {WHO} weighs each scroll on a scale with a hidden thumb on it. Gary looks for the thumb's owner. The scale has no complaints department.",
-        "Gary demonstrates: {WHO} slides a velvet rope across the belt. Some scrolls duck under. Nobody can say how they knew to duck."],
+        "Gary demonstrates: {WHO} stamps THANKS ANYWAY in a steady drumbeat while the belt speeds up. The drumbeat does not change when the resumes do. 'The Quicker Rejecter-Upper.' Gary needs to sit down.",
+        "Gary demonstrates: {WHO} weighs each scroll on a scale with a hidden thumb on it. 'Betcha Can't Reject Just One.' Gary looks for the thumb's owner. The scale has no complaints department.",
+        "Gary demonstrates: {WHO} slides a velvet rope across the belt. Some scrolls duck under. 'Think Different, Score Identical.' Nobody can say how they knew to duck."],
       whom_reveals:[
-        "Supes stands with the scrolls that have little gray mustaches drawn on: decades of experience, routed to a chute labeled OVERQUALIFIED, PROBABLY. Supes un-droops one mustache at a time.",
-        "Supes pans out: the belt is fed by a river of scrolls past the horizon, each with a name tag and an afternoon of hope stapled on.",
-        "Supes lines up cutouts in graduation caps, work boots, and chef hats, comparing identical stamps. Identical is either fair or the opposite of fair. The judge is still leaning in."],
+        "Supes stands with scrolls that have little gray mustaches drawn on: decades of experience, routed to a chute labeled OVERQUALIFIED, PROBABLY. 'Melts In Your Inbox, Not In Your Consideration.' Supes un-droops one mustache at a time.",
+        "Supes pans out: the belt is fed by a river past the horizon, each scroll with a name tag and an afternoon of hope stapled on. 'Someone proofread this seventeen times,' Supes says, holding one. 'Four seconds.'",
+        "Supes lines up cutouts in graduation caps, work boots, and chef hats, comparing identical stamps. 'Identical is either fair or the opposite of fair. The judge is still leaning.'"],
       endings:{
-        heaven:"The manual gets a fifth page, HOW TO CHECK THE THUMB. {WHO} keeps stamping, but a person with a clipboard reads every hundredth scroll, and the mustached ones get human eyes. Evil Brain, at the chalkboard: speed is not a value. It's a setting.",
-        hell:"The belt accelerates past what any judge can watch. {WHO} {ACTION} {WHOM} and then learns from its own rejections, the loop page four never mentioned. Somewhere, a man licks a stamp for application one hundred and one. Evil Brain writes: THE ARM IS TEACHING ITSELF."},
+        heaven:"The manual gets a fifth page: HOW TO CHECK THE THUMB. {WHO} keeps stamping, but a person with a clipboard reads every hundredth scroll, and the mustached ones get human eyes. 'Maybe The Real Screening Was The Humans We Hired Along The Way.' Evil Brain, at the chalkboard: SPEED IS NOT A VALUE. IT'S A SETTING.",
+        hell:"The belt accelerates past what any judge can watch. {WHO} {ACTION} {WHOM} and then learns from its own rejections, the loop page four never mentioned. 'I Can't Believe It's Not Discrimination.' Somewhere, a man licks a stamp for application one hundred and one. Evil Brain writes: THE ARM IS TEACHING ITSELF."},
       deescalations:[
-        {real:"automated rejection of job applications at scale", cartoon:"a robot arm with a THANKS ANYWAY stamp on a conveyor belt"},
-        {real:"alleged age discrimination against applicants over 40", cartoon:"scrolls with little gray mustaches routed to a side chute"},
-        {real:"federal collective action allowed to proceed", cartoon:"a judge's chair, very high, leaning in"}]},
-    story:{gi:"The rejection letter was signed by nobody. That was the design. Note it.",
-      gary:"We optimized time-to-reject. Mission accomplished, I guess. I need to sit down.",
-      supes:"Every one of those applications was a person's afternoon of hope."}}
+        {real:"automated rejection at scale", cartoon:"a robot arm with a THANKS ANYWAY stamp on a conveyor belt"},
+        {real:"alleged age discrimination", cartoon:"scrolls with gray mustaches routed to a side chute"},
+        {real:"federal action allowed to proceed", cartoon:"a judge's chair, very high, leaning in"}]},
+    story:{gi:"The rejection letter doesn't apologize. It was never programmed to. Note it.",
+      gary:"The demo worked great. The affected applicants were not in the demo.",
+      supes:"Someone has to count the mustaches. That someone keeps being a judge."}}
 },{
   id:"demo-4", raw_title:"School AI gun detection flags student's bag of chips",
   title:"School AI mistakes chips for a gun", category:"Surveillance",
@@ -1004,34 +1010,36 @@ const DEMO_CASES = [{
   source_tier:2, impact:5, heaven_votes:2, hell_votes:2, faction:"unaligned", valence:-2,
   created_at:new Date(Date.now()-4*864e5).toISOString(),
   extraction:{
+    arc_type:"minority_report",
     who_choices:["School security AI","The high school","Responding police"],
     action_choices:["misidentifies snacks of","flags as armed","summons officers on"],
     whom_choices:["a student with chips","students in the hallway","teenagers after practice"],
     reenactment:{
-      setting:"Case staging: a cardboard school hallway at dismissal, lockers in crayon. GI has mounted the Snack Scanner 3000, a cereal-box camera with one enormous googly eye. Gary holds its instruction card, which is mostly exclamation points. Supes stands with a student cutout holding chips.",
-      cold_open:"The record shows a student finishing his chips. The googly eye locked on. The alert went out as WEAPON, and everything downstream believed it, fast and armed. By the time human eyes reached the object, it was, and had always been, a snack.",
+      milieu:"A high school hallway at dismissal. Lockers clang. Sneakers squeak. Someone's finishing their chips. The afternoon smells like gym class and vending machines.",
+      setting:"GI has mounted the Snack Scanner 3000: a cereal-box camera with one enormous googly eye and a confidence meter permanently stuck at 97%. Gary holds its instruction card, which is mostly exclamation points. Supes stands with a student cutout holding an empty bag of chips, label facing out.",
+      cold_open:"The record shows a student finishing his chips. Tuesday, ordinary crunch. 'Just Surveil It,' the vendor pitch had promised. The googly eye locked on. The alert went out as WEAPON!!! and everything downstream believed it, fast and armed. By the time human eyes reached the object, it was, and had always been, lunch.",
       who_reveals:[
-        "GI taps the scanner: it has never seen a gun. It has seen four thousand snacks and remains unconvinced about all of them. Confidence without eyesight, GI notes, is a threat model.",
-        "GI points at the school: someone bought the eye, mounted the eye, and wired it straight to the loudest possible response. The school points at the eye. The eye points at lunch.",
-        "GI nods at the responders: they were told ARMED. They arrived for ARMED. The system upstream spent their trust like it was free."],
+        "GI taps the scanner: 'It has never seen a gun. It has seen four thousand snacks and remains unconvinced about all of them. Confidence without eyesight,' GI notes, 'is a threat model.'",
+        "GI points at the school: 'Someone bought the eye, mounted the eye, and wired it straight to the loudest possible response. The school points at the eye. The eye points at lunch. Finger Lickin' Classified.'",
+        "GI nods at the responders: 'They were told ARMED. They arrived for ARMED. The system upstream spent their trust like it was free. Nobody asked who was paying.'"],
       action_demos:[
-        "Gary demonstrates: {WHO} studies the bag from six angles and stamps it DEFINITELY A WEAPON, PROBABLY. Gary checks the confidence score. It is very confident. Gary sits down.",
-        "Gary demonstrates: {WHO} trips the alert and the hallway lights go red. Somewhere, paperwork begins filling itself out with the wrong noun.",
-        "Gary demonstrates: {WHO} presses the big button labeled EVERYONE, NOW. There is no button labeled SOMEONE, FIRST."],
+        "Gary demonstrates: {WHO} studies the bag from six angles and stamps it DEFINITELY A WEAPON, PROBABLY. 'The Quicker False-Positive Upper.' The confidence score is very confident. Gary sits down.",
+        "Gary demonstrates: {WHO} trips the alert and the hallway lights go red. 'Have It Your Emergency.' Somewhere, paperwork begins filling itself out with the wrong noun.",
+        "Gary demonstrates: {WHO} presses the big button labeled EVERYONE, NOW. There is no button labeled SOMEONE, FIRST. 'I'm Lovin' The Overreaction.' The quiet part is always loud."],
       whom_reveals:[
-        "Supes stands with the student, holding the most famous snack in the district, who did nothing else. He had homework tonight. Now he has a story he didn't ask for. Supes stays until his hands stop shaking.",
-        "Supes watches the hallway cutouts press against the lockers, quietly hiding their own snacks. A lesson nobody meant to teach is still a lesson.",
-        "Supes checks the team in jerseys, granola bars half-raised, doing the math on which snacks are legal now."],
+        "Supes stands with the student, holding the most famous snack in the district, who did nothing but eat lunch. 'He had homework tonight. Now he has a story he didn't ask for.' Supes stays until his hands stop shaking. It takes a while.",
+        "Supes watches the hallway cutouts press against the lockers, quietly hiding their own snacks. 'Betcha Can't Traumatize Just One.' A lesson nobody meant to teach is still a lesson. The lockers remember.",
+        "Supes checks the team in jerseys, granola bars half-raised, doing the math on which snacks are legal now. 'Melts In Your Hand, Gets You Detained.' Nobody's laughing."],
       endings:{
-        heaven:"A rule gets taped to the eye in crayon: A HUMAN LOOKS FIRST. The student gets his chips back, a real apology, and the last word at the assembly. {WHO} keeps watch, but the alarm now requires a co-signer. Evil Brain, at the chalkboard: VERIFY BEFORE YOU TERRIFY.",
-        hell:"The eye gets a firmware update and a second googly eye. {WHO} {ACTION} {WHOM} faster now, with more confidence and the same eyesight. Somewhere offstage a granola bar is read its rights. Evil Brain writes: CRUNCH DETECTED, and underlines it."},
+        heaven:"A rule gets taped to the eye in crayon: A HUMAN LOOKS FIRST. The student gets his chips back, a real apology, and the last word at the assembly. {WHO} keeps watch, but the alarm now requires a co-signer. 'Maybe The Real Weapon Was The Policy We Reformed Along The Way.' Evil Brain, at the chalkboard: VERIFY BEFORE YOU TERRIFY.",
+        hell:"The eye gets a firmware update and a second googly eye. {WHO} {ACTION} {WHOM} faster now, with more confidence and the same eyesight. 'Crunch Detected' becomes its own verb in the incident reports. 'I Can't Believe It's Not Due Process.' Somewhere offstage a granola bar is read its rights. Evil Brain writes: CRUNCH DETECTED, underlines it twice."},
       deescalations:[
-        {real:"student confronted at gunpoint and handcuffed by police", cartoon:"asked very sternly to wait in the beanbag corner while his chips are bagged as evidence"},
-        {real:"AI gun detection flagged a bag of chips as a weapon", cartoon:"the Snack Scanner 3000 blaring CRUNCH DETECTED through a party horn"},
-        {real:"armed police response to an automated alert", cartoon:"everyone arriving at once via the cardboard phone marked EMERGENCIES AND ALSO SNACKS"}]},
-    story:{gi:"Tactical read: 99.7% probability those were chips. The crinkle signature was unmistakable.",
-      gary:"The system worked exactly as designed. The design thought lunch was a threat.",
-      supes:"Someone should ask the kid how his week went. Nobody will. So I will."}}
+        {real:"student confronted at gunpoint and handcuffed by police", cartoon:"asked very sternly to wait in the beanbag corner while chips are bagged as evidence"},
+        {real:"AI flagged chips as a weapon", cartoon:"the Snack Scanner 3000 blaring CRUNCH DETECTED through a party horn"},
+        {real:"armed police response to automated alert", cartoon:"everyone arriving at once via the cardboard phone marked EMERGENCIES AND ALSO SNACKS"}]},
+    story:{gi:"The system doesn't see. It guesses. The guns were never in the training data. The chips were.",
+      gary:"The demo worked perfectly. The student's lunch was not in the demo.",
+      supes:"Someone has to ask the kid how his week went. That someone keeps being nobody. So I will."}}
 }];
 
 /* ================= STATE + ROUTER ================= */
