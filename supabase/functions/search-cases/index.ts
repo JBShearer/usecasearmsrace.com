@@ -75,9 +75,22 @@ Deno.serve(async (req) => {
       { headers: { ...CORS, "Content-Type": "application/json" } });
   }
 
+  // Load all cases (empty query) - for initial page load
+  const fastQ = String(b.q ?? "").trim();
+  if (!fastQ && !b.who && !b.action && !b.whom && !b.deep && !b.id) {
+    const { data } = await supa.from("cases")
+      .select("id, title, raw_title, summary, article_quote, category, faction, impact, heaven_votes, hell_votes, source_url, source_tier, tech_types, data_types, extraction, created_at")
+      .eq("status", "live")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    return new Response(JSON.stringify({
+      results: data ?? [],
+      ms: Date.now() - t0,
+    }), { headers: { ...CORS, "Content-Type": "application/json" } });
+  }
+
   // Fast path for realtime typing: ILIKE only, no embedding
   // DB and web search run IN PARALLEL for speed
-  const fastQ = String(b.q ?? "").trim();
   if (fastQ && !b.who && !b.action && !b.whom && !b.deep) {
     // Fire DB and web in parallel - don't wait for DB to decide on web
     const dbPromise = supa.from("cases")
