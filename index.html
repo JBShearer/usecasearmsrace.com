@@ -284,8 +284,8 @@ De-escalation stages the stakes, never the facts.</footer>
 <script>
 /* ================= CONFIG ================= */
 const CONFIG = {
-  SUPABASE_URL: "",            // e.g. https://aslcrwmbdtvimjrexxzw.supabase.co
-  SUPABASE_ANON_KEY: "",
+  SUPABASE_URL: "https://aslcrwmbdtvimjrexxzw.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls",
   VIDEO_EMBED: "",             // e.g. https://www.youtube.com/embed/XXXX
   EPISODES: [],                // [{title:"EP 12: The Chips Incident", url:"..."}]
   FN: n => CONFIG.SUPABASE_URL + "/functions/v1/" + n,
@@ -586,7 +586,15 @@ function scene(seed, beat, opts={}){
   s+='<rect x="0" y="0" width="'+W+'" height="120" fill="url(#dots'+id+')"/>';
   // ground line
   s+='<line x1="0" y1="180" x2="'+W+'" y2="180" stroke="#EDE6D6" stroke-width="2" opacity="0.5"/>';
-  const cat=(window.CASE&&CASE.category)||'Prediction';
+  // Map arc_type to visual category for set pieces
+  const arcType = window.CASE && (CASE.category || CASE.extraction?.arc_type);
+  const ARC_TO_CAT = {
+    'panopticon': 'Surveillance', 'data_harvest': 'Surveillance',
+    'computer_says_no': 'Automation', 'rise_of_machines': 'Automation',
+    'good_works': 'Healthcare', 'black_box': 'Prediction',
+    'minority_report': 'Prediction'
+  };
+  const cat = ARC_TO_CAT[arcType] || arcType || 'Prediction';
   const caseText=window.CASE?(CASE.title+' '+CASE.summary):'';
   // beat compositions
   if(beat==='case'){
@@ -1091,7 +1099,7 @@ function verdict(f){
 function buildTags(){
   const host=document.getElementById('tagchips');host.innerHTML='';
   const tags=new Set();
-  if(CASE.category)tags.add(CASE.category);
+  if(CASE.category || CASE.extraction?.arc_type)tags.add(CASE.category || CASE.extraction.arc_type);
   tags.add(PICK.who);tags.add((PICK.action||'').split(' ')[0]);
   (CASE.tech_types||[]).forEach(t=>tags.add(t));
   (CASE.data_types||[]).forEach(t=>tags.add(t));
@@ -1275,7 +1283,8 @@ function gInkblot(box){
   box.appendChild(b);
 }
 function gWordrun(box){
-  const cat=(window.CASE&&CASE.category)||'Surveillance';
+  const arcType = window.CASE && (CASE.category || CASE.extraction?.arc_type);
+  const cat = arcType || 'Surveillance';
   const rel=['camera','database','consent','warrant','biometric','watchlist','alert','audit'];
   const noise=['sandwich','umbrella','trombone','pelican','casserole','doily','yodeling','wallpaper'];
   const deck=[...rel.slice(0,5),...noise.slice(0,5)].sort(()=>Math.random()-0.5);
