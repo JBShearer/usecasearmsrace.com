@@ -1,1427 +1,1201 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Use Case Arms Race | Document AI Before It Documents You</title>
-<meta name="description" content="The registry of AI deployment. Document use cases. Vote good or evil. Track the arms race.">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<link rel="icon" type="image/jpeg" sizes="32x32" href="/images/logo.jpg">
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>USE CASE ARMS RACE</title>
 <style>
-:root {
-  --paper: #F6F2E8;
-  --ink: #1A1817;
-  --pencil: #8B8680;
-  --crayon: #D42B1E;
-  --good: #2E7D32;
-  --manila: #E8DCC0;
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { height: 100%; margin: 0; }
-body {
-  font-family: 'Georgia', serif;
-  background: var(--paper);
-  color: var(--ink);
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-a { color: var(--ink); }
-.container { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+:root{--ink:#0E0E0E;--bone:#EDE6D6;--crayon:#C1121F;--pencil:#7a7263;--gold:#c9a84c;
+  --gi:#6b7d5a;--gary:#4a7d9c;--supes:#c9a84c}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--bone);
+  font:16px/1.5 -apple-system,'Helvetica Neue',Arial,sans-serif;
+  padding-top:env(safe-area-inset-top)}
+header{padding:14px 18px;border-bottom:2px solid var(--bone);
+  display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+h1{margin:0;font-size:17px;letter-spacing:3px;text-transform:uppercase;cursor:pointer}
+.tagline{color:var(--pencil);font-size:12px}
+main{max-width:720px;margin:0 auto;padding:16px 14px 60px}
+.screen{display:none}.screen.on{display:block;animation:snap .12s steps(2)}
+@keyframes snap{from{opacity:0}to{opacity:1}}
+button.go{width:100%;margin-top:12px;background:var(--bone);color:var(--ink);
+  border:none;padding:15px;font:700 15px/1 inherit;letter-spacing:2px;
+  text-transform:uppercase;cursor:pointer}
+button.go:hover{opacity:0.85}
+button.ghost{width:100%;margin-top:8px;background:var(--ink);color:var(--bone);
+  border:2px solid var(--bone);padding:12px;font:700 13px/1 inherit;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer}
+.badge{display:inline-block;border:1px solid var(--bone);padding:1px 7px;
+  font-size:11px;letter-spacing:1px;margin-right:6px}
+.badge.hell{border-color:var(--crayon);color:var(--crayon)}
+.badge.heaven{border-color:var(--gold);color:var(--gold)}
+.stamp{color:var(--crayon);font-weight:800;text-transform:uppercase;
+  letter-spacing:1px;transform:rotate(-2deg);display:inline-block}
 
-/* Header */
-header {
-  background: var(--manila);
-  border-bottom: 3px solid var(--ink);
-  padding: 12px 0;
-  flex-shrink: 0;
-}
-header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-.logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
-.logo img { height: 40px; border-radius: 4px; border: 2px solid var(--ink); }
-.logo h1 { font-size: 1.1rem; font-weight: normal; }
-nav { display: flex; gap: 4px; }
-nav button {
-  background: var(--paper);
-  border: 2px solid var(--ink);
-  color: var(--ink);
-  padding: 8px 14px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.85rem;
-}
-nav button:hover { background: var(--manila); }
-nav button.active { background: var(--ink); color: var(--paper); }
+/* HOME */
+.videobox{border:2px solid var(--bone);aspect-ratio:16/9;margin:0 0 12px;
+  display:flex;align-items:center;justify-content:center;color:var(--pencil);
+  font-size:13px;letter-spacing:2px;text-transform:uppercase;overflow:hidden}
+.videobox iframe{width:100%;height:100%;border:0}
+.epirow{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px}
+.epi{flex:0 0 auto;border:1px solid var(--pencil);padding:8px 12px;font-size:12px;
+  letter-spacing:1px;text-transform:uppercase;color:var(--bone);cursor:pointer;
+  white-space:nowrap;text-decoration:none}
+.searchwrap{position:relative;margin:6px 0 4px}
+#q{width:100%;background:var(--ink);color:var(--bone);border:2px solid var(--bone);
+  padding:15px 14px;font:inherit}
+#qhint{color:var(--pencil);font-size:11px;letter-spacing:1px;margin:6px 2px 12px}
+.hit{border:2px solid var(--bone);padding:14px;margin:12px 0;cursor:pointer;
+  transition:border-color 0.15s}
+.hit:hover{border-color:var(--gold)}
+.hit h3{margin:0 0 6px;font-size:16px;text-transform:uppercase;letter-spacing:.5px}
+.hit .sum{font-size:14px;color:var(--bone);margin:6px 0}
+.hit .qt{font-family:Georgia,serif;font-style:italic;font-size:13px;color:var(--pencil);
+  border-left:3px solid var(--crayon);padding-left:8px;margin:8px 0 4px}
+.hit .meta{font-size:11px;color:var(--pencil);letter-spacing:1px}
+.votebar{height:7px;background:var(--crayon);margin-top:8px;position:relative}
+.votebar i{position:absolute;left:0;top:0;bottom:0;background:var(--gold)}
+.quickvote{display:flex;gap:8px;margin-top:10px}
+.qv{background:none;border:2px solid;padding:6px 16px;font-size:18px;cursor:pointer;flex:1}
+.qv.heaven{border-color:var(--gold);color:var(--gold)}
+.qv.hell{border-color:var(--crayon);color:var(--crayon)}
+.qv:hover{opacity:0.7}
+.qv:disabled{opacity:0.4;cursor:default}
+.divider{color:var(--pencil);font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  border-bottom:1px dashed var(--pencil);padding-bottom:4px;margin:18px 0 6px}
+.webhit{border:1px dashed var(--pencil);padding:12px;margin:10px 0}
+.webhit .meta{font-size:11px;color:var(--pencil)}
 
-/* Views */
-main { flex: 1 0 auto; }
-.view { display: none; padding: 24px 0; }
-.view.active { display: block; }
+/* SCENE STAGING - theatrical view */
+.scene-stage{background:#0a0a09;border:3px solid var(--bone);margin:0 0 16px;
+  position:relative;overflow:hidden}
+.scene-art{width:100%;aspect-ratio:16/9;position:relative}
+.scene-art svg{width:100%;height:100%;display:block}
+.scene-art img{width:100%;height:100%;object-fit:cover}
+.scene-curtain{position:absolute;inset:0;background:linear-gradient(180deg,
+  transparent 60%,rgba(14,14,14,0.95) 100%)}
+.scene-label{position:absolute;bottom:12px;left:14px;right:14px;
+  font:800 13px/1.3 inherit;letter-spacing:3px;text-transform:uppercase;
+  color:var(--bone)}
 
-/* Hero Section */
-.hero {
-  text-align: center;
-  padding: 32px 0;
-  border-bottom: 2px solid var(--ink);
-  margin-bottom: 24px;
-}
-.hero h2 { font-size: 1.8rem; margin-bottom: 12px; }
-.hero-mission {
-  max-width: 700px;
-  margin: 0 auto 24px;
-  line-height: 1.7;
-  color: var(--ink);
-}
-.hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+/* Character dialogue - proper acting */
+.dialogue{margin:16px 0;padding:0}
+.dialogue-line{display:flex;gap:14px;margin:12px 0;align-items:flex-start}
+.char-avatar{width:56px;height:56px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font:800 20px/1 inherit;border:3px solid}
+.char-avatar.gi{background:#2a3425;border-color:var(--gi);color:var(--gi)}
+.char-avatar.gary{background:#1e3040;border-color:var(--gary);color:var(--gary)}
+.char-avatar.supes{background:#3d3520;border-color:var(--supes);color:var(--supes)}
+.char-avatar.brain{background:#2a1a1a;border-color:var(--crayon);color:var(--crayon)}
+.char-speech{flex:1}
+.char-name{font:800 11px/1 inherit;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:4px}
+.char-name.gi{color:var(--gi)}
+.char-name.gary{color:var(--gary)}
+.char-name.supes{color:var(--supes)}
+.char-name.brain{color:var(--crayon)}
+.char-text{font:15px/1.5 Georgia,serif;color:var(--bone)}
+.char-text em{color:var(--pencil);font-style:italic}
 
-/* Map */
-#world-map {
-  height: 280px;
-  border: 3px solid var(--ink);
-  margin-bottom: 24px;
-  background: var(--paper);
-}
-.leaflet-container { background: var(--paper) !important; }
+/* Stage directions */
+.stage-direction{font:italic 13px/1.5 Georgia,serif;color:var(--pencil);
+  text-align:center;margin:16px 0;padding:8px 16px;
+  border-top:1px dashed var(--pencil);border-bottom:1px dashed var(--pencil)}
 
-/* Two Column Layout */
-.two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-@media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+/* Choices as dramatic options */
+.choice-prompt{font:800 18px/1.3 inherit;letter-spacing:1px;margin:20px 0 12px;
+  text-transform:uppercase}
+.choice{display:block;width:100%;text-align:left;background:var(--ink);
+  color:var(--bone);border:2px solid var(--bone);padding:14px 16px;margin:8px 0;
+  font:500 15px/1.4 inherit;cursor:pointer;transition:all 0.15s}
+.choice:hover{background:var(--bone);color:var(--ink)}
+.choice small{display:block;font:italic 12px/1.4 Georgia,serif;color:var(--pencil);
+  margin-top:4px}
+.choice:hover small{color:var(--ink);opacity:0.7}
+.choice.free{border-style:dashed;color:var(--pencil)}
+.choice.free:hover{color:var(--ink)}
 
-/* Section Headers */
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--ink);
-}
-.section-header h3 { font-size: 1.1rem; }
-.section-header a { font-size: 0.85rem; }
+/* Progress dots */
+.dots{letter-spacing:8px;color:var(--pencil);font-size:12px;margin-bottom:8px}
+.dots b{color:var(--crayon)}
 
-/* Case List (Leaderboard style) */
-.case-list { }
-.case-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border: 2px solid var(--ink);
-  margin-bottom: 8px;
-  background: white;
-  cursor: pointer;
-}
-.case-row:hover { background: var(--manila); }
-.case-rank {
-  font-weight: bold;
-  font-size: 1.2rem;
-  min-width: 30px;
-  text-align: center;
-}
-.case-rank.evil { color: var(--crayon); }
-.case-rank.good { color: var(--good); }
-.case-info { flex: 1; min-width: 0; }
-.case-title {
-  font-weight: bold;
-  font-size: 0.95rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.case-snippet {
-  font-size: 0.8rem;
-  color: var(--pencil);
-  margin-top: 2px;
-  line-height: 1.3;
-}
-.case-meta {
-  font-size: 0.8rem;
-  color: var(--pencil);
-  display: flex;
-  gap: 8px;
-  margin-top: 4px;
-}
-.case-category {
-  background: var(--manila);
-  padding: 2px 6px;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-}
-.vote-btns { display: flex; gap: 6px; }
-.vote-btn {
-  padding: 6px 10px;
-  border: 2px solid;
-  background: transparent;
-  cursor: pointer;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.vote-btn.evil { border-color: var(--crayon); color: var(--crayon); }
-.vote-btn.good { border-color: var(--good); color: var(--good); }
-.vote-btn:hover { transform: scale(1.05); }
-.vote-btn.voted.evil { background: var(--crayon); color: white; }
-.vote-btn.voted.good { background: var(--good); color: white; }
+/* Verdict buttons */
+.verdicts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.verdicts button{padding:24px 8px;font:800 18px/1.3 inherit;letter-spacing:1px;
+  cursor:pointer;border:3px solid;background:var(--ink);transition:all 0.15s}
+#vheaven{color:var(--gold);border-color:var(--gold)}
+#vhell{color:var(--crayon);border-color:var(--crayon)}
+#vheaven:hover{background:var(--gold);color:var(--ink)}
+#vhell:hover{background:var(--crayon);color:var(--ink)}
 
-/* Episode List */
-.episode-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border: 2px solid var(--ink);
-  margin-bottom: 8px;
-  background: white;
-  cursor: pointer;
-}
-.episode-row:hover { background: var(--manila); }
-.episode-num {
-  font-weight: bold;
-  font-size: 0.9rem;
-  min-width: 50px;
-  color: var(--pencil);
-}
-.episode-title { flex: 1; font-size: 0.95rem; }
-.episode-date { font-size: 0.8rem; color: var(--pencil); }
+/* Court record vs staging */
+details.program{border:1px dashed var(--pencil);padding:10px;margin:12px 0;
+  font-size:13px;color:var(--pencil)}
+details.program summary{cursor:pointer}
+details.program table{width:100%;border-collapse:collapse;margin-top:6px}
+details.program td{border:1px solid var(--pencil);padding:5px;vertical-align:top}
 
-/* Video Container */
-.video-section {
-  margin-bottom: 24px;
-  text-align: center;
-}
-.video-container {
-  max-width: 640px;
-  margin: 0 auto;
-  aspect-ratio: 16/9;
-  background: var(--ink);
-  border: 3px solid var(--ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--paper);
-}
+/* FILE SCREEN */
+.nuancebox{border:1px dashed var(--pencil);padding:10px 12px;margin:12px 0}
+.nlabel{font-size:11px;letter-spacing:2px;color:var(--pencil);margin-bottom:6px}
+.nrow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;
+  font-size:10px;color:var(--pencil);margin:4px 0;text-transform:uppercase;letter-spacing:1px}
+input[type=range]{width:100%}
+textarea{width:100%;background:var(--ink);color:var(--bone);
+  border:2px solid var(--bone);padding:12px;font:inherit;min-height:100px;resize:vertical}
+.chips{margin:8px 0}
+.chip{display:inline-block;border:1px solid var(--pencil);color:var(--pencil);
+  padding:6px 10px;margin:3px;cursor:pointer;font-size:12px;letter-spacing:1px}
+.chip:hover{border-color:var(--bone);color:var(--bone)}
+.rewardline{color:var(--pencil);font-size:13px;margin-top:6px}
 
-/* Filter Row */
-.filter-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-.filter-row input, .filter-row select {
-  padding: 8px 12px;
-  border: 2px solid var(--ink);
-  font-family: inherit;
-  background: white;
-}
-.filter-row input { flex: 1; min-width: 150px; }
+/* Card modal popup */
+.card-modal{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:1000;
+  display:none;align-items:center;justify-content:center;padding:20px}
+.card-modal.on{display:flex;animation:fadeUp 0.3s ease-out}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.card-inner{max-width:400px;width:100%;position:relative}
+.card-inner svg{width:100%;height:auto;display:block;border:3px solid var(--bone)}
+.card-close{position:absolute;top:-40px;right:0;background:none;border:none;
+  color:var(--bone);font-size:28px;cursor:pointer;padding:8px}
+.card-stats{text-align:center;margin:16px 0;color:var(--pencil);font-size:13px}
+.card-actions{display:flex;gap:10px;margin-top:16px}
+.card-actions button{flex:1}
 
-/* Submit Form */
-.submit-section { max-width: 700px; margin: 0 auto; }
-.form-intro {
-  text-align: center;
-  margin-bottom: 24px;
-  padding: 20px;
-  background: var(--manila);
-  border: 2px solid var(--ink);
-}
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
-.form-group input, .form-group textarea, .form-group select {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid var(--ink);
-  font-family: inherit;
-  font-size: 1rem;
-  background: white;
-}
-.form-group textarea { min-height: 100px; resize: vertical; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.form-hint { font-size: 0.85rem; color: var(--pencil); margin-top: 4px; }
-.redact-note {
-  display: inline-block;
-  background: #fff3cd;
-  color: #856404;
-  padding: 2px 6px;
-  font-size: 0.7rem;
-  margin-left: 8px;
-}
+/* Scratch reveal overlay */
+.scratch-area{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:90%;display:flex;gap:8px;justify-content:center}
+.scratch-box{background:var(--pencil);padding:12px 16px;cursor:pointer;
+  font:800 14px/1 inherit;letter-spacing:2px;text-transform:uppercase;
+  user-select:none;border:2px solid var(--bone);color:var(--ink)}
+.scratch-box.revealed{background:transparent;color:var(--gold);border-color:var(--gold)}
+.scratch-skip{position:absolute;bottom:20px;right:20px;background:var(--ink);
+  border:1px solid var(--pencil);color:var(--pencil);padding:6px 12px;
+  font-size:11px;letter-spacing:1px;cursor:pointer}
+.scratch-skip:hover{color:var(--bone);border-color:var(--bone)}
 
-/* Valence Selection */
-.valence-row {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.valence-btn {
-  flex: 1;
-  padding: 16px;
-  border: 3px solid var(--ink);
-  background: white;
-  cursor: pointer;
-  text-align: center;
-  font-family: inherit;
-}
-.valence-btn:hover { background: var(--manila); }
-.valence-btn.evil.selected { border-color: var(--crayon); background: rgba(212,43,30,0.1); }
-.valence-btn.good.selected { border-color: var(--good); background: rgba(46,125,50,0.1); }
-.valence-icon { font-size: 1.5rem; }
-.valence-label { font-weight: bold; margin-top: 4px; }
-.valence-desc { font-size: 0.8rem; color: var(--pencil); margin-top: 4px; }
+/* Chalkboard ending */
+.chalkboard{background:#1a2e1a;border:4px solid #3d5c3d;padding:20px;margin:16px 0;
+  font:italic 18px/1.5 'Marker Felt','Comic Sans MS',cursive;color:#d4e8c4;
+  text-align:center;transform:rotate(-0.5deg)}
+.chalkboard::before{content:'EVIL BRAIN WRITES:';display:block;
+  font:800 10px/1 -apple-system,Arial,sans-serif;letter-spacing:3px;
+  color:#8fa87f;margin-bottom:10px}
 
-/* Category Grid */
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.category-btn {
-  padding: 10px 8px;
-  border: 2px solid var(--ink);
-  background: white;
-  cursor: pointer;
-  font-size: 0.85rem;
-  text-align: center;
-}
-.category-btn:hover { background: var(--manila); }
-.category-btn.selected { background: var(--ink); color: var(--paper); }
-.category-btn.evil-cat { border-left: 4px solid var(--crayon); }
-.category-btn.good-cat { border-left: 4px solid var(--good); }
-.category-btn.neutral-cat { border-left: 4px solid var(--pencil); }
-
-/* Buttons */
-.btn {
-  padding: 12px 24px;
-  border: 2px solid var(--ink);
-  font-family: inherit;
-  font-size: 1rem;
-  cursor: pointer;
-  background: white;
-}
-.btn:hover { background: var(--manila); }
-.btn-primary { background: var(--crayon); color: white; border-color: var(--crayon); }
-.btn-primary:hover { background: #b8251a; }
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  padding: 16px;
-}
-.modal-overlay.active { display: flex; }
-.modal {
-  background: var(--paper);
-  border: 3px solid var(--ink);
-  max-width: 600px;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-  padding: 24px;
-  position: relative;
-  z-index: 10001;
-}
-.modal-close {
-  float: right;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-/* About */
-.about-section { line-height: 1.8; }
-.about-section h3 { margin-top: 24px; margin-bottom: 8px; }
-
-/* Footer */
-footer {
-  background: var(--manila);
-  border-top: 3px solid var(--ink);
-  padding: 24px 0;
-  font-size: 0.9rem;
-  flex-shrink: 0;
-}
-footer a { text-decoration: none; }
-.footer-grid { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
-.footer-brand img { height: 32px; border-radius: 4px; margin-bottom: 8px; }
-
-/* Toast */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--ink);
-  color: var(--paper);
-  padding: 12px 24px;
-  z-index: 300;
-  display: none;
-}
-.toast.show { display: block; }
-
-/* Feed Styles */
-.feed-tabs {
-  display: flex;
-  gap: 0;
-  border-bottom: 3px solid var(--ink);
-  margin-bottom: 16px;
-}
-.feed-tab {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  background: var(--paper);
-  font-family: inherit;
-  font-size: 0.9rem;
-  cursor: pointer;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -3px;
-  color: var(--pencil);
-  transition: all 0.15s;
-}
-.feed-tab:hover { color: var(--ink); background: var(--manila); }
-.feed-tab.active { color: var(--ink); border-bottom-color: var(--crayon); background: white; }
-
-.feed-card {
-  border: 2px solid var(--ink);
-  background: white;
-  margin-bottom: 12px;
-  padding: 16px;
-  position: relative;
-}
-.feed-card:hover { box-shadow: 3px 3px 0 var(--ink); }
-.feed-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
-}
-.feed-org {
-  font-size: 0.8rem;
-  color: var(--pencil);
-  font-style: italic;
-}
-.feed-category {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background: var(--manila);
-  padding: 2px 6px;
-  border: 1px solid var(--pencil);
-}
-.feed-title {
-  font-size: 1.1rem;
-  font-weight: normal;
-  margin-bottom: 8px;
-  line-height: 1.4;
-  cursor: pointer;
-}
-.feed-title:hover { color: var(--crayon); }
-.feed-desc {
-  font-size: 0.85rem;
-  color: var(--pencil);
-  line-height: 1.5;
-  margin-bottom: 12px;
-}
-.feed-impact {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 8px;
-  font-size: 0.75rem;
-}
-.feed-impact-label { color: var(--pencil); text-transform: uppercase; letter-spacing: 0.5px; }
-.feed-pip {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--manila);
-  border: 1px solid var(--pencil);
-}
-.feed-pip.filled { background: var(--ink); border-color: var(--ink); }
-.feed-vote-bar {
-  height: 6px;
-  background: var(--manila);
-  border: 1px solid var(--pencil);
-  margin-bottom: 4px;
-  display: flex;
-  overflow: hidden;
-}
-.feed-vote-good { background: var(--good); height: 100%; }
-.feed-vote-evil { background: var(--crayon); height: 100%; }
-.feed-vote-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.7rem;
-  color: var(--pencil);
-  margin-bottom: 8px;
-}
-.feed-status {
-  display: inline-block;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 2px 8px;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-.feed-status.verified { background: var(--good); color: white; }
-.feed-status.review { background: #F9A825; color: var(--ink); }
-.feed-status.retracted { background: var(--crayon); color: white; text-decoration: line-through; }
-.feed-source {
-  font-size: 0.75rem;
-  color: var(--pencil);
-  margin-bottom: 4px;
-}
-.feed-source a { color: var(--pencil); }
-.feed-source a:hover { color: var(--ink); }
-.feed-time {
-  font-size: 0.7rem;
-  color: var(--pencil);
-  margin-bottom: 12px;
-}
-.feed-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-top: 12px;
-  border-top: 1px solid var(--manila);
-}
-.feed-action {
-  padding: 6px 10px;
-  border: 1px solid var(--pencil);
-  background: var(--paper);
-  font-family: inherit;
-  font-size: 0.8rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.15s;
-}
-.feed-action:hover { border-color: var(--ink); background: var(--manila); }
-.feed-action.vote-evil:hover { border-color: var(--crayon); color: var(--crayon); }
-.feed-action.vote-good:hover { border-color: var(--good); color: var(--good); }
-.feed-action.voted { background: var(--ink); color: white; border-color: var(--ink); }
-
-@media (max-width: 600px) {
-  .form-row { grid-template-columns: 1fr; }
-  .valence-row { flex-direction: column; }
-  nav { width: 100%; }
-  nav button { flex: 1; font-size: 0.8rem; padding: 8px; }
-}
+footer{color:var(--pencil);font-size:11px;text-align:center;padding:16px;
+  border-top:1px solid var(--pencil);margin-top:24px}
+small.demo{color:var(--crayon)}
 </style>
 </head>
 <body>
-
 <header>
-  <div class="container">
-    <a href="https://evilbrainlabs.com" class="logo" target="_blank" title="Evil Brain Labs">
-      <img src="/images/logo.jpg" alt="Evil Brain Labs">
-      <h1>Use Case Arms Race</h1>
-    </a>
-    <nav>
-      <button data-view="home" class="active">Home</button>
-      <button data-view="feed">Feed</button>
-      <button data-view="cases">Registry</button>
-      <button data-view="submit">Submit</button>
-      <button data-view="about">About</button>
-    </nav>
-  </div>
+  <div><h1 onclick="goHome()">Use Case Arms Race</h1>
+  <div class="tagline">Document AI before it documents you. <small class="demo" id="demoflag"></small></div></div>
 </header>
-
 <main>
-<!-- HOME VIEW -->
-<section class="view active" id="view-home">
-  <div class="container">
-    <div class="hero">
-      <h2>Document AI Before It Documents You</h2>
-      <p class="hero-mission">
-        The Evil Brain showed Jason what happens if we don't learn to deploy AI responsibly.
-        Now he's compelled to document every use case, every day, for as long as it takes.
-        This registry is his life's work. Vote on what's harmful. Vote on what helps.
-        The arms race is already here. At least we can track it.
-      </p>
-      <div class="hero-cta">
-        <button class="btn btn-primary" onclick="switchView('submit')">Submit a Use Case</button>
-        <button class="btn" onclick="switchView('cases')">Browse the Registry</button>
-      </div>
-    </div>
 
-    <!-- Map -->
-    <div id="world-map"></div>
+<!-- ================= HOME ================= -->
+<section id="home" class="screen on">
+  <div class="videobox" id="videobox">DAILY EPISODE</div>
+  <div class="epirow" id="epirow"></div>
+  <div class="searchwrap">
+    <input id="q" placeholder="Search the casefile, or paste a URL to file a new case"
+      autocomplete="off">
+  </div>
+  <div id="qhint">Try: hospital AI · police surveillance · algorithm denies benefits</div>
+  <div id="results"></div>
+</section>
 
-    <!-- Two Column: Cases and Episodes -->
-    <div class="two-col">
-      <!-- Case Leaderboard -->
-      <div>
-        <div class="section-header">
-          <h3>📊 Top Cases</h3>
-          <a href="#" onclick="switchView('cases'); return false;">View all →</a>
-        </div>
-        <div id="home-cases">
-          <p style="color: var(--pencil)">Loading cases...</p>
-        </div>
-      </div>
+<!-- ============ 1. CASE FILE - THE COLD OPEN ============ -->
+<section id="s-case" class="screen">
+  <div class="dots"><b>&#9679;</b> &#9675; &#9675; &#9675; &#9675; &#9675;</div>
 
-      <!-- Latest Episodes -->
-      <div>
-        <div class="section-header">
-          <h3>📺 Latest Episodes</h3>
-          <a href="#" onclick="switchView('episodes'); return false;">View all →</a>
-        </div>
-        <div class="video-section">
-          <div class="video-container" id="latest-video">
-            <span>🎬 Loading...</span>
-          </div>
-        </div>
-        <div id="home-episodes">
-          <p style="color: var(--pencil)">Loading episodes...</p>
-        </div>
+  <!-- Scene staging visualization -->
+  <div class="scene-stage">
+    <div class="scene-art" id="scene-art-case"></div>
+    <div class="scene-curtain"></div>
+    <div class="scene-label" id="scene-label-case">THE STAGING</div>
+  </div>
+
+  <!-- Stage direction: the setting -->
+  <div class="stage-direction" id="stage-setting"></div>
+
+  <!-- GI reads the record - cold open -->
+  <div class="dialogue">
+    <div class="dialogue-line">
+      <div class="char-avatar gi">GI</div>
+      <div class="char-speech">
+        <div class="char-name gi">GI reads the record</div>
+        <div class="char-text" id="cold-open"></div>
       </div>
     </div>
   </div>
-</section>
 
-<!-- CASES VIEW -->
-<section class="view" id="view-cases">
-  <div class="container">
-    <h2 style="margin-bottom: 16px">📚 Case Registry</h2>
+  <!-- Case metadata -->
+  <div style="margin:16px 0">
+    <span class="badge" id="c-src"></span>
+    <span class="badge" id="c-impact"></span>
+    <span class="badge" id="c-faction"></span>
+  </div>
 
-    <div class="filter-row">
-      <input type="text" id="case-search" placeholder="Search cases...">
-      <select id="valence-filter">
-        <option value="">All Cases</option>
-        <option value="evil">👿 Harmful</option>
-        <option value="good">😇 Beneficial</option>
-      </select>
-      <select id="category-filter">
-        <option value="">All Categories</option>
-        <optgroup label="Potentially Harmful">
-          <option value="surveillance">Surveillance</option>
-          <option value="discrimination">Discrimination</option>
-          <option value="labor_harm">Labor Exploitation</option>
-          <option value="privacy_violation">Privacy Violation</option>
-          <option value="manipulation">Manipulation</option>
-          <option value="misinformation">Misinformation</option>
-        </optgroup>
-        <optgroup label="Potentially Beneficial">
-          <option value="accessibility">Accessibility</option>
-          <option value="healthcare_benefit">Healthcare Improvement</option>
-          <option value="education_benefit">Education Enhancement</option>
-          <option value="safety_improvement">Safety Improvement</option>
-          <option value="environmental">Environmental Protection</option>
-          <option value="efficiency">Efficiency Gains</option>
-        </optgroup>
-        <optgroup label="Neutral / Context-Dependent">
-          <option value="automation">Automation</option>
-          <option value="personalization">Personalization</option>
-          <option value="prediction">Prediction</option>
-          <option value="content_generation">Content Generation</option>
-        </optgroup>
-      </select>
-    </div>
+  <h2 style="margin:8px 0;font-size:18px;letter-spacing:1px" id="c-title"></h2>
+  <p style="font-size:14px;color:var(--pencil);margin:4px 0" id="c-summary"></p>
 
-    <div id="full-case-list">
-      <p style="color: var(--pencil)">Loading cases...</p>
+  <div id="c-quote-wrap" style="display:none">
+    <div style="font-family:Georgia,serif;font-style:italic;font-size:15px;
+      border-left:3px solid var(--crayon);padding-left:12px;margin:12px 0">
+      <span id="c-quote"></span>
+      <small style="display:block;font-style:normal;color:var(--pencil);
+        font-size:11px;letter-spacing:1px;margin-top:4px">— FROM THE RECORD</small>
     </div>
   </div>
+
+  <p style="font-size:12px;margin:8px 0">
+    <a id="c-link" target="_blank" style="color:var(--pencil)">Read the primary source →</a>
+  </p>
+
+  <details class="program"><summary>Court record vs. our staging</summary>
+    <table id="c-deesc"></table>
+  </details>
+
+  <button class="go" onclick="enterStage()">Enter the scene →</button>
 </section>
 
-<!-- SUBMIT VIEW -->
-<section class="view" id="view-submit">
-  <div class="container">
-    <div class="submit-section">
-      <div class="form-intro">
-        <h2>🧠 Submit to the Registry</h2>
-        <p>Document an AI use case. The community votes on whether it helps or harms.</p>
-      </div>
+<!-- ============ 2. WHO - THE ACTOR REVEALS ============ -->
+<section id="s-who" class="screen">
+  <div class="dots">&#9679; <b>&#9679;</b> &#9675; &#9675; &#9675; &#9675;</div>
 
-      <form id="submit-form">
-        <!-- Valence -->
-        <label style="font-weight: bold; display: block; margin-bottom: 8px;">Is this use case harmful or beneficial?</label>
-        <div class="valence-row">
-          <button type="button" class="valence-btn evil selected" onclick="selectValence('evil')">
-            <div class="valence-icon">👿</div>
-            <div class="valence-label">Harmful</div>
-            <div class="valence-desc">Causes harm, violates rights, or has negative implications</div>
-          </button>
-          <button type="button" class="valence-btn good" onclick="selectValence('good')">
-            <div class="valence-icon">😇</div>
-            <div class="valence-label">Beneficial</div>
-            <div class="valence-desc">Helps people, improves outcomes, or solves problems</div>
-          </button>
-        </div>
-        <input type="hidden" id="valence" value="evil">
+  <div class="scene-stage">
+    <div class="scene-art" id="scene-art-who"></div>
+    <div class="scene-curtain"></div>
+    <div class="scene-label">ACT I: THE ACTOR</div>
+  </div>
 
-        <!-- Category -->
-        <label style="font-weight: bold; display: block; margin-bottom: 8px;">Category</label>
-        <div class="category-grid" id="category-grid">
-          <!-- Harmful -->
-          <button type="button" class="category-btn evil-cat" data-cat="surveillance">Surveillance</button>
-          <button type="button" class="category-btn evil-cat" data-cat="discrimination">Discrimination</button>
-          <button type="button" class="category-btn evil-cat" data-cat="labor_harm">Labor Exploitation</button>
-          <button type="button" class="category-btn evil-cat" data-cat="privacy_violation">Privacy Violation</button>
-          <button type="button" class="category-btn evil-cat" data-cat="manipulation">Manipulation</button>
-          <button type="button" class="category-btn evil-cat" data-cat="misinformation">Misinformation</button>
-          <!-- Beneficial -->
-          <button type="button" class="category-btn good-cat" data-cat="accessibility">Accessibility</button>
-          <button type="button" class="category-btn good-cat" data-cat="healthcare_benefit">Healthcare</button>
-          <button type="button" class="category-btn good-cat" data-cat="education_benefit">Education</button>
-          <button type="button" class="category-btn good-cat" data-cat="safety_improvement">Safety</button>
-          <button type="button" class="category-btn good-cat" data-cat="environmental">Environmental</button>
-          <button type="button" class="category-btn good-cat" data-cat="efficiency">Efficiency</button>
-          <!-- Neutral -->
-          <button type="button" class="category-btn neutral-cat" data-cat="automation">Automation</button>
-          <button type="button" class="category-btn neutral-cat" data-cat="personalization">Personalization</button>
-          <button type="button" class="category-btn neutral-cat" data-cat="prediction">Prediction</button>
-          <button type="button" class="category-btn neutral-cat" data-cat="content_generation">Content Gen</button>
-        </div>
-        <input type="hidden" id="category" value="">
-
-        <!-- Title & Description -->
-        <div class="form-group">
-          <label for="title">Title *</label>
-          <input type="text" id="title" required placeholder="Brief name for the use case">
-        </div>
-
-        <div class="form-group">
-          <label for="description">Description *</label>
-          <textarea id="description" required placeholder="What does this AI do? Who does it affect? What are the implications?"></textarea>
-        </div>
-
-        <!-- Source -->
-        <div class="form-group">
-          <label for="url">Source URL <span class="redact-note">🔒 Hidden until approved</span></label>
-          <input type="url" id="url" placeholder="https://...">
-        </div>
-
-        <div class="form-group">
-          <label for="company">Company/Organization <span class="redact-note">🔒 Hidden until approved</span></label>
-          <input type="text" id="company" placeholder="Who is deploying this?">
-        </div>
-
-        <!-- Location -->
-        <div class="form-row">
-          <div class="form-group">
-            <label for="country">Country</label>
-            <select id="country">
-              <option value="">Select...</option>
-              <option value="US">United States</option>
-              <option value="GB">United Kingdom</option>
-              <option value="CN">China</option>
-              <option value="DE">Germany</option>
-              <option value="FR">France</option>
-              <option value="JP">Japan</option>
-              <option value="IN">India</option>
-              <option value="AU">Australia</option>
-              <option value="CA">Canada</option>
-              <option value="BR">Brazil</option>
-              <option value="GLOBAL">Global</option>
-              <option value="OTHER">Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="severity">Impact Level (1-5)</label>
-            <select id="severity">
-              <option value="1">1 - Minor</option>
-              <option value="2">2 - Moderate</option>
-              <option value="3" selected>3 - Significant</option>
-              <option value="4">4 - Severe</option>
-              <option value="5">5 - Critical</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="text-align: center; margin-top: 24px;">
-          <button type="submit" class="btn btn-primary" id="submit-btn">Submit to Registry</button>
-        </div>
-      </form>
-
-      <div id="submit-success" style="display: none; text-align: center; padding: 40px;">
-        <div style="font-size: 3rem;">✓</div>
-        <h2>Submitted</h2>
-        <p>Your case is pending review.</p>
-        <button class="btn" onclick="resetForm()" style="margin-top: 16px;">Submit Another</button>
+  <div class="dialogue">
+    <div class="dialogue-line">
+      <div class="char-avatar gi">GI</div>
+      <div class="char-speech">
+        <div class="char-name gi">GI</div>
+        <div class="char-text" id="gi-intro"></div>
       </div>
     </div>
   </div>
+
+  <div class="choice-prompt">Who drove this case?</div>
+  <div id="ch-who"></div>
 </section>
 
-<!-- FEED VIEW (Twitter-like timeline) -->
-<section class="view" id="view-feed">
-  <div class="container">
-    <!-- Feed Tabs -->
-    <div class="feed-tabs">
-      <button class="feed-tab active" data-feed="latest">Latest</button>
-      <button class="feed-tab" data-feed="top">Top</button>
-      <button class="feed-tab" data-feed="underfire">Under Fire</button>
-      <button class="feed-tab" data-feed="flips">Flips</button>
-    </div>
+<!-- ============ 3. ACTION - GARY DEMONSTRATES ============ -->
+<section id="s-action" class="screen">
+  <div class="dots">&#9679; &#9679; <b>&#9679;</b> &#9675; &#9675; &#9675;</div>
 
-    <!-- Feed Container -->
-    <div id="feed-container">
-      <p style="color: var(--pencil); padding: 24px; text-align: center;">Loading feed...</p>
-    </div>
-
-    <!-- Load More -->
-    <div id="feed-loader" style="text-align: center; padding: 24px; display: none;">
-      <button class="btn" onclick="loadMoreFeed()">Load More</button>
-    </div>
+  <div class="scene-stage">
+    <div class="scene-art" id="scene-art-action"></div>
+    <div class="scene-curtain"></div>
+    <div class="scene-label">ACT II: THE ACT</div>
   </div>
-</section>
 
-<!-- ABOUT VIEW -->
-<section class="view" id="view-about">
-  <div class="container">
-    <div class="about-section" style="max-width: 700px; margin: 0 auto;">
-      <h2>About Use Case Arms Race</h2>
+  <!-- The actor's reveal from previous choice -->
+  <div class="stage-direction" id="who-reveal-text"></div>
 
-      <h3>The Mission</h3>
-      <p>The Evil Brain—the world's first AGI—showed Jason what happens if humanity doesn't learn to deploy AI responsibly. The future it revealed was not dystopian in the dramatic sense. It was quietly, efficiently worse. So Jason made a deal: document every use case, every day, and maybe we learn fast enough to change course.</p>
-
-      <h3>The Registry</h3>
-      <p>This is a public record of AI deployments—good and bad, beneficial and harmful, promising and concerning. Anyone can submit. Everyone can vote. The goal isn't to stop AI. It's to see it clearly.</p>
-
-      <h3>The Show</h3>
-      <p>Every morning, Jason reads a new use case on camera. Under two minutes. His reactions are genuine. The fake commercials that follow are commentary on how people are actually thinking about deploying AI. Some of it is absurd. Some of it is already real.</p>
-
-      <h3>The Human</h3>
-      <p>Jason Shearer is the only human employee at Evil Brain Labs. His contract is interminable. His benefits include Class B citizenship after the robot invasion. He does this because the alternative—shown to him by the Brain—was worse.</p>
-
-      <h3>The Company</h3>
-      <p>Evil Brain Labs is the third-worst AI company. It achieves this by being the third-worst market entrant in every product category. The Brain believes this is optimal: bad enough to demonstrate the problems, good enough to stay in business.</p>
-
-      <div style="margin-top: 32px; text-align: center;">
-        <a href="https://evilbrainlabs.com" class="btn">Enter Evil Brain Labs →</a>
+  <div class="dialogue">
+    <div class="dialogue-line">
+      <div class="char-avatar gary">G</div>
+      <div class="char-speech">
+        <div class="char-name gary">Gary</div>
+        <div class="char-text" id="gary-intro"></div>
       </div>
     </div>
   </div>
+
+  <div class="choice-prompt" id="action-prompt">What did they do?</div>
+  <div id="ch-action"></div>
 </section>
+
+<!-- ============ 4. WHOM - SUPES SPEAKS FOR THEM ============ -->
+<section id="s-whom" class="screen">
+  <div class="dots">&#9679; &#9679; &#9679; <b>&#9679;</b> &#9675; &#9675;</div>
+
+  <div class="scene-stage">
+    <div class="scene-art" id="scene-art-whom"></div>
+    <div class="scene-curtain"></div>
+    <div class="scene-label">ACT III: THE AFFECTED</div>
+  </div>
+
+  <!-- The action demo from previous choice -->
+  <div class="stage-direction" id="action-demo-text"></div>
+
+  <div class="dialogue">
+    <div class="dialogue-line">
+      <div class="char-avatar supes">S</div>
+      <div class="char-speech">
+        <div class="char-name supes">Supes</div>
+        <div class="char-text" id="supes-intro"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="choice-prompt" id="whom-prompt">Who bears the weight?</div>
+  <div id="ch-whom"></div>
+</section>
+
+<!-- ============ 5. VERDICT ============ -->
+<section id="s-verdict" class="screen">
+  <div class="dots">&#9679; &#9679; &#9679; &#9679; <b>&#9679;</b> &#9675;</div>
+
+  <div class="scene-stage">
+    <div class="scene-art" id="scene-art-verdict"></div>
+    <div class="scene-curtain"></div>
+    <div class="scene-label">THE VERDICT</div>
+  </div>
+
+  <!-- The whom reveal from previous choice -->
+  <div class="stage-direction" id="whom-reveal-text"></div>
+
+  <div style="border:3px solid var(--bone);padding:16px;margin:16px 0;text-align:center">
+    <div style="font-size:12px;letter-spacing:2px;color:var(--pencil);margin-bottom:8px">THE CHAIN</div>
+    <div style="font:800 16px/1.4 inherit;letter-spacing:1px" id="v-triple"></div>
+  </div>
+
+  <div class="dialogue">
+    <div class="dialogue-line">
+      <div class="char-avatar brain">🧠</div>
+      <div class="char-speech">
+        <div class="char-name brain">Evil Brain</div>
+        <div class="char-text">The record is complete. The audience will now render judgment. Is this <em>heaven</em>... or <em>hell</em>?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="verdicts">
+    <button id="vheaven" onclick="verdict('heaven')">😇<br>HEAVEN</button>
+    <button id="vhell" onclick="verdict('hell')">😈<br>HELL</button>
+  </div>
+  <div style="text-align:center;color:var(--pencil);font-size:11px;letter-spacing:1px;margin-top:8px">
+    Nobody votes for you.
+  </div>
+</section>
+
+<!-- ============ 6. FILE (ending + notes combined) ============ -->
+<section id="s-file" class="screen">
+  <div class="dots">&#9679; &#9679; &#9679; &#9679; &#9679; <b>&#9679;</b></div>
+
+  <div class="scene-stage">
+    <div class="scene-art" id="scene-art-ending"></div>
+    <div class="scene-curtain"></div>
+    <div class="scene-label" id="ending-label">THE ENDING</div>
+  </div>
+
+  <!-- The theatrical ending -->
+  <div class="dialogue">
+    <div class="dialogue-line">
+      <div class="char-avatar brain">🧠</div>
+      <div class="char-speech">
+        <div class="char-name brain">Evil Brain narrates the ending</div>
+        <div class="char-text" id="ending-text"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chalkboard lesson -->
+  <div class="chalkboard" id="chalkboard"></div>
+
+  <h3 style="font-size:14px;letter-spacing:2px;margin:24px 0 8px">CASE NOTES (OPTIONAL)</h3>
+  <div class="chips" id="tagchips"></div>
+  <textarea id="notes" oninput="noteMeter()" placeholder="What did you notice? Tap tags above or write your own."></textarea>
+  <div class="rewardline" id="notemeter">10+ characters starts earning coins.</div>
+
+  <div class="nuancebox">
+    <div class="nlabel">YOUR READING</div>
+    <div class="nrow"><span>Safety</span><input type="range" id="na0" min="0" max="100" value="50"><span>Surveillance</span></div>
+    <div class="nrow"><span>Privacy</span><input type="range" id="na1" min="0" max="100" value="50"><span>Data brokering</span></div>
+    <div class="nrow"><span>Benefit</span><input type="range" id="na2" min="0" max="100" value="50"><span>Harm</span></div>
+  </div>
+
+  <button class="go" onclick="mint()">Mint your card →</button>
+</section>
+
 </main>
 
-<!-- Case Modal -->
-<div class="modal-overlay" id="case-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <div id="case-detail"></div>
+<!-- CARD MODAL POPUP -->
+<div class="card-modal" id="cardModal">
+  <div class="card-inner">
+    <button class="card-close" onclick="closeCard()">×</button>
+    <div id="cardsvg"></div>
+    <div class="scratch-area" id="scratchArea">
+      <div class="scratch-box" onclick="revealStat(this,'atk')">ATK</div>
+      <div class="scratch-box" onclick="revealStat(this,'def')">DEF</div>
+      <div class="scratch-box" onclick="revealStat(this,'rarity')">RARITY</div>
+    </div>
+    <button class="scratch-skip" onclick="revealAll()">Reveal all</button>
+    <div class="card-stats" id="cardStats"></div>
+    <div class="card-actions">
+      <button class="ghost" onclick="closeCard();startNext()">Open another case</button>
+      <button class="go" onclick="closeCard()">Done</button>
+    </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
-<footer>
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <a href="https://evilbrainlabs.com"><img src="/images/logo.jpg" alt="Evil Brain Labs"></a>
-        <p>A production of <a href="https://evilbrainlabs.com">Evil Brain Labs</a></p>
-        <p style="color: var(--pencil);">Tracking the arms race so you don't have to.</p>
-      </div>
-      <div>
-        <p><a href="https://evilbrainlabs.com">Evil Brain Labs</a></p>
-        <p><a href="#" onclick="switchView('about'); return false;">About</a></p>
-      </div>
-    </div>
-  </div>
-</footer>
+<footer>Faction is decided by human votes only. The registry takes no position.<br>
+De-escalation stages the stakes, never the facts.</footer>
 
 <script>
-const SUPABASE_URL = 'https://aslcrwmbdtvimjrexxzw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls';
-
-let sb = null;
-let map = null;
-let selectedCategory = '';
-let selectedValence = 'evil';
-let userVotes = JSON.parse(localStorage.getItem('ucar_votes') || '{}');
-
-// Initialize
-document.addEventListener('DOMContentLoaded', async () => {
-  if (window.supabase) {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-
-  // Nav
-  document.querySelectorAll('nav button').forEach(btn => {
-    btn.onclick = () => switchView(btn.dataset.view);
-  });
-
-  // Init map
-  initMap();
-
-  // Load data
-  await loadHomeCases();
-  await loadHomeEpisodes();
-
-  // Category buttons
-  document.querySelectorAll('.category-btn').forEach(btn => {
-    btn.onclick = () => selectCategory(btn.dataset.cat);
-  });
-
-  // Form
-  document.getElementById('submit-form').onsubmit = handleSubmit;
-
-  // Filters
-  document.getElementById('case-search').oninput = debounce(loadFullCases, 300);
-  document.getElementById('valence-filter').onchange = loadFullCases;
-  document.getElementById('category-filter').onchange = loadFullCases;
-
-  // Modal close
-  document.getElementById('case-modal').onclick = e => {
-    if (e.target.id === 'case-modal') closeModal();
-  };
-});
-
-function switchView(view) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('view-' + view).classList.add('active');
-  document.querySelector(`nav button[data-view="${view}"]`)?.classList.add('active');
-  window.scrollTo(0, 0);
-
-  if (view === 'cases') loadFullCases();
-}
-
-// Map
-function initMap() {
-  map = L.map('world-map', {
-    center: [30, 0],
-    zoom: 2,
-    zoomControl: false,
-    attributionControl: false
-  });
-
-  // Simple tile layer with paper-like styling
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-    maxZoom: 8,
-    minZoom: 1
-  }).addTo(map);
-
-  // Sample markers (would be loaded from database)
-  const locations = [
-    { lat: 37.7749, lng: -122.4194, name: 'San Francisco', count: 12 },
-    { lat: 40.7128, lng: -74.0060, name: 'New York', count: 8 },
-    { lat: 51.5074, lng: -0.1278, name: 'London', count: 6 },
-    { lat: 35.6762, lng: 139.6503, name: 'Tokyo', count: 5 },
-    { lat: 31.2304, lng: 121.4737, name: 'Shanghai', count: 7 },
-  ];
-
-  locations.forEach(loc => {
-    L.circleMarker([loc.lat, loc.lng], {
-      radius: 6 + loc.count,
-      fillColor: '#D42B1E',
-      color: '#1A1817',
-      weight: 2,
-      fillOpacity: 0.6
-    }).addTo(map).bindPopup(`<b>${loc.name}</b><br>${loc.count} cases`);
-  });
-}
-
-// Load home cases (top 5)
-async function loadHomeCases() {
-  const container = document.getElementById('home-cases');
-  if (!sb) {
-    container.innerHTML = '<p style="color: var(--pencil)">Database not connected</p>';
-    return;
-  }
-
-  try {
-    const { data: cases, error } = await sb
-      .from('use_cases')
-      .select('id, title, description, category, evil_votes, good_votes')
-      .in('status', ['active', 'approved'])
-      .order('evil_votes', { ascending: false })
-      .limit(5);
-
-    if (error) throw error;
-
-    if (!cases || cases.length === 0) {
-      container.innerHTML = '<p style="color: var(--pencil)">No cases yet. Be the first to submit!</p>';
-      return;
-    }
-
-    container.innerHTML = cases.map((c, i) => renderCaseRow(c, i + 1)).join('');
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = '<p style="color: var(--crayon)">Error loading cases</p>';
-  }
-}
-
-// Load full cases
-async function loadFullCases() {
-  const container = document.getElementById('full-case-list');
-  if (!sb) return;
-
-  const search = document.getElementById('case-search').value;
-  const valence = document.getElementById('valence-filter').value;
-  const category = document.getElementById('category-filter').value;
-
-  container.innerHTML = '<p style="color: var(--pencil)">Loading...</p>';
-
-  try {
-    let query = sb
-      .from('use_cases')
-      .select('id, title, description, category, evil_votes, good_votes, location_country')
-      .in('status', ['active', 'approved'])
-      .order('created_at', { ascending: false })
-      .limit(50);
-
-    if (search) {
-      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
-    }
-    if (category) {
-      query = query.eq('category', category);
-    }
-
-    const { data: cases, error } = await query;
-    if (error) throw error;
-
-    let filtered = cases || [];
-    if (valence === 'evil') {
-      filtered = filtered.filter(c => (c.evil_votes || 0) >= (c.good_votes || 0));
-    } else if (valence === 'good') {
-      filtered = filtered.filter(c => (c.good_votes || 0) > (c.evil_votes || 0));
-    }
-
-    if (filtered.length === 0) {
-      container.innerHTML = '<p style="color: var(--pencil)">No cases found.</p>';
-      return;
-    }
-
-    // Sort by total votes
-    filtered.sort((a, b) => ((b.evil_votes || 0) + (b.good_votes || 0)) - ((a.evil_votes || 0) + (a.good_votes || 0)));
-
-    container.innerHTML = filtered.map((c, i) => renderCaseRow(c, i + 1)).join('');
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-function renderCaseRow(c, rank) {
-  const isEvil = (c.evil_votes || 0) >= (c.good_votes || 0);
-  const evilVoted = userVotes[c.id] === 'evil';
-  const goodVoted = userVotes[c.id] === 'good';
-  const snippet = c.description ? c.description.substring(0, 80) + (c.description.length > 80 ? '...' : '') : '';
-
-  return `
-    <div class="case-row" onclick="openCase('${c.id}')">
-      <div class="case-rank ${isEvil ? 'evil' : 'good'}">#${rank}</div>
-      <div class="case-info">
-        <div class="case-title">${esc(c.title)}</div>
-        ${snippet ? `<div class="case-snippet">${esc(snippet)}</div>` : ''}
-        <div class="case-meta">
-          ${c.category ? `<span class="case-category">${c.category.replace(/_/g, ' ')}</span>` : ''}
-          ${c.location_country ? `<span>${c.location_country}</span>` : ''}
-        </div>
-      </div>
-      <div class="vote-btns">
-        <button class="vote-btn evil ${evilVoted ? 'voted' : ''}" onclick="event.stopPropagation(); vote('${c.id}', 'evil')">
-          👿 ${c.evil_votes || 0}
-        </button>
-        <button class="vote-btn good ${goodVoted ? 'voted' : ''}" onclick="event.stopPropagation(); vote('${c.id}', 'good')">
-          😇 ${c.good_votes || 0}
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-// Load episodes
-async function loadHomeEpisodes() {
-  const container = document.getElementById('home-episodes');
-  const videoContainer = document.getElementById('latest-video');
-
-  if (!sb) {
-    container.innerHTML = '<p style="color: var(--pencil)">Database not connected</p>';
-    return;
-  }
-
-  try {
-    const { data: episodes, error } = await sb
-      .from('episodes')
-      .select('*')
-      .eq('status', 'published')
-      .order('episode_number', { ascending: false })
-      .limit(5);
-
-    if (error) throw error;
-
-    if (!episodes || episodes.length === 0) {
-      videoContainer.innerHTML = '<span>Episodes coming soon</span>';
-      container.innerHTML = '';
-      return;
-    }
-
-    // Latest video
-    const latest = episodes[0];
-    if (latest.video_url) {
-      videoContainer.innerHTML = `<iframe src="${latest.video_url}" style="width:100%;height:100%;border:0" allowfullscreen></iframe>`;
-    } else {
-      videoContainer.innerHTML = `<span>E${String(latest.episode_number).padStart(3,'0')}: ${esc(latest.title)}</span>`;
-    }
-
-    // Episode list
-    container.innerHTML = episodes.map(ep => `
-      <div class="episode-row">
-        <span class="episode-num">E${String(ep.episode_number).padStart(3,'0')}</span>
-        <span class="episode-title">${esc(ep.title)}</span>
-        <span class="episode-date">${new Date(ep.published_at).toLocaleDateString()}</span>
-      </div>
-    `).join('');
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-// Open case modal
-async function openCase(id) {
-  const modal = document.getElementById('case-modal');
-  const detail = document.getElementById('case-detail');
-  detail.innerHTML = '<p>Loading...</p>';
-  modal.classList.add('active');
-
-  try {
-    const { data: c, error } = await sb
-      .from('use_cases')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-
-    detail.innerHTML = `
-      <h2>${esc(c.title)}</h2>
-      ${c.category ? `<p><strong>Category:</strong> ${c.category.replace(/_/g, ' ')}</p>` : ''}
-      <p style="margin: 16px 0; line-height: 1.7;">${esc(c.description || 'No description')}</p>
-      <p><strong>Location:</strong> ${c.location_country || 'Global'}</p>
-      <p><strong>Impact:</strong> ${'⚠️'.repeat(c.severity || 3)}</p>
-
-      <div style="display: flex; gap: 12px; margin: 24px 0;">
-        <button class="vote-btn evil ${userVotes[c.id]==='evil'?'voted':''}" onclick="vote('${c.id}','evil')" style="flex:1;padding:12px;font-size:1rem">
-          👿 Harmful (${c.evil_votes || 0})
-        </button>
-        <button class="vote-btn good ${userVotes[c.id]==='good'?'voted':''}" onclick="vote('${c.id}','good')" style="flex:1;padding:12px;font-size:1rem">
-          😇 Beneficial (${c.good_votes || 0})
-        </button>
-      </div>
-    `;
-  } catch (err) {
-    detail.innerHTML = '<p style="color: var(--crayon)">Error loading case</p>';
-  }
-}
-
-function closeModal() {
-  document.getElementById('case-modal').classList.remove('active');
-}
-
-// Voting
-async function vote(id, valence) {
-  userVotes[id] = valence;
-  localStorage.setItem('ucar_votes', JSON.stringify(userVotes));
-  toast(`Voted ${valence === 'evil' ? '👿 Harmful' : '😇 Beneficial'}`);
-  await loadHomeCases();
-  await loadFullCases();
-}
-
-// Form handling
-function selectValence(val) {
-  selectedValence = val;
-  document.getElementById('valence').value = val;
-  document.querySelectorAll('.valence-btn').forEach(b => b.classList.remove('selected'));
-  document.querySelector(`.valence-btn.${val}`).classList.add('selected');
-}
-
-function selectCategory(cat) {
-  selectedCategory = cat;
-  document.getElementById('category').value = cat;
-  document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
-  document.querySelector(`.category-btn[data-cat="${cat}"]`)?.classList.add('selected');
-}
-
-async function handleSubmit(e) {
-  e.preventDefault();
-  if (!sb) {
-    toast('Error: Database not connected');
-    return;
-  }
-
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.textContent = 'Submitting...';
-
-  try {
-    const data = {
-      title: document.getElementById('title').value,
-      description: document.getElementById('description').value,
-      url_raw: document.getElementById('url').value || null,
-      company_name_raw: document.getElementById('company').value || null,
-      location_country: document.getElementById('country').value || null,
-      category: selectedCategory || null,
-      severity: parseInt(document.getElementById('severity').value) || 3,
-      status: 'pending_review',
-      evil_votes: selectedValence === 'evil' ? 1 : 0,
-      good_votes: selectedValence === 'good' ? 1 : 0
-    };
-
-    const { error } = await sb.from('use_cases').insert([data]);
-    if (error) throw error;
-
-    document.getElementById('submit-form').style.display = 'none';
-    document.getElementById('submit-success').style.display = 'block';
-  } catch (err) {
-    console.error(err);
-    toast('Error: ' + (err.message || 'Failed to submit'));
-    btn.disabled = false;
-    btn.textContent = 'Submit to Registry';
-  }
-}
-
-function resetForm() {
-  document.getElementById('submit-form').reset();
-  document.getElementById('submit-form').style.display = 'block';
-  document.getElementById('submit-success').style.display = 'none';
-  document.getElementById('submit-btn').disabled = false;
-  document.getElementById('submit-btn').textContent = 'Submit to Registry';
-  selectedCategory = '';
-  selectedValence = 'evil';
-  document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
-  selectValence('evil');
-}
-
-// Utilities
-function esc(s) {
-  if (!s) return '';
-  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[c]);
-}
-
-function debounce(fn, ms) {
-  let t;
-  return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
-}
-
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// Globals
-window.switchView = switchView;
-window.openCase = openCase;
-window.closeModal = closeModal;
-window.vote = vote;
-window.selectValence = selectValence;
-window.resetForm = resetForm;
-window.loadMoreFeed = loadMoreFeed;
-
-// ========== FEED SYSTEM ==========
-let feedTab = 'latest';
-let feedCursor = null;
-let feedLoading = false;
-
-// Initialize feed tabs
-document.querySelectorAll('.feed-tab').forEach(tab => {
-  tab.onclick = () => {
-    document.querySelectorAll('.feed-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    feedTab = tab.dataset.feed;
-    feedCursor = null;
-    loadFeed(true);
-  };
-});
-
-async function loadFeed(reset = false) {
-  if (!sb) return;
-  if (feedLoading) return;
-  feedLoading = true;
-
-  const container = document.getElementById('feed-container');
-  const loader = document.getElementById('feed-loader');
-
-  if (reset) {
-    container.innerHTML = '<p style="color: var(--pencil); padding: 24px; text-align: center;">Loading...</p>';
-  }
-
-  try {
-    let query = sb
-      .from('use_cases')
-      .select('id, title, description, category, evil_votes, good_votes, status, severity, url, company_name_display, created_at, last_flip_at')
-      .in('status', ['active', 'approved', 'machine_verified', 'under_review', 'pending_review'])
-      .limit(20);
-
-    // Apply tab filter
-    switch (feedTab) {
-      case 'latest':
-        query = query.order('created_at', { ascending: false });
-        break;
-      case 'top':
-        query = query.order('evil_votes', { ascending: false }); // Simplified; ideally use computed score
-        break;
-      case 'underfire':
-        query = query.eq('status', 'under_review').order('created_at', { ascending: false });
-        break;
-      case 'flips':
-        query = query.not('last_flip_at', 'is', null).order('last_flip_at', { ascending: false });
-        break;
-    }
-
-    if (feedCursor) {
-      query = query.lt('created_at', feedCursor);
-    }
-
-    const { data: cases, error } = await query;
-    if (error) throw error;
-
-    if (reset) container.innerHTML = '';
-
-    if (!cases || cases.length === 0) {
-      if (reset) {
-        container.innerHTML = '<p style="color: var(--pencil); padding: 24px; text-align: center;">No cases found.</p>';
-      }
-      loader.style.display = 'none';
-      feedLoading = false;
-      return;
-    }
-
-    cases.forEach(c => {
-      container.insertAdjacentHTML('beforeend', renderFeedCard(c));
-    });
-
-    feedCursor = cases[cases.length - 1].created_at;
-    loader.style.display = cases.length === 20 ? 'block' : 'none';
-  } catch (err) {
-    console.error('Feed error:', err);
-    if (reset) {
-      container.innerHTML = '<p style="color: var(--crayon); padding: 24px; text-align: center;">Error loading feed.</p>';
-    }
-  }
-
-  feedLoading = false;
-}
-
-function loadMoreFeed() {
-  loadFeed(false);
-}
-
-function renderFeedCard(c) {
-  const goodVotes = c.good_votes || 0;
-  const evilVotes = c.evil_votes || 0;
-  const total = goodVotes + evilVotes || 1;
-  const goodPct = Math.round((goodVotes / total) * 100);
-  const evilPct = 100 - goodPct;
-
-  const statusMap = {
-    'machine_verified': { class: 'verified', text: 'MACHINE VERIFIED' },
-    'under_review': { class: 'review', text: 'UNDER REVIEW' },
-    'retracted': { class: 'retracted', text: 'RETRACTED' },
-    'active': { class: 'verified', text: 'VERIFIED' },
-    'approved': { class: 'verified', text: 'VERIFIED' }
-  };
-  const status = statusMap[c.status] || { class: 'verified', text: 'VERIFIED' };
-
-  const severity = c.severity || 3;
-  const pips = Array(5).fill(0).map((_, i) => `<span class="feed-pip ${i < severity ? 'filled' : ''}"></span>`).join('');
-
-  const timeAgo = relativeTime(c.created_at);
-  const userVote = userVotes[c.id];
-
-  let sourceHost = '';
-  if (c.url) {
-    try { sourceHost = new URL(c.url).hostname; } catch (e) { sourceHost = 'source'; }
-  }
-
-  return `
-    <article class="feed-card" data-id="${c.id}">
-      <div class="feed-card-header">
-        <span class="feed-org">${esc(c.company_name_display || 'Unknown Org')}</span>
-        <span class="feed-category">${esc((c.category || 'other').replace(/_/g, ' '))}</span>
-      </div>
-      <h3 class="feed-title" onclick="openCase('${c.id}')">${esc(c.title)}</h3>
-      <p class="feed-desc">${esc((c.description || '').substring(0, 140))}${(c.description || '').length > 140 ? '...' : ''}</p>
-      <div class="feed-impact">
-        <span class="feed-impact-label">Impact:</span>
-        ${pips}
-      </div>
-      <div class="feed-vote-bar">
-        <div class="feed-vote-good" style="width: ${goodPct}%"></div>
-        <div class="feed-vote-evil" style="width: ${evilPct}%"></div>
-      </div>
-      <div class="feed-vote-labels">
-        <span>${goodPct}% Good</span>
-        <span>${evilPct}% Evil</span>
-      </div>
-      <span class="feed-status ${status.class}">${status.text}</span>
-      ${c.url ? `<div class="feed-source">Source: <a href="${c.url}" target="_blank" rel="noopener">${sourceHost}</a></div>` : ''}
-      <div class="feed-time">${timeAgo}</div>
-      <div class="feed-actions">
-        <button class="feed-action vote-evil ${userVote === 'evil' ? 'voted' : ''}" onclick="vote('${c.id}', 'evil')">
-          👿 Evil (${evilVotes.toLocaleString()})
-        </button>
-        <button class="feed-action vote-good ${userVote === 'good' ? 'voted' : ''}" onclick="vote('${c.id}', 'good')">
-          😇 Good (${goodVotes.toLocaleString()})
-        </button>
-        <button class="feed-action" onclick="shareCase('${c.id}', '${esc(c.title).replace(/'/g, "\\'")}')">
-          🔗 Share
-        </button>
-        <button class="feed-action" onclick="watchCase('${c.id}')">
-          👁 Watch
-        </button>
-      </div>
-    </article>
-  `;
-}
-
-function relativeTime(dateStr) {
-  if (!dateStr) return '';
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diff = Math.floor((now - date) / 1000);
-
-  if (diff < 60) return 'just now';
-  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-  if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
-  return Math.floor(diff / 604800) + 'w ago';
-}
-
-function shareCase(id, title) {
-  const url = `${window.location.origin}?case=${id}`;
-  if (navigator.share) {
-    navigator.share({ title: title + ' - Use Case Arms Race', url });
-  } else {
-    navigator.clipboard.writeText(url);
-    toast('Link copied to clipboard');
-  }
-}
-
-function watchCase(id) {
-  toast('Watching case (sign in to enable notifications)');
-}
-
-// Load feed when switching to feed view
-const origSwitchView = switchView;
-switchView = function(view) {
-  origSwitchView(view);
-  if (view === 'feed' && document.getElementById('feed-container').children.length <= 1) {
-    loadFeed(true);
-  }
+/* ================= CONFIG ================= */
+const CONFIG = {
+  SUPABASE_URL: "https://aslcrwmbdtvimjrexxzw.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls",
+  VIDEO_EMBED: "",
+  EPISODES: [],
+  FN: n => CONFIG.SUPABASE_URL + "/functions/v1/" + n,
 };
+const DEMO = !CONFIG.SUPABASE_URL;
+document.getElementById('demoflag').textContent = DEMO ? "DEMO MODE" : "";
+
+/* State */
+let CASE = null, PICK = {free:{}}, VOTE = null, CARD_DATA = null;
+let _allCases = null;
+
+/* Anonymous play id */
+function anonId(){
+  try{
+    let id = localStorage.getItem('ucar_anon');
+    if(!id){ id = crypto.randomUUID(); localStorage.setItem('ucar_anon', id); }
+    return id;
+  }catch(e){ return crypto.randomUUID(); }
+}
+
+/* ================= UTILITIES ================= */
+const esc = s => String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const setText = (id,t) => { document.getElementById(id).textContent = t; };
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+function goHome(){ CASE=null; show('home'); }
+
+/* Template fill: {WHO} {ACTION} {WHOM} */
+const fill = (t,ctx) => String(t||'')
+  .replaceAll('{WHO}',ctx.WHO||'the actor')
+  .replaceAll('{ACTION}',ctx.ACTION||'acts on')
+  .replaceAll('{WHOM}',ctx.WHOM||'everyone');
+
+/* ================= SCENE ART GENERATOR ================= */
+function rng(seed){
+  let x=0;
+  for(const ch of String(seed)) x=(x*31+ch.charCodeAt(0))>>>0;
+  return ()=>{x^=x<<13;x>>>=0;x^=x>>>17;x^=x<<5;x>>>=0;return x/0xffffffff;};
+}
+
+/* Generate detailed scene art from art_prompt */
+function generateSceneArt(seed, artPrompt, mood){
+  const r = rng(seed);
+  const baseInk = mood==='hell' ? 'var(--crayon)'
+                : mood==='heaven' ? 'var(--gold)'
+                : 'var(--bone)';
+  const wash = mood==='hell' ? 'rgba(193,18,31,0.12)'
+             : mood==='heaven' ? 'rgba(201,168,76,0.10)'
+             : 'rgba(237,230,214,0.04)';
+
+  // Parse art prompt for scene elements
+  const words = (artPrompt||'').toLowerCase().split(/[\s,]+/);
+  const hasEye = words.some(w=>['eye','watch','surveillance','camera','scan'].includes(w));
+  const hasChain = words.some(w=>['chain','lock','blockchain','immutable'].includes(w));
+  const hasMedical = words.some(w=>['hospital','medical','health','patient','nurse'].includes(w));
+  const hasData = words.some(w=>['data','algorithm','code','digital','computer'].includes(w));
+  const hasNature = words.some(w=>['weather','storm','cloud','rain','fire','tree','forest'].includes(w));
+  const hasBuilding = words.some(w=>['building','office','school','court','city'].includes(w));
+
+  // Build SVG layers
+  let svg = `<svg viewBox="0 0 720 405" xmlns="http://www.w3.org/2000/svg">`;
+  svg += `<rect width="720" height="405" fill="var(--ink)"/>`;
+  svg += `<rect width="720" height="405" fill="${wash}"/>`;
+
+  // Background rays/atmosphere
+  const rayCount = 8 + Math.floor(r()*8);
+  for(let i=0;i<rayCount;i++){
+    const a = (i/rayCount)*Math.PI*2;
+    const cx = 360 + (r()-0.5)*200;
+    const cy = 200 + (r()-0.5)*100;
+    svg += `<line x1="${cx}" y1="${cy}"
+      x2="${cx+Math.cos(a)*500}" y2="${cy+Math.sin(a)*500}"
+      stroke="${baseInk}" stroke-width="${1+r()*2}" opacity="${0.1+r()*0.15}"/>`;
+  }
+
+  // Horizon line
+  svg += `<line x1="0" y1="280" x2="720" y2="280" stroke="${baseInk}" stroke-width="2" opacity="0.3"/>`;
+
+  // Ground texture
+  for(let i=0;i<20;i++){
+    const x = r()*720;
+    const w = 20+r()*80;
+    svg += `<line x1="${x}" y1="${280+r()*60}" x2="${x+w}" y2="${285+r()*55}"
+      stroke="${baseInk}" stroke-width="1" opacity="${0.15+r()*0.2}"/>`;
+  }
+
+  // Scene-specific elements based on art_prompt keywords
+  if(hasEye){
+    // Surveillance eye
+    const ex = 360+r()*100-50, ey = 140+r()*40;
+    svg += `<g transform="translate(${ex},${ey})">
+      <ellipse cx="0" cy="0" rx="${60+r()*20}" ry="${30+r()*10}" fill="none" stroke="${baseInk}" stroke-width="4"/>
+      <circle cx="0" cy="0" r="${18+r()*8}" fill="${baseInk}"/>
+      <circle cx="${3+r()*4}" cy="${-3-r()*4}" r="${5+r()*3}" fill="var(--ink)"/>
+      ${r()>0.5?'<line x1="-80" y1="0" x2="-40" y2="0" stroke="'+baseInk+'" stroke-width="2"/>':''}
+      ${r()>0.5?'<line x1="40" y1="0" x2="80" y2="0" stroke="'+baseInk+'" stroke-width="2"/>':''}
+    </g>`;
+  }
+
+  if(hasChain){
+    // Chain links
+    for(let i=0;i<5;i++){
+      const cx = 120+i*120+r()*40;
+      const cy = 180+r()*60;
+      svg += `<ellipse cx="${cx}" cy="${cy}" rx="25" ry="16" fill="none" stroke="${baseInk}" stroke-width="4"/>`;
+      if(i<4) svg += `<line x1="${cx+25}" y1="${cy}" x2="${cx+95}" y2="${cy+r()*20-10}" stroke="${baseInk}" stroke-width="2"/>`;
+    }
+  }
+
+  if(hasMedical){
+    // Medical cross + heartbeat
+    const mx = 320+r()*80;
+    svg += `<g transform="translate(${mx},150)">
+      <rect x="-8" y="-30" width="16" height="60" fill="${baseInk}"/>
+      <rect x="-30" y="-8" width="60" height="16" fill="${baseInk}"/>
+    </g>`;
+    // Heartbeat line
+    svg += `<polyline points="80,200 160,200 200,160 240,240 280,200 400,200"
+      fill="none" stroke="${baseInk}" stroke-width="3" opacity="0.5"/>`;
+  }
+
+  if(hasData){
+    // Binary/data streams
+    for(let col=0;col<8;col++){
+      const x = 80+col*80;
+      for(let row=0;row<6;row++){
+        if(r()>0.6){
+          svg += `<text x="${x}" y="${50+row*30}" fill="${baseInk}" font-family="monospace"
+            font-size="12" opacity="${0.2+r()*0.3}">${r()>0.5?'1':'0'}</text>`;
+        }
+      }
+    }
+  }
+
+  if(hasNature){
+    // Clouds or trees
+    for(let i=0;i<4;i++){
+      const cx = 100+i*160+r()*60;
+      const cy = 80+r()*40;
+      svg += `<ellipse cx="${cx}" cy="${cy}" rx="${40+r()*30}" ry="${20+r()*15}"
+        fill="none" stroke="${baseInk}" stroke-width="2" opacity="0.3"/>`;
+    }
+  }
+
+  if(hasBuilding){
+    // Silhouette buildings
+    for(let i=0;i<5;i++){
+      const bx = 50+i*140+r()*40;
+      const bw = 60+r()*40;
+      const bh = 80+r()*100;
+      svg += `<rect x="${bx}" y="${280-bh}" width="${bw}" height="${bh}"
+        fill="${baseInk}" opacity="0.15"/>`;
+      // Windows
+      for(let wy=0;wy<Math.floor(bh/25);wy++){
+        for(let wx=0;wx<Math.floor(bw/20);wx++){
+          if(r()>0.4){
+            svg += `<rect x="${bx+8+wx*18}" y="${285-bh+10+wy*22}" width="8" height="10"
+              fill="${baseInk}" opacity="${0.3+r()*0.3}"/>`;
+          }
+        }
+      }
+    }
+  }
+
+  // Decorative frame
+  svg += `<rect x="12" y="12" width="696" height="381" fill="none" stroke="${baseInk}" stroke-width="3"/>`;
+  svg += `<rect x="20" y="20" width="680" height="365" fill="none" stroke="${baseInk}" stroke-width="1" opacity="0.5"/>`;
+
+  // Corner ornaments
+  const corners = [[30,30],[690,30],[30,375],[690,375]];
+  corners.forEach(([cx,cy])=>{
+    svg += `<circle cx="${cx}" cy="${cy}" r="4" fill="${baseInk}"/>`;
+  });
+
+  svg += `</svg>`;
+  return svg;
+}
+
+/* ================= HOME: SEARCH + RESULTS ================= */
+async function loadAllCases(){
+  if(_allCases) return _allCases;
+  const r = await fetch(CONFIG.FN('search-cases'),{method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
+    body:JSON.stringify({})});
+  const d = await r.json();
+  _allCases = d.results || [];
+  return _allCases;
+}
+
+function scoreCase(c, q){
+  const ql = q.toLowerCase();
+  const words = ql.split(/\s+/).filter(w=>w.length>2);
+  let score = 0;
+  const t = ((c.title||'')+(c.raw_title||'')+(c.summary||'')+
+    (c.extraction?.summary||'')+(c.extraction?.article_quote||'')).toLowerCase();
+  for(const w of words){
+    if(t.includes(w)) score += 10;
+  }
+  if((c.title||'').toLowerCase().includes(ql)) score += 50;
+  // Boost recent
+  if(c.created_at){
+    const age = (Date.now()-new Date(c.created_at).getTime())/(1000*60*60*24);
+    if(age < 7) score += 20;
+    else if(age < 30) score += 10;
+  }
+  return score;
+}
+
+let _searchTimeout = null;
+document.getElementById('q').addEventListener('input', e=>{
+  clearTimeout(_searchTimeout);
+  _searchTimeout = setTimeout(()=>runSearch(e.target.value), 80);
+});
+
+async function runSearch(raw){
+  const q = raw.trim();
+  const host = document.getElementById('results');
+
+  // URL detection
+  if(/^https?:\/\//i.test(q)){
+    renderFilePrompt(q, host);
+    return;
+  }
+
+  // Load all cases for instant filtering
+  const all = await loadAllCases();
+
+  if(!q){
+    // Show all, newest first
+    host.innerHTML = '';
+    all.slice(0,20).forEach(c=>host.appendChild(hitCard(c)));
+    return;
+  }
+
+  // Score and rank
+  const scored = all.map(c=>({c, score:scoreCase(c,q)})).filter(x=>x.score>0);
+  scored.sort((a,b)=>b.score-a.score);
+
+  host.innerHTML = '';
+  scored.slice(0,15).forEach(({c})=>host.appendChild(hitCard(c)));
+
+  // If few results, offer web search
+  if(scored.length < 3 && q.length > 5){
+    const div = document.createElement('div');
+    div.className = 'divider';
+    div.textContent = 'SEARCH THE WEB FOR NEW CASES';
+    host.appendChild(div);
+
+    const btn = document.createElement('button');
+    btn.className = 'ghost';
+    btn.textContent = 'Search news for "'+q+'"';
+    btn.onclick = ()=>webSearch(q, host);
+    host.appendChild(btn);
+  }
+}
+
+async function webSearch(q, host){
+  const r = await fetch(CONFIG.FN('search-cases'),{method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
+    body:JSON.stringify({q, web:true})});
+  const d = await r.json();
+  if(d.web_results?.length){
+    for(const w of d.web_results){
+      const el = document.createElement('div');
+      el.className = 'webhit';
+      el.innerHTML = '<div>'+esc(w.title)+'</div><div class="meta">'+esc(w.domain||'')+'</div>';
+      const b = document.createElement('button');
+      b.className = 'ghost';
+      b.textContent = 'File this into the queue';
+      b.onclick = ()=>fileURL(w.url);
+      el.appendChild(b);
+      host.appendChild(el);
+    }
+  }
+}
+
+function hitCard(c){
+  const total = (c.heaven_votes||0)+(c.hell_votes||0);
+  const pct = total ? Math.round(100*c.heaven_votes/total) : 0;
+  const isNew = c.created_at && (Date.now()-new Date(c.created_at).getTime() < 7*24*60*60*1000);
+
+  const el = document.createElement('div');
+  el.className = 'hit';
+  el.innerHTML = (isNew ? '<span class="badge" style="background:var(--crayon);color:var(--bone)">NEW</span>' : '')
+    + '<span class="badge '+(c.faction||'unaligned')+'">'+(c.faction||'UNALIGNED').toUpperCase()+'</span>'
+    + '<span class="badge">IMPACT '+'★'.repeat(c.impact||1)+'</span>'
+    + '<h3>'+esc(c.title||c.raw_title)+'</h3>'
+    + '<div class="sum">'+esc(c.extraction?.summary||c.summary||'')+'</div>'
+    + (c.extraction?.article_quote ? '<div class="qt">\"'+esc(c.extraction.article_quote)+'\"</div>' : '')
+    + '<div class="meta">'+total+' VERDICTS · '+pct+'% HEAVEN</div>'
+    + '<div class="votebar"><i style="width:'+pct+'%"></i></div>'
+    + '<div class="quickvote">'
+    + '<button class="qv heaven" onclick="event.stopPropagation();quickVote(\''+c.id+'\',\'heaven\',this)">😇</button>'
+    + '<button class="qv hell" onclick="event.stopPropagation();quickVote(\''+c.id+'\',\'hell\',this)">😈</button>'
+    + '</div>';
+  el.onclick = ()=>openCase(c.id);
+  return el;
+}
+
+async function quickVote(caseId, faction, btn){
+  btn.disabled = true;
+  btn.textContent = '✓';
+  try{
+    await fetch(CONFIG.FN('submit-verdict'),{method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
+      body:JSON.stringify({case_id:caseId,who:'quick',action:'quick',whom:'quick',faction_vote:faction,notes:''})});
+    if(_allCases){
+      const c = _allCases.find(x=>x.id===caseId);
+      if(c){ faction==='heaven' ? c.heaven_votes++ : c.hell_votes++; }
+    }
+  }catch(e){}
+}
+
+function renderFilePrompt(url, host){
+  host.innerHTML = '';
+  const el = document.createElement('div');
+  el.className = 'webhit';
+  el.innerHTML = '<div>File a new case from this source?</div><div class="meta">'+esc(url)+'</div>';
+  const b = document.createElement('button');
+  b.className = 'go';
+  b.textContent = 'File it →';
+  b.onclick = ()=>fileURL(url);
+  el.appendChild(b);
+  host.appendChild(el);
+}
+
+async function fileURL(url){
+  const r = await fetch(CONFIG.FN('file-case'),{method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
+    body:JSON.stringify({url})});
+  const d = await r.json();
+  alert(d.ok ? 'Filed. The steward will extract and queue it for review.' : (d.error||'Could not file.'));
+}
+
+/* ================= PLAY FLOW ================= */
+async function openCase(id){
+  let c = (_allCases||[]).find(x=>x.id===id);
+  if(!c){
+    const r = await fetch(CONFIG.FN('search-cases'),{method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
+      body:JSON.stringify({id})});
+    c = ((await r.json()).results||[])[0];
+  }
+  if(!c) return;
+
+  CASE = c;
+  PICK = {free:{}};
+  VOTE = null;
+
+  const ex = c.extraction || {};
+  const re = ex.reenactment || {};
+
+  // Scene 1: Case file with cold open
+  document.getElementById('scene-art-case').innerHTML =
+    generateSceneArt(c.id+'case', ex.art_prompt, 'flat');
+  document.getElementById('scene-label-case').textContent = 'CASE: '+(c.category||'UNKNOWN').toUpperCase();
+
+  // Setting as stage direction
+  setText('stage-setting', re.setting || 'The stage is set. The players await.');
+
+  // Cold open narration
+  setText('cold-open', re.cold_open || ex.summary || c.summary || '');
+
+  // Metadata
+  setText('c-src', c.source_tier===1 ? 'PRIMARY SOURCE' : 'REPORTED');
+  setText('c-impact', 'IMPACT '+'★'.repeat(c.impact||1));
+  const fBadge = document.getElementById('c-faction');
+  fBadge.textContent = (c.faction||'UNALIGNED').toUpperCase();
+  fBadge.className = 'badge '+(c.faction||'unaligned');
+
+  setText('c-title', c.title || c.raw_title);
+  setText('c-summary', ex.summary || c.summary || '');
+
+  const qWrap = document.getElementById('c-quote-wrap');
+  const quote = ex.article_quote || c.article_quote;
+  if(quote){
+    setText('c-quote', '"'+quote+'"');
+    qWrap.style.display = 'block';
+  } else {
+    qWrap.style.display = 'none';
+  }
+
+  document.getElementById('c-link').href = c.source_url || '#';
+
+  // De-escalation table
+  const deTable = document.getElementById('c-deesc');
+  deTable.innerHTML = '<tr><td><b>COURT RECORD</b></td><td><b>OUR STAGING</b></td></tr>'
+    + (re.deescalations||[]).map(d=>'<tr><td>'+esc(d.real)+'</td><td>'+esc(d.cartoon)+'</td></tr>').join('');
+
+  show('s-case');
+}
+
+function enterStage(){
+  const ex = CASE.extraction || {};
+  const re = ex.reenactment || {};
+  const story = ex.story || {};
+
+  // WHO screen
+  document.getElementById('scene-art-who').innerHTML =
+    generateSceneArt(CASE.id+'who', ex.art_prompt, 'flat');
+
+  // GI's intro line
+  setText('gi-intro', story.gi || 'Tactical assessment: observe carefully.');
+
+  // Render WHO choices with their theatrical reveals as hints
+  renderTheatricalChoices('who', ex.who_choices, re.who_reveals);
+
+  show('s-who');
+}
+
+function renderTheatricalChoices(slot, options, reveals){
+  const host = document.getElementById('ch-'+slot);
+  host.innerHTML = '';
+
+  // Shuffle order for position-bias control
+  const indices = [0,1,2].sort(()=>Math.random()-0.5);
+
+  for(const i of indices){
+    if(!options[i]) continue;
+    const btn = document.createElement('button');
+    btn.className = 'choice';
+    btn.innerHTML = esc(options[i]);
+    // Add hint from reveal if available
+    if(reveals && reveals[i]){
+      const hint = reveals[i].split('.')[0]; // First sentence as hint
+      if(hint.length < 100){
+        btn.innerHTML += '<small>'+esc(hint)+'</small>';
+      }
+    }
+    btn.onclick = ()=>selectChoice(slot, i, options[i], reveals?reveals[i]:null);
+    host.appendChild(btn);
+  }
+
+  // Free text option
+  const free = document.createElement('button');
+  free.className = 'choice free';
+  free.textContent = 'None of these. Say it my way →';
+  free.onclick = ()=>{
+    const v = prompt('In your own words:');
+    if(v && v.trim()){
+      selectChoice(slot, -1, v.trim(), null);
+      PICK.free[slot] = true;
+    }
+  };
+  host.appendChild(free);
+}
+
+function selectChoice(slot, index, value, reveal){
+  PICK[slot] = value;
+  PICK[slot+'Index'] = index;
+  PICK[slot+'Reveal'] = reveal;
+  advanceStage(slot);
+}
+
+function advanceStage(slot){
+  const ex = CASE.extraction || {};
+  const re = ex.reenactment || {};
+  const story = ex.story || {};
+
+  if(slot === 'who'){
+    // Show WHO reveal then move to ACTION
+    document.getElementById('scene-art-action').innerHTML =
+      generateSceneArt(CASE.id+'action', ex.art_prompt, 'flat');
+
+    // The reveal text for the chosen actor
+    const revealText = PICK.whoReveal
+      ? fill(PICK.whoReveal, {WHO:PICK.who})
+      : PICK.who + ' steps into the record.';
+    setText('who-reveal-text', revealText);
+
+    // Gary's line
+    setText('gary-intro', story.gary || 'The technology worked exactly as designed. That\'s either good or terrifying.');
+
+    // Action prompt
+    setText('action-prompt', PICK.who + ' does what?');
+
+    // Render action choices
+    renderTheatricalChoices('action', ex.action_choices, re.action_demos);
+
+    show('s-action');
+
+  } else if(slot === 'action'){
+    // Show ACTION demo then move to WHOM
+    document.getElementById('scene-art-whom').innerHTML =
+      generateSceneArt(CASE.id+'whom', ex.art_prompt, 'flat');
+
+    // The demo text for the chosen action
+    const demoText = PICK.actionReveal
+      ? fill(PICK.actionReveal, {WHO:PICK.who, ACTION:PICK.action})
+      : PICK.who + ' ' + PICK.action + '.';
+    setText('action-demo-text', demoText);
+
+    // Supes' line
+    setText('supes-intro', story.supes || 'Someone always bears the weight. Let\'s see who.');
+
+    // Whom prompt
+    setText('whom-prompt', PICK.who + ' ' + PICK.action + '... whom?');
+
+    // Render whom choices
+    renderTheatricalChoices('whom', ex.whom_choices, re.whom_reveals);
+
+    show('s-whom');
+
+  } else if(slot === 'whom'){
+    // Show WHOM reveal then move to VERDICT
+    document.getElementById('scene-art-verdict').innerHTML =
+      generateSceneArt(CASE.id+'verdict', ex.art_prompt, 'flat');
+
+    // The reveal text for the affected
+    const revealText = PICK.whomReveal
+      ? fill(PICK.whomReveal, {WHO:PICK.who, ACTION:PICK.action, WHOM:PICK.whom})
+      : PICK.whom + ' bear the weight.';
+    setText('whom-reveal-text', revealText);
+
+    // The triple
+    setText('v-triple', PICK.who + ' → ' + PICK.action + ' → ' + PICK.whom);
+
+    show('s-verdict');
+  }
+}
+
+function verdict(faction){
+  VOTE = faction;
+  const ex = CASE.extraction || {};
+  const re = ex.reenactment || {};
+
+  // Ending scene
+  document.getElementById('scene-art-ending').innerHTML =
+    generateSceneArt(CASE.id+'ending'+faction, ex.art_prompt, faction);
+  document.getElementById('ending-label').textContent =
+    faction==='heaven' ? 'THE WARM ENDING' : 'THE COLD ENDING';
+
+  // Get the ending text and extract chalkboard lesson
+  const endingRaw = (re.endings||{})[faction] || '';
+  const filled = fill(endingRaw, {WHO:PICK.who, ACTION:PICK.action, WHOM:PICK.whom});
+
+  // Split out the chalkboard lesson if present
+  const chalkMatch = filled.match(/Evil Brain[^:]*:\s*['""]?([^'""]+)['""]?\.?$/i);
+  let mainText = filled;
+  let chalkText = '';
+  if(chalkMatch){
+    mainText = filled.replace(/Evil Brain[^:]*:\s*['""]?[^'""]+['""]?\.?$/i, '').trim();
+    chalkText = chalkMatch[1];
+  }
+
+  setText('ending-text', mainText);
+  setText('chalkboard', chalkText || 'The record speaks for itself.');
+
+  // Build tags
+  buildTags();
+  document.getElementById('notes').value = '';
+  noteMeter();
+
+  show('s-file');
+}
+
+function buildTags(){
+  const host = document.getElementById('tagchips');
+  host.innerHTML = '';
+  const ex = CASE.extraction || {};
+
+  const tags = new Set();
+  if(CASE.category) tags.add(CASE.category);
+  tags.add(PICK.who);
+  tags.add((PICK.action||'').split(' ')[0]);
+  (ex.tech_types||[]).forEach(t=>tags.add(t));
+  (ex.data_types||[]).forEach(t=>tags.add(t));
+  ['no consent','human oversight missing','worked as designed','needs an off switch',
+   'human was load-bearing'].forEach(t=>tags.add(t));
+
+  for(const t of [...tags].filter(Boolean).slice(0,10)){
+    const c = document.createElement('span');
+    c.className = 'chip';
+    c.textContent = t;
+    c.onclick = ()=>{
+      const n = document.getElementById('notes');
+      n.value = (n.value ? n.value.trimEnd()+' ' : '') + '#'+t.replace(/\s+/g,'-')+' ';
+      noteMeter();
+      n.focus();
+    };
+    host.appendChild(c);
+  }
+}
+
+function noteMeter(){
+  const n = document.getElementById('notes').value.length;
+  const coins = n>=200 ? 25 : n>=100 ? 15 : n>=50 ? 10 : n>=10 ? 5 : 0;
+  setText('notemeter', n+' characters · '+(coins ? 'earns '+coins+' coins' : '10+ characters starts earning'));
+}
+
+/* ================= CARD MINTING ================= */
+function deriveCard(impact, valence, tier){
+  const v = Math.max(-2, Math.min(2, valence||0));
+  return {
+    atk: impact*2 + (v<0 ? -v : 0),
+    def: impact + (v>0 ? v : 0) + (tier===1 ? 1 : 0),
+    rarity: impact>=5 ? 'LEGENDARY' : impact===4 ? 'RARE' : impact===3 ? 'UNCOMMON' : 'COMMON'
+  };
+}
+
+async function mint(){
+  const notes = document.getElementById('notes').value;
+  const nuance = [0,1,2].map(i=>Number(document.getElementById('na'+i).value));
+
+  let resp;
+  try{
+    const r = await fetch(CONFIG.FN('submit-verdict'),{method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
+      body:JSON.stringify({
+        case_id:CASE.id, who:PICK.who, action:PICK.action, whom:PICK.whom,
+        who_free:!!PICK.free.who, action_free:!!PICK.free.action, whom_free:!!PICK.free.whom,
+        faction_vote:VOTE, notes, nuance_after:nuance
+      })});
+    resp = await r.json();
+  }catch(e){
+    // Fallback for demo
+    const total = (CASE.heaven_votes||0)+(CASE.hell_votes||0)+1;
+    const s = deriveCard(CASE.impact, CASE.extraction?.valence, CASE.source_tier);
+    resp = {
+      card:{card_name:CASE.title, faction_at_mint:VOTE, ...s},
+      rewards:{coins:notes.length>=200?25:notes.length>=100?15:notes.length>=50?10:notes.length>=10?5:0, rep:3},
+      collective:{heaven_pct:Math.round(100*(CASE.heaven_votes+(VOTE==='heaven'?1:0))/total), votes:total}
+    };
+  }
+
+  CARD_DATA = resp;
+  renderCardModal(resp);
+  document.getElementById('cardModal').classList.add('on');
+}
+
+function renderCardModal(resp){
+  const c = resp.card;
+  const faction = c.faction_at_mint || 'unaligned';
+  const ink = faction==='hell' ? 'var(--crayon)' : faction==='heaven' ? 'var(--gold)' : 'var(--bone)';
+
+  // Card SVG
+  const artSvg = generateSceneArt(CASE.id+'card', CASE.extraction?.art_prompt, faction);
+
+  document.getElementById('cardsvg').innerHTML = `
+    <svg viewBox="0 0 360 500" xmlns="http://www.w3.org/2000/svg">
+      <rect width="360" height="500" fill="var(--ink)"/>
+      <rect x="6" y="6" width="348" height="488" fill="none" stroke="${ink}" stroke-width="4"/>
+      <g transform="translate(15,15) scale(0.46)">${artSvg.replace(/<\/?svg[^>]*>/g,'')}</g>
+      <text x="180" y="230" text-anchor="middle" fill="${ink}" font-family="Arial"
+        font-weight="800" font-size="11" letter-spacing="3">${faction.toUpperCase()}</text>
+      <text x="180" y="260" text-anchor="middle" fill="var(--bone)" font-family="Arial"
+        font-weight="800" font-size="14" letter-spacing="1">${esc((c.card_name||'').toUpperCase().slice(0,36))}</text>
+      <line x1="30" y1="275" x2="330" y2="275" stroke="${ink}" stroke-width="1"/>
+      <text x="180" y="300" text-anchor="middle" fill="var(--pencil)" font-family="Georgia"
+        font-style="italic" font-size="11">${esc(PICK.who)} → ${esc(PICK.action)} → ${esc(PICK.whom)}</text>
+      <rect x="30" y="420" width="80" height="50" fill="var(--ink)" stroke="${ink}" stroke-width="2"/>
+      <text x="70" y="442" text-anchor="middle" fill="var(--bone)" font-family="Arial" font-weight="800" font-size="10">ATK</text>
+      <text x="70" y="462" text-anchor="middle" fill="${ink}" font-family="Arial" font-weight="800" font-size="20" id="card-atk">?</text>
+      <rect x="140" y="420" width="80" height="50" fill="var(--ink)" stroke="${ink}" stroke-width="2"/>
+      <text x="180" y="442" text-anchor="middle" fill="var(--bone)" font-family="Arial" font-weight="800" font-size="10">DEF</text>
+      <text x="180" y="462" text-anchor="middle" fill="${ink}" font-family="Arial" font-weight="800" font-size="20" id="card-def">?</text>
+      <rect x="250" y="420" width="80" height="50" fill="var(--ink)" stroke="${ink}" stroke-width="2"/>
+      <text x="290" y="442" text-anchor="middle" fill="var(--bone)" font-family="Arial" font-weight="800" font-size="10">RARITY</text>
+      <text x="290" y="460" text-anchor="middle" fill="${ink}" font-family="Arial" font-weight="800" font-size="11" id="card-rarity">?</text>
+    </svg>`;
+
+  // Reset scratch boxes
+  document.querySelectorAll('.scratch-box').forEach(b=>{
+    b.classList.remove('revealed');
+    b.textContent = b.getAttribute('onclick').includes('atk') ? 'ATK'
+                  : b.getAttribute('onclick').includes('def') ? 'DEF' : 'RARITY';
+  });
+  document.getElementById('scratchArea').style.display = 'flex';
+  document.querySelector('.scratch-skip').style.display = 'block';
+
+  // Stats
+  document.getElementById('cardStats').innerHTML =
+    (resp.rewards ? `+${resp.rewards.coins} coins · +${resp.rewards.rep} rep` : '') +
+    (resp.collective ? ` · ${resp.collective.votes} total verdicts · ${resp.collective.heaven_pct}% heaven` : '');
+}
+
+function revealStat(el, stat){
+  if(el.classList.contains('revealed')) return;
+  el.classList.add('revealed');
+  const c = CARD_DATA.card;
+  if(stat==='atk'){
+    el.textContent = '⚔ '+c.atk;
+    document.getElementById('card-atk').textContent = c.atk;
+  } else if(stat==='def'){
+    el.textContent = '🛡 '+c.def;
+    document.getElementById('card-def').textContent = c.def;
+  } else {
+    el.textContent = c.rarity;
+    document.getElementById('card-rarity').textContent = c.rarity;
+  }
+  // Check if all revealed
+  if(document.querySelectorAll('.scratch-box.revealed').length === 3){
+    document.getElementById('scratchArea').style.display = 'none';
+    document.querySelector('.scratch-skip').style.display = 'none';
+  }
+}
+
+function revealAll(){
+  document.querySelectorAll('.scratch-box').forEach(b=>{
+    const stat = b.getAttribute('onclick').includes('atk') ? 'atk'
+               : b.getAttribute('onclick').includes('def') ? 'def' : 'rarity';
+    revealStat(b, stat);
+  });
+}
+
+function closeCard(){
+  document.getElementById('cardModal').classList.remove('on');
+  goHome();
+}
+
+function startNext(){
+  document.getElementById('cardModal').classList.remove('on');
+  // Pick a random case
+  if(_allCases && _allCases.length){
+    const other = _allCases.filter(c=>c.id!==CASE?.id);
+    if(other.length){
+      const next = other[Math.floor(Math.random()*other.length)];
+      openCase(next.id);
+      return;
+    }
+  }
+  goHome();
+}
+
+/* ================= INIT ================= */
+loadAllCases().then(cases=>{
+  const host = document.getElementById('results');
+  cases.slice(0,15).forEach(c=>host.appendChild(hitCard(c)));
+});
+
+// Video embed
+if(CONFIG.VIDEO_EMBED){
+  document.getElementById('videobox').innerHTML =
+    '<iframe src="'+CONFIG.VIDEO_EMBED+'" allowfullscreen></iframe>';
+}
+
+// Episodes
+if(CONFIG.EPISODES.length){
+  const row = document.getElementById('epirow');
+  CONFIG.EPISODES.forEach(ep=>{
+    const a = document.createElement('a');
+    a.className = 'epi';
+    a.href = ep.url;
+    a.target = '_blank';
+    a.textContent = ep.title;
+    row.appendChild(a);
+  });
+}
 </script>
 </body>
 </html>
-<!-- deploy 1783041841 -->
