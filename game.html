@@ -1840,6 +1840,71 @@ main {
   font-style: italic;
 }
 
+/* Verdict nuance sliders */
+.verdict-nuance {
+  margin-top: 16px;
+}
+.nuance-comparison {
+  background: var(--bg-card);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 12px;
+  font-size: 11px;
+}
+.nuance-comparison-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.nuance-comparison-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+.nuance-comparison-row:last-child {
+  border-bottom: none;
+}
+.nuance-comparison-label {
+  color: var(--text-dim);
+  width: 100px;
+}
+.nuance-comparison-before, .nuance-comparison-after {
+  width: 60px;
+  text-align: center;
+}
+.nuance-comparison-shift {
+  width: 80px;
+  text-align: center;
+  font-weight: 600;
+}
+.nuance-comparison-shift.shifted-left {
+  color: var(--heaven);
+}
+.nuance-comparison-shift.shifted-right {
+  color: var(--hell);
+}
+.nuance-comparison-shift.no-shift {
+  color: var(--text-dim);
+}
+.nuance-shift-summary {
+  text-align: center;
+  font-size: 12px;
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  background: var(--bg-card);
+}
+.nuance-shift-summary.big-shift {
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid var(--purple);
+  color: var(--purple);
+}
+.nuance-shift-summary.no-shift {
+  color: var(--text-dim);
+}
+
 .search-status {
   margin-top: 12px;
   font-size: 12px;
@@ -2605,6 +2670,55 @@ main {
           </div>
 
           <div class="triple-progress" id="verdict-story-triple"></div>
+
+          <!-- POST-VERDICT NUANCE SLIDERS -->
+          <div class="nuance-sliders verdict-nuance" id="verdict-nuance-sliders">
+            <div class="nuance-header" onclick="toggleVerdictNuanceSliders()">
+              <span>🔄 Did your view change? Rate again (optional)</span>
+              <span class="nuance-toggle" id="verdict-nuance-toggle">▶</span>
+            </div>
+            <div class="nuance-content" id="verdict-nuance-content" style="display:none">
+              <div class="nuance-comparison" id="nuance-comparison">
+                <!-- Will show first impression vs now -->
+              </div>
+              <!-- Safety vs Surveillance -->
+              <div class="nuance-row">
+                <span class="nuance-left">🛡️ Safety</span>
+                <input type="range" class="nuance-slider" id="verdict-slider-safety-surveillance"
+                       min="0" max="100" value="50" oninput="updateVerdictNuance('safety_surveillance', this.value)">
+                <span class="nuance-right">👁️ Surveillance</span>
+              </div>
+              <!-- Privacy vs Brokering -->
+              <div class="nuance-row">
+                <span class="nuance-left">🔒 Privacy</span>
+                <input type="range" class="nuance-slider" id="verdict-slider-privacy-brokering"
+                       min="0" max="100" value="50" oninput="updateVerdictNuance('privacy_brokering', this.value)">
+                <span class="nuance-right">💰 Brokering</span>
+              </div>
+              <!-- Edge vs Megadatabase -->
+              <div class="nuance-row">
+                <span class="nuance-left">📱 Edge</span>
+                <input type="range" class="nuance-slider" id="verdict-slider-edge-mega"
+                       min="0" max="100" value="50" oninput="updateVerdictNuance('edge_mega', this.value)">
+                <span class="nuance-right">🏢 Megadatabase</span>
+              </div>
+              <!-- Autonomy vs HITL -->
+              <div class="nuance-row">
+                <span class="nuance-left">🤖 Autonomy</span>
+                <input type="range" class="nuance-slider" id="verdict-slider-autonomy-hitl"
+                       min="0" max="100" value="50" oninput="updateVerdictNuance('autonomy_hitl', this.value)">
+                <span class="nuance-right">👤 HITL</span>
+              </div>
+              <!-- Benefit vs Harm -->
+              <div class="nuance-row">
+                <span class="nuance-left">✅ Benefit</span>
+                <input type="range" class="nuance-slider" id="verdict-slider-benefit-harm"
+                       min="0" max="100" value="50" oninput="updateVerdictNuance('benefit_harm', this.value)">
+                <span class="nuance-right">❌ Harm</span>
+              </div>
+              <div class="nuance-shift-summary" id="nuance-shift-summary"></div>
+            </div>
+          </div>
         </div>
       </div>
       <button class="story-continue" onclick="continueFromVerdictStory()">
@@ -5690,6 +5804,181 @@ function getNuanceInterpretation() {
   return interpretations;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// VERDICT NUANCE SLIDERS - "Did your view change?"
+// ═══════════════════════════════════════════════════════════════
+
+// Store first impression for comparison
+let firstImpressionNuance = {};
+let verdictNuanceSliders = {};
+
+function toggleVerdictNuanceSliders() {
+  const content = document.getElementById('verdict-nuance-content');
+  const toggle = document.getElementById('verdict-nuance-toggle');
+
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    toggle.classList.add('open');
+    // Show comparison with first impression
+    showNuanceComparison();
+  } else {
+    content.style.display = 'none';
+    toggle.classList.remove('open');
+  }
+}
+
+function updateVerdictNuance(dimension, value) {
+  const val = parseInt(value);
+
+  if (val !== 50) {
+    verdictNuanceSliders[dimension] = val;
+  } else {
+    delete verdictNuanceSliders[dimension];
+  }
+
+  // Update shift summary
+  updateShiftSummary();
+}
+
+// Initialize verdict sliders with first impression values
+function initVerdictNuanceSliders() {
+  // Store first impression
+  firstImpressionNuance = { ...nuanceSliders };
+
+  // Reset verdict sliders to first impression or center
+  Object.keys(NUANCE_DIMENSIONS).forEach(dim => {
+    const slider = document.getElementById(`verdict-slider-${dim.replace('_', '-')}`);
+    if (slider) {
+      // Start at first impression value, or center if no first impression
+      const initialValue = firstImpressionNuance[dim] || 50;
+      slider.value = initialValue;
+      verdictNuanceSliders[dim] = initialValue !== 50 ? initialValue : undefined;
+    }
+  });
+
+  // Collapse by default
+  const content = document.getElementById('verdict-nuance-content');
+  const toggle = document.getElementById('verdict-nuance-toggle');
+  if (content) content.style.display = 'none';
+  if (toggle) toggle.classList.remove('open');
+}
+
+// Show comparison between first impression and current
+function showNuanceComparison() {
+  const container = document.getElementById('nuance-comparison');
+  if (!container) return;
+
+  // Only show if there were first impressions
+  const hasFirstImpressions = Object.keys(firstImpressionNuance).length > 0;
+
+  if (!hasFirstImpressions) {
+    container.innerHTML = '<div class="nuance-hint">You didn\'t rate this case before - rate now to record your informed opinion!</div>';
+    return;
+  }
+
+  let html = '<div class="nuance-comparison-title">Your First Impression vs Now</div>';
+
+  Object.entries(NUANCE_DIMENSIONS).forEach(([dim, config]) => {
+    const before = firstImpressionNuance[dim];
+    if (before === undefined) return; // Only show dimensions that were rated
+
+    const after = verdictNuanceSliders[dim] || 50;
+    const shift = after - before;
+
+    const shiftClass = shift < -10 ? 'shifted-left' : shift > 10 ? 'shifted-right' : 'no-shift';
+    const shiftText = shift < -10 ? `← ${Math.abs(shift)}` : shift > 10 ? `${shift} →` : '—';
+
+    const beforeLabel = before < 50 ? config.left : before > 50 ? config.right : 'Neutral';
+    const afterLabel = after < 50 ? config.left : after > 50 ? config.right : 'Neutral';
+
+    html += `
+      <div class="nuance-comparison-row">
+        <span class="nuance-comparison-label">${config.leftIcon} ${config.left}</span>
+        <span class="nuance-comparison-before">${beforeLabel}</span>
+        <span class="nuance-comparison-shift ${shiftClass}">${shiftText}</span>
+        <span class="nuance-comparison-after">${afterLabel}</span>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+// Calculate and display overall shift summary
+function updateShiftSummary() {
+  const container = document.getElementById('nuance-shift-summary');
+  if (!container) return;
+
+  let totalShift = 0;
+  let shiftCount = 0;
+
+  Object.keys(firstImpressionNuance).forEach(dim => {
+    const before = firstImpressionNuance[dim] || 50;
+    const after = verdictNuanceSliders[dim] || 50;
+    totalShift += Math.abs(after - before);
+    shiftCount++;
+  });
+
+  if (shiftCount === 0) {
+    container.innerHTML = '';
+    container.className = 'nuance-shift-summary';
+    return;
+  }
+
+  const avgShift = totalShift / shiftCount;
+
+  if (avgShift >= 20) {
+    container.innerHTML = '🔄 <strong>Significant shift!</strong> The story changed your perspective.';
+    container.className = 'nuance-shift-summary big-shift';
+  } else if (avgShift >= 10) {
+    container.innerHTML = '↔️ Your view shifted somewhat after seeing the full picture.';
+    container.className = 'nuance-shift-summary';
+  } else {
+    container.innerHTML = '✓ Your first impression held up.';
+    container.className = 'nuance-shift-summary no-shift';
+  }
+
+  // Also update the comparison display
+  showNuanceComparison();
+}
+
+// Save both first impression and verdict nuance data
+async function saveVerdictNuanceData() {
+  if (!currentArticle?.id) return;
+
+  const UPDATE_URL = `${SUPABASE_URL}/functions/v1/update-case`;
+
+  try {
+    // Calculate shift data
+    const shiftData = {};
+    Object.keys(NUANCE_DIMENSIONS).forEach(dim => {
+      const before = firstImpressionNuance[dim];
+      const after = verdictNuanceSliders[dim];
+      if (before !== undefined || after !== undefined) {
+        shiftData[dim] = {
+          first_impression: before || 50,
+          after_story: after || 50,
+          shift: (after || 50) - (before || 50)
+        };
+      }
+    });
+
+    if (Object.keys(shiftData).length > 0) {
+      await fetch(UPDATE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          case_id: currentArticle.id,
+          action: 'set_nuance_shift',
+          nuance_shift: shiftData
+        })
+      });
+    }
+  } catch (err) {
+    console.log('Failed to save verdict nuance data:', err);
+  }
+}
+
 // Generate case-specific placeholder art
 function generateCaseArt(article) {
   const artSvg = document.getElementById('case-art');
@@ -5945,6 +6234,9 @@ function showVerdictStoryScene() {
   // Generate verdict scene art
   generateSceneArt('verdict', currentArticle, { action: currentFaction === 'heaven' ? 'helps' : 'harms' });
 
+  // Initialize verdict nuance sliders (for "did your view change?")
+  initVerdictNuanceSliders();
+
   // Show the triple
   document.getElementById('verdict-story-triple').innerHTML = `
     <span class="picked">[${picks.who}]</span>
@@ -5959,6 +6251,10 @@ function showVerdictStoryScene() {
 
 function continueFromVerdictStory() {
   playSfx('confirm');
+
+  // Save the nuance shift data (first impression vs after story)
+  saveVerdictNuanceData();
+
   showNotesScreen();  // Continue to notes, then mint
 }
 
