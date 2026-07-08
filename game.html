@@ -1075,7 +1075,7 @@ main {
   width: 220px;
   height: 300px;
 }
-.scratch-overlay {
+.card-scratch-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -1089,7 +1089,7 @@ main {
   border-radius: 12px;
   overflow: hidden;
 }
-.scratch-overlay.revealed {
+.card-scratch-overlay.revealed {
   display: none;
 }
 #scratch-canvas {
@@ -6476,132 +6476,10 @@ function selectInlineVerdict(verdict) {
   // Set music mood
   if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('verdict');
 
-  // After a beat, show the scratch card reveal
+  // After a beat, go to the mint screen (which has the scratch card)
   setTimeout(() => {
-    showScratchCardReveal();
+    showMintScreen();
   }, 600);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// SCRATCH CARD LOTTERY REVEAL
-// ═══════════════════════════════════════════════════════════════
-function showScratchCardReveal() {
-  playSfx('mint');
-  if (window.chiptuneEngine) window.chiptuneEngine.setNarrativePhase('mint');
-
-  // Prepare the card underneath
-  const cardTitle = `${picks.who} ${picks.action} ${picks.whom}`.substring(0, 40);
-  const faction = selectedVerdict;
-  const atk = Math.floor(Math.random() * 8) + 3;
-  const def = Math.floor(Math.random() * 8) + 3;
-  const flavorTexts = faction === 'heaven' ? [
-    '"For the greater good... probably."',
-    '"What could possibly go wrong?"',
-    '"Innovation! Progress! Synergy!"',
-    '"This is fine." 🔥'
-  ] : [
-    '"The computer says no."',
-    '"Efficiency at any cost."',
-    '"Trust the algorithm."',
-    '"Your data is in good hands. Ours."'
-  ];
-
-  document.getElementById('scratch-card-title').textContent = cardTitle;
-  document.getElementById('scratch-card-art').textContent = faction === 'heaven' ? '😇' : '😈';
-  document.getElementById('scratch-card-faction').textContent = faction.toUpperCase();
-  document.getElementById('scratch-card-faction').style.color = faction === 'heaven' ? 'var(--good)' : 'var(--bad)';
-  document.getElementById('scratch-card-flavor').textContent = flavorTexts[Math.floor(Math.random() * flavorTexts.length)];
-  document.getElementById('scratch-card-atk').textContent = atk;
-  document.getElementById('scratch-card-def').textContent = def;
-
-  // Initialize scratch canvas
-  const canvas = document.getElementById('scratch-canvas');
-  const ctx = canvas.getContext('2d');
-
-  // Fill with scratch-off material
-  ctx.fillStyle = faction === 'heaven' ? '#3a7ca5' : '#8b0000';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Add sparkle pattern
-  ctx.fillStyle = 'rgba(255,255,255,0.1)';
-  for (let i = 0; i < 50; i++) {
-    ctx.beginPath();
-    ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 3, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Add text
-  ctx.fillStyle = 'rgba(255,255,255,0.8)';
-  ctx.font = 'bold 24px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText('SCRATCH TO', canvas.width/2, canvas.height/2 - 20);
-  ctx.fillText('REVEAL!', canvas.width/2, canvas.height/2 + 20);
-  ctx.font = '16px system-ui';
-  ctx.fillText('🎴 ✨ 🎴', canvas.width/2, canvas.height/2 + 60);
-
-  // Scratch mechanics
-  let isScratching = false;
-  let scratchedPixels = 0;
-  const totalPixels = canvas.width * canvas.height;
-
-  const scratch = (x, y) => {
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.beginPath();
-    ctx.arc(x, y, 25, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalCompositeOperation = 'source-over';
-
-    // Check scratch progress
-    scratchedPixels += 1960; // Approximate area scratched
-    if (scratchedPixels / totalPixels > 0.4) {
-      // Revealed enough - auto-complete
-      finishScratch();
-    }
-  };
-
-  canvas.onmousedown = (e) => { isScratching = true; scratch(e.offsetX, e.offsetY); };
-  canvas.onmousemove = (e) => { if (isScratching) scratch(e.offsetX, e.offsetY); };
-  canvas.onmouseup = () => { isScratching = false; };
-  canvas.onmouseleave = () => { isScratching = false; };
-
-  // Touch support
-  canvas.ontouchstart = (e) => { isScratching = true; const t = e.touches[0]; const r = canvas.getBoundingClientRect(); scratch(t.clientX - r.left, t.clientY - r.top); e.preventDefault(); };
-  canvas.ontouchmove = (e) => { if (isScratching) { const t = e.touches[0]; const r = canvas.getBoundingClientRect(); scratch(t.clientX - r.left, t.clientY - r.top); } e.preventDefault(); };
-  canvas.ontouchend = () => { isScratching = false; };
-
-  // Show overlay
-  document.getElementById('scratch-overlay').classList.add('active');
-}
-
-function skipScratch() {
-  finishScratch();
-}
-
-function finishScratch() {
-  // Hide canvas to reveal card
-  document.getElementById('scratch-canvas').style.opacity = '0';
-
-  // Play reveal sound
-  playSfx('complete');
-
-  // Update instructions and show continue button
-  document.getElementById('scratch-instructions').textContent = 'Card Revealed!';
-  document.getElementById('scratch-skip').style.display = 'none';
-  document.getElementById('scratch-continue').style.display = 'block';
-}
-
-function finishAndContinue() {
-  // Hide scratch overlay
-  document.getElementById('scratch-overlay').classList.remove('active');
-  document.getElementById('scratch-canvas').style.opacity = '1';
-
-  // Reset for next time
-  document.getElementById('scratch-instructions').textContent = 'Scratch to reveal your card!';
-  document.getElementById('scratch-skip').style.display = 'block';
-  document.getElementById('scratch-continue').style.display = 'none';
-
-  // Go to NOTES first (the gold!) then mint
-  showNotesScreen();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -7736,29 +7614,6 @@ function escAttr(str) {
   return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
 }
 </script>
-
-<!-- SCRATCH CARD LOTTERY REVEAL -->
-<div class="scratch-overlay" id="scratch-overlay">
-  <div class="scratch-container" id="scratch-container">
-    <div class="scratch-card-underneath" id="scratch-card-underneath">
-      <!-- Card revealed underneath -->
-      <div class="card-title" id="scratch-card-title">YOUR CARD</div>
-      <div class="card-art" id="scratch-card-art">🎴</div>
-      <div class="card-faction" id="scratch-card-faction">FACTION</div>
-      <div class="card-flavor" id="scratch-card-flavor">"Flavor text"</div>
-      <div class="card-stats">
-        <span class="atk">ATK: <span id="scratch-card-atk">5</span></span>
-        <span class="def">DEF: <span id="scratch-card-def">5</span></span>
-      </div>
-    </div>
-    <canvas class="scratch-canvas" id="scratch-canvas" width="280" height="380"></canvas>
-  </div>
-  <div class="scratch-instructions" id="scratch-instructions">Scratch to reveal your card!</div>
-  <div class="scratch-skip" id="scratch-skip" onclick="skipScratch()">or tap here to skip</div>
-  <button class="continue-btn" id="scratch-continue" onclick="finishAndContinue()" style="display:none;margin-top:20px;">
-    Add to Collection
-  </button>
-</div>
 
 </body>
 </html>
