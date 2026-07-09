@@ -1,1028 +1,915 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>USE CASE ARMS RACE</title>
 <style>
-:root{--ink:#0E0E0E;--bone:#EDE6D6;--crayon:#C1121F;--pencil:#7a7263;--gold:#c9a84c;
-  --gi:#6b7d5a;--gary:#4a7d9c;--supes:#c9a84c}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--ink);color:var(--bone);
-  font:16px/1.5 -apple-system,'Helvetica Neue',Arial,sans-serif;
-  padding-top:env(safe-area-inset-top)}
-header{padding:14px 18px;border-bottom:2px solid var(--bone);
-  display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
-h1{margin:0;font-size:17px;letter-spacing:3px;text-transform:uppercase;cursor:pointer}
-.tagline{color:var(--pencil);font-size:12px}
-main{max-width:720px;margin:0 auto;padding:16px 14px 60px}
-.screen{display:none}.screen.on{display:block;animation:snap .12s steps(2)}
-@keyframes snap{from{opacity:0}to{opacity:1}}
-button.go{width:100%;margin-top:12px;background:var(--bone);color:var(--ink);
-  border:none;padding:15px;font:700 15px/1 inherit;letter-spacing:2px;
-  text-transform:uppercase;cursor:pointer}
-button.ghost{width:100%;margin-top:8px;background:var(--ink);color:var(--bone);
-  border:2px solid var(--bone);padding:12px;font:700 13px/1 inherit;
-  letter-spacing:2px;text-transform:uppercase;cursor:pointer}
-.badge{display:inline-block;border:1px solid var(--bone);padding:1px 7px;
-  font-size:11px;letter-spacing:1px;margin-right:6px}
-.badge.hell{border-color:var(--crayon);color:var(--crayon)}
-.badge.heaven{border-color:var(--gold);color:var(--gold)}
-.stamp{color:var(--crayon);font-weight:800;text-transform:uppercase;
-  letter-spacing:1px;transform:rotate(-2deg);display:inline-block}
-/* HOME */
-.videobox{border:2px solid var(--bone);aspect-ratio:16/9;margin:0 0 12px;
-  display:flex;align-items:center;justify-content:center;color:var(--pencil);
-  font-size:13px;letter-spacing:2px;text-transform:uppercase;overflow:hidden}
-.videobox iframe{width:100%;height:100%;border:0}
-.epirow{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px}
-.epi{flex:0 0 auto;border:1px solid var(--pencil);padding:8px 12px;font-size:12px;
-  letter-spacing:1px;text-transform:uppercase;color:var(--bone);cursor:pointer;
-  white-space:nowrap;text-decoration:none}
-.searchwrap{position:relative;margin:6px 0 4px}
-#q{width:100%;background:var(--ink);color:var(--bone);border:2px solid var(--bone);
-  padding:15px 14px;font:inherit}
-#qhint{color:var(--pencil);font-size:11px;letter-spacing:1px;margin:6px 2px 12px}
-.hit{border:2px solid var(--bone);padding:14px;margin:12px 0;cursor:pointer}
-.hit h3{margin:0 0 6px;font-size:16px;text-transform:uppercase;letter-spacing:.5px}
-.hit .sum{font-size:14px;color:var(--bone);margin:6px 0}
-.hit .qt{font-family:Georgia,serif;font-style:italic;font-size:13px;color:var(--pencil);
-  border-left:3px solid var(--crayon);padding-left:8px;margin:8px 0 4px}
-.hit .meta{font-size:11px;color:var(--pencil);letter-spacing:1px}
-.votebar{height:7px;background:var(--crayon);margin-top:8px;position:relative}
-.votebar i{position:absolute;left:0;top:0;bottom:0;background:var(--gold)}
-.quickvote{display:flex;gap:8px;margin-top:10px}
-.qv{background:none;border:2px solid;padding:6px 16px;font-size:18px;cursor:pointer;flex:1}
-.qv.heaven{border-color:var(--gold);color:var(--gold)}
-.qv.hell{border-color:var(--crayon);color:var(--crayon)}
-.qv:hover{opacity:0.7}
-.qv:disabled{opacity:0.4;cursor:default}
-.divider{color:var(--pencil);font-size:11px;letter-spacing:3px;text-transform:uppercase;
-  border-bottom:1px dashed var(--pencil);padding-bottom:4px;margin:18px 0 6px}
-.webhit{border:1px dashed var(--pencil);padding:12px;margin:10px 0}
-.webhit .meta{font-size:11px;color:var(--pencil)}
-/* PLAY SCREENS */
-.art{border:2px solid var(--bone);margin:0 0 12px;line-height:0}
-.art svg{width:100%;height:auto;display:block}
-.prompt{font-size:18px;text-transform:uppercase;letter-spacing:1px;margin:14px 0 10px}
-.carry{font-family:Georgia,serif;font-size:16px;margin:10px 0;color:var(--bone)}
-.bubble{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;
-  border:1px solid var(--pencil);padding:10px;margin:10px 0}
-.bubble .who{font:800 11px/1.2 inherit;letter-spacing:1px;padding:6px;border:2px solid;
-  text-transform:uppercase;align-self:start}
-.bubble.gi .who{color:var(--gi);border-color:var(--gi)}
-.bubble.gary .who{color:var(--gary);border-color:var(--gary)}
-.bubble.supes .who{color:var(--supes);border-color:var(--supes)}
-.bubble p{margin:0;font-size:14px}
-.choice{display:block;width:100%;text-align:left;background:var(--ink);
-  color:var(--bone);border:2px solid var(--bone);padding:14px;margin:8px 0;
-  font:inherit;cursor:pointer}
-.choice:hover{background:var(--bone);color:var(--ink)}
-.free{border-style:dashed;color:var(--pencil)}
-.dots{letter-spacing:8px;color:var(--pencil);font-size:12px;margin-bottom:8px}
-.dots b{color:var(--crayon)}
-.summary{font-size:15px;margin:8px 0}
-.quote{font-family:Georgia,serif;font-style:italic;border-left:3px solid var(--crayon);
-  padding-left:10px;margin:12px 0;font-size:15px}
-.quote small{display:block;font-style:normal;color:var(--pencil);font-size:11px;
-  letter-spacing:1px;margin-top:4px}
-.verdicts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-.verdicts button{padding:20px 8px;font:800 16px/1.3 inherit;letter-spacing:1px;
-  cursor:pointer;border:3px solid;background:var(--ink)}
-#vheaven{color:var(--gold);border-color:var(--gold)}
-#vhell{color:var(--crayon);border-color:var(--crayon)}
-#vheaven:hover{background:var(--gold);color:var(--ink)}
-#vhell:hover{background:var(--crayon);color:var(--ink)}
-details.program{border:1px dashed var(--pencil);padding:10px;margin:12px 0;
-  font-size:13px;color:var(--pencil)}
-details.program table{width:100%;border-collapse:collapse;margin-top:6px}
-details.program td{border:1px solid var(--pencil);padding:5px;vertical-align:top}
-.nuancebox{border:1px dashed var(--pencil);padding:10px 12px;margin:12px 0}
-.nlabel{font-size:11px;letter-spacing:2px;color:var(--pencil);margin-bottom:6px}
-.nrow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;
-  font-size:10px;color:var(--pencil);margin:4px 0;text-transform:uppercase;letter-spacing:1px}
-input[type=range]{width:100%}
-/* FILE SCREEN */
-textarea{width:100%;background:var(--ink);color:var(--bone);
-  border:2px solid var(--bone);padding:12px;font:inherit;min-height:100px}
-.chips{margin:8px 0}
-.chip{display:inline-block;border:1px solid var(--pencil);color:var(--pencil);
-  padding:6px 10px;margin:3px;cursor:pointer;font-size:12px;letter-spacing:1px}
-.chip:hover{border-color:var(--bone);color:var(--bone)}
-.rewardline{color:var(--pencil);font-size:13px;margin-top:6px}
-/* CARD */
-.cardwrap{position:relative;margin:12px 0}
-.cardwrap svg{width:100%;height:auto;display:block;border:2px solid var(--bone)}
-#scratch{position:absolute;inset:0;touch-action:none;cursor:crosshair}
-.shiftline{color:var(--gold);font-size:12px;margin-top:6px}
-/* MINIGAME INLINE */
-.mg{border:2px dashed var(--crayon);padding:14px;margin:14px 0}
-.mg .mlabel{font-size:11px;letter-spacing:2px;color:var(--crayon);
-  text-transform:uppercase;margin-bottom:8px}
-.mg input[type=text]{width:100%;background:var(--ink);color:var(--bone);
-  border:1px solid var(--pencil);padding:8px;font:inherit;margin:4px 0}
-.wordcard{font-size:20px;text-align:center;padding:18px;border:2px solid var(--bone);
-  margin:8px 0;letter-spacing:1px;text-transform:uppercase}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.pair button{padding:12px;font:700 13px/1 inherit;cursor:pointer;
-  background:var(--ink);color:var(--bone);border:2px solid var(--bone)}
-.bucket{border:2px dashed var(--pencil);padding:8px;min-height:44px;margin:6px 0;font-size:12px}
-.mchip{display:inline-block;border:1px solid var(--bone);padding:5px 9px;margin:3px;
-  cursor:pointer;font-size:12px}
-.mchip.sel{background:var(--bone);color:var(--ink)}
-footer{color:var(--pencil);font-size:11px;text-align:center;padding:16px;
-  border-top:1px solid var(--pencil);margin-top:24px}
-small.demo{color:var(--crayon)}
+/* ========== THEME SYSTEM ========== */
+:root {
+  --cream:#F5F0E6;--marker:#1A1817;--stamp:#C1121F;--pencil:#6B6560;
+  --brain-bg:#0D0A0F;--brain-fg:#E8E0E4;--spotlight:#D4A84C;--shadow:#4A3045;
+  --bg:var(--cream);--fg:var(--marker);--accent:var(--stamp);--muted:var(--pencil);
+  --good:#2D8B4A;--good-glow:#4ADE80;--evil:#C1121F;--evil-glow:#FF4444;--neutral:#6B6560;
+  --card-bg:#0a0a0c;
+}
+[data-theme="dark"] {
+  --bg:var(--brain-bg);--fg:var(--brain-fg);--accent:var(--spotlight);--muted:var(--shadow);
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html,body {
+  background:var(--bg);color:var(--fg);
+  font:16px/1.5 'SF Pro Text',-apple-system,'Helvetica Neue',sans-serif;
+  min-height:100vh;transition:background .25s,color .25s;
+}
+
+/* ========== HEADER ========== */
+header {
+  padding:14px 18px;border-bottom:2px solid var(--fg);
+  display:flex;justify-content:space-between;align-items:center;
+}
+h1 { font-size:14px;font-weight:800;letter-spacing:4px;text-transform:uppercase;cursor:pointer; }
+.theme-toggle {
+  background:none;border:1px solid var(--muted);color:var(--fg);
+  padding:6px 10px;font-size:16px;cursor:pointer;border-radius:4px;
+}
+
+/* ========== SCREENS ========== */
+main { max-width:480px;margin:0 auto;padding:16px; }
+.screen { display:none; }
+.screen.active { display:block;animation:fadeIn .25s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ========== CASEBOOK ========== */
+.search-box {
+  width:100%;padding:14px 16px;font:inherit;font-size:14px;
+  background:var(--bg);color:var(--fg);
+  border:2px solid var(--fg);margin-bottom:20px;
+}
+.search-box::placeholder { color:var(--muted); }
+
+.case-list { display:flex;flex-direction:column;gap:16px; }
+
+.case-card {
+  border:2px solid var(--fg);padding:0;cursor:pointer;
+  background:var(--bg);transition:all .15s;position:relative;
+  overflow:hidden;
+}
+.case-card::before {
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:var(--accent);opacity:0;transition:opacity .15s;
+}
+.case-card:hover { transform:translateX(4px); }
+.case-card:hover::before { opacity:1; }
+.case-card.evil-tint::before { background:var(--evil); }
+.case-card.good-tint::before { background:var(--good); }
+
+.case-card-inner { padding:16px 16px 16px 20px; }
+.case-card h3 {
+  font-size:13px;font-weight:800;text-transform:uppercase;
+  letter-spacing:1.5px;margin-bottom:10px;line-height:1.4;
+}
+.case-card .quote {
+  font-size:13px;color:var(--muted);font-style:italic;
+  border-left:3px solid var(--accent);padding-left:12px;margin-bottom:12px;
+  line-height:1.5;
+}
+.case-card .stats-row {
+  display:flex;gap:16px;font-size:10px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;color:var(--muted);
+}
+.case-card .stat { display:flex;align-items:center;gap:4px; }
+.case-card .stat-val { color:var(--fg); }
+
+/* ========== TRIPLE PANELS ========== */
+.progress-bar {
+  display:flex;gap:8px;margin-bottom:20px;
+}
+.progress-step {
+  flex:1;height:4px;background:var(--muted);opacity:0.3;
+  border-radius:2px;transition:all .3s;
+}
+.progress-step.active { background:var(--accent);opacity:1; }
+.progress-step.done { background:var(--fg);opacity:0.6; }
+
+.panel-label {
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:6px;
+}
+.panel-title {
+  font-size:20px;font-weight:800;letter-spacing:2px;
+  text-transform:uppercase;color:var(--accent);margin-bottom:16px;
+}
+
+.story-segment {
+  font-size:15px;line-height:1.7;margin-bottom:20px;
+  padding:20px;background:var(--fg);color:var(--bg);
+  border-left:4px solid var(--accent);position:relative;
+}
+.story-segment::before {
+  content:'"';position:absolute;top:10px;left:12px;
+  font-size:40px;opacity:0.15;font-family:Georgia,serif;
+}
+
+.choices { display:flex;flex-direction:column;gap:10px;margin-bottom:20px; }
+.choice-btn {
+  padding:16px 20px;font:inherit;font-size:14px;font-weight:500;
+  background:var(--bg);color:var(--fg);
+  border:2px solid var(--fg);cursor:pointer;
+  text-align:left;transition:all .15s;
+  position:relative;overflow:hidden;
+}
+.choice-btn::before {
+  content:'';position:absolute;left:0;top:0;bottom:0;width:0;
+  background:var(--accent);transition:width .15s;
+}
+.choice-btn:hover { padding-left:28px; }
+.choice-btn:hover::before { width:8px; }
+.choice-btn.selected {
+  background:var(--accent);color:var(--bg);
+  border-color:var(--accent);padding-left:20px;
+}
+.choice-btn.selected::before { width:0; }
+
+.source-link {
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;color:var(--accent);text-decoration:none;
+  letter-spacing:1px;text-transform:uppercase;font-weight:600;
+}
+.source-link:hover { text-decoration:underline; }
+
+.next-btn {
+  width:100%;padding:18px;margin-top:20px;
+  font:inherit;font-size:13px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;
+  background:var(--fg);color:var(--bg);
+  border:none;cursor:pointer;transition:all .15s;
+}
+.next-btn:hover { transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+.next-btn:disabled { opacity:0.3;cursor:not-allowed;transform:none;box-shadow:none; }
+
+/* ========== NOTES SECTION ========== */
+.notes-section {
+  margin-top:24px;padding-top:20px;border-top:1px dashed var(--muted);
+}
+.notes-label {
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.notes-label span { color:var(--accent);font-weight:700; }
+.notes-input {
+  width:100%;padding:14px;font:inherit;font-size:14px;
+  background:var(--bg);color:var(--fg);
+  border:1px solid var(--muted);min-height:80px;
+  resize:vertical;transition:border-color .15s;
+}
+.notes-input:focus { border-color:var(--fg);outline:none; }
+
+/* ========== DOOM CLOCK ========== */
+.doom-overlay {
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at center, rgba(20,10,15,0.95) 0%, rgba(0,0,0,0.98) 100%);
+  display:none;align-items:center;justify-content:center;
+  z-index:100;
+}
+.doom-overlay.active { display:flex; }
+
+.doom-machine {
+  text-align:center;max-width:380px;width:90%;
+}
+.doom-title {
+  font-size:11px;letter-spacing:6px;text-transform:uppercase;
+  color:var(--evil);margin-bottom:8px;
+  text-shadow:0 0 20px var(--evil-glow);
+}
+.doom-subtitle {
+  font-size:24px;font-weight:800;letter-spacing:4px;
+  color:#EDE6D6;margin-bottom:32px;
+  text-shadow:0 2px 20px rgba(0,0,0,0.5);
+}
+
+.doom-slots {
+  display:flex;gap:12px;justify-content:center;margin-bottom:32px;
+  perspective:500px;
+}
+.doom-slot {
+  width:110px;height:70px;
+  background:linear-gradient(180deg, #1a1a1e 0%, #0a0a0c 100%);
+  border:3px solid #333;
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;letter-spacing:1px;
+  text-transform:uppercase;color:#666;
+  box-shadow:inset 0 2px 10px rgba(0,0,0,0.5), 0 4px 20px rgba(0,0,0,0.3);
+  overflow:hidden;position:relative;
+}
+.doom-slot::before {
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 50%);
+  pointer-events:none;
+}
+.doom-slot.spinning {
+  animation:slotGlow 0.3s ease infinite alternate;
+}
+.doom-slot.spinning .slot-text {
+  animation:slotSpin .08s linear infinite;
+}
+@keyframes slotGlow {
+  from { border-color:#333; }
+  to { border-color:#555; }
+}
+@keyframes slotSpin {
+  0% { transform:translateY(-120%);opacity:0.5; }
+  50% { opacity:1; }
+  100% { transform:translateY(120%);opacity:0.5; }
+}
+.doom-slot.landed {
+  border-color:var(--spotlight);
+  box-shadow:inset 0 2px 10px rgba(0,0,0,0.5), 0 0 30px rgba(212,168,76,0.3);
+}
+.doom-slot.landed .slot-text {
+  color:var(--spotlight);animation:none;
+  text-shadow:0 0 10px var(--spotlight);
+}
+
+.doom-status {
+  font-size:12px;letter-spacing:3px;text-transform:uppercase;
+  color:#666;margin-bottom:24px;
+  min-height:20px;
+}
+.doom-close {
+  padding:14px 32px;font:inherit;font-size:11px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;
+  background:transparent;color:#666;
+  border:1px solid #444;cursor:pointer;
+  border-radius:4px;transition:all .15s;
+}
+.doom-close:hover { border-color:#888;color:#aaa; }
+
+/* ========== CARD ========== */
+.card-overlay {
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at center, rgba(10,10,12,0.95) 0%, rgba(0,0,0,0.98) 100%);
+  display:none;align-items:center;justify-content:center;
+  z-index:200;padding:20px;overflow-y:auto;
+}
+.card-overlay.active { display:flex; }
+
+.card-container { text-align:center; }
+
+.card {
+  width:300px;max-width:100%;
+  background:var(--card-bg);
+  border-radius:12px;
+  overflow:hidden;position:relative;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5), 0 0 1px rgba(255,255,255,0.1);
+}
+.card::before {
+  content:'';position:absolute;inset:0;
+  border-radius:12px;padding:3px;
+  background:linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(255,255,255,0.1) 100%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;
+}
+
+.card.good { --card-color:var(--good);--card-glow:var(--good-glow); }
+.card.evil { --card-color:var(--evil);--card-glow:var(--evil-glow); }
+.card.neutral { --card-color:var(--neutral);--card-glow:#999; }
+
+.card-art {
+  height:160px;
+  background:linear-gradient(180deg, #151518 0%, #0a0a0c 100%);
+  position:relative;overflow:hidden;
+}
+.card-art svg { width:100%;height:100%; }
+.card-art::after {
+  content:'';position:absolute;bottom:0;left:0;right:0;height:40px;
+  background:linear-gradient(transparent, var(--card-bg));
+}
+
+.card-header {
+  padding:16px 16px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.card-title {
+  font-size:12px;font-weight:800;letter-spacing:2px;
+  text-transform:uppercase;color:#EDE6D6;
+  margin-bottom:8px;line-height:1.4;
+}
+.card-quote {
+  font-size:11px;font-style:italic;
+  color:#777;line-height:1.5;
+}
+
+.card-ability {
+  margin:12px 16px;padding:12px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px;
+  position:relative;
+}
+.card-ability-icon {
+  position:absolute;top:-8px;left:12px;
+  background:var(--card-bg);padding:0 6px;
+  font-size:12px;
+}
+.card-ability-name {
+  font-size:10px;font-weight:800;letter-spacing:2px;
+  text-transform:uppercase;color:var(--card-color, #EDE6D6);
+  margin-bottom:6px;
+}
+.card-ability-text {
+  font-size:11px;color:#999;line-height:1.5;
+}
+
+.card-footer {
+  padding:12px 16px 16px;
+  display:flex;justify-content:space-between;align-items:flex-end;
+}
+.card-stats { display:flex;gap:16px; }
+.card-stat {
+  text-align:center;
+}
+.card-stat-label {
+  font-size:8px;letter-spacing:1px;color:#555;
+  text-transform:uppercase;margin-bottom:2px;
+}
+.card-stat-val {
+  font-size:18px;font-weight:800;color:var(--card-color, #EDE6D6);
+  text-shadow:0 0 20px var(--card-glow, transparent);
+}
+
+.card-qr {
+  width:44px;height:44px;
+  background:#fff;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.card-qr svg { width:36px;height:36px; }
+
+.card-rarity {
+  position:absolute;top:12px;right:12px;
+  font-size:8px;font-weight:800;letter-spacing:2px;
+  text-transform:uppercase;color:var(--card-color);
+  background:rgba(0,0,0,0.6);padding:4px 8px;
+  border-radius:4px;
+}
+
+/* ========== SCRATCHER ========== */
+.scratcher {
+  position:absolute;
+  background:linear-gradient(135deg, #2a2a2e 0%, #1a1a1e 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;letter-spacing:2px;
+  color:#555;text-transform:uppercase;
+  cursor:crosshair;transition:opacity .3s;
+  border-radius:6px;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,0.3);
+}
+.scratcher::before {
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,0.02) 2px,
+    rgba(255,255,255,0.02) 4px
+  );
+  border-radius:6px;
+}
+.scratcher:hover { background:linear-gradient(135deg, #333338 0%, #222226 100%); }
+.scratcher.revealed { opacity:0;pointer-events:none; }
+
+.card-close {
+  width:300px;max-width:100%;
+  padding:16px;margin-top:20px;
+  font:inherit;font-size:11px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;
+  background:var(--card-color, #333);color:#0a0a0a;
+  border:none;cursor:pointer;border-radius:6px;
+  transition:all .15s;
+}
+.card-close:hover { transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,0.3); }
+
+/* ========== FILE PROMPT ========== */
+.file-prompt {
+  border:2px dashed var(--muted);padding:24px;
+  text-align:center;margin-top:20px;border-radius:8px;
+}
+.file-prompt p { font-size:13px;color:var(--muted);margin-bottom:16px; }
+.file-btn {
+  padding:14px 28px;font:inherit;font-size:12px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  background:var(--fg);color:var(--bg);
+  border:none;cursor:pointer;transition:all .15s;
+}
+.file-btn:hover { transform:translateY(-2px); }
+
+/* ========== TOAST ========== */
+.toast {
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--fg);color:var(--bg);
+  padding:14px 24px;font-size:13px;letter-spacing:1px;font-weight:500;
+  z-index:300;border-radius:6px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.3);
+  opacity:0;transition:all .3s ease;
+}
+.toast.active { transform:translateX(-50%) translateY(0);opacity:1; }
+
+/* ========== FOIL EFFECT ========== */
+@keyframes foilShimmer {
+  0% { background-position:200% center; }
+  100% { background-position:-200% center; }
+}
+.card.rare::after {
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(
+    120deg,
+    transparent 20%,
+    rgba(255,255,255,0.1) 40%,
+    rgba(255,255,255,0.2) 50%,
+    rgba(255,255,255,0.1) 60%,
+    transparent 80%
+  );
+  background-size:200% 100%;
+  animation:foilShimmer 3s ease infinite;
+  pointer-events:none;border-radius:12px;
+}
 </style>
 </head>
 <body>
+
 <header>
-  <div><h1 onclick="goHome()">Use Case Arms Race</h1>
-  <div class="tagline">Document AI before it documents you. <small class="demo" id="demoflag"></small></div></div>
+  <h1 onclick="goHome()">Use Case Arms Race</h1>
+  <button class="theme-toggle" onclick="toggleTheme()">☀️</button>
 </header>
+
 <main>
+  <!-- CASEBOOK -->
+  <section id="casebook" class="screen active">
+    <input type="text" class="search-box" id="search"
+           placeholder="Search cases or paste a news URL..."
+           oninput="handleSearch(this.value)">
+    <div class="case-list" id="caseList"></div>
+    <div id="filePrompt" class="file-prompt" style="display:none">
+      <p>📰 This looks like a news story</p>
+      <button class="file-btn" onclick="fileCase()">Put it in the mail →</button>
+    </div>
+  </section>
 
-<!-- ================= HOME ================= -->
-<section id="home" class="screen on">
-  <div class="videobox" id="videobox">DAILY EPISODE</div>
-  <div class="epirow" id="epirow"></div>
-  <div class="searchwrap">
-    <input id="q" placeholder="Search the casefile, or paste a URL to file a new case"
-      autocomplete="off">
-  </div>
-  <div id="qhint">Try: hospital AI · police surveillance · algorithm denies benefits</div>
-  <div id="results"></div>
-</section>
+  <!-- WHO Panel -->
+  <section id="panel-who" class="screen">
+    <div class="progress-bar">
+      <div class="progress-step active"></div>
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+    </div>
+    <div class="panel-label">The Record</div>
+    <div class="panel-title">Who</div>
+    <div class="story-segment" id="story-who"></div>
+    <div class="choices" id="choices-who"></div>
+    <a href="#" class="source-link" id="source-link" target="_blank">↗ Read the source</a>
+    <button class="next-btn" id="next-who" onclick="nextPanel('what')" disabled>Continue →</button>
+  </section>
 
-<!-- ============ 1. CASE FILE ============ -->
-<section id="s-case" class="screen">
-  <div class="dots"><b>&#9679;</b> &#9675; &#9675; &#9675; &#9675; &#9675;</div>
-  <div class="art" id="a-case"></div>
-  <div><span class="badge" id="c-src"></span><span class="badge" id="c-impact"></span>
-    <span class="badge" id="c-faction"></span></div>
-  <h2 class="prompt" id="c-title"></h2>
-  <p class="summary" id="c-summary"></p>
-  <div class="quote" id="c-quote" style="display:none"></div>
-  <p class="meta"><a id="c-link" target="_blank" style="color:var(--bone)">Primary source &rarr;</a></p>
-  <details class="program"><summary>De-escalation note (stakes staged, facts intact)</summary>
-    <table id="c-deesc"></table></details>
-  <div class="nuancebox">
-    <div class="nlabel">FIRST IMPRESSIONS (optional)</div>
-    <div class="nrow"><span>Safety</span><input type="range" id="nb0" min="0" max="100" value="50"><span>Surveillance</span></div>
-    <div class="nrow"><span>Privacy</span><input type="range" id="nb1" min="0" max="100" value="50"><span>Data brokering</span></div>
-    <div class="nrow"><span>Benefit</span><input type="range" id="nb2" min="0" max="100" value="50"><span>Harm</span></div>
-  </div>
-  <button class="go" onclick="show('s-who')">Open the case &rarr;</button>
-</section>
+  <!-- WHAT Panel -->
+  <section id="panel-what" class="screen">
+    <div class="progress-bar">
+      <div class="progress-step done"></div>
+      <div class="progress-step active"></div>
+      <div class="progress-step"></div>
+    </div>
+    <div class="panel-label">The Record</div>
+    <div class="panel-title">Does What</div>
+    <div class="story-segment" id="story-what"></div>
+    <div class="choices" id="choices-what"></div>
+    <button class="next-btn" id="next-what" onclick="nextPanel('whom')" disabled>Continue →</button>
+  </section>
 
-<!-- ============ 2. WHO ============ -->
-<section id="s-who" class="screen">
-  <div class="dots">&#9679; <b>&#9679;</b> &#9675; &#9675; &#9675; &#9675;</div>
-  <div class="art" id="a-who"></div>
-  <div class="bubble gi"><span class="who">GI</span><p id="b-gi"></p></div>
-  <div class="prompt">Who is the primary actor?</div>
-  <div id="ch-who"></div>
-</section>
-
-<!-- ============ 3. ACTION ============ -->
-<section id="s-action" class="screen">
-  <div class="dots">&#9679; &#9679; <b>&#9679;</b> &#9675; &#9675; &#9675;</div>
-  <div class="art" id="a-action"></div>
-  <p class="carry" id="carry-who"></p>
-  <div class="bubble gary"><span class="who">Gary</span><p id="b-gary"></p></div>
-  <div class="prompt" id="p-action"></div>
-  <div id="ch-action"></div>
-</section>
-
-<!-- ============ 4. WHOM ============ -->
-<section id="s-whom" class="screen">
-  <div class="dots">&#9679; &#9679; &#9679; <b>&#9679;</b> &#9675; &#9675;</div>
-  <div class="art" id="a-whom"></div>
-  <p class="carry" id="carry-action"></p>
-  <div class="bubble supes"><span class="who">Supes</span><p id="b-supes"></p></div>
-  <div class="prompt" id="p-whom"></div>
-  <div id="ch-whom"></div>
-</section>
-
-<!-- ============ 5. VERDICT ============ -->
-<section id="s-verdict" class="screen">
-  <div class="dots">&#9679; &#9679; &#9679; &#9679; <b>&#9679;</b> &#9675;</div>
-  <div class="art" id="a-verdict"></div>
-  <p class="carry" id="carry-whom"></p>
-  <h2 class="prompt" id="v-triple" style="border:2px solid var(--bone);padding:12px"></h2>
-  <div class="prompt">Your verdict. Nobody votes for you.</div>
-  <div class="verdicts">
-    <button id="vheaven" onclick="verdict('heaven')">&#128519; HEAVEN</button>
-    <button id="vhell" onclick="verdict('hell')">&#128520; HELL</button>
-  </div>
-</section>
-
-<!-- ============ 6. FILE (combined ending + notes) ============ -->
-<section id="s-file" class="screen">
-  <div class="dots">&#9679; &#9679; &#9679; &#9679; &#9679; <b>&#9679;</b></div>
-  <div class="art" id="a-ending"></div>
-  <p class="carry" id="ending-text"></p>
-  <h2 class="prompt">Case notes</h2>
-  <div class="chips" id="tagchips"></div>
-  <textarea id="notes" oninput="noteMeter()" placeholder="What did you notice? Tap tags above or write your own."></textarea>
-  <div class="rewardline" id="notemeter">Optional. 10+ characters starts earning.</div>
-  <div class="nuancebox">
-    <div class="nlabel">SECOND READ</div>
-    <div class="nrow"><span>Safety</span><input type="range" id="na0" min="0" max="100" value="50"><span>Surveillance</span></div>
-    <div class="nrow"><span>Privacy</span><input type="range" id="na1" min="0" max="100" value="50"><span>Data brokering</span></div>
-    <div class="nrow"><span>Benefit</span><input type="range" id="na2" min="0" max="100" value="50"><span>Harm</span></div>
-  </div>
-  <button class="go" onclick="mint()">Mint the card &rarr;</button>
-</section>
-
-<!-- ============ 7. CARD ============ -->
-<section id="s-card" class="screen">
-  <div><span class="stamp">Case closed</span></div>
-  <div class="cardwrap" id="cardwrap">
-    <div id="cardsvg"></div>
-    <canvas id="scratch"></canvas>
-  </div>
-  <div class="rewardline" id="m-rewards"></div>
-  <div class="rewardline" id="m-collective"></div>
-  <div class="shiftline" id="m-shift"></div>
-  <div id="mg-after"></div>
-  <button class="go" onclick="goHome()">Return to the casefile &rarr;</button>
-  <button class="ghost" onclick="startNext()">Open another case</button>
-</section>
-
+  <!-- WHOM Panel -->
+  <section id="panel-whom" class="screen">
+    <div class="progress-bar">
+      <div class="progress-step done"></div>
+      <div class="progress-step done"></div>
+      <div class="progress-step active"></div>
+    </div>
+    <div class="panel-label">The Record</div>
+    <div class="panel-title">To Whom</div>
+    <div class="story-segment" id="story-whom"></div>
+    <div class="choices" id="choices-whom"></div>
+    <div class="notes-section">
+      <div class="notes-label">Mad Lib <span>vs</span> Mad Conservative</div>
+      <textarea class="notes-input" id="notes" placeholder="Your thoughts..."></textarea>
+    </div>
+    <button class="next-btn" id="next-whom" onclick="closeCaseAndSpin()" disabled>Case Closed →</button>
+  </section>
 </main>
-<footer>Faction is decided by human votes only. The registry takes no position.<br>
-De-escalation stages the stakes, never the facts.</footer>
+
+<!-- DOOM CLOCK -->
+<div class="doom-overlay" id="doomOverlay">
+  <div class="doom-machine">
+    <div class="doom-title">⚠ Warning</div>
+    <div class="doom-subtitle">DOOM CLOCK</div>
+    <div class="doom-slots">
+      <div class="doom-slot" id="slot-who"><span class="slot-text">WHO</span></div>
+      <div class="doom-slot" id="slot-what"><span class="slot-text">WHAT</span></div>
+      <div class="doom-slot" id="slot-whom"><span class="slot-text">WHOM</span></div>
+    </div>
+    <div class="doom-status" id="doomStatus">Calculating timeline...</div>
+    <button class="doom-close" onclick="closeDoom()">I've seen enough</button>
+  </div>
+</div>
+
+<!-- CARD -->
+<div class="card-overlay" id="cardOverlay">
+  <div class="card-container">
+    <div class="card" id="card">
+      <div class="card-rarity" id="cardRarity">COMMON</div>
+      <div class="card-art" id="cardArt"></div>
+      <div class="card-header">
+        <div class="card-title" id="cardTitle">CASE TITLE</div>
+        <div class="card-quote" id="cardQuote">"Quote"</div>
+      </div>
+      <div class="card-ability">
+        <span class="card-ability-icon">⚡</span>
+        <div class="card-ability-name" id="abilityName">ABILITY</div>
+        <div class="card-ability-text" id="abilityText">Description</div>
+      </div>
+      <div class="card-footer">
+        <div class="card-stats">
+          <div class="card-stat">
+            <div class="card-stat-label">ATK</div>
+            <div class="card-stat-val" id="statAtk">0</div>
+          </div>
+          <div class="card-stat">
+            <div class="card-stat-label">DEF</div>
+            <div class="card-stat-val" id="statDef">0</div>
+          </div>
+          <div class="card-stat">
+            <div class="card-stat-label">EVL</div>
+            <div class="card-stat-val" id="statEvl">0</div>
+          </div>
+        </div>
+        <div class="card-qr" id="cardQr"></div>
+      </div>
+    </div>
+    <button class="card-close" onclick="closeCard()">Back to Casebook</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-/* ================= CONFIG ================= */
-const CONFIG = {
-  SUPABASE_URL: "https://aslcrwmbdtvimjrexxzw.supabase.co",
-  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls",
-  VIDEO_EMBED: "",
-  EPISODES: [],
-  FN: n => CONFIG.SUPABASE_URL + "/functions/v1/" + n,
-};
-const DEMO = !CONFIG.SUPABASE_URL;
-document.getElementById('demoflag').textContent = DEMO ? "DEMO MODE" : "";
-
-/* Anonymous play id (persists on this device; his site, not an artifact) */
-function anonId(){
-  try{
-    let id = localStorage.getItem('ucar_anon');
-    if(!id){ id = crypto.randomUUID(); localStorage.setItem('ucar_anon', id); }
-    return id;
-  }catch(e){ return crypto.randomUUID(); }
+/* ========== THEME ========== */
+function getTheme() {
+  return localStorage.getItem('ucar_theme') ||
+    (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
 }
-
-/* ============ DEMO CASES ============
-   [COPY] Placeholder voice demonstrating the intended structure; final
-   lines are OWNER. Fields mirror exactly what extract-worker emits. */
-const DEMO_CASES = [{
-  id:"demo-1", raw_title:"Cobb County approves Clearview AI contract",
-  title:"County police adopt face-search database",
-  summary:"Cobb County commissioners approved a 3-year contract giving police access to Clearview AI's face-matching database of billions of scraped public images, at $18,000 per year, after a six-month pilot.",
-  article_quote:"In seven seconds, and we'd been working the case for years.",
-  source_url:"https://www.atlantanewsfirst.com/2022/12/15/new-contract-with-facial-recognition-tech-company-raises-privacy-concerns-cobb-county/",
-  source_tier:1, impact:4, heaven_votes:9, hell_votes:21, faction:"hell", valence:-2,
-  category:"Surveillance",
-  extraction:{
-    who_choices:["Cobb County Police","County commissioners","Clearview AI"],
-    action_choices:["searches faces of","matches suspects against","runs face recognition on"],
-    whom_choices:["billions of scraped photos","residents and the public","unsolved case suspects"],
-    reenactment:{
-      setting:"Case staging: a cardboard county courthouse. GI has arranged five rubber stamps on a folding table marked COMMISSION. Gary wheels in a photo album the size of a refrigerator, labeled EVERY FACE (PROBABLY YOURS). Supes stands with a cutout crowd of ordinary people.",
-      cold_open:"GI reads the record: a detective had a blurry photo and three lost years. The album found a match in seven seconds. The five stamps came down as one. Gary pats the album. The album hums. Supes counts the faces inside and stops counting at four billion.",
-      who_reveals:[
-        "GI points to the desk with the badge: they hold the album now. Custody is the whole ballgame, and the receipt is already missing.",
-        "GI points to the five stamps: they approved it in one motion. When asked who decided, the stamps point at each other.",
-        "GI points to the vendor's brochure: the album never forgets, it says. The brochure is also a subscription form."],
-      action_demos:[
-        "Gary demonstrates: {WHO} holds a photo up to the album, which glows and burps out forty maybes. Gary calls this a feature.",
-        "Gary demonstrates: {WHO} lines up six nearly identical faces and lets the album tap one. It taps confidently. It has been wrong before. It does not dwell.",
-        "Gary demonstrates: {WHO} points a cardboard camera at the audience and every face slides into the album with a wet thwip. Gary checks: nobody signed anything."],
-      whom_reveals:[
-        "Supes opens the album gently: four billion school photos wave back. None of them remember posing for this. Supes waves back anyway.",
-        "Supes walks the cutout crowd across the stage: a jogger, a grandma, a barista. The album photocopies each one in passing. The grandma notices. Supes takes her statement.",
-        "Supes stands beside a silhouette labeled UNSOLVED. The album points at it. Then at a different silhouette. Then back. Supes writes down both."],
-      endings:{
-        heaven:"The audience writes the ending: {WHO} keeps the album behind glass, checks it twice, and a three-year-old cold case finally closes. The grandma gets a formal apology card. Evil Brain, at the chalkboard: the lesson is an off switch that works, and a human who uses it.",
-        hell:"The audience writes the ending: the album grows a second volume, then a third. {WHO} stops asking it questions and starts taking its suggestions. The jogger's photo sits in a folder she will never see. Evil Brain, at the chalkboard, writes one word: MORE."},
-      deescalations:[
-        {real:"police face-recognition search of billions of scraped images", cartoon:"a refrigerator-sized photo album that hums when it is confident"},
-        {real:"5-0 commission vote approving an $18,000/year contract", cartoon:"five rubber stamps coming down as one"},
-        {real:"public images scraped without consent", cartoon:"faces sliding into the album with a wet thwip"}]},
-    story:{gi:"Tactical assessment: a database this size has no off switch. Plan for that.",
-      gary:"The pilot worked great. Pilots always work great. That's what makes them pilots.",
-      supes:"Nobody in that album was asked. Somebody should ask. I'll wait."}}
-},{
-  id:"demo-2", raw_title:"Hospital deploys AI sepsis early-warning system",
-  title:"Hospital AI flags sepsis hours earlier",
-  summary:"A regional hospital network deployed a machine-learning early-warning system that monitors vitals and lab results to flag sepsis risk hours before clinical presentation, with nurses reviewing every alert.",
-  article_quote:null,
-  source_url:"https://example.org/hospital-sepsis-ai",
-  source_tier:2, impact:4, heaven_votes:26, hell_votes:4, faction:"heaven", valence:2,
-  category:"Healthcare",
-  extraction:{
-    who_choices:["Hospital network","Clinical AI system","Care teams"],
-    action_choices:["flags sepsis risk for","monitors vitals of","alerts nurses about"],
-    whom_choices:["admitted patients","at-risk patients","ICU candidates"],
-    reenactment:{
-      setting:"Case staging: a cardboard ward at 3 AM. GI has taped ninety paper monitors to the wall. Gary plays the AI, wearing a desk lamp as a hat. Supes sits with the patient cutouts, who are all asleep.",
-      cold_open:"GI reads the record: one monitor changed pitch by a half-step. No human ear caught it. Gary's lamp snapped on six hours before anything looked wrong. A note was passed. A nurse looked with human eyes. That is the entire incident, and that is the point.",
-      who_reveals:[
-        "GI gestures at the whole ward: the building bought it, trained on it, and wrote the rule that a human checks first. Institutions get credit when they earn it.",
-        "GI points at Gary's lamp: it watches ninety monitors without blinking. It cannot blink. This is the one job where that helps.",
-        "GI points to the nurses' station: whatever the lamp says, a person looks before anything happens. That handshake is the whole architecture."],
-      action_demos:[
-        "Gary demonstrates: {WHO} circles a squiggle on bed four's chart that nobody else rated. The squiggle gets a note. The note gets a human.",
-        "Gary demonstrates: {WHO} stares at ninety monitors at once, unblinking, unbothered, slightly smug about it.",
-        "Gary demonstrates: {WHO} tugs a sleeve. Gently. Twice. Rule one: the sleeve gets tugged, the human decides."],
-      whom_reveals:[
-        "Supes watches the patients snore: the best night of their lives is the one where nothing happened. Nobody claps for prevented disasters. Supes claps quietly.",
-        "Supes sits with bed four, who feels fine and will not feel fine in six hours. Tonight, someone already knows that. That someone passed a note.",
-        "Supes checks the wings: a cutout in an ICU gown waits there, hoping to stay in the wings. Tonight it does."],
-      endings:{
-        heaven:"The audience writes the ending: {WHO} {ACTION} {WHOM} at 3 AM, a nurse checks, antibiotics hang six hours early, and bed four goes home Tuesday complaining about the food. He never learns about the note. Evil Brain, at the chalkboard: this worked because a human was load-bearing. Copy the whole sentence.",
-        hell:"The audience writes the ending: the notes multiply until the nurse stops reading them. The lamp beeps into the void. When every bed is bed four, no bed is. Evil Brain, at the chalkboard: an alarm nobody answers is just a clock."},
-      deescalations:[
-        {real:"ML model continuously monitoring vitals and lab results", cartoon:"Gary in a desk-lamp hat staring at ninety paper monitors"},
-        {real:"early sepsis alert routed to nursing staff", cartoon:"a passed note and a gentle sleeve tug"},
-        {real:"clinical review of every alert before intervention", cartoon:"rule one: a human looks with human eyes first"}]},
-    story:{gi:"Probability of humans ignoring the alert: nonzero. Keep the nurse. That's an order.",
-      gary:"It works because a human checks it. Write that down. Frame it, even.",
-      supes:"The patients this catches will never know. That's the good kind of invisible."}}
-},{
-  id:"demo-3", raw_title:"Workday AI hiring screening discrimination suit proceeds",
-  title:"Hiring algorithm screens millions of applicants",
-  summary:"A federal court allowed a collective action to proceed alleging an AI-powered applicant screening system used by hundreds of employers discriminated against applicants over 40, with hundreds of millions of applications processed.",
-  article_quote:null,
-  source_url:"https://example.org/hiring-ai-suit",
-  source_tier:1, impact:5, heaven_votes:2, hell_votes:3, faction:"unaligned", valence:-1,
-  category:"Automation",
-  extraction:{
-    who_choices:["Workday screening AI","Hundreds of employers","The vendor"],
-    action_choices:["auto-rejects","scores and filters","screens out"],
-    whom_choices:["applicants over 40","millions of job seekers","qualified candidates"],
-    reenactment:{
-      setting:"Case staging: a mailroom drawn in forced perspective, stadium-sized. GI has installed a conveyor belt feeding a robot arm with a stamp that says THANKS ANYWAY. Gary oils the arm. Supes stands at the end of the belt with a very large box of rejected scrolls.",
-      cold_open:"GI reads the record: a man mailed his resume with both hands and a little kiss for luck. Four seconds on the belt. THANKS ANYWAY. He got the rejection before he got home. He applied ninety-nine more times. The arm is very consistent. A judge leaned in.",
-      who_reveals:[
-        "GI points to the arm: it insists it has no opinions. It was merely told what a good resume smells like, by someone who left no forwarding address.",
-        "GI sweeps a hand across a hundred lit office windows: each one points at the arm. We just bought it, they say, in unison, and the windows go dark.",
-        "GI holds up the vendor's manual: four pages. Page four is blank. Uptime, however, is excellent."],
-      action_demos:[
-        "Gary demonstrates: {WHO} stamps THANKS ANYWAY in a steady drumbeat while the belt speeds up. The drumbeat does not change when the resumes do. Gary finds this efficient and says so, uneasily.",
-        "Gary demonstrates: {WHO} weighs each scroll on a scale with a hidden thumb on it. Gary looks for the thumb's owner. The scale has no complaints department.",
-        "Gary demonstrates: {WHO} slides a velvet rope across the belt. Some scrolls duck under. Nobody can say how they knew to duck."],
-      whom_reveals:[
-        "Supes stands with the scrolls that have little gray mustaches drawn on: decades of experience, routed to a chute labeled OVERQUALIFIED, PROBABLY. Supes un-droops one mustache at a time.",
-        "Supes pans the camera out: the belt is fed by a river of scrolls past the horizon, each with a name tag and an afternoon of hope stapled on.",
-        "Supes lines up cutouts in graduation caps, work boots, and chef hats, comparing identical stamps. Identical is either fair or the opposite of fair. The judge is still leaning in."],
-      endings:{
-        heaven:"The audience writes the ending: the manual gets a fifth page, HOW TO CHECK THE THUMB. {WHO} keeps stamping, but a person with a clipboard now reads every hundredth scroll, and the mustached ones get human eyes. Evil Brain, at the chalkboard: speed is not a value. It's a setting.",
-        hell:"The audience writes the ending: the belt accelerates past what any judge can watch. {WHO} {ACTION} {WHOM} and then learns from its own rejections, which is exactly the loop page four never mentioned. Somewhere, a man licks a stamp for application one hundred and one. Evil Brain writes: THE ARM IS TEACHING ITSELF.",},
-      deescalations:[
-        {real:"automated rejection of job applications at scale", cartoon:"a robot arm with a THANKS ANYWAY stamp on a conveyor belt"},
-        {real:"alleged age discrimination against applicants over 40", cartoon:"scrolls with little gray mustaches routed to a side chute"},
-        {real:"federal collective action allowed to proceed", cartoon:"a judge's chair, very high, leaning in"}]},
-    story:{gi:"The rejection letter was signed by nobody. That was the design. Note it.",
-      gary:"We optimized time-to-reject. Mission accomplished, I guess. I need to sit down.",
-      supes:"Every one of those applications was a person's afternoon of hope."}}
-},{
-  id:"demo-4", raw_title:"School AI gun detection flags student's bag of chips",
-  title:"School AI mistakes chips for a gun",
-  summary:"A Maryland high school's AI gun detection system flagged a student's empty snack bag as a weapon. Police responded; the student was confronted at gunpoint and handcuffed before officers confirmed the object was a bag of chips.",
-  article_quote:"confronted at gunpoint and handcuffed by police",
-  source_url:"https://example.org/school-ai-chips",
-  source_tier:2, impact:5, heaven_votes:2, hell_votes:2, faction:"unaligned", valence:-2,
-  category:"Surveillance",
-  extraction:{
-    who_choices:["School security AI","The high school","Responding police"],
-    action_choices:["misidentifies snacks of","flags as armed","summons officers on"],
-    whom_choices:["a student with chips","students in the hallway","teenagers after practice"],
-    reenactment:{
-      setting:"Case staging: a cardboard school hallway at dismissal, lockers in crayon. GI has mounted the Snack Scanner 3000, a cereal-box camera with one enormous googly eye. Gary holds its instruction card, which is mostly exclamation points. Supes stands with a student cutout holding chips.",
-      cold_open:"GI reads the record: a student finished his chips. The googly eye locked on. The alert went out as WEAPON, and everything downstream believed it, fast and armed. By the time human eyes arrived at the object, it was, and had always been, a snack. Supes checks on the kid. The kid is fine. The kid is not fine.",
-      who_reveals:[
-        "GI taps the scanner: it has never seen a gun. It has seen four thousand snacks and remains unconvinced about all of them. Confidence without eyesight, GI notes, is a threat model.",
-        "GI points at the school: someone bought the eye, mounted the eye, and wired the eye straight to the loudest possible response. The school points at the eye. The eye points at lunch.",
-        "GI nods at the responders: they were told ARMED. They arrived for ARMED. The system upstream spent their trust like it was free."],
-      action_demos:[
-        "Gary demonstrates: {WHO} studies the bag from six angles and stamps it DEFINITELY A WEAPON, PROBABLY. Gary checks the confidence score. It is very confident. Gary sits down.",
-        "Gary demonstrates: {WHO} trips the alert and the hallway lights go red. Somewhere, paperwork begins filling itself out with the wrong noun.",
-        "Gary demonstrates: {WHO} presses the big button labeled EVERYONE, NOW. There is no button labeled SOMEONE, FIRST."],
-      whom_reveals:[
-        "Supes stands with the student, who is holding the most famous snack in the district and did nothing else. He had homework tonight. Now he has a story he didn't ask for. Supes stays until his hands stop shaking.",
-        "Supes watches the hallway cutouts press against the lockers, quietly hiding their own snacks. A lesson nobody meant to teach is still a lesson.",
-        "Supes checks the team in jerseys, granola bars half-raised, doing the math on which snacks are legal now."],
-      endings:{
-        heaven:"The audience writes the ending: a rule gets taped to the eye in crayon: A HUMAN LOOKS FIRST. The student gets his chips back, a real apology, and the last word at the assembly. {WHO} keeps watch, but the alarm now requires a co-signer. Evil Brain, at the chalkboard: VERIFY BEFORE YOU TERRIFY.",
-        hell:"The audience writes the ending: the eye gets a firmware update and a second googly eye. {WHO} {ACTION} {WHOM} faster now, with more confidence and the same eyesight. The evidence bags get bigger. Somewhere offstage a granola bar is read its rights. Evil Brain writes: CRUNCH DETECTED, and underlines it."},
-      deescalations:[
-        {real:"student confronted at gunpoint and handcuffed by police", cartoon:"asked very sternly to wait in the beanbag corner while his chips are bagged as evidence"},
-        {real:"AI gun detection flagged a bag of chips as a weapon", cartoon:"the Snack Scanner 3000 blaring CRUNCH DETECTED through a party horn"},
-        {real:"armed police response to an automated alert", cartoon:"everyone arriving at once via the cardboard phone marked EMERGENCIES AND ALSO SNACKS"}]},
-    story:{gi:"Tactical read: 99.7% probability those were chips. The crinkle signature was unmistakable.",
-      gary:"The system worked exactly as designed. The design thought lunch was a threat.",
-      supes:"Someone should ask the kid how his week went. Nobody will. So I will."}}
-}];
-
-/* ================= STATE + ROUTER ================= */
-let CASE=null, PICK={}, VOTE=null, searchCount=0;
-function show(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  document.getElementById(id).classList.add('on');
-  window.scrollTo(0,0);
-  if(id==='s-card') requestAnimationFrame(initScratch);
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('ucar_theme', t);
+  document.querySelector('.theme-toggle').textContent = t === 'dark' ? '🧠' : '☀️';
 }
-function goHome(){ show('home'); doSearch(); }
-function startNext(){
-  const pool = DEMO ? DEMO_CASES : (window._lastResults||DEMO_CASES);
-  const next = pool[Math.floor(Math.random()*pool.length)];
-  openCase(next.id);
+function toggleTheme() {
+  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 }
+setTheme(getTheme());
 
-/* ================= HOME ================= */
-function renderHome(){
-  const vb=document.getElementById('videobox');
-  if(CONFIG.VIDEO_EMBED){ vb.innerHTML='<iframe src="'+CONFIG.VIDEO_EMBED
-    +'" allowfullscreen loading="lazy"></iframe>'; }
-  const row=document.getElementById('epirow'); row.innerHTML='';
-  const eps=CONFIG.EPISODES.length?CONFIG.EPISODES:
-    [{title:'Episode feed: OWNER links daily shorts here',url:'#'}];
-  for(const e of eps){
-    const a=document.createElement('a'); a.className='epi'; a.href=e.url;
-    a.target=e.url==='#'?'':'_blank'; a.textContent=e.title; row.appendChild(a);
+/* ========== STATE ========== */
+let CASES = [];
+let CURRENT = null;
+let PICKS = { who: null, what: null, whom: null };
+
+/* ========== DEMO DATA ========== */
+const DEMO_CASES = [
+  {
+    id: 'demo-1',
+    title: 'County Police Adopt Face-Search Database',
+    quote: 'In seven seconds, and we\'d been working the case for years.',
+    source_url: 'https://atlantanewsfirst.com/2022/12/15/facial-recognition-cobb-county/',
+    segments: {
+      who: 'Cobb County commissioners approved a 3-year contract giving police access to Clearview AI\'s face-matching database of billions of scraped public images.',
+      what: 'The system searches billions of scraped public photos to match faces against suspects, returning results in seconds for cases that took years.',
+      whom: 'Anyone who has ever posted a photo online is now searchable—4 billion faces indexed without consent or notification.'
+    },
+    choices: {
+      who: ['County Police', 'Clearview AI', 'County Commissioners', 'The Algorithm'],
+      what: ['Searches faces', 'Scrapes photos', 'Matches suspects', 'Surveils everyone'],
+      whom: ['4 billion people', 'Criminal suspects', 'The public', 'Social media users']
+    },
+    ability: { name: 'FACE HARVEST', text: 'Scrape all faces in play. Targets cannot opt out or be notified.' },
+    stats: { atk: 7, def: 4, evl: 4 },
+    rarity: 'rare'
+  },
+  {
+    id: 'demo-2',
+    title: 'Hospital AI Catches Sepsis Hours Early',
+    quote: 'The system caught it before any of us noticed the signs.',
+    source_url: 'https://example.com/sepsis-ai',
+    segments: {
+      who: 'A regional hospital network deployed an ML early-warning system that continuously monitors vitals and lab results.',
+      what: 'The AI flags sepsis risk hours before clinical presentation, with nurses reviewing every alert before action.',
+      whom: 'Admitted patients now have an algorithmic guardian—one that never sleeps, never blinks, never forgets to check.'
+    },
+    choices: {
+      who: ['Hospital Network', 'The AI System', 'Care Teams', 'Night Shift'],
+      what: ['Monitors vitals', 'Flags risk early', 'Alerts nurses', 'Watches silently'],
+      whom: ['ICU patients', 'All admitted', 'At-risk cases', 'The sleeping']
+    },
+    ability: { name: 'EARLY WARNING', text: 'Reveal one hidden threat before it activates. Human must confirm.' },
+    stats: { atk: 2, def: 9, evl: 1 },
+    rarity: 'uncommon'
+  },
+  {
+    id: 'demo-3',
+    title: 'Hiring AI Screens Out Workers Over 40',
+    quote: 'I applied 100 times. Never got a single interview.',
+    source_url: 'https://example.com/workday-lawsuit',
+    segments: {
+      who: 'A federal court allowed a class action to proceed against Workday\'s AI-powered applicant screening system.',
+      what: 'The algorithm automatically filters and scores hundreds of millions of resumes, allegedly discriminating against age.',
+      whom: 'Millions of job seekers over 40 whose applications were processed and rejected without any human ever reading them.'
+    },
+    choices: {
+      who: ['Workday AI', 'Hundreds of employers', 'The Algorithm', 'HR Automation'],
+      what: ['Auto-rejects', 'Scores unfairly', 'Screens out', 'Discriminates'],
+      whom: ['Workers over 40', 'Millions of seekers', 'The experienced', 'Qualified candidates']
+    },
+    ability: { name: 'THANKS ANYWAY', text: 'Instantly reject target. No explanation given. Cannot be appealed.' },
+    stats: { atk: 6, def: 2, evl: 5 },
+    rarity: 'rare'
   }
+];
+
+/* ========== NAVIGATION ========== */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
 }
 
-/* ================= SEARCH (single bar, debounced) ================= */
-let qTimer=null;
-document.getElementById('q').addEventListener('input', ()=>{
-  clearTimeout(qTimer); qTimer=setTimeout(doSearch, 250);
-});
-document.getElementById('q').addEventListener('keydown', e=>{
-  if(e.key==='Enter'){ clearTimeout(qTimer); doSearch(); }
-});
-function isURL(s){ return /^https?:\/\/\S+\.\S+/.test(s.trim()); }
-
-// Cache all cases for instant client-side filtering
-let _allCases = null;
-let _caseLoadPromise = null;
-async function loadAllCases() {
-  if (_allCases) return _allCases;
-  if (_caseLoadPromise) return _caseLoadPromise;
-  _caseLoadPromise = fetch(CONFIG.FN('search-cases'), {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY},
-    body: JSON.stringify({q: '', limit: 100})
-  }).then(r => r.json()).then(d => {
-    _allCases = d.results || [];
-    return _allCases;
-  });
-  return _caseLoadPromise;
+function goHome() {
+  CURRENT = null;
+  PICKS = { who: null, what: null, whom: null };
+  showScreen('casebook');
 }
 
-// Score a case against query for ranking
-function scoreCase(c, terms) {
-  if (!terms.length) return 1;
-  const text = ((c.title || c.raw_title || '') + ' ' + (c.summary || '') + ' ' + (c.extraction?.article_quote || '')).toLowerCase();
-  let score = 0;
-  for (const t of terms) {
-    if (text.includes(t)) score += t.length; // longer matches = better
-  }
-  return score;
+/* ========== CASEBOOK ========== */
+function renderCases(cases) {
+  const list = document.getElementById('caseList');
+  list.innerHTML = cases.map(c => {
+    const tint = c.stats.evl >= 4 ? 'evil-tint' : c.stats.evl <= 1 ? 'good-tint' : '';
+    return `
+    <div class="case-card ${tint}" onclick="openCase('${c.id}')">
+      <div class="case-card-inner">
+        <h3>${esc(c.title)}</h3>
+        ${c.quote ? `<div class="quote">"${esc(truncate(c.quote, 80))}"</div>` : ''}
+        <div class="stats-row">
+          <div class="stat">ATK <span class="stat-val">${c.stats.atk}</span></div>
+          <div class="stat">DEF <span class="stat-val">${c.stats.def}</span></div>
+          <div class="stat">EVL <span class="stat-val">${c.stats.evl}</span></div>
+          <div class="stat" style="margin-left:auto;color:var(--accent)">${c.rarity?.toUpperCase() || 'COMMON'}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-async function doSearch(){
-  const q=document.getElementById('q').value.trim();
-  const host=document.getElementById('results');
-  if(isURL(q)){ return renderFilePrompt(q, host); }
-  let results=[], web=[];
-  if(DEMO){
-    const needle=q.toLowerCase();
-    results=DEMO_CASES.filter(c=>!needle
-      ||(c.title+' '+c.summary+' '+(c.article_quote||'')).toLowerCase().includes(needle)
-      ||needle.split(/\s+/).some(w=>w.length>3&&(c.title+' '+c.summary).toLowerCase().includes(w)));
-    if(!results.length&&q) web=[{title:'(Demo) Live web results appear here when deployed: "'
-      +q+'"',url:'#',domain:'gdelt + google news via edge function'}];
-    if(!results.length&&!q) results=DEMO_CASES;
+function handleSearch(val) {
+  const prompt = document.getElementById('filePrompt');
+  if (isUrl(val)) {
+    prompt.style.display = 'block';
+    prompt.dataset.url = val;
   } else {
-    // Load all cases once, then filter locally for instant response
-    const all = await loadAllCases();
-    const terms = q.toLowerCase().split(/\s+/).filter(w => w.length > 1);
-    if (!terms.length) {
-      results = all.slice(0, 20);
-    } else {
-      results = all
-        .map(c => ({ c, score: scoreCase(c, terms) }))
-        .filter(x => x.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 20)
-        .map(x => x.c);
-    }
-    // Fetch web results only if few local results and query is substantial
-    if (results.length < 3 && q.length > 5) {
-      try {
-        const r = await fetch(CONFIG.FN('search-cases'), {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY},
-          body: JSON.stringify({q, web: true, limit: 1})
-        });
-        const data = await r.json();
-        web = data.web_results || [];
-      } catch(e) { /* web is best-effort */ }
-    }
+    prompt.style.display = 'none';
+    const q = val.toLowerCase();
+    const filtered = CASES.filter(c =>
+      c.title.toLowerCase().includes(q) ||
+      (c.quote && c.quote.toLowerCase().includes(q))
+    );
+    renderCases(filtered);
   }
-  window._lastResults=results;
-  host.innerHTML='';
-  searchCount++;
-  let mgSlot = (q && searchCount%3===0) ? 1+Math.floor(Math.random()*Math.max(1,results.length)) : -1;
-  results.forEach((c,i)=>{
-    host.appendChild(hitCard(c));
-    if(i+1===mgSlot) host.appendChild(inlineMinigame());
+}
+
+function isUrl(s) { return /^https?:\/\/.+\..+/.test(s.trim()); }
+
+function fileCase() {
+  toast('📬 It\'s in the mail! Check your inbox later.');
+  document.getElementById('search').value = '';
+  document.getElementById('filePrompt').style.display = 'none';
+}
+
+/* ========== TRIPLE PANELS ========== */
+function openCase(id) {
+  CURRENT = CASES.find(c => c.id === id) || DEMO_CASES.find(c => c.id === id);
+  if (!CURRENT) return;
+  PICKS = { who: null, what: null, whom: null };
+
+  document.getElementById('story-who').textContent = CURRENT.segments.who;
+  document.getElementById('story-what').textContent = CURRENT.segments.what;
+  document.getElementById('story-whom').textContent = CURRENT.segments.whom;
+
+  renderChoices('who', CURRENT.choices.who);
+  renderChoices('what', CURRENT.choices.what);
+  renderChoices('whom', CURRENT.choices.whom);
+
+  document.getElementById('source-link').href = CURRENT.source_url;
+  document.getElementById('next-who').disabled = true;
+  document.getElementById('next-what').disabled = true;
+  document.getElementById('next-whom').disabled = true;
+
+  showScreen('panel-who');
+}
+
+function renderChoices(slot, choices) {
+  document.getElementById(`choices-${slot}`).innerHTML = choices.map((c, i) => `
+    <button class="choice-btn" onclick="selectChoice('${slot}', ${i}, this)">${esc(c)}</button>
+  `).join('');
+}
+
+function selectChoice(slot, idx, btn) {
+  PICKS[slot] = CURRENT.choices[slot][idx];
+  btn.parentElement.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById(`next-${slot}`).disabled = false;
+}
+
+function nextPanel(next) { showScreen(`panel-${next}`); }
+
+/* ========== DOOM CLOCK ========== */
+const DOOM_MESSAGES = [
+  'Calculating timeline...',
+  'Scanning probable futures...',
+  'Measuring consequences...',
+  'Weighing outcomes...',
+  'The clock ticks...'
+];
+
+function closeCaseAndSpin() {
+  showScreen('casebook');
+  document.getElementById('doomOverlay').classList.add('active');
+
+  ['who', 'what', 'whom'].forEach(s => {
+    const slot = document.getElementById(`slot-${s}`);
+    slot.classList.remove('landed');
+    slot.classList.add('spinning');
+    slot.querySelector('.slot-text').textContent = '???';
   });
-  if(mgSlot>results.length && mgSlot>0) host.appendChild(inlineMinigame());
-  if(web.length){
-    const d=document.createElement('div'); d.className='divider';
-    d.textContent='FROM THE WEB (not yet in the record)'; host.appendChild(d);
-    for(const w of web){
-      const el=document.createElement('div'); el.className='webhit';
-      el.innerHTML='<div>'+esc(w.title)+'</div><div class="meta">'+esc(w.domain||'')+'</div>';
-      const b=document.createElement('button'); b.className='ghost';
-      b.textContent='File this into the queue';
-      b.onclick=()=>fileURL(w.url);
-      if(w.url!=='#') el.appendChild(b);
-      host.appendChild(el);
-    }
-  }
-}
-function hitCard(c){
-  const total=(c.heaven_votes||0)+(c.hell_votes||0);
-  const pct=total?Math.round(100*c.heaven_votes/total):0;
-  const isNew = c.created_at && (Date.now() - new Date(c.created_at).getTime() < 7*24*60*60*1000);
-  const el=document.createElement('div'); el.className='hit';
-  el.innerHTML=(isNew?'<span class="badge" style="background:var(--crayon);color:var(--bone)">NEW</span>':'')
-    +'<span class="badge '+(c.faction||'unaligned')+'">'
-    +(c.faction||'unaligned').toUpperCase()+'</span>'
-    +'<span class="badge">IMPACT '+'\u2605'.repeat(c.impact||1)+'</span>'
-    +'<h3>'+esc(c.title||c.raw_title)+'</h3>'
-    +'<div class="sum">'+esc(c.summary||c.extraction?.summary||'')+'</div>'
-    +(c.extraction?.article_quote||c.article_quote?'<div class="qt">\u201C'+esc(c.extraction?.article_quote||c.article_quote)+'\u201D</div>':'')
-    +'<div class="meta">'+total+' VERDICTS \u2022 '+pct+'% HEAVEN</div>'
-    +'<div class="votebar"><i style="width:'+pct+'%"></i></div>'
-    +'<div class="quickvote">'
-    +'<button class="qv heaven" onclick="event.stopPropagation();quickVote(\''+c.id+'\',\'heaven\',this)">\u{1F607}</button>'
-    +'<button class="qv hell" onclick="event.stopPropagation();quickVote(\''+c.id+'\',\'hell\',this)">\u{1F608}</button>'
-    +'</div>';
-  el.onclick=()=>openCase(c.id);
-  return el;
-}
-async function quickVote(caseId, faction, btn){
-  btn.disabled=true; btn.textContent='\u2713';
-  if(DEMO) return;
-  try{
-    await fetch(CONFIG.FN('submit-verdict'),{method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
-      body:JSON.stringify({case_id:caseId,who:'quick',action:'quick',whom:'quick',faction_vote:faction,notes:''})});
-    // Update cache
-    if(_allCases){
-      const c=_allCases.find(x=>x.id===caseId);
-      if(c){ faction==='heaven'?c.heaven_votes++:c.hell_votes++; }
-    }
-  }catch(e){}
-}
-function renderFilePrompt(url, host){
-  host.innerHTML='';
-  const el=document.createElement('div'); el.className='webhit';
-  el.innerHTML='<div>File a new case from this source?</div><div class="meta">'
-    +esc(url)+'</div>';
-  const b=document.createElement('button'); b.className='go';
-  b.textContent='File it \u2192'; b.onclick=()=>fileURL(url);
-  el.appendChild(b); host.appendChild(el);
-}
-async function fileURL(url){
-  if(DEMO){ alert('DEMO: when deployed, this files the URL into the staged queue and the steward prefills it.'); return; }
-  const r=await fetch(CONFIG.FN('file-case'),{method:'POST',
-    headers:{'Content-Type':'application/json',
-      'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,
-      'x-anon-id':anonId()},
-    body:JSON.stringify({url})});
-  const d=await r.json();
-  alert(d.ok?'Filed. The steward will prefill it for review.':(d.error||'Could not file.'));
+
+  let msgIdx = 0;
+  const statusEl = document.getElementById('doomStatus');
+  const msgInterval = setInterval(() => {
+    statusEl.textContent = DOOM_MESSAGES[msgIdx++ % DOOM_MESSAGES.length];
+  }, 400);
+
+  setTimeout(() => landSlot('who', PICKS.who), 1000);
+  setTimeout(() => landSlot('what', PICKS.what), 1600);
+  setTimeout(() => landSlot('whom', PICKS.whom), 2200);
+  setTimeout(() => {
+    clearInterval(msgInterval);
+    statusEl.textContent = 'The clock has spoken.';
+    setTimeout(showCard, 1000);
+  }, 2800);
 }
 
-/* ================= POSTER ART (deterministic, per beat) ================= */
-function rng(seed){let x=0;for(const ch of seed)x=(x*31+ch.charCodeAt(0))>>>0;
-  return ()=>{x^=x<<13;x>>>=0;x^=x>>>17;x^=x<<5;x>>>=0;return x/0xffffffff};}
-const MOTIFS={
-  Surveillance:(x,y,s)=>'<g transform="translate('+x+','+y+') scale('+s+')">'
-    +'<ellipse cx="0" cy="0" rx="46" ry="26" fill="none" stroke="currentColor" stroke-width="5"/>'
-    +'<circle cx="0" cy="0" r="13" fill="currentColor"/><circle cx="4" cy="-4" r="4" fill="var(--ink)"/></g>',
-  Healthcare:(x,y,s)=>'<g transform="translate('+x+','+y+') scale('+s+')">'
-    +'<rect x="-10" y="-34" width="20" height="68" fill="currentColor"/>'
-    +'<rect x="-34" y="-10" width="68" height="20" fill="currentColor"/></g>',
-  Automation:(x,y,s)=>'<g transform="translate('+x+','+y+') scale('+s+')">'
-    +'<circle cx="0" cy="0" r="26" fill="none" stroke="currentColor" stroke-width="8"/>'
-    +'<circle cx="0" cy="0" r="7" fill="currentColor"/>'
-    +[0,60,120,180,240,300].map(a=>'<rect x="-5" y="-40" width="10" height="14" fill="currentColor" transform="rotate('+a+')"/>').join('')+'</g>',
-  Prediction:(x,y,s)=>'<g transform="translate('+x+','+y+') scale('+s+')">'
-    +'<path d="M-36 22 L-10 -6 L8 8 L36 -26" fill="none" stroke="currentColor" stroke-width="7"/>'
-    +'<path d="M20 -26 h16 v16" fill="none" stroke="currentColor" stroke-width="7"/></g>',
-};
-function poster(seed, beat, mood, label, sub){
-  const r=rng(seed+beat);
-  const cat=(CASE&&CASE.category)||'Prediction';
-  const motif=(MOTIFS[cat]||MOTIFS.Prediction);
-  const wash = mood==='hell' ? 'rgba(193,18,31,0.18)'
-             : mood==='heaven' ? 'rgba(201,168,76,0.16)' : 'transparent';
-  const ink = mood==='hell' ? 'var(--crayon)' : mood==='heaven' ? 'var(--gold)' : 'var(--bone)';
-  let rays='';
-  const n=12+Math.floor(r()*6);
-  for(let i=0;i<n;i++){const a=(i/n)*Math.PI*2;
-    rays+='<line x1="360" y1="120" x2="'+(360+Math.cos(a)*400).toFixed(0)
-      +'" y2="'+(120+Math.sin(a)*400).toFixed(0)
-      +'" stroke="'+ink+'" stroke-width="'+(2+r()*3).toFixed(1)+'" opacity="0.22"/>';}
-  let extra='';
-  if(beat==='whom'){ for(let i=0;i<14;i++){
-    extra+='<circle cx="'+(60+r()*600).toFixed(0)+'" cy="'+(190+r()*40).toFixed(0)
-      +'" r="'+(5+r()*6).toFixed(0)+'" fill="'+ink+'" opacity="0.7"/>';}}
-  if(beat==='action'){ extra='<rect x="80" y="150" width="560" height="10" fill="'+ink+'" opacity="0.6"/>'
-    +'<rect x="80" y="170" width="560" height="10" fill="'+ink+'" opacity="0.35"/>';}
-  return '<svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+esc(label)+'">'
-    +'<rect width="720" height="240" fill="var(--ink)"/>'
-    +'<rect width="720" height="240" fill="'+wash+'"/>'
-    +rays
-    +'<g style="color:'+ink+'">'+motif(360,118,1.1+r()*0.3)+'</g>'
-    +extra
-    +'<rect x="10" y="10" width="700" height="220" fill="none" stroke="'+ink+'" stroke-width="4"/>'
-    +'<text x="360" y="42" text-anchor="middle" fill="'+ink
-    +'" font-family="Arial" font-weight="800" font-size="22" letter-spacing="6">'+esc(label)+'</text>'
-    +(sub?'<text x="360" y="224" text-anchor="middle" fill="'+ink
-    +'" font-family="Georgia" font-style="italic" font-size="13">'+esc(sub)+'</text>':'')
-    +'</svg>';
+function landSlot(slot, value) {
+  const el = document.getElementById(`slot-${slot}`);
+  el.classList.remove('spinning');
+  el.classList.add('landed');
+  el.querySelector('.slot-text').textContent = truncate(value, 10);
 }
 
-/* ================= CASE FLOW (discrete screens) ================= */
-async function openCase(id){
-  let c=DEMO?DEMO_CASES.find(x=>x.id===id):null;
-  if(!c && !DEMO){
-    const r=await fetch(CONFIG.FN('search-cases'),{method:'POST',
-      headers:{'Content-Type':'application/json',
-        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
-      body:JSON.stringify({id})});
-    c=((await r.json()).results||[])[0];
+function closeDoom() {
+  document.getElementById('doomOverlay').classList.remove('active');
+  goHome();
+}
+
+/* ========== CARD ========== */
+function showCard() {
+  document.getElementById('doomOverlay').classList.remove('active');
+  const c = CURRENT;
+  const verdict = c.stats.evl >= 4 ? 'evil' : c.stats.evl <= 1 ? 'good' : 'neutral';
+
+  const card = document.getElementById('card');
+  card.className = 'card ' + verdict + (c.rarity === 'rare' ? ' rare' : '');
+
+  document.getElementById('cardTitle').textContent = c.title;
+  document.getElementById('cardQuote').textContent = `"${c.quote}"`;
+  document.getElementById('abilityName').textContent = c.ability.name;
+  document.getElementById('abilityText').textContent = c.ability.text;
+  document.getElementById('statAtk').textContent = c.stats.atk;
+  document.getElementById('statDef').textContent = c.stats.def;
+  document.getElementById('statEvl').textContent = c.stats.evl;
+  document.getElementById('cardRarity').textContent = (c.rarity || 'common').toUpperCase();
+  document.getElementById('cardArt').innerHTML = generateCardArt(c, verdict);
+  document.getElementById('cardQr').innerHTML = generateQR();
+
+  addScratchers();
+  document.getElementById('cardOverlay').classList.add('active');
+}
+
+function generateCardArt(c, verdict) {
+  const colors = {
+    good: { bg1:'#0a1a0f', bg2:'#051008', accent:'#2D8B4A', glow:'#4ADE80' },
+    evil: { bg1:'#1a0a0a', bg2:'#100505', accent:'#C1121F', glow:'#FF4444' },
+    neutral: { bg1:'#12121a', bg2:'#08080c', accent:'#6B6560', glow:'#999' }
+  };
+  const col = colors[verdict];
+  const seed = c.id.split('').reduce((a,b) => a + b.charCodeAt(0), 0);
+
+  // Generate pseudo-random elements based on seed
+  const r = (n) => ((seed * 9301 + 49297) % 233280) / 233280 * n;
+  const circles = Array.from({length: 5}, (_, i) =>
+    `<circle cx="${60 + i*50 + r(30)}" cy="${60 + r(60)}" r="${10 + r(20)}"
+      fill="none" stroke="${col.accent}" stroke-width="1" opacity="${0.1 + r(0.2)}"/>`
+  ).join('');
+
+  const icon = verdict === 'evil' ? '👁' : verdict === 'good' ? '🛡' : '⚖';
+
+  return `<svg viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="glow-${c.id}" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="${col.glow}" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="${col.bg1}" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="bg-${c.id}" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="${col.bg1}"/>
+        <stop offset="100%" stop-color="${col.bg2}"/>
+      </linearGradient>
+    </defs>
+    <rect width="300" height="160" fill="url(#bg-${c.id})"/>
+    <circle cx="150" cy="80" r="60" fill="url(#glow-${c.id})"/>
+    ${circles}
+    <circle cx="150" cy="80" r="35" fill="none" stroke="${col.accent}" stroke-width="2" opacity="0.5"/>
+    <circle cx="150" cy="80" r="20" fill="none" stroke="${col.accent}" stroke-width="3" opacity="0.8"/>
+    <text x="150" y="88" text-anchor="middle" font-size="24">${icon}</text>
+    <text x="150" y="145" text-anchor="middle" font-size="8" fill="${col.accent}" letter-spacing="1" opacity="0.6">
+      ${PICKS.who?.toUpperCase().slice(0,15)} → ${PICKS.what?.toUpperCase().slice(0,12)} → ${PICKS.whom?.toUpperCase().slice(0,12)}
+    </text>
+  </svg>`;
+}
+
+function generateQR() {
+  // Simple placeholder QR pattern
+  const cells = [];
+  for(let y=0; y<7; y++) {
+    for(let x=0; x<7; x++) {
+      const isBorder = x===0||x===6||y===0||y===6;
+      const isCorner = (x<3&&y<3)||(x>3&&y<3)||(x<3&&y>3);
+      const fill = (isBorder && isCorner) || Math.random() > 0.5;
+      if(fill) cells.push(`<rect x="${x*5+2}" y="${y*5+2}" width="4" height="4" fill="#000"/>`);
+    }
   }
-  if(!c) return;
-  CASE=c; PICK={free:{}}; VOTE=null;
-  const re=c.extraction.reenactment||{};
-  document.getElementById('a-case').innerHTML=
-    poster(c.id,'case','flat','CASE FILE', c.category||'');
-  setText('c-title', c.title||c.raw_title);
-  setText('c-summary', c.summary||'');
-  const qEl=document.getElementById('c-quote');
-  if(c.article_quote){qEl.innerHTML='\u201C'+esc(c.article_quote)
-    +'\u201D<small>FROM THE RECORD</small>'; qEl.style.display='block';}
-  else qEl.style.display='none';
-  setText('c-src', c.source_tier===1?'FIRST-PARTY SOURCE':'REPORTED');
-  setText('c-impact','IMPACT '+'\u2605'.repeat(c.impact||1));
-  const f=document.getElementById('c-faction');
-  f.textContent=(c.faction||'unaligned').toUpperCase();
-  f.className='badge '+(c.faction||'unaligned');
-  document.getElementById('c-link').href=c.source_url;
-  document.getElementById('c-deesc').innerHTML=
-    '<tr><td><b>COURT RECORD</b></td><td><b>OUR STAGING</b></td></tr>'
-    +((re.deescalations||[]).map(d=>'<tr><td>'+esc(d.real)+'</td><td>'
-    +esc(d.cartoon)+'</td></tr>').join(''));
-  [0,1,2].forEach(i=>{document.getElementById('nb'+i).value=50;});
-  // WHO screen prep
-  document.getElementById('a-who').innerHTML=poster(c.id,'who','flat','THE ACTOR',null);
-  setText('b-gi',(c.extraction.story||{}).gi||re.cold_open||'');
-  renderChoices('who', c.extraction.who_choices, i=>{
-    PICK.whoReveal=(re.who_reveals||[])[i]||'';
+  return `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <rect width="40" height="40" fill="#fff"/>
+    ${cells.join('')}
+  </svg>`;
+}
+
+function addScratchers() {
+  document.querySelectorAll('.scratcher').forEach(s => s.remove());
+  const card = document.getElementById('card');
+
+  const zones = [
+    { top:'195px', left:'12px', width:'calc(100% - 24px)', height:'76px', label:'⬛ SCRATCH TO REVEAL' }
+  ];
+
+  zones.forEach(z => {
+    const s = document.createElement('div');
+    s.className = 'scratcher';
+    s.style.cssText = `top:${z.top};left:${z.left};width:${z.width};height:${z.height};`;
+    s.textContent = z.label;
+    s.onclick = () => s.classList.add('revealed');
+    card.appendChild(s);
   });
-  show('s-case');
-}
-function renderChoices(slot, options, onIndex){
-  const host=document.getElementById('ch-'+slot); host.innerHTML='';
-  const idx=[0,1,2].sort(()=>Math.random()-0.5); // position-bias control
-  for(const i of idx){
-    const b=document.createElement('button'); b.className='choice';
-    b.textContent=options[i];
-    b.onclick=()=>{ PICK[slot]=options[i]; if(onIndex)onIndex(i); advance(slot); };
-    host.appendChild(b);
-  }
-  const f=document.createElement('button'); f.className='choice free';
-  f.textContent='None of these. Say it your way \u2192';
-  f.onclick=()=>{const v=prompt('In your own words:');
-    if(v&&v.trim()){PICK[slot]=v.trim();PICK.free[slot]=true;
-      if(onIndex)onIndex(-1); advance(slot);}};
-  host.appendChild(f);
-}
-const fill=(t,c)=>String(t||'')
-  .replaceAll('{WHO}',c.WHO||'the actor')
-  .replaceAll('{ACTION}',c.ACTION||'acts on')
-  .replaceAll('{WHOM}',c.WHOM||'everyone');
-
-function advance(slot){
-  const re=CASE.extraction.reenactment||{}, st=CASE.extraction.story||{};
-  if(slot==='who'){
-    document.getElementById('a-action').innerHTML=
-      poster(CASE.id,'action','flat','THE ACT',null);
-    setText('carry-who', PICK.whoReveal ? fill(PICK.whoReveal,{}) :
-      PICK.who+' steps into the record.');
-    setText('b-gary', st.gary||'');
-    setText('p-action', PICK.who+' does what?');
-    renderChoices('action', CASE.extraction.action_choices, i=>{
-      PICK.actionDemo=(re.action_demos||[])[i]||'';
-    });
-    show('s-action');
-  } else if(slot==='action'){
-    document.getElementById('a-whom').innerHTML=
-      poster(CASE.id,'whom','flat','THE AFFECTED',null);
-    setText('carry-action', fill(PICK.actionDemo,{WHO:PICK.who})
-      || (PICK.who+' '+PICK.action+'.'));
-    setText('b-supes', st.supes||'');
-    setText('p-whom', PICK.who+' '+PICK.action+' whom?');
-    renderChoices('whom', CASE.extraction.whom_choices, i=>{
-      PICK.whomReveal=(re.whom_reveals||[])[i]||'';
-    });
-    show('s-whom');
-  } else {
-    PICK.nuance_before=[0,1,2].map(i=>Number(document.getElementById('nb'+i).value));
-    document.getElementById('a-verdict').innerHTML=
-      poster(CASE.id,'verdict','flat','THE VERDICT',null);
-    setText('carry-whom', fill(PICK.whomReveal,{WHO:PICK.who,ACTION:PICK.action})||'');
-    setText('v-triple', PICK.who+' \u2192 '+PICK.action+' \u2192 '+PICK.whom);
-    show('s-verdict');
-  }
-}
-function verdict(f){
-  VOTE=f;
-  const re=CASE.extraction.reenactment||{};
-  document.getElementById('a-ending').innerHTML=
-    poster(CASE.id,'ending-'+f, f, f==='heaven'?'THE WARM ENDING':'THE COLD ENDING', null);
-  setText('ending-text', fill((re.endings||{})[f]||'',
-    {WHO:PICK.who,ACTION:PICK.action,WHOM:PICK.whom}));
-  // FILE screen prep
-  buildTags();
-  document.getElementById('notes').value=''; noteMeter();
-  [0,1,2].forEach(i=>{document.getElementById('na'+i).value=PICK.nuance_before[i];});
-  show('s-file');
-}
-function buildTags(){
-  const host=document.getElementById('tagchips'); host.innerHTML='';
-  const tags=new Set();
-  if(CASE.category) tags.add(CASE.category);
-  tags.add(PICK.who); tags.add((PICK.action||'').split(' ')[0]);
-  (CASE.tech_types||[]).forEach(t=>tags.add(t));
-  (CASE.data_types||[]).forEach(t=>tags.add(t));
-  ['no consent','human oversight missing','worked as designed','needs an off switch',
-   'human was load-bearing'].forEach(t=>tags.add(t));
-  for(const t of [...tags].filter(Boolean).slice(0,10)){
-    const c=document.createElement('span'); c.className='chip'; c.textContent=t;
-    c.onclick=()=>{const n=document.getElementById('notes');
-      n.value=(n.value?n.value.trimEnd()+' ':'')+'#'+t.replace(/\s+/g,'-')+' ';
-      noteMeter(); n.focus();};
-    host.appendChild(c);
-  }
-}
-function noteMeter(){
-  const n=document.getElementById('notes').value.length;
-  const coins=n>=200?25:n>=100?15:n>=50?10:n>=10?5:0;
-  setText('notemeter', n+' characters \u00B7 '+(coins?('earns '+coins+' coins')
-    :'10+ characters starts earning'));
 }
 
-/* ================= MINT + CARD GRAPHIC + SCRATCH ================= */
-function deriveCard(impact,valence,tier){
-  const v=Math.max(-2,Math.min(2,valence||0));
-  return {atk:impact*2+(v<0?-v:0), def:impact+(v>0?v:0)+(tier===1?1:0),
-    rarity:impact>=5?'legendary':impact===4?'rare':impact===3?'uncommon':'common'};
-}
-async function mint(){
-  const notes=document.getElementById('notes').value;
-  PICK.nuance_after=[0,1,2].map(i=>Number(document.getElementById('na'+i).value));
-  let resp;
-  if(DEMO){
-    if(VOTE==='heaven') CASE.heaven_votes++; else CASE.hell_votes++;
-    const total=CASE.heaven_votes+CASE.hell_votes;
-    const s=deriveCard(CASE.impact,CASE.valence,CASE.source_tier);
-    resp={card:{card_name:CASE.title,faction_at_mint:CASE.faction,...s},
-      rewards:{coins:(notes.length>=200?25:notes.length>=100?15:notes.length>=50?10:notes.length>=10?5:0),
-        rep:3+Math.min(10,Math.floor(notes.length/50)*2)+(Object.keys(PICK.free).length?2:0)},
-      collective:{heaven_pct:Math.round(100*CASE.heaven_votes/total),votes:total}};
-  } else {
-    const r=await fetch(CONFIG.FN('submit-verdict'),{method:'POST',
-      headers:{'Content-Type':'application/json',
-        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,
-        'x-anon-id':anonId()},
-      body:JSON.stringify({case_id:CASE.id,who:PICK.who,action:PICK.action,whom:PICK.whom,
-        who_free:!!PICK.free.who,action_free:!!PICK.free.action,whom_free:!!PICK.free.whom,
-        faction_vote:VOTE,notes,
-        nuance_before:PICK.nuance_before,nuance_after:PICK.nuance_after})});
-    resp=await r.json();
-  }
-  renderCard(resp);
-  show('s-card');
-}
-function renderCard(resp){
-  const c=resp.card, f=c.faction_at_mint||'unaligned';
-  const ink=f==='hell'?'var(--crayon)':f==='heaven'?'var(--gold)':'var(--bone)';
-  const artSvg=poster(CASE.id,'card',f,'', null)
-    .replace('<svg viewBox="0 0 720 240"','<svg viewBox="0 0 720 240" width="720" height="240"');
-  document.getElementById('cardsvg').innerHTML=
-    '<svg viewBox="0 0 720 470" xmlns="http://www.w3.org/2000/svg">'
-    +'<rect width="720" height="470" fill="var(--ink)"/>'
-    +'<rect x="8" y="8" width="704" height="454" fill="none" stroke="'+ink+'" stroke-width="6"/>'
-    +'<g transform="translate(0,14)">'+artSvg.replace(/<\/?svg[^>]*>/g,'')+'</g>'
-    +'<text x="360" y="292" text-anchor="middle" fill="var(--bone)" font-family="Arial" '
-    +'font-weight="800" font-size="24" letter-spacing="2">'
-    +esc((c.card_name||'').toUpperCase().slice(0,42))+'</text>'
-    +'<text x="30" y="336" fill="var(--bone)" font-family="Arial" font-weight="800" font-size="26">\u2694 '
-    +c.atk+'</text>'
-    +'<text x="690" y="336" text-anchor="end" fill="var(--bone)" font-family="Arial" font-weight="800" font-size="26">\u26E8 '
-    +c.def+'</text>'
-    +'<text x="360" y="336" text-anchor="middle" fill="'+ink
-    +'" font-family="Arial" font-size="14" letter-spacing="4">'+c.rarity.toUpperCase()+'</text>'
-    +'<text x="360" y="368" text-anchor="middle" fill="var(--pencil)" font-family="Arial" '
-    +'font-size="13" letter-spacing="1">'+esc(PICK.who+' \u2192 '+PICK.action+' \u2192 '+PICK.whom).slice(0,80)+'</text>'
-    +(CASE.article_quote
-      ?'<text x="360" y="412" text-anchor="middle" fill="var(--bone)" font-family="Georgia" '
-       +'font-style="italic" font-size="14">\u201C'+esc(CASE.article_quote.slice(0,78))+'\u201D</text>'
-       +'<text x="360" y="432" text-anchor="middle" fill="var(--pencil)" font-family="Arial" '
-       +'font-size="10" letter-spacing="2">FROM THE RECORD</text>'
-      :'')
-    +'</svg>';
-  setText('m-rewards','+'+resp.rewards.coins+' coins \u00B7 +'+resp.rewards.rep+' rep'
-    +(Object.keys(PICK.free).length?' (your own words bonus)':''));
-  setText('m-collective', resp.collective.votes+' verdicts \u00B7 '
-    +resp.collective.heaven_pct+'% chose the warm ending');
-  const deltas=PICK.nuance_after.map((v,i)=>v-PICK.nuance_before[i]);
-  const AX=['Safety vs Surveillance','Privacy vs Data brokering','Benefit vs Harm'];
-  const big=deltas.map((d,i)=>[Math.abs(d),d,i]).sort((a,b)=>b[0]-a[0])[0];
-  setText('m-shift', big[0]>=8
-    ?'The case moved your read '+big[0]+' points on '+AX[big[2]]+'.'
-    :'Your read held steady.');
-  // Minigames only during search, not after case completion
-  document.getElementById('mg-after').innerHTML='';
-}
-/* Scratch: sized after the screen is visible; auto-reveals at 55%. */
-function initScratch(){
-  const canvas=document.getElementById('scratch');
-  const host=document.getElementById('cardwrap');
-  const w=host.clientWidth, h=host.clientHeight;
-  if(!w||!h){ requestAnimationFrame(initScratch); return; }
-  const dpr=window.devicePixelRatio||1;
-  canvas.width=w*dpr; canvas.height=h*dpr;
-  canvas.style.width=w+'px'; canvas.style.height=h+'px';
-  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
-  ctx.fillStyle='#141414'; ctx.fillRect(0,0,w,h);
-  ctx.strokeStyle='#C1121F'; ctx.lineWidth=3; ctx.strokeRect(6,6,w-12,h-12);
-  ctx.fillStyle='#C1121F'; ctx.font='700 16px Arial'; ctx.textAlign='center';
-  ctx.fillText('SCRATCH TO REVEAL YOUR CARD', w/2, h/2);
-  let down=false, scratched=0;
-  const total=w*h;
-  const pos=e=>{const r=canvas.getBoundingClientRect();
-    const p=e.touches?e.touches[0]:e; return [p.clientX-r.left,p.clientY-r.top];};
-  const scr=(x,y)=>{ctx.globalCompositeOperation='destination-out';
-    ctx.beginPath(); ctx.arc(x,y,22,0,Math.PI*2); ctx.fill();
-    scratched+=Math.PI*22*22*0.55;
-    if(scratched>total*0.55){canvas.style.transition='opacity .4s';
-      canvas.style.opacity='0'; setTimeout(()=>canvas.remove(),450);}};
-  canvas.onmousedown=e=>{down=true;scr(...pos(e));};
-  canvas.onmousemove=e=>{if(down)scr(...pos(e));};
-  window.addEventListener('mouseup',()=>down=false);
-  canvas.addEventListener('touchstart',e=>{down=true;scr(...pos(e));e.preventDefault();},{passive:false});
-  canvas.addEventListener('touchmove',e=>{if(down){scr(...pos(e));e.preventDefault();}},{passive:false});
-  window.addEventListener('touchend',()=>down=false);
+function closeCard() {
+  document.getElementById('cardOverlay').classList.remove('active');
+  goHome();
 }
 
-/* ============ INLINE MINIGAMES (sensors in the flow) ============ */
-async function postSignal(sig, box){
-  let n=0;
-  if(sig.game==='inkblot'){const w=sig.words.filter(x=>x.length>1);
-    n=w.length+w.length*(w.length-1)/2;}
-  if(sig.game==='wordrun')n=sig.collected.length+sig.avoided.length;
-  if(sig.game==='sticky')n=sig.placements.length;
-  if(sig.game==='trivia')n=1;
-  if(sig.game==='perp')n=Math.min(12,(sig.description.match(/[a-z]{4,}/gi)||[]).length);
-  if(!DEMO){
-    fetch(CONFIG.FN('minigame-signal'),{method:'POST',
-      headers:{'Content-Type':'application/json',
-        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
-      body:JSON.stringify(sig)}).catch(()=>{});
-  }
-  box.innerHTML='<div class="mlabel">SIGNAL FILED</div>'
-    +n+' edges \u2192 the graph. +3 coins. Flat rate, always: your answers are data, never a score.';
+/* ========== UTILITIES ========== */
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
 }
-function inlineMinigame(){
-  const games=[gInkblot,gWordrun,gSticky,gTrivia,gPerp];
-  const g=games[Math.floor(Math.random()*games.length)];
-  const box=document.createElement('div'); box.className='mg';
-  g(box); return box;
+function truncate(s, n) {
+  return (!s || s.length <= n) ? (s || '') : s.slice(0, n).trim() + '…';
 }
-function gInkblot(box){
-  const seed='blob-'+Math.floor(Math.random()*99999);
-  const r=rng(seed); const pts=[];
-  for(let i=0;i<10;i++){const a=i/10*2*Math.PI;const rad=34+r()*40;
-    pts.push([100+Math.cos(a)*rad,70+Math.sin(a)*rad*0.8]);}
-  box.innerHTML='<div class="mlabel">While the Brain files paperwork: INK BLOT</div>'
-    +'<svg viewBox="0 0 200 140" style="width:60%;display:block;margin:0 auto">'
-    +'<path d="M'+pts.map(p=>p.map(x=>x.toFixed(1)).join(',')).join(' L ')
-    +' Z" fill="var(--bone)" opacity="0.9"/></svg>'
-    +'<input type="text" id="ib-'+seed+'" placeholder="three words, comma separated">';
-  const b=document.createElement('button'); b.className='ghost'; b.textContent='File it';
-  b.onclick=()=>{const words=document.getElementById('ib-'+seed).value
-    .split(',').map(w=>w.trim()).filter(Boolean).slice(0,3);
-    if(words.length<2)return alert('At least two words.');
-    postSignal({game:'inkblot',blob_seed:seed,words},box);};
-  box.appendChild(b);
-}
-function gWordrun(box){
-  const cat=(CASE&&CASE.category)||'Surveillance';
-  const rel=['camera','database','consent','warrant','biometric','watchlist','alert','audit'];
-  const noise=['sandwich','umbrella','trombone','pelican','casserole','doily','yodeling','wallpaper'];
-  const deck=[...rel.slice(0,5),...noise.slice(0,5)]
-    .map(w=>({w})).sort(()=>Math.random()-0.5);
-  let i=0; const collected=[],avoided=[];
-  box.innerHTML='<div class="mlabel">WORD RUNNER \u00B7 context: '+esc(cat)+'</div>'
-    +'<div class="wordcard" id="wr-w"></div>'
-    +'<div class="pair"><button id="wr-c">COLLECT</button><button id="wr-d">DODGE</button></div>'
-    +'<div class="rewardline" id="wr-n"></div>';
-  const next=()=>{ if(i>=deck.length)
-      return postSignal({game:'wordrun',case_category:cat,collected,avoided},box);
-    box.querySelector('#wr-w').textContent=deck[i].w;
-    box.querySelector('#wr-n').textContent=(i+1)+' of '+deck.length;};
-  box.querySelector('#wr-c').onclick=()=>{collected.push(deck[i].w);i++;next();};
-  box.querySelector('#wr-d').onclick=()=>{avoided.push(deck[i].w);i++;next();};
-  next();
-}
-function gSticky(box){
-  const concepts=['license plate readers','sepsis alerts','resume filters',
-    'wildfire detection','face databases','loan scoring'].sort(()=>Math.random()-0.5).slice(0,4);
-  const buckets=['PANOPTICON','GOOD WORKS','COMPUTER SAYS NO'];
-  let sel=null; const placements=[];
-  box.innerHTML='<div class="mlabel">STICKY NOTES \u00B7 tap a note, then its arc</div>'
-    +'<div id="st-chips"></div>'
-    +buckets.map((b,i)=>'<div class="bucket" data-b="'+b+'"><b>'+b+'</b> <span id="st-b'+i+'"></span></div>').join('');
-  const chips=box.querySelector('#st-chips');
-  concepts.forEach(c=>{const ch=document.createElement('span');ch.className='mchip';
-    ch.textContent=c;ch.onclick=()=>{box.querySelectorAll('.mchip').forEach(x=>x.classList.remove('sel'));
-      ch.classList.add('sel');sel=ch;};chips.appendChild(ch);});
-  box.querySelectorAll('.bucket').forEach((bk,i)=>{
-    bk.onclick=()=>{if(!sel)return;
-      placements.push({concept:sel.textContent,bucket:bk.dataset.b});
-      box.querySelector('#st-b'+i).appendChild(sel);
-      sel.classList.remove('sel'); sel.onclick=null; sel=null;
-      if(placements.length===concepts.length)
-        postSignal({game:'sticky',placements},box);};});
-}
-const TRIVIA=[
- {id:'t-consent',q:'Under most US law, scraping public photos for a face database requires the subject\u2019s consent.',a:false},
- {id:'t-fnr',q:'Studies have found face recognition error rates differ across demographic groups.',a:true},
- {id:'t-hitl',q:'"Human in the loop" guarantees a person actually reviewed the decision.',a:false}];
-function gTrivia(box){
-  const t=TRIVIA[Math.floor(Math.random()*TRIVIA.length)];
-  box.innerHTML='<div class="mlabel">CLASSIFIED TRIVIA</div><p style="font-size:14px">'+esc(t.q)+'</p>'
-    +'<div class="pair"><button id="tv-t">TRUE</button><button id="tv-f">FALSE</button></div>'
-    +'<div class="rewardline">Confidence: <span id="tv-cl">75%</span></div>'
-    +'<input type="range" id="tv-c" min="50" max="100" value="75">';
-  box.querySelector('#tv-c').oninput=e=>box.querySelector('#tv-cl').textContent=e.target.value+'%';
-  const answer=v=>postSignal({game:'trivia',question_id:t.id,correct:v===t.a,
-    confidence:Number(box.querySelector('#tv-c').value)/100},box);
-  box.querySelector('#tv-t').onclick=()=>answer(true);
-  box.querySelector('#tv-f').onclick=()=>answer(false);
-}
-function gPerp(box){
-  const seed='face-'+Math.floor(Math.random()*99999);
-  const r=rng(seed);
-  const eyeY=64+r()*10, mouthW=18+r()*26, tilt=(r()-0.5)*12;
-  const hat=r()>0.6, glasses=r()>0.6;
-  box.innerHTML='<div class="mlabel">DESCRIBE THE PERP (procedural face; never a real one)</div>'
-    +'<svg viewBox="0 0 200 150" style="width:55%;display:block;margin:0 auto">'
-    +'<ellipse cx="100" cy="80" rx="'+(52+r()*16)+'" ry="58" fill="none" stroke="var(--bone)" stroke-width="3"/>'
-    +'<circle cx="76" cy="'+eyeY+'" r="'+(4+r()*4)+'" fill="var(--bone)"/>'
-    +'<circle cx="124" cy="'+eyeY+'" r="'+(4+r()*4)+'" fill="var(--bone)"/>'
-    +'<line x1="64" y1="'+(eyeY-14+tilt)+'" x2="88" y2="'+(eyeY-14-tilt)+'" stroke="var(--bone)" stroke-width="3"/>'
-    +'<line x1="112" y1="'+(eyeY-14-tilt)+'" x2="136" y2="'+(eyeY-14+tilt)+'" stroke="var(--bone)" stroke-width="3"/>'
-    +'<path d="M '+(100-mouthW/2)+' 112 Q 100 '+(104+r()*20)+' '+(100+mouthW/2)+' 112" fill="none" stroke="var(--bone)" stroke-width="3"/>'
-    +(glasses?'<rect x="64" y="'+(eyeY-8)+'" width="24" height="16" fill="none" stroke="var(--bone)"/><rect x="112" y="'+(eyeY-8)+'" width="24" height="16" fill="none" stroke="var(--bone)"/>':'')
-    +(hat?'<rect x="48" y="14" width="104" height="12" fill="var(--bone)"/><rect x="72" y="0" width="56" height="18" fill="var(--bone)"/>':'')
-    +'</svg>'
-    +'<input type="text" id="pp-'+seed+'" placeholder="describe them for the sketch artist">';
-  const b=document.createElement('button'); b.className='ghost'; b.textContent='File the description';
-  b.onclick=()=>{const d=box.querySelector('#pp-'+seed).value;
-    if(d.trim().length<15)return alert('The sketch artist needs more than that.');
-    postSignal({game:'perp',face_seed:seed,description:d},box);};
-  box.appendChild(b);
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('active');
+  setTimeout(() => t.classList.remove('active'), 3000);
 }
 
-/* helpers */
-function setText(id,t){document.getElementById(id).textContent=t}
-function esc(t){const d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML}
-renderHome(); doSearch();
+/* ========== INIT ========== */
+CASES = DEMO_CASES;
+renderCases(CASES);
 </script>
 </body>
 </html>
