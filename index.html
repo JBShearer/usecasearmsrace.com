@@ -252,27 +252,30 @@ button.ghost{width:100%;margin-top:8px;background:transparent;color:var(--fg);
   border:2px solid var(--fg);border-radius:12px;padding:12px;
   font:700 12.5px/1 inherit;letter-spacing:2px;text-transform:uppercase;
   cursor:pointer;min-height:46px}
-/* ============ MODIFIER SHEET ============ */
+/* ============ MODIFIER SHEET (Smart Picker) ============ */
 #sheetveil{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:44;display:none}
 #sheetveil.on{display:block}
 #sheet{position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--card);
   border-top:3px solid var(--fg);border-radius:20px 20px 0 0;
   padding:16px 16px calc(18px + env(safe-area-inset-bottom));
   transform:translateY(105%);transition:transform .22s;max-width:640px;
-  margin:0 auto}
+  margin:0 auto;max-height:85vh;overflow-y:auto}
 #sheet.on{transform:none}
-#sheet .stitle{font-size:12px;letter-spacing:2px;color:var(--muted);
-  text-transform:uppercase;margin-bottom:10px}
-.segrow{display:grid;gap:6px;margin:8px 0}
-.segrow.s4{grid-template-columns:repeat(4,1fr)}
-.seg{border:1.5px solid var(--line);border-radius:10px;padding:9px 4px;
-  font-size:11px;letter-spacing:.5px;cursor:pointer;background:none;
-  text-transform:uppercase;text-align:center}
-.seg.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+#sheet .stitle{font-size:14px;letter-spacing:2px;color:var(--fg);
+  text-transform:uppercase;margin-bottom:14px;font-weight:700}
+.sheet-row{margin-bottom:14px}
+.sheet-label{font-size:11px;letter-spacing:1.5px;color:var(--muted);
+  text-transform:uppercase;margin-bottom:6px;font-weight:600}
+.sheet-chips{display:flex;flex-wrap:wrap;gap:6px}
+.sheet-chip{border:2px solid var(--line);border-radius:10px;padding:8px 12px;
+  font-size:12px;cursor:pointer;background:var(--bg);font-weight:500;
+  transition:all .1s}
+.sheet-chip:hover{border-color:var(--fg)}
+.sheet-chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.sheet-chip.add{border-style:dashed;border-color:var(--accent);color:var(--accent)}
 #modterm{width:100%;background:var(--bg);color:var(--fg);
-  border:2px solid var(--fg);border-radius:12px;padding:13px;font:inherit;
-  margin-top:6px}
-#sheet .hint{font-size:11.5px;color:var(--muted);margin-top:6px}
+  border:2px solid var(--fg);border-radius:12px;padding:13px;font:inherit}
+#sheet .hint{font-size:11.5px;color:var(--muted);margin:10px 0 6px}
 /* ============ ADMIN ============ */
 .adminbox{background:var(--card);border:2.5px solid var(--fg);border-radius:16px;
   padding:14px;margin:12px 0;max-width:640px}
@@ -378,27 +381,41 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
 
 </main>
 
-<!-- ============ MODIFIER SHEET ============ -->
+<!-- ============ MODIFIER SHEET (Smart Picker) ============ -->
 <div id="sheetveil" onclick="closeSheet()"></div>
 <div id="sheet">
-  <div class="stitle" id="sheetTitle">Add a modifier</div>
-  <div class="dlabel" style="font-size:10.5px;letter-spacing:2px;color:var(--muted);text-transform:uppercase">Attaches to</div>
-  <div class="segrow s4" id="slotSeg">
-    <button class="seg on" data-v="who">WHO</button>
-    <button class="seg" data-v="action">ACTION</button>
-    <button class="seg" data-v="whom">WHOM</button>
-    <button class="seg" data-v="case">CASE</button>
+  <div class="stitle" id="sheetTitle">Refine this case</div>
+
+  <div class="sheet-row">
+    <div class="sheet-label">WHO deployed this?</div>
+    <div class="sheet-chips" id="whoChips"></div>
   </div>
-  <div class="dlabel" style="font-size:10.5px;letter-spacing:2px;color:var(--muted);text-transform:uppercase">Kind</div>
-  <div class="segrow s4" id="kindSeg">
-    <button class="seg on" data-v="adjective">ADJECTIVE</button>
-    <button class="seg" data-v="adverb">ADVERB</button>
-    <button class="seg" data-v="proper_noun">PROPER NOUN</button>
-    <button class="seg" data-v="compound">COMPOUND</button>
+
+  <div class="sheet-row">
+    <div class="sheet-label">What did they do?</div>
+    <div class="sheet-chips" id="actionChips"></div>
   </div>
-  <input type="text" id="modterm" placeholder="e.g. warrantless, Clearview, facial recognition" maxlength="40">
-  <div class="hint">1-3 words. No sentences: contributions here are search vocabulary, not comments. Every accepted term deepens graph traversal for everyone.</div>
-  <button class="go" onclick="submitModifier()">File the modifier</button>
+
+  <div class="sheet-row">
+    <div class="sheet-label">Who is affected?</div>
+    <div class="sheet-chips" id="whomChips"></div>
+  </div>
+
+  <div class="sheet-row">
+    <div class="sheet-label">Category</div>
+    <div class="sheet-chips" id="categoryChips"></div>
+  </div>
+
+  <div class="sheet-row">
+    <div class="sheet-label">Custom tag</div>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="modterm" placeholder="Add your own term" maxlength="40" style="flex:1">
+      <button class="ghost" onclick="addCustomTag()" style="width:auto;margin:0;padding:10px 14px">Add</button>
+    </div>
+  </div>
+
+  <div class="hint">Select terms that describe this case. Your picks become searchable tags.</div>
+  <button class="go" onclick="submitRefinement()">Save refinements</button>
 </div>
 <div class="toast" id="toast"></div>
 <footer>Faction is decided by human votes only. The registry takes no position.<br>
@@ -1410,49 +1427,130 @@ async function pollCaseStatus(id){
 
 /* ============ MODIFIER SHEET ============ */
 let SHEET_CASE=null;
-function segInit(id){
-  const seg=document.getElementById(id);
-  seg.querySelectorAll('.seg').forEach(b=>b.onclick=()=>{
-    seg.querySelectorAll('.seg').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on');});
-}
-segInit('slotSeg');segInit('kindSeg');
-function segVal(id){return document.querySelector('#'+id+' .seg.on').dataset.v;}
+const CATEGORIES=['Surveillance','Healthcare','Education','Law Enforcement',
+  'Employment','Financial','Government','Transportation','Defense','Social Media'];
+let SHEET_SELECTIONS={who:[],action:[],whom:[],category:null,custom:[]};
+
 function openSheet(c){
   SHEET_CASE=c;
-  setText('sheetTitle','Add a modifier \u00B7 '+(c.title||'').slice(0,44));
+  SHEET_SELECTIONS={who:[],action:[],whom:[],category:null,custom:[]};
+  setText('sheetTitle','Refine: '+(c.title||'').slice(0,40));
+
+  const ex=c.extraction||{};
+  const existing=c.modifier_terms||[];
+
+  /* Populate WHO chips */
+  const whoOpts=[...new Set([...(ex.who_choices||[]),...existing.filter(t=>t.match(/^[A-Z]/))].filter(Boolean))].slice(0,6);
+  renderChips('whoChips',whoOpts,'who');
+
+  /* Populate ACTION chips */
+  const actionOpts=[...new Set([...(ex.action_choices||[]),'deploys','monitors','uses','denies','tracks'].filter(Boolean))].slice(0,6);
+  renderChips('actionChips',actionOpts,'action');
+
+  /* Populate WHOM chips */
+  const whomOpts=[...new Set([...(ex.whom_choices||[]),'customers','students','patients','citizens','employees','users'].filter(Boolean))].slice(0,6);
+  renderChips('whomChips',whomOpts,'whom');
+
+  /* Populate CATEGORY chips */
+  renderChips('categoryChips',CATEGORIES,'category',true);
+
+  /* Pre-select existing modifier_terms */
+  for(const term of existing){
+    const chip=document.querySelector(`.sheet-chip[data-term="${term.toLowerCase()}"]`);
+    if(chip&&!chip.classList.contains('on')){chip.classList.add('on');
+      const slot=chip.closest('.sheet-chips').id.replace('Chips','');
+      if(slot!=='category')SHEET_SELECTIONS[slot].push(term.toLowerCase());
+    }
+  }
+
   document.getElementById('modterm').value='';
   document.getElementById('sheet').classList.add('on');
   document.getElementById('sheetveil').classList.add('on');
-  setTimeout(()=>document.getElementById('modterm').focus(),240);
 }
+
+function renderChips(containerId,options,slot,singleSelect=false){
+  const container=document.getElementById(containerId);
+  container.innerHTML=options.map(opt=>
+    `<button class="sheet-chip" data-term="${esc(opt.toLowerCase())}" data-slot="${slot}"
+      onclick="toggleChip(this,${singleSelect})">${esc(opt)}</button>`
+  ).join('');
+}
+
+function toggleChip(chip,singleSelect){
+  const slot=chip.dataset.slot;
+  const term=chip.dataset.term;
+  if(singleSelect){
+    /* Single select: clear others in same container */
+    chip.parentElement.querySelectorAll('.sheet-chip').forEach(c=>c.classList.remove('on'));
+    chip.classList.add('on');
+    SHEET_SELECTIONS[slot]=term;
+  }else{
+    /* Multi select */
+    chip.classList.toggle('on');
+    if(chip.classList.contains('on')){
+      if(!SHEET_SELECTIONS[slot].includes(term))SHEET_SELECTIONS[slot].push(term);
+    }else{
+      SHEET_SELECTIONS[slot]=SHEET_SELECTIONS[slot].filter(t=>t!==term);
+    }
+  }
+}
+
+function addCustomTag(){
+  const input=document.getElementById('modterm');
+  const term=input.value.trim().toLowerCase();
+  if(!term||term.length<2||term.length>40)return toast('2-40 characters');
+  if(!SHEET_SELECTIONS.custom.includes(term)){
+    SHEET_SELECTIONS.custom.push(term);
+    /* Add as a chip to the whom row (generic) */
+    const container=document.getElementById('whomChips');
+    const chip=document.createElement('button');
+    chip.className='sheet-chip on';
+    chip.dataset.term=term;
+    chip.dataset.slot='custom';
+    chip.textContent=term;
+    chip.onclick=()=>{chip.remove();SHEET_SELECTIONS.custom=SHEET_SELECTIONS.custom.filter(t=>t!==term);};
+    container.appendChild(chip);
+  }
+  input.value='';
+  toast('Added: '+term);
+}
+
 function closeSheet(){
   document.getElementById('sheet').classList.remove('on');
   document.getElementById('sheetveil').classList.remove('on');
 }
-async function submitModifier(){
-  const term=document.getElementById('modterm').value.trim();
-  const words=term.split(/\s+/).filter(Boolean);
-  if(term.length<2||term.length>40||words.length<1||words.length>3)
-    return toast('1-3 words, 2-40 characters.');
+
+async function submitRefinement(){
   const c=SHEET_CASE;if(!c)return;
-  const slot=segVal('slotSeg'),kind=segVal('kindSeg');
-  const norm=term.toLowerCase();
-  if(DEMO){
-    c.modifier_terms=c.modifier_terms||[];
-    if(!c.modifier_terms.includes(norm))c.modifier_terms.push(norm);
-    closeSheet();renderResults(currentQuery());
-    toast('Modifier filed (demo). It is now searchable.');return;
+  const allTerms=[...SHEET_SELECTIONS.who,...SHEET_SELECTIONS.action,
+    ...SHEET_SELECTIONS.whom,...SHEET_SELECTIONS.custom];
+  if(SHEET_SELECTIONS.category)allTerms.push(SHEET_SELECTIONS.category);
+
+  if(!allTerms.length){toast('Select at least one term');return;}
+
+  /* Update local cache */
+  c.modifier_terms=c.modifier_terms||[];
+  for(const t of allTerms){
+    if(!c.modifier_terms.includes(t))c.modifier_terms.push(t);
   }
-  try{
-    const d=await api('modifiers',{case_id:c.id,slot,kind,term:norm});
-    if(d.error)return toast(d.error);
-    c.modifier_terms=c.modifier_terms||[];
-    if(!c.modifier_terms.includes(norm))c.modifier_terms.push(norm);
+  if(SHEET_SELECTIONS.category)c.category=SHEET_SELECTIONS.category;
+
+  if(DEMO){
     closeSheet();renderResults(currentQuery());
-    toast(d.strengthened?'Term strengthened. The graph agrees with you.'
-      :'Modifier filed. It is now search vocabulary.');
-  }catch(e){toast('Could not reach the registry.');}
+    toast('Refinements saved (demo)');return;
+  }
+
+  /* Submit each term to modifiers endpoint */
+  try{
+    for(const term of allTerms){
+      const slot=SHEET_SELECTIONS.who.includes(term)?'who':
+        SHEET_SELECTIONS.action.includes(term)?'action':
+        SHEET_SELECTIONS.whom.includes(term)?'whom':'case';
+      await api('modifiers',{case_id:c.id,slot,kind:'compound',term});
+    }
+    closeSheet();renderResults(currentQuery());
+    toast('Saved '+allTerms.length+' tags');
+  }catch(e){toast('Could not save refinements');}
 }
 
 /* ================= ADMIN (#admin) ================= */
