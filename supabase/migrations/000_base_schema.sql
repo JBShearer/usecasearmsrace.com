@@ -9,7 +9,9 @@ CREATE TABLE IF NOT EXISTS use_cases (
 
   -- Basic metadata
   title TEXT NOT NULL,
-  source TEXT,  -- URL to article/documentation
+  description TEXT,  -- Longer description (used by 001's generate_case_did function)
+  category TEXT,     -- Category classification (used by 001's generate_case_did function)
+  source TEXT,       -- URL to article/documentation
 
   -- Voting (good vs evil)
   good_votes INTEGER DEFAULT 0,
@@ -21,7 +23,8 @@ CREATE TABLE IF NOT EXISTS use_cases (
     'machine_verified',  -- Passed automated checks
     'needs_human',       -- Flagged for human review
     'approved',          -- Human approved
-    'rejected'           -- Rejected (spam, duplicate, etc.)
+    'rejected',          -- Rejected (spam, duplicate, etc.)
+    'active'             -- Active/published (used by 001's publicly_accessible view)
   )),
 
   -- Machine verification
