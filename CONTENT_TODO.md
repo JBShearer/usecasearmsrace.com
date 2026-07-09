@@ -135,15 +135,31 @@ All `[COPY: *]` placeholders in code are logged here for Jason to finalize.
   - Location: TBD
 
 ### Card Minting
-- **OWNER DECISION: Backgrounds art assets** → Currently 3 solid fallbacks
-  - Context: Need final background library for card art
-  - Location: `supabase/storage/backgrounds/`
+- **✅ OWNER DECISION: No custom background assets** → Evaluate procedural generation options
+  - Jason not providing custom art assets
+  - Options to evaluate:
+    1. Procedural SVG patterns (geometric, noise, gradients)
+    2. Stable Diffusion API (generate on-the-fly, cache)
+    3. Abstract shapes derived from case_id hash
+    4. Expand current 3 solid colors to 10+ with variations
+  - Must remain deterministic (same case_id → same background)
+  - Location: `supabase/storage/backgrounds/` or procedural in renderCard.ts
   - Source: EBL_BATTLER_BUILD_PLAN section 4.4
 
-### K'Dee Production Workflow
-- **OWNER DECISION: Video production workflow** → Mentioned but not specified
-  - Context: "K'Dee production workflow: OWNER"
+### Video Production Workflow
+- **✅ OWNER DECISION: Daily video production** → Jason handles daily on his end
+  - K'Dee was sample video only
+  - Jason produces daily show episodes
+  - Buffer used for distribution (YouTube Shorts, TikTok, LinkedIn)
   - Location: SHOW_LAUNCH_RUNBOOK section 3
+
+### Buffer Integration
+- **NEW REQUIREMENT: Buffer API integration** → Distribute show to multiple platforms
+  - Post episode to YouTube Shorts
+  - Post to TikTok
+  - Post to LinkedIn
+  - Single Buffer API call distributes to all platforms
+  - Store Buffer post IDs in episodes table for tracking
 
 ---
 
@@ -174,7 +190,9 @@ When OWNER provides final copy:
 - [ ] Battle lane names finalized
 - [ ] Rival PM character identities finalized
 - [ ] Episode script templates finalized
-- [ ] Background art assets delivered
+- [x] Background art assets → No custom assets, evaluate procedural options
+- [x] Video production workflow → Jason handles daily, Buffer for distribution
+- [x] Economy values → Trusted, proceed with config/economy.ts defaults
 
 **Last updated:** 2026-07-08  
-**Pending items:** 20+ placeholders
+**Pending items:** 17 placeholders (3 resolved)
