@@ -1261,13 +1261,16 @@ async function fileURL(url){
     if(d.ok){
       /* v2: instant extraction means case is already live! */
       if(d.instant&&d.case_id){
-        toast('✓ Case filed and live!',{action:()=>location.hash='case='+d.case_id});
         /* Fetch and cache it immediately */
         try{
           const cd=await api('search-cases',{id:d.case_id});
           const c=(cd.results||[])[0];
           if(c)CACHE.set(c.id,c);
         }catch(e){}
+        toast('✓ Case filed and live!',{action:()=>{
+          clearSearch();
+          location.hash='case='+d.case_id;
+        }});
         return true;
       }
       /* Fallback for old backend: poll for completion */
@@ -1277,7 +1280,10 @@ async function fileURL(url){
       return true;
     }
     if(d.dedupe&&d.case_id){
-      toast('Already in the registry!',{action:()=>location.hash='case='+d.case_id});
+      toast('Already in the registry!',{action:()=>{
+        clearSearch();
+        location.hash='case='+d.case_id;
+      }});
       return true;
     }
     toast(d.error||'Could not file.');return false;
