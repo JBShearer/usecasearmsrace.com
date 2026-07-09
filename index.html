@@ -199,6 +199,13 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 .mc-action-btn{flex:1;padding:8px;border:2px solid var(--fg);border-radius:8px;
   background:var(--fg);color:var(--bg);font-size:11px;font-weight:700;cursor:pointer}
 .mc-action-btn.secondary{background:transparent;color:var(--fg)}
+.mc-close{background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0 4px}
+.mc-close:hover{color:var(--fg)}
+.mc-vote-row{display:flex;gap:8px;margin-top:10px}
+.mc-vote{flex:1;padding:8px 12px;border:2px solid var(--line);border-radius:8px;
+  background:transparent;font-size:12px;cursor:pointer;transition:all .15s}
+.mc-vote.halo:hover{border-color:var(--halo);background:rgba(76,175,80,0.1)}
+.mc-vote.horns:hover{border-color:var(--horns);background:rgba(244,67,54,0.1)}
 /* MINE ALL Button */
 .mine-all-btn{display:none;width:100%;padding:16px 24px;margin:12px 0;
   background:linear-gradient(135deg,var(--horns),#ff4444);border:3px solid var(--horns);
@@ -1111,15 +1118,26 @@ function renderSelectedCase(){
   const domain=domainOf(c.source_url||c.url||'');
   const timeAgo=c.added_at?getTimeAgo(c.added_at):'';
   const triple=full.canonical?`${full.canonical.who} → ${full.canonical.action} → ${full.canonical.whom}`:'';
+  const summary=c.summary||full.summary||'';
+  const quote=c.quote||full.article_quote||'';
+
+  /* Clean title - remove HTML entities and site suffixes */
+  let title=c.title||full.title||'Pending...';
+  title=title.replace(/&#x27;/g,"'").replace(/&amp;/g,'&').replace(/&quot;/g,'"')
+    .replace(/\s*[-–|]\s*(Let's Data Science|Medium|LinkedIn|Twitter|Facebook).*$/i,'').trim();
 
   let bodyHtml='';
   if(state==='pending'||state==='processing'){
     bodyHtml=`<div class="mc-progress"><div class="mc-progress-bar"></div><span>Extracting case details...</span></div>`;
   }else if(state==='done'||state==='saved'){
     bodyHtml=`<div class="mc-selected-body">
-      <div class="mc-selected-summary">${esc(c.summary||full.summary||'')}</div>
-      ${c.quote||full.article_quote?`<blockquote class="mc-selected-quote">"${esc((c.quote||full.article_quote||'').slice(0,200))}"</blockquote>`:''}
+      ${summary?`<div class="mc-selected-summary">${esc(summary)}</div>`:'<div class="mc-selected-summary" style="color:var(--muted)">No summary extracted</div>'}
+      ${quote?`<blockquote class="mc-selected-quote">"${esc(quote.slice(0,250))}"</blockquote>`:''}
       ${triple?`<div class="mc-selected-triple">${esc(triple)}</div>`:''}
+      <div class="mc-vote-row">
+        <button class="mc-vote halo" onclick="castVote(CACHE.get('${c.id}')||{id:'${c.id}'},1)">😇 Good</button>
+        <button class="mc-vote horns" onclick="castVote(CACHE.get('${c.id}')||{id:'${c.id}'},-1)">😈 Evil</button>
+      </div>
     </div>`;
   }else if(state==='failed'){
     bodyHtml=`<div class="mc-error">
@@ -1130,17 +1148,16 @@ function renderSelectedCase(){
 
   panel.innerHTML=`
     <div class="mc-selected-header">
-      <button class="mc-back" onclick="deselectMyCase()">← Back</button>
       <span class="mc-selected-state ${state}">${stateLabels[state]||state}</span>
+      <button class="mc-close" onclick="deselectMyCase()">×</button>
     </div>
-    <h3 class="mc-selected-title">${esc(c.title||'Pending...')}</h3>
+    <h3 class="mc-selected-title">${esc(title)}</h3>
     <div class="mc-selected-meta">
-      <a href="${esc(c.source_url||c.url||'#')}" target="_blank" rel="noopener" class="mc-selected-url">${esc(domain)}</a>
+      <a href="${esc(c.source_url||c.url||'#')}" target="_blank" rel="noopener" class="mc-selected-url">${esc(domain)} ↗</a>
       <span class="mc-selected-time">${timeAgo}</span>
     </div>
     ${bodyHtml}
     <div class="mc-selected-actions">
-      <button class="mc-action-btn" onclick="viewFullCase('${c.id}')">View Full Case</button>
       <button class="mc-action-btn secondary" onclick="shareCase('${c.id}')">Share</button>
     </div>
   `;
@@ -1312,8 +1329,10 @@ function renderPending(){renderMyCases();}/* compatibility */
 
 /* ============ MINE ALL FEATURE ============ */
 async function mineAllWebResults(){
+  console.log('mineAllWebResults called, lastWeb:', lastWeb.length, 'MINING_IN_PROGRESS:', MINING_IN_PROGRESS);
   if(MINING_IN_PROGRESS)return;
   const unfiledHits=lastWeb.filter(w=>w.url&&w.url!=='#'&&!w.filed);
+  console.log('unfiledHits:', unfiledHits.length);
   if(!unfiledHits.length){toast('No web results to mine');return;}
 
   MINING_IN_PROGRESS=true;
@@ -1327,11 +1346,11 @@ async function mineAllWebResults(){
   let completed=0;
   const concurrencyLimit=3;
   const queue=[...unfiledHits];
-  const active=[];
 
   async function processOne(hit){
     /* Generate temp ID for tracking */
     const tempId='mine_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+    console.log('Processing:', hit.url, 'tempId:', tempId);
 
     /* Add to MY_CASES immediately with pending state */
     addToMyCases({
@@ -1343,12 +1362,14 @@ async function mineAllWebResults(){
 
     try{
       const ok=await fileURLForMining(hit.url,tempId);
+      console.log('fileURLForMining result:', ok, 'for', hit.url);
       if(ok){
         hit.filed=true;
       }else{
         updateCaseState(tempId,'failed',{error:'Could not file URL'});
       }
     }catch(e){
+      console.error('Mining error:', e);
       updateCaseState(tempId,'failed',{error:e.message||'Network error'});
     }
 
@@ -1395,7 +1416,15 @@ async function fileURLForMining(url,tempId){
 
   try{
     const d=await api('file-case',{url});
-    if(d.ok){
+    console.log('file-case response for', url, ':', d);
+
+    if(d.error){
+      console.error('file-case error:', d.error);
+      updateCaseState(tempId,'failed',{error:d.error});
+      return false;
+    }
+
+    if(d.ok||d.dedupe){
       /* Update temp ID to real case ID */
       const c=MY_CASES.find(x=>x.id===tempId);
       if(c&&d.case_id){
@@ -1403,8 +1432,8 @@ async function fileURLForMining(url,tempId){
         saveMyCases();
       }
 
-      if(d.instant&&d.case_id){
-        /* Instant extraction - fetch full case data */
+      if((d.instant||d.dedupe)&&d.case_id){
+        /* Instant extraction or dedupe - fetch full case data */
         try{
           const cd=await api('search-cases',{id:d.case_id});
           const fullCase=(cd.results||[])[0];
@@ -1417,7 +1446,6 @@ async function fileURLForMining(url,tempId){
               canonical:fullCase.canonical
             });
           }else{
-            /* Fallback: at least mark done, title will update on next view */
             updateCaseState(d.case_id,'done',{title:'Case filed - tap to view'});
           }
         }catch(e){
@@ -1434,32 +1462,11 @@ async function fileURLForMining(url,tempId){
       return true;
     }
 
-    if(d.dedupe&&d.case_id){
-      /* Already exists - update our record */
-      const c=MY_CASES.find(x=>x.id===tempId);
-      if(c){
-        c.id=d.case_id;
-        saveMyCases();
-      }
-      /* Fetch the existing case */
-      try{
-        const cd=await api('search-cases',{id:d.case_id});
-        const fullCase=(cd.results||[])[0];
-        if(fullCase){
-          CACHE.set(fullCase.id,fullCase);
-          updateCaseState(d.case_id,'done',{
-            title:fullCase.title,
-            quote:fullCase.article_quote,
-            summary:fullCase.summary,
-            canonical:fullCase.canonical
-          });
-        }
-      }catch(e){}
-      return true;
-    }
-
+    /* Unhandled response - probably an error */
+    console.error('Unexpected file-case response:', d);
     return false;
   }catch(e){
+    console.error('fileURLForMining exception:', e);
     return false;
   }
 }
