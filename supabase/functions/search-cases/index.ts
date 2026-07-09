@@ -27,7 +27,7 @@ async function webSearch(q: string) {
   const cached = webCache.get(q);
   if (cached && Date.now() - cached.t < WEB_TTL) return cached.r;
 
-  const out: { title: string; url: string; domain: string }[] = [];
+  const out: { title: string; url: string; domain: string; snippet: string }[] = [];
 
   // Tavily: fast news search (~500-800ms)
   if (TAVILY_KEY) {
@@ -50,7 +50,8 @@ async function webSearch(q: string) {
           out.push({
             title: item.title ?? "",
             url: item.url ?? "",
-            domain: item.url ? new URL(item.url).hostname.replace(/^www\./, "") : ""
+            domain: item.url ? new URL(item.url).hostname.replace(/^www\./, "") : "",
+            snippet: item.content?.slice(0, 200) ?? ""
           });
         }
       }

@@ -145,10 +145,17 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
   padding-bottom:4px;margin:10px 0 0}
 .webhit{border:2px dashed var(--muted);border-radius:14px;padding:12px;
   background:var(--card)}
+.webhit a{color:var(--fg);text-decoration:none;font-weight:600;display:block;
+  line-height:1.4}
+.webhit a:hover{text-decoration:underline}
+.webhit .snippet{font-size:13px;color:var(--muted);margin:4px 0;line-height:1.4;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .webhit .meta{font-size:11px;color:var(--muted);margin-top:2px}
 .webhit button{margin-top:8px;background:none;border:1.5px solid var(--fg);
   border-radius:10px;padding:9px 12px;font-size:11.5px;letter-spacing:1px;
   text-transform:uppercase;cursor:pointer;font-weight:800}
+.webhit.filed{border-color:var(--accent);opacity:0.6}
+.webhit.filed button{display:none}
 button.go{width:100%;margin-top:12px;background:var(--fg);color:var(--bg);
   border:none;border-radius:12px;padding:15px;font:800 14px/1 inherit;
   letter-spacing:2px;text-transform:uppercase;cursor:pointer;min-height:50px}
@@ -579,12 +586,21 @@ function renderResults(q){
     const d=document.createElement('div');d.className='divider';
     d.textContent='FROM THE WEB (not yet in the record)';host.appendChild(d);
     for(const w of lastWeb){
-      const el=document.createElement('div');el.className='webhit';
+      const el=document.createElement('div');el.className='webhit'+(w.filed?' filed':'');
       el.innerHTML='<a href="'+esc(w.url)+'" target="_blank" rel="noopener">'+esc(w.title)+'</a>'
+        +(w.snippet?'<div class="snippet">'+esc(w.snippet)+'</div>':'')
         +'<div class="meta">'+esc(w.domain||domainOf(w.url))+'</div>';
-      if(w.url&&w.url!=='#'){const b=document.createElement('button');
-        b.textContent='+File';b.onclick=()=>fileURL(w.url);
-        el.appendChild(b);}
+      if(w.url&&w.url!=='#'&&!w.filed){
+        const b=document.createElement('button');
+        b.textContent='+File';
+        b.onclick=async()=>{
+          b.textContent='Filing...';b.disabled=true;
+          const ok=await fileURL(w.url);
+          if(ok){w.filed=true;renderResults(currentQuery());}
+          else{b.textContent='+File';b.disabled=false;}
+        };
+        el.appendChild(b);
+      }
       host.appendChild(el);
     }
   }
@@ -680,10 +696,11 @@ function renderFilePrompt(url,host){
   b.onclick=()=>fileURL(url);el.appendChild(b);host.appendChild(el);
 }
 async function fileURL(url){
-  if(DEMO){toast('DEMO: deploys to the staged queue when configured.');return;}
+  if(DEMO){toast('DEMO: deploys to the staged queue when configured.');return false;}
   try{const d=await api('file-case',{url});
-    toast(d.ok?'Filed. The steward will prefill it for review.':(d.error||'Could not file.'));
-  }catch(e){toast('Could not reach the registry.');}
+    if(d.ok){toast('Filed! The steward will process it.');return true;}
+    toast(d.error||'Could not file.');return false;
+  }catch(e){toast('Could not reach the registry.');return false;}
 }
 
 /* ============ MODIFIER SHEET ============ */
