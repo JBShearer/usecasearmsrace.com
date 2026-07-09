@@ -59,11 +59,16 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
   -webkit-overflow-scrolling:touch}.epi{flex:0 0 78%;white-space:normal}}
 /* ============ SEARCH ============ */
 .searchwrap{position:sticky;top:66px;z-index:25;background:var(--bg);
-  padding:6px 0 4px}
+  padding:6px 0 4px;position:relative}
 #q{width:100%;background:var(--card);color:var(--fg);
-  border:2.5px solid var(--fg);border-radius:14px;padding:15px 16px;
+  border:2.5px solid var(--fg);border-radius:14px;padding:15px 44px 15px 16px;
   font:inherit;min-height:52px;font-size:17px}
 #q::placeholder{color:var(--muted)}
+.qclear{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  width:32px;height:32px;border:none;background:var(--muted);color:var(--bg);
+  border-radius:50%;font-size:20px;line-height:1;cursor:pointer;display:none;
+  align-items:center;justify-content:center}
+.qclear.on{display:flex}
 #parseRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 #parseRow:empty{display:none}
 .pchip{border:1.5px solid var(--accent);color:var(--accent);border-radius:9px;
@@ -229,6 +234,7 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
   <div class="searchwrap">
     <input id="q" placeholder="Search: who did what to whom … or paste a URL to file a case"
       autocomplete="off" autocapitalize="off">
+    <button id="qclear" class="qclear" onclick="clearSearch()" aria-label="Clear search">×</button>
     <div id="parseRow"></div>
   </div>
   <div id="latency"></div>
@@ -490,8 +496,21 @@ function renderParse(p){
 /* ============ SEARCH: instant local + fast path + streaming web ======== */
 let topupTimer=null,webTimer=null,webToken=0;
 function currentQuery(){return document.getElementById('q').value.trim();}
+function updateClearBtn(){
+  const q=currentQuery();
+  document.getElementById('qclear').classList.toggle('on',q.length>0);
+}
+function clearSearch(){
+  document.getElementById('q').value='';
+  updateClearBtn();
+  lastWeb=[];lastParsed=null;
+  renderResults('');renderParse(null);
+  setText('latency','');
+  document.getElementById('q').focus();
+}
 document.getElementById('q').addEventListener('input',()=>{
   const q=currentQuery();lastWeb=[];lastParsed=null;
+  updateClearBtn();
   renderResults(q);
   renderParse(q&&!isURL(q)?clientParse(q):null);
   clearTimeout(topupTimer);clearTimeout(webTimer);
