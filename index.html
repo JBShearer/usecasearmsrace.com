@@ -403,6 +403,40 @@ const DEMO_CASES=[{
 /* ================= STATE ================= */
 const CACHE=new Map();DEMO_CASES.forEach(c=>CACHE.set(c.id,c));
 let CATEGORY=null,MY_VOTES={},OPEN_ID=null,lastWeb=[],lastParsed=null;
+/* Web result cache: stores ALL web results keyed by query fragments.
+   Typing "utah" instantly shows any cached results mentioning "utah".
+   Acts like a local news index that grows with each search. */
+const WEB_INDEX=new Map();/* query -> {hits:[], ts:number} */
+const WEB_TTL=30*60*1000; /* 30 min - news is semi-stable */
+function indexWeb(q,hits){
+  if(!hits||!hits.length)return;
+  const k=q.toLowerCase().trim();
+  WEB_INDEX.set(k,{hits,ts:Date.now()});
+  if(WEB_INDEX.size>150){/* prune oldest */
+    const oldest=[...WEB_INDEX.entries()].sort((a,b)=>a[1].ts-b[1].ts)[0];
+    if(oldest)WEB_INDEX.delete(oldest[0]);}
+}
+function recallWeb(q){
+  /* Return cached web hits that match ANY word in q */
+  const words=q.toLowerCase().split(/\s+/).filter(w=>w.length>=3);
+  if(!words.length)return[];
+  const now=Date.now(),seen=new Set(),out=[];
+  for(const [k,v] of WEB_INDEX){
+    if(now-v.ts>WEB_TTL)continue;/* expired */
+    const keyWords=k.split(/\s+/);
+    const match=words.some(w=>keyWords.some(kw=>kw.includes(w)||w.includes(kw)));
+    if(match)for(const h of v.hits){
+      const sig=h.url||h.title;
+      if(!seen.has(sig)){seen.add(sig);out.push(h);}
+    }
+  }
+  /* Rank by relevance: hits whose title contains query words first */
+  return out.sort((a,b)=>{
+    const aq=words.filter(w=>(a.title||'').toLowerCase().includes(w)).length;
+    const bq=words.filter(w=>(b.title||'').toLowerCase().includes(w)).length;
+    return bq-aq;
+  }).slice(0,12);
+}
 try{MY_VOTES=JSON.parse(localStorage.getItem('ucar_votes')||'{}');}catch(e){}
 function saveVotes(){try{localStorage.setItem('ucar_votes',JSON.stringify(MY_VOTES));}catch(e){}}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
@@ -494,7 +528,7 @@ function renderParse(p){
 }
 
 /* ============ SEARCH: instant local + fast path + streaming web ======== */
-let topupTimer=null,webTimer=null,webToken=0;
+let topupTimer=null,webTimer=null,webToken=0,webFresh=false;
 function currentQuery(){return document.getElementById('q').value.trim();}
 function updateClearBtn(){
   const q=currentQuery();
@@ -503,14 +537,16 @@ function updateClearBtn(){
 function clearSearch(){
   document.getElementById('q').value='';
   updateClearBtn();
-  lastWeb=[];lastParsed=null;
+  lastWeb=[];lastParsed=null;webFresh=false;
   renderResults('');renderParse(null);
   setText('latency','');
   document.getElementById('q').focus();
 }
 document.getElementById('q').addEventListener('input',()=>{
-  const q=currentQuery();lastWeb=[];lastParsed=null;
+  const q=currentQuery();lastParsed=null;webFresh=false;
   updateClearBtn();
+  /* INSTANT: show cached web results that match this query */
+  lastWeb=q.length>=3?recallWeb(q):[];
   renderResults(q);
   renderParse(q&&!isURL(q)?clientParse(q):null);
   clearTimeout(topupTimer);clearTimeout(webTimer);
@@ -560,7 +596,9 @@ async function webStream(q){
     else{const data=await api('search-cases',{q,web_only:true});
       (data.results||[]).forEach(c=>CACHE.set(c.id,c));
       web=data.web_results||[];}
-    if(token===webToken&&currentQuery()===q){lastWeb=web;renderResults(q);}
+    /* Index fresh web results for future instant recall */
+    if(web.length)indexWeb(q,web);
+    if(token===webToken&&currentQuery()===q){lastWeb=web;webFresh=true;renderResults(q);}
   }catch(e){}
 }
 async function boot(){
@@ -603,7 +641,8 @@ function renderResults(q){
   }
   if(lastWeb.length){
     const d=document.createElement('div');d.className='divider';
-    d.textContent='FROM THE WEB (not yet in the record)';host.appendChild(d);
+    d.textContent=webFresh?'FROM THE WEB':'FROM THE WEB • cached';
+    host.appendChild(d);
     for(const w of lastWeb){
       const el=document.createElement('div');el.className='webhit'+(w.filed?' filed':'');
       el.innerHTML='<a href="'+esc(w.url)+'" target="_blank" rel="noopener">'+esc(w.title)+'</a>'
