@@ -50,49 +50,92 @@ const AI_TERMS = ["ai", "artificial intelligence", "machine learning", "algorith
 const DEPLOY_VERBS = ["deploy", "use", "implement", "adopt", "install", "launch", "roll out", "introduce"];
 const WHOM_PATTERNS = ["student", "patient", "resident", "citizen", "customer", "employee", "worker", "applicant", "driver", "user"];
 
-function extractOrg(text: string): string | null {
+function extractAllOrgs(text: string): string[] {
   const lower = text.toLowerCase();
-  // Check gazetteer first
+  const found: string[] = [];
+  // Check gazetteer
   for (const [key, val] of Object.entries(GAZETTEER)) {
-    if (lower.includes(key)) return val.name;
+    if (lower.includes(key) && !found.includes(val.name)) {
+      found.push(val.name);
+      if (found.length >= 4) break;
+    }
   }
   // NER-style: capitalized multi-word phrases
-  const matches = text.match(/(?:[A-Z][a-z]+\s+){1,3}(?:Department|Agency|Police|School|University|Hospital|Corporation|Inc|LLC|Company)/g);
-  if (matches?.length) return matches[0].trim();
-  return null;
+  if (found.length < 4) {
+    const matches = text.match(/(?:[A-Z][a-z]+\s+){1,3}(?:Department|Agency|Police|School|University|Hospital|Corporation|Inc|LLC|Company)/g) || [];
+    for (const m of matches) {
+      const name = m.trim();
+      if (!found.includes(name)) {
+        found.push(name);
+        if (found.length >= 4) break;
+      }
+    }
+  }
+  return found;
+}
+
+function extractOrg(text: string): string | null {
+  const orgs = extractAllOrgs(text);
+  return orgs[0] || null;
+}
+
+function extractAllActions(text: string): string[] {
+  const lower = text.toLowerCase();
+  const found: string[] = [];
+  for (const verb of DEPLOY_VERBS) {
+    if (lower.includes(verb) && !found.includes(verb + "s")) {
+      found.push(verb + "s");
+      if (found.length >= 4) break;
+    }
+  }
+  return found;
+}
+
+function extractAllWhom(text: string): string[] {
+  const lower = text.toLowerCase();
+  const found: string[] = [];
+  for (const pattern of WHOM_PATTERNS) {
+    if (lower.includes(pattern) && !found.includes(pattern + "s")) {
+      found.push(pattern + "s");
+      if (found.length >= 4) break;
+    }
+  }
+  return found;
+}
+
+function extractTriple(text: string): { who: string | null; action: string | null; whom: string | null; who_choices: string[]; action_choices: string[]; whom_choices: string[] } {
+  const who_choices = extractAllOrgs(text);
+  const action_choices = extractAllActions(text);
+  const whom_choices = extractAllWhom(text);
+
+  return {
+    who: who_choices[0] || null,
+    action: action_choices[0] || null,
+    whom: whom_choices[0] || null,
+    who_choices,
+    action_choices,
+    whom_choices,
+  };
 }
 
 function extractImpact(text: string, sourceTier: number): number {
   const lower = text.toLowerCase();
   let impact = 1;
-  // Rights-affecting terms
   if (RIGHTS_TERMS.some(t => lower.includes(t))) impact += 1;
-  // Scale terms
   if (SCALE_TERMS.some(t => lower.includes(t))) impact += 1;
-  // AI terms (confirms relevance)
   if (AI_TERMS.some(t => lower.includes(t))) impact += 1;
-  // First-party source bonus
   if (sourceTier === 1) impact += 1;
   return Math.min(5, impact);
 }
 
-function extractTriple(text: string): { who: string | null; action: string | null; whom: string | null } {
-  const lower = text.toLowerCase();
-  const who = extractOrg(text);
-  let action: string | null = null;
-  let whom: string | null = null;
-
-  for (const verb of DEPLOY_VERBS) {
-    if (lower.includes(verb)) { action = verb + "s"; break; }
-  }
-  for (const pattern of WHOM_PATTERNS) {
-    if (lower.includes(pattern)) { whom = pattern + "s"; break; }
-  }
-
-  return { who, action, whom };
+interface ArticleData {
+  title: string;
+  text: string;
+  summary: string;
+  quote: string;
 }
 
-async function fetchArticle(url: string): Promise<{ title: string; text: string } | null> {
+async function fetchArticle(url: string): Promise<ArticleData | null> {
   try {
     const r = await fetch(url, {
       headers: { "User-Agent": "UCAR-Bot/1.0 (AI Use Case Registry)" },
@@ -100,17 +143,58 @@ async function fetchArticle(url: string): Promise<{ title: string; text: string 
     });
     if (!r.ok) return null;
     const html = await r.text();
-    // Extract title
-    const titleMatch = html.match(/<title[^>]*>([^<]+)</i);
-    const title = titleMatch?.[1]?.trim() || "";
+
+    // Extract title: prefer Open Graph, fall back to <title>
+    const ogTitle = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)?.[1]
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i)?.[1];
+    const titleTag = html.match(/<title[^>]*>([^<]+)</i)?.[1]?.trim();
+    const title = ogTitle?.trim() || titleTag || "";
+
+    // Extract description: prefer Open Graph
+    const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i)?.[1]
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i)?.[1]
+      || html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)?.[1];
+
     // Strip HTML for text
     const text = html
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+      .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, "")
+      .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, "")
+      .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, "")
       .replace(/<[^>]+>/g, " ")
       .replace(/\s+/g, " ")
-      .slice(0, 15000);
-    return { title, text };
+      .slice(0, 20000);
+
+    // Extract summary: OG desc or first AI-relevant paragraph
+    let summary = ogDesc?.trim() || "";
+    if (!summary) {
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 60);
+      for (const s of sentences.slice(0, 20)) {
+        if (AI_TERMS.some(t => s.toLowerCase().includes(t))) {
+          summary = s.trim().slice(0, 300);
+          break;
+        }
+      }
+    }
+
+    // Extract quote: find quoted text or impactful sentence
+    let quote = "";
+    const quoteMatch = text.match(/"([^"]{40,200})"/);
+    if (quoteMatch) {
+      quote = quoteMatch[1];
+    } else {
+      // Find sentence with rights term + AI term
+      for (const s of text.split(/[.!?]+/).slice(0, 30)) {
+        const lower = s.toLowerCase();
+        if (RIGHTS_TERMS.some(t => lower.includes(t)) && AI_TERMS.some(t => lower.includes(t))) {
+          quote = s.trim().slice(0, 250);
+          break;
+        }
+      }
+    }
+
+    return { title, text, summary, quote };
   } catch {
     return null;
   }
@@ -175,14 +259,25 @@ Deno.serve(async (req) => {
 
     const impact = extractImpact(combinedText, sourceTier);
     const triple = extractTriple(combinedText);
-    const org = extractOrg(combinedText);
+
+    // Build better title from triple
+    let smartTitle = article?.title || "";
+    if (triple.who && triple.action && triple.whom) {
+      smartTitle = `${triple.who} ${triple.action} ${triple.whom}`;
+    } else if (triple.who && triple.action) {
+      smartTitle = `${triple.who} ${triple.action} AI`;
+    } else if (!smartTitle) {
+      smartTitle = `AI deployment at ${triple.who || parsed.hostname}`;
+    }
 
     // Build case row - go straight to 'live' with basic extraction
     // Note: schema uses 'faction' not 'category' - faction is heaven/hell/unaligned
     const row: Record<string, unknown> = {
       external_id: externalId,
       raw_title: article?.title || `Filed from ${parsed.hostname}`,
-      title: article?.title || `AI deployment at ${org || parsed.hostname}`,
+      title: smartTitle.slice(0, 200),
+      summary: article?.summary?.slice(0, 500) || null,
+      article_quote: article?.quote?.slice(0, 300) || null,
       source_url: parsed.href,
       source_tier: sourceTier,
       faction: "unaligned", // Deterministic extraction can't judge good/evil
@@ -190,9 +285,9 @@ Deno.serve(async (req) => {
       status: "live", // Instant live! Not staged.
       extraction: {
         deterministic: true,
-        who_choices: triple.who ? [triple.who] : [],
-        action_choices: triple.action ? [triple.action] : [],
-        whom_choices: triple.whom ? [triple.whom] : [],
+        who_choices: triple.who_choices,
+        action_choices: triple.action_choices,
+        whom_choices: triple.whom_choices,
         extracted_at: new Date().toISOString(),
       },
     };
