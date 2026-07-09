@@ -815,7 +815,7 @@ function showLoadScreen(on,searchQuery){
         qh.innerHTML='<div class="lq-stat">'+esc(stat)+'</div>';
       }else if(quotes.length){
         const quote=quotes[qi%quotes.length];qi++;
-        qh.innerHTML='<div class="lq">"'+esc(quote.q.slice(0,200)+(quote.q.length>200?'...':'')+'"</div>'
+        qh.innerHTML='<div class="lq">"'+esc(quote.q.slice(0,200)+(quote.q.length>200?'...':''))+'"</div>'
           +'<div class="lq-src">— '+esc(quote.src||'case notes')+'</div>';
       }
     });
@@ -825,7 +825,7 @@ function showLoadScreen(on,searchQuery){
   const qh=document.getElementById('loadquotes');
   if(quotes.length){
     const quote=quotes[0];qi=1;
-    qh.innerHTML='<div class="lq">"'+esc(quote.q.slice(0,200)+(quote.q.length>200?'...':'')+'"</div>'
+    qh.innerHTML='<div class="lq">"'+esc(quote.q.slice(0,200)+(quote.q.length>200?'...':''))+'"</div>'
       +'<div class="lq-src">— '+esc(quote.src||'case notes')+'</div>';
   }else if(stats.length){
     qh.innerHTML='<div class="lq-stat">'+esc(stats[0])+'</div>';si=1;
