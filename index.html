@@ -1059,11 +1059,15 @@ function exportMyCases(format){
       navigator.clipboard.writeText(text).then(()=>toast('Copied to clipboard!'));
     }
   }else{
-    /* JSON download */
-    const blob=new Blob([JSON.stringify(enriched,null,2)],{type:'application/json'});
+    /* CSV download */
+    const headers=['Title','Summary','Source URL','Faction','Impact','Community Notes','Registry URL'];
+    const escCSV=s=>{s=String(s||'');return s.includes(',')||s.includes('"')||s.includes('\n')?'"'+s.replace(/"/g,'""')+'"':s;};
+    const rows=enriched.map(c=>[c.title,c.summary,c.source_url,c.faction,c.impact,c.community_notes,c.registry_url].map(escCSV).join(','));
+    const csv=headers.join(',')+'\n'+rows.join('\n');
+    const blob=new Blob([csv],{type:'text/csv'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
-    a.href=url;a.download='my-cases-'+new Date().toISOString().slice(0,10)+'.json';
+    a.href=url;a.download='my-cases-'+new Date().toISOString().slice(0,10)+'.csv';
     a.click();URL.revokeObjectURL(url);
     toast('Downloaded '+enriched.length+' cases');
   }
