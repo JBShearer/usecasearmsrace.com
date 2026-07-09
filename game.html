@@ -5,438 +5,109 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>USE CASE ARMS RACE</title>
 <style>
-/* ========== THEME SYSTEM ========== */
 :root {
   --cream:#F5F0E6;--marker:#1A1817;--stamp:#C1121F;--pencil:#6B6560;
   --brain-bg:#0D0A0F;--brain-fg:#E8E0E4;--spotlight:#D4A84C;--shadow:#4A3045;
   --bg:var(--cream);--fg:var(--marker);--accent:var(--stamp);--muted:var(--pencil);
   --good:#2D8B4A;--good-glow:#4ADE80;--evil:#C1121F;--evil-glow:#FF4444;--neutral:#6B6560;
-  --card-bg:#0a0a0c;
 }
-[data-theme="dark"] {
-  --bg:var(--brain-bg);--fg:var(--brain-fg);--accent:var(--spotlight);--muted:var(--shadow);
-}
-* { box-sizing:border-box; margin:0; padding:0; }
-html,body {
-  background:var(--bg);color:var(--fg);
-  font:16px/1.5 'SF Pro Text',-apple-system,'Helvetica Neue',sans-serif;
-  min-height:100vh;transition:background .25s,color .25s;
-}
+[data-theme="dark"]{--bg:var(--brain-bg);--fg:var(--brain-fg);--accent:var(--spotlight);--muted:var(--shadow)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--fg);font:16px/1.5 -apple-system,sans-serif;min-height:100vh}
 
-/* ========== HEADER ========== */
-header {
-  padding:14px 18px;border-bottom:2px solid var(--fg);
-  display:flex;justify-content:space-between;align-items:center;
-}
-h1 { font-size:14px;font-weight:800;letter-spacing:4px;text-transform:uppercase;cursor:pointer; }
-.theme-toggle {
-  background:none;border:1px solid var(--muted);color:var(--fg);
-  padding:6px 10px;font-size:16px;cursor:pointer;border-radius:4px;
-}
+header{padding:14px 18px;border-bottom:2px solid var(--fg);display:flex;justify-content:space-between;align-items:center}
+h1{font-size:14px;font-weight:800;letter-spacing:4px;text-transform:uppercase;cursor:pointer}
+.theme-toggle{background:none;border:1px solid var(--muted);color:var(--fg);padding:6px 10px;font-size:16px;cursor:pointer;border-radius:4px}
 
-/* ========== SCREENS ========== */
-main { max-width:480px;margin:0 auto;padding:16px; }
-.screen { display:none; }
-.screen.active { display:block;animation:fadeIn .25s ease; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+main{max-width:520px;margin:0 auto;padding:16px}
+.screen{display:none}
+.screen.active{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-/* ========== CASEBOOK ========== */
-.search-box {
-  width:100%;padding:14px 16px;font:inherit;font-size:14px;
-  background:var(--bg);color:var(--fg);
-  border:2px solid var(--fg);margin-bottom:20px;
-}
-.search-box::placeholder { color:var(--muted); }
+/* Casebook */
+.search-box{width:100%;padding:14px;font:inherit;background:var(--bg);color:var(--fg);border:2px solid var(--fg);margin-bottom:16px}
+.case-list{display:flex;flex-direction:column;gap:12px}
+.case-card{border:2px solid var(--fg);padding:16px;cursor:pointer;background:var(--bg);transition:all .15s}
+.case-card:hover{box-shadow:4px 4px 0 var(--fg)}
+.case-card h3{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.case-card .quote{font-size:13px;color:var(--muted);font-style:italic;border-left:3px solid var(--accent);padding-left:12px;margin-bottom:8px}
+.case-card .meta{font-size:10px;color:var(--muted);letter-spacing:1px}
 
-.case-list { display:flex;flex-direction:column;gap:16px; }
+/* Case Screen */
+.back-btn{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-bottom:12px}
+.case-title{font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.story-box{background:var(--fg);color:var(--bg);padding:16px;margin-bottom:12px;font-size:14px;line-height:1.6}
+.story-quote{font-style:italic;border-left:3px solid var(--accent);padding-left:12px;margin-bottom:12px;color:var(--muted);font-size:13px}
+.source-link{display:inline-block;font-size:10px;color:var(--accent);text-decoration:none;letter-spacing:1px;margin-bottom:20px}
 
-.case-card {
-  border:2px solid var(--fg);padding:0;cursor:pointer;
-  background:var(--bg);transition:all .15s;position:relative;
-  overflow:hidden;
-}
-.case-card::before {
-  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
-  background:var(--accent);opacity:0;transition:opacity .15s;
-}
-.case-card:hover { transform:translateX(4px); }
-.case-card:hover::before { opacity:1; }
-.case-card.evil-tint::before { background:var(--evil); }
-.case-card.good-tint::before { background:var(--good); }
+.triple-section{margin-bottom:16px}
+.triple-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.triple-label span{color:var(--accent);font-weight:700}
+.triple-choices{display:flex;flex-wrap:wrap;gap:6px}
+.triple-btn{padding:8px 12px;font:inherit;font-size:12px;background:var(--bg);color:var(--fg);border:1px solid var(--fg);cursor:pointer}
+.triple-btn:hover{background:var(--fg);color:var(--bg)}
+.triple-btn.selected{background:var(--accent);color:var(--bg);border-color:var(--accent)}
 
-.case-card-inner { padding:16px 16px 16px 20px; }
-.case-card h3 {
-  font-size:13px;font-weight:800;text-transform:uppercase;
-  letter-spacing:1.5px;margin-bottom:10px;line-height:1.4;
-}
-.case-card .quote {
-  font-size:13px;color:var(--muted);font-style:italic;
-  border-left:3px solid var(--accent);padding-left:12px;margin-bottom:12px;
-  line-height:1.5;
-}
-.case-card .stats-row {
-  display:flex;gap:16px;font-size:10px;font-weight:700;
-  letter-spacing:1px;text-transform:uppercase;color:var(--muted);
-}
-.case-card .stat { display:flex;align-items:center;gap:4px; }
-.case-card .stat-val { color:var(--fg); }
+.notes-section{margin-top:20px;padding-top:16px;border-top:1px dashed var(--muted)}
+.notes-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.notes-label span{color:var(--accent)}
+.notes-input{width:100%;padding:10px;font:inherit;font-size:13px;background:var(--bg);color:var(--fg);border:1px solid var(--muted);min-height:60px;resize:vertical}
 
-/* ========== TRIPLE PANELS ========== */
-.progress-bar {
-  display:flex;gap:8px;margin-bottom:20px;
-}
-.progress-step {
-  flex:1;height:4px;background:var(--muted);opacity:0.3;
-  border-radius:2px;transition:all .3s;
-}
-.progress-step.active { background:var(--accent);opacity:1; }
-.progress-step.done { background:var(--fg);opacity:0.6; }
+.submit-btn{width:100%;padding:16px;margin-top:16px;font:inherit;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:var(--fg);color:var(--bg);border:none;cursor:pointer}
+.submit-btn:disabled{opacity:0.3;cursor:not-allowed}
 
-.panel-label {
-  font-size:10px;letter-spacing:3px;text-transform:uppercase;
-  color:var(--muted);margin-bottom:6px;
-}
-.panel-title {
-  font-size:20px;font-weight:800;letter-spacing:2px;
-  text-transform:uppercase;color:var(--accent);margin-bottom:16px;
-}
+/* Doom Clock */
+.doom-overlay{position:fixed;inset:0;background:radial-gradient(ellipse at center,rgba(12,5,8,0.97),#000);display:none;align-items:center;justify-content:center;z-index:100}
+.doom-overlay.active{display:flex}
+.doom-machine{text-align:center;width:90%;max-width:380px}
+.doom-warn{font-size:10px;letter-spacing:5px;color:var(--evil);margin-bottom:4px}
+.doom-title{font-size:32px;font-weight:800;letter-spacing:4px;color:#EDE6D6;margin-bottom:32px}
+.doom-slots{display:flex;gap:10px;justify-content:center;margin-bottom:32px}
+.doom-slot{flex:1;height:70px;background:linear-gradient(180deg,#18181c,#0c0c0e);border:3px solid #2a2a2e;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;letter-spacing:1px;color:#444;overflow:hidden}
+.doom-slot.spinning .slot-text{animation:spin .07s linear infinite}
+@keyframes spin{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+.doom-slot.landed{border-color:var(--spotlight);box-shadow:0 0 24px rgba(212,168,76,0.3)}
+.doom-slot.landed .slot-text{color:var(--spotlight);animation:none;font-size:10px}
+.doom-status{font-size:11px;letter-spacing:2px;color:#555;margin-bottom:24px;min-height:20px}
+.doom-skip{padding:10px 24px;font:inherit;font-size:10px;letter-spacing:2px;background:none;color:#444;border:1px solid #333;cursor:pointer;border-radius:4px}
 
-.story-segment {
-  font-size:15px;line-height:1.7;margin-bottom:20px;
-  padding:20px;background:var(--fg);color:var(--bg);
-  border-left:4px solid var(--accent);position:relative;
-}
-.story-segment::before {
-  content:'"';position:absolute;top:10px;left:12px;
-  font-size:40px;opacity:0.15;font-family:Georgia,serif;
-}
+/* Card */
+.card-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.97);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;overflow-y:auto}
+.card-overlay.active{display:flex}
+.card-wrap{text-align:center}
+.card{width:280px;background:#08080a;border-radius:14px;overflow:hidden;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+.card::before{content:'';position:absolute;inset:0;border-radius:14px;padding:3px;background:linear-gradient(135deg,rgba(255,255,255,0.12),transparent 60%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;pointer-events:none}
+.card.good{--c:var(--good);--cg:var(--good-glow)}
+.card.evil{--c:var(--evil);--cg:var(--evil-glow)}
+.card.neutral{--c:var(--neutral);--cg:#888}
+.card-art{height:120px;background:#0c0c0e;display:flex;align-items:center;justify-content:center;position:relative}
+.card-art-icon{font-size:48px}
+.card-rarity{position:absolute;top:8px;right:8px;font-size:7px;font-weight:700;letter-spacing:1px;color:var(--c);background:rgba(0,0,0,0.6);padding:3px 6px;border-radius:3px}
+.card-body{padding:14px}
+.card-name{font-size:11px;font-weight:800;letter-spacing:1px;color:#EDE6D6;margin-bottom:4px}
+.card-triple{font-size:9px;color:var(--c);letter-spacing:1px;margin-bottom:8px;line-height:1.4}
+.card-quote{font-size:10px;font-style:italic;color:#555;margin-bottom:10px;line-height:1.4}
+.card-ability{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:10px;margin-bottom:10px;text-align:left}
+.card-ability-name{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--c);margin-bottom:3px}
+.card-ability-text{font-size:9px;color:#777;line-height:1.4}
+.card-stats{display:flex;justify-content:center;gap:24px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)}
+.card-stat-label{font-size:7px;color:#444;letter-spacing:1px}
+.card-stat-val{font-size:18px;font-weight:800;color:var(--c)}
+.card-qr{position:absolute;bottom:12px;right:12px;width:32px;height:32px;background:#fff;border-radius:2px}
+.card-close{width:280px;padding:12px;margin-top:14px;font:inherit;font-size:10px;font-weight:700;letter-spacing:2px;background:var(--c,#333);color:#000;border:none;cursor:pointer;border-radius:6px}
 
-.choices { display:flex;flex-direction:column;gap:10px;margin-bottom:20px; }
-.choice-btn {
-  padding:16px 20px;font:inherit;font-size:14px;font-weight:500;
-  background:var(--bg);color:var(--fg);
-  border:2px solid var(--fg);cursor:pointer;
-  text-align:left;transition:all .15s;
-  position:relative;overflow:hidden;
-}
-.choice-btn::before {
-  content:'';position:absolute;left:0;top:0;bottom:0;width:0;
-  background:var(--accent);transition:width .15s;
-}
-.choice-btn:hover { padding-left:28px; }
-.choice-btn:hover::before { width:8px; }
-.choice-btn.selected {
-  background:var(--accent);color:var(--bg);
-  border-color:var(--accent);padding-left:20px;
-}
-.choice-btn.selected::before { width:0; }
+.scratcher{position:absolute;top:138px;left:14px;right:14px;height:60px;background:#1a1a1e;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;letter-spacing:1px;color:#333;cursor:pointer;border-radius:6px;transition:opacity .3s}
+.scratcher.revealed{opacity:0;pointer-events:none}
 
-.source-link {
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:11px;color:var(--accent);text-decoration:none;
-  letter-spacing:1px;text-transform:uppercase;font-weight:600;
-}
-.source-link:hover { text-decoration:underline; }
+@keyframes foil{0%{background-position:200% center}100%{background-position:-200% center}}
+.card.rare::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.08) 48%,rgba(255,255,255,0.15) 50%,rgba(255,255,255,0.08) 52%,transparent 70%);background-size:200% 100%;animation:foil 2.5s linear infinite;pointer-events:none;border-radius:14px}
 
-.next-btn {
-  width:100%;padding:18px;margin-top:20px;
-  font:inherit;font-size:13px;font-weight:700;
-  letter-spacing:3px;text-transform:uppercase;
-  background:var(--fg);color:var(--bg);
-  border:none;cursor:pointer;transition:all .15s;
-}
-.next-btn:hover { transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.2); }
-.next-btn:disabled { opacity:0.3;cursor:not-allowed;transform:none;box-shadow:none; }
+.file-prompt{border:2px dashed var(--muted);padding:20px;text-align:center;margin-top:16px}
+.file-prompt p{font-size:12px;color:var(--muted);margin-bottom:10px}
+.file-btn{padding:10px 20px;font:inherit;font-size:11px;letter-spacing:2px;background:var(--fg);color:var(--bg);border:none;cursor:pointer}
 
-/* ========== NOTES SECTION ========== */
-.notes-section {
-  margin-top:24px;padding-top:20px;border-top:1px dashed var(--muted);
-}
-.notes-label {
-  font-size:10px;letter-spacing:2px;text-transform:uppercase;
-  color:var(--muted);margin-bottom:8px;
-}
-.notes-label span { color:var(--accent);font-weight:700; }
-.notes-input {
-  width:100%;padding:14px;font:inherit;font-size:14px;
-  background:var(--bg);color:var(--fg);
-  border:1px solid var(--muted);min-height:80px;
-  resize:vertical;transition:border-color .15s;
-}
-.notes-input:focus { border-color:var(--fg);outline:none; }
-
-/* ========== DOOM CLOCK ========== */
-.doom-overlay {
-  position:fixed;inset:0;
-  background:radial-gradient(ellipse at center, rgba(20,10,15,0.95) 0%, rgba(0,0,0,0.98) 100%);
-  display:none;align-items:center;justify-content:center;
-  z-index:100;
-}
-.doom-overlay.active { display:flex; }
-
-.doom-machine {
-  text-align:center;max-width:380px;width:90%;
-}
-.doom-title {
-  font-size:11px;letter-spacing:6px;text-transform:uppercase;
-  color:var(--evil);margin-bottom:8px;
-  text-shadow:0 0 20px var(--evil-glow);
-}
-.doom-subtitle {
-  font-size:24px;font-weight:800;letter-spacing:4px;
-  color:#EDE6D6;margin-bottom:32px;
-  text-shadow:0 2px 20px rgba(0,0,0,0.5);
-}
-
-.doom-slots {
-  display:flex;gap:12px;justify-content:center;margin-bottom:32px;
-  perspective:500px;
-}
-.doom-slot {
-  width:110px;height:70px;
-  background:linear-gradient(180deg, #1a1a1e 0%, #0a0a0c 100%);
-  border:3px solid #333;
-  border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:800;letter-spacing:1px;
-  text-transform:uppercase;color:#666;
-  box-shadow:inset 0 2px 10px rgba(0,0,0,0.5), 0 4px 20px rgba(0,0,0,0.3);
-  overflow:hidden;position:relative;
-}
-.doom-slot::before {
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 50%);
-  pointer-events:none;
-}
-.doom-slot.spinning {
-  animation:slotGlow 0.3s ease infinite alternate;
-}
-.doom-slot.spinning .slot-text {
-  animation:slotSpin .08s linear infinite;
-}
-@keyframes slotGlow {
-  from { border-color:#333; }
-  to { border-color:#555; }
-}
-@keyframes slotSpin {
-  0% { transform:translateY(-120%);opacity:0.5; }
-  50% { opacity:1; }
-  100% { transform:translateY(120%);opacity:0.5; }
-}
-.doom-slot.landed {
-  border-color:var(--spotlight);
-  box-shadow:inset 0 2px 10px rgba(0,0,0,0.5), 0 0 30px rgba(212,168,76,0.3);
-}
-.doom-slot.landed .slot-text {
-  color:var(--spotlight);animation:none;
-  text-shadow:0 0 10px var(--spotlight);
-}
-
-.doom-status {
-  font-size:12px;letter-spacing:3px;text-transform:uppercase;
-  color:#666;margin-bottom:24px;
-  min-height:20px;
-}
-.doom-close {
-  padding:14px 32px;font:inherit;font-size:11px;font-weight:600;
-  letter-spacing:2px;text-transform:uppercase;
-  background:transparent;color:#666;
-  border:1px solid #444;cursor:pointer;
-  border-radius:4px;transition:all .15s;
-}
-.doom-close:hover { border-color:#888;color:#aaa; }
-
-/* ========== CARD ========== */
-.card-overlay {
-  position:fixed;inset:0;
-  background:radial-gradient(ellipse at center, rgba(10,10,12,0.95) 0%, rgba(0,0,0,0.98) 100%);
-  display:none;align-items:center;justify-content:center;
-  z-index:200;padding:20px;overflow-y:auto;
-}
-.card-overlay.active { display:flex; }
-
-.card-container { text-align:center; }
-
-.card {
-  width:300px;max-width:100%;
-  background:var(--card-bg);
-  border-radius:12px;
-  overflow:hidden;position:relative;
-  box-shadow:0 20px 60px rgba(0,0,0,0.5), 0 0 1px rgba(255,255,255,0.1);
-}
-.card::before {
-  content:'';position:absolute;inset:0;
-  border-radius:12px;padding:3px;
-  background:linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(255,255,255,0.1) 100%);
-  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;
-  pointer-events:none;
-}
-
-.card.good { --card-color:var(--good);--card-glow:var(--good-glow); }
-.card.evil { --card-color:var(--evil);--card-glow:var(--evil-glow); }
-.card.neutral { --card-color:var(--neutral);--card-glow:#999; }
-
-.card-art {
-  height:160px;
-  background:linear-gradient(180deg, #151518 0%, #0a0a0c 100%);
-  position:relative;overflow:hidden;
-}
-.card-art svg { width:100%;height:100%; }
-.card-art::after {
-  content:'';position:absolute;bottom:0;left:0;right:0;height:40px;
-  background:linear-gradient(transparent, var(--card-bg));
-}
-
-.card-header {
-  padding:16px 16px 12px;
-  border-bottom:1px solid rgba(255,255,255,0.08);
-}
-.card-title {
-  font-size:12px;font-weight:800;letter-spacing:2px;
-  text-transform:uppercase;color:#EDE6D6;
-  margin-bottom:8px;line-height:1.4;
-}
-.card-quote {
-  font-size:11px;font-style:italic;
-  color:#777;line-height:1.5;
-}
-
-.card-ability {
-  margin:12px 16px;padding:12px;
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:6px;
-  position:relative;
-}
-.card-ability-icon {
-  position:absolute;top:-8px;left:12px;
-  background:var(--card-bg);padding:0 6px;
-  font-size:12px;
-}
-.card-ability-name {
-  font-size:10px;font-weight:800;letter-spacing:2px;
-  text-transform:uppercase;color:var(--card-color, #EDE6D6);
-  margin-bottom:6px;
-}
-.card-ability-text {
-  font-size:11px;color:#999;line-height:1.5;
-}
-
-.card-footer {
-  padding:12px 16px 16px;
-  display:flex;justify-content:space-between;align-items:flex-end;
-}
-.card-stats { display:flex;gap:16px; }
-.card-stat {
-  text-align:center;
-}
-.card-stat-label {
-  font-size:8px;letter-spacing:1px;color:#555;
-  text-transform:uppercase;margin-bottom:2px;
-}
-.card-stat-val {
-  font-size:18px;font-weight:800;color:var(--card-color, #EDE6D6);
-  text-shadow:0 0 20px var(--card-glow, transparent);
-}
-
-.card-qr {
-  width:44px;height:44px;
-  background:#fff;border-radius:4px;
-  display:flex;align-items:center;justify-content:center;
-  position:relative;overflow:hidden;
-}
-.card-qr svg { width:36px;height:36px; }
-
-.card-rarity {
-  position:absolute;top:12px;right:12px;
-  font-size:8px;font-weight:800;letter-spacing:2px;
-  text-transform:uppercase;color:var(--card-color);
-  background:rgba(0,0,0,0.6);padding:4px 8px;
-  border-radius:4px;
-}
-
-/* ========== SCRATCHER ========== */
-.scratcher {
-  position:absolute;
-  background:linear-gradient(135deg, #2a2a2e 0%, #1a1a1e 100%);
-  display:flex;align-items:center;justify-content:center;
-  font-size:9px;font-weight:700;letter-spacing:2px;
-  color:#555;text-transform:uppercase;
-  cursor:crosshair;transition:opacity .3s;
-  border-radius:6px;
-  box-shadow:inset 0 2px 4px rgba(0,0,0,0.3);
-}
-.scratcher::before {
-  content:'';position:absolute;inset:0;
-  background:repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 2px,
-    rgba(255,255,255,0.02) 2px,
-    rgba(255,255,255,0.02) 4px
-  );
-  border-radius:6px;
-}
-.scratcher:hover { background:linear-gradient(135deg, #333338 0%, #222226 100%); }
-.scratcher.revealed { opacity:0;pointer-events:none; }
-
-.card-close {
-  width:300px;max-width:100%;
-  padding:16px;margin-top:20px;
-  font:inherit;font-size:11px;font-weight:700;
-  letter-spacing:3px;text-transform:uppercase;
-  background:var(--card-color, #333);color:#0a0a0a;
-  border:none;cursor:pointer;border-radius:6px;
-  transition:all .15s;
-}
-.card-close:hover { transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,0.3); }
-
-/* ========== FILE PROMPT ========== */
-.file-prompt {
-  border:2px dashed var(--muted);padding:24px;
-  text-align:center;margin-top:20px;border-radius:8px;
-}
-.file-prompt p { font-size:13px;color:var(--muted);margin-bottom:16px; }
-.file-btn {
-  padding:14px 28px;font:inherit;font-size:12px;font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;
-  background:var(--fg);color:var(--bg);
-  border:none;cursor:pointer;transition:all .15s;
-}
-.file-btn:hover { transform:translateY(-2px); }
-
-/* ========== TOAST ========== */
-.toast {
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
-  background:var(--fg);color:var(--bg);
-  padding:14px 24px;font-size:13px;letter-spacing:1px;font-weight:500;
-  z-index:300;border-radius:6px;
-  box-shadow:0 8px 30px rgba(0,0,0,0.3);
-  opacity:0;transition:all .3s ease;
-}
-.toast.active { transform:translateX(-50%) translateY(0);opacity:1; }
-
-/* ========== FOIL EFFECT ========== */
-@keyframes foilShimmer {
-  0% { background-position:200% center; }
-  100% { background-position:-200% center; }
-}
-.card.rare::after {
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(
-    120deg,
-    transparent 20%,
-    rgba(255,255,255,0.1) 40%,
-    rgba(255,255,255,0.2) 50%,
-    rgba(255,255,255,0.1) 60%,
-    transparent 80%
-  );
-  background-size:200% 100%;
-  animation:foilShimmer 3s ease infinite;
-  pointer-events:none;border-radius:12px;
-}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--fg);color:var(--bg);padding:10px 18px;font-size:12px;z-index:300;border-radius:4px;opacity:0;transition:all .3s}
+.toast.active{transform:translateX(-50%) translateY(0);opacity:1}
 </style>
 </head>
 <body>
@@ -447,469 +118,232 @@ main { max-width:480px;margin:0 auto;padding:16px; }
 </header>
 
 <main>
-  <!-- CASEBOOK -->
+  <!-- Casebook -->
   <section id="casebook" class="screen active">
-    <input type="text" class="search-box" id="search"
-           placeholder="Search cases or paste a news URL..."
-           oninput="handleSearch(this.value)">
+    <input class="search-box" id="search" placeholder="Search or paste URL..." oninput="handleSearch(this.value)">
     <div class="case-list" id="caseList"></div>
     <div id="filePrompt" class="file-prompt" style="display:none">
-      <p>📰 This looks like a news story</p>
+      <p>📰 News story detected</p>
       <button class="file-btn" onclick="fileCase()">Put it in the mail →</button>
     </div>
   </section>
 
-  <!-- WHO Panel -->
-  <section id="panel-who" class="screen">
-    <div class="progress-bar">
-      <div class="progress-step active"></div>
-      <div class="progress-step"></div>
-      <div class="progress-step"></div>
-    </div>
-    <div class="panel-label">The Record</div>
-    <div class="panel-title">Who</div>
-    <div class="story-segment" id="story-who"></div>
-    <div class="choices" id="choices-who"></div>
-    <a href="#" class="source-link" id="source-link" target="_blank">↗ Read the source</a>
-    <button class="next-btn" id="next-who" onclick="nextPanel('what')" disabled>Continue →</button>
-  </section>
+  <!-- Case -->
+  <section id="case" class="screen">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <div class="case-title" id="caseTitle"></div>
+    <div class="story-box" id="storyBox"></div>
+    <div class="story-quote" id="storyQuote"></div>
+    <a href="#" class="source-link" id="sourceLink" target="_blank">↗ Source</a>
 
-  <!-- WHAT Panel -->
-  <section id="panel-what" class="screen">
-    <div class="progress-bar">
-      <div class="progress-step done"></div>
-      <div class="progress-step active"></div>
-      <div class="progress-step"></div>
+    <div class="triple-section">
+      <div class="triple-label"><span>1</span> Who</div>
+      <div class="triple-choices" id="choices-who"></div>
     </div>
-    <div class="panel-label">The Record</div>
-    <div class="panel-title">Does What</div>
-    <div class="story-segment" id="story-what"></div>
-    <div class="choices" id="choices-what"></div>
-    <button class="next-btn" id="next-what" onclick="nextPanel('whom')" disabled>Continue →</button>
-  </section>
+    <div class="triple-section">
+      <div class="triple-label"><span>2</span> Does What</div>
+      <div class="triple-choices" id="choices-what"></div>
+    </div>
+    <div class="triple-section">
+      <div class="triple-label"><span>3</span> To Whom</div>
+      <div class="triple-choices" id="choices-whom"></div>
+    </div>
 
-  <!-- WHOM Panel -->
-  <section id="panel-whom" class="screen">
-    <div class="progress-bar">
-      <div class="progress-step done"></div>
-      <div class="progress-step done"></div>
-      <div class="progress-step active"></div>
-    </div>
-    <div class="panel-label">The Record</div>
-    <div class="panel-title">To Whom</div>
-    <div class="story-segment" id="story-whom"></div>
-    <div class="choices" id="choices-whom"></div>
     <div class="notes-section">
       <div class="notes-label">Mad Lib <span>vs</span> Mad Conservative</div>
-      <textarea class="notes-input" id="notes" placeholder="Your thoughts..."></textarea>
+      <textarea class="notes-input" id="notes" placeholder="Hot take..."></textarea>
     </div>
-    <button class="next-btn" id="next-whom" onclick="closeCaseAndSpin()" disabled>Case Closed →</button>
+
+    <button class="submit-btn" id="submitBtn" onclick="spin()" disabled>Case Closed →</button>
   </section>
 </main>
 
-<!-- DOOM CLOCK -->
+<!-- Doom Clock -->
 <div class="doom-overlay" id="doomOverlay">
   <div class="doom-machine">
-    <div class="doom-title">⚠ Warning</div>
-    <div class="doom-subtitle">DOOM CLOCK</div>
+    <div class="doom-warn">⚠ WARNING</div>
+    <div class="doom-title">DOOM CLOCK</div>
     <div class="doom-slots">
       <div class="doom-slot" id="slot-who"><span class="slot-text">WHO</span></div>
       <div class="doom-slot" id="slot-what"><span class="slot-text">WHAT</span></div>
       <div class="doom-slot" id="slot-whom"><span class="slot-text">WHOM</span></div>
     </div>
-    <div class="doom-status" id="doomStatus">Calculating timeline...</div>
-    <button class="doom-close" onclick="closeDoom()">I've seen enough</button>
+    <div class="doom-status" id="doomStatus"></div>
+    <button class="doom-skip" onclick="skipDoom()">Skip</button>
   </div>
 </div>
 
-<!-- CARD -->
+<!-- Card -->
 <div class="card-overlay" id="cardOverlay">
-  <div class="card-container">
+  <div class="card-wrap">
     <div class="card" id="card">
+      <div class="card-art"><span class="card-art-icon" id="cardIcon">👁</span></div>
       <div class="card-rarity" id="cardRarity">COMMON</div>
-      <div class="card-art" id="cardArt"></div>
-      <div class="card-header">
-        <div class="card-title" id="cardTitle">CASE TITLE</div>
-        <div class="card-quote" id="cardQuote">"Quote"</div>
-      </div>
-      <div class="card-ability">
-        <span class="card-ability-icon">⚡</span>
-        <div class="card-ability-name" id="abilityName">ABILITY</div>
-        <div class="card-ability-text" id="abilityText">Description</div>
-      </div>
-      <div class="card-footer">
-        <div class="card-stats">
-          <div class="card-stat">
-            <div class="card-stat-label">ATK</div>
-            <div class="card-stat-val" id="statAtk">0</div>
-          </div>
-          <div class="card-stat">
-            <div class="card-stat-label">DEF</div>
-            <div class="card-stat-val" id="statDef">0</div>
-          </div>
-          <div class="card-stat">
-            <div class="card-stat-label">EVL</div>
-            <div class="card-stat-val" id="statEvl">0</div>
-          </div>
+      <div class="card-body">
+        <div class="card-name" id="cardName"></div>
+        <div class="card-triple" id="cardTriple"></div>
+        <div class="card-quote" id="cardQuote"></div>
+        <div class="card-ability">
+          <div class="card-ability-name" id="abilityName">⚡ ABILITY</div>
+          <div class="card-ability-text" id="abilityText"></div>
         </div>
-        <div class="card-qr" id="cardQr"></div>
+        <div class="card-stats">
+          <div class="card-stat"><div class="card-stat-label">ATK</div><div class="card-stat-val" id="statAtk">0</div></div>
+          <div class="card-stat"><div class="card-stat-label">DEF</div><div class="card-stat-val" id="statDef">0</div></div>
+          <div class="card-stat"><div class="card-stat-label">EVL</div><div class="card-stat-val" id="statEvl">0</div></div>
+        </div>
       </div>
+      <div class="card-qr" id="cardQr"></div>
+      <div class="scratcher" id="scratcher" onclick="this.classList.add('revealed')">▓▓ SCRATCH ▓▓</div>
     </div>
-    <button class="card-close" onclick="closeCard()">Back to Casebook</button>
+    <button class="card-close" onclick="closeCard()">Done</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-/* ========== THEME ========== */
-function getTheme() {
-  return localStorage.getItem('ucar_theme') ||
-    (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
-}
-function setTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('ucar_theme', t);
-  document.querySelector('.theme-toggle').textContent = t === 'dark' ? '🧠' : '☀️';
-}
-function toggleTheme() {
-  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-}
+const API = 'https://aslcrwmbdtvimjrexxzw.supabase.co/functions/v1/';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls';
+
+let CASES=[], CURRENT=null, PICKS={who:null,what:null,whom:null};
+
+// Theme
+const getTheme=()=>localStorage.getItem('ucar_theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+const setTheme=t=>{document.documentElement.setAttribute('data-theme',t);localStorage.setItem('ucar_theme',t);document.querySelector('.theme-toggle').textContent=t==='dark'?'🧠':'☀️'};
+const toggleTheme=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
 setTheme(getTheme());
 
-/* ========== STATE ========== */
-let CASES = [];
-let CURRENT = null;
-let PICKS = { who: null, what: null, whom: null };
+// Nav
+const show=id=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');scrollTo(0,0)};
+const goHome=()=>{CURRENT=null;PICKS={who:null,what:null,whom:null};show('casebook')};
 
-/* ========== DEMO DATA ========== */
-const DEMO_CASES = [
-  {
-    id: 'demo-1',
-    title: 'County Police Adopt Face-Search Database',
-    quote: 'In seven seconds, and we\'d been working the case for years.',
-    source_url: 'https://atlantanewsfirst.com/2022/12/15/facial-recognition-cobb-county/',
-    segments: {
-      who: 'Cobb County commissioners approved a 3-year contract giving police access to Clearview AI\'s face-matching database of billions of scraped public images.',
-      what: 'The system searches billions of scraped public photos to match faces against suspects, returning results in seconds for cases that took years.',
-      whom: 'Anyone who has ever posted a photo online is now searchable—4 billion faces indexed without consent or notification.'
-    },
-    choices: {
-      who: ['County Police', 'Clearview AI', 'County Commissioners', 'The Algorithm'],
-      what: ['Searches faces', 'Scrapes photos', 'Matches suspects', 'Surveils everyone'],
-      whom: ['4 billion people', 'Criminal suspects', 'The public', 'Social media users']
-    },
-    ability: { name: 'FACE HARVEST', text: 'Scrape all faces in play. Targets cannot opt out or be notified.' },
-    stats: { atk: 7, def: 4, evl: 4 },
-    rarity: 'rare'
-  },
-  {
-    id: 'demo-2',
-    title: 'Hospital AI Catches Sepsis Hours Early',
-    quote: 'The system caught it before any of us noticed the signs.',
-    source_url: 'https://example.com/sepsis-ai',
-    segments: {
-      who: 'A regional hospital network deployed an ML early-warning system that continuously monitors vitals and lab results.',
-      what: 'The AI flags sepsis risk hours before clinical presentation, with nurses reviewing every alert before action.',
-      whom: 'Admitted patients now have an algorithmic guardian—one that never sleeps, never blinks, never forgets to check.'
-    },
-    choices: {
-      who: ['Hospital Network', 'The AI System', 'Care Teams', 'Night Shift'],
-      what: ['Monitors vitals', 'Flags risk early', 'Alerts nurses', 'Watches silently'],
-      whom: ['ICU patients', 'All admitted', 'At-risk cases', 'The sleeping']
-    },
-    ability: { name: 'EARLY WARNING', text: 'Reveal one hidden threat before it activates. Human must confirm.' },
-    stats: { atk: 2, def: 9, evl: 1 },
-    rarity: 'uncommon'
-  },
-  {
-    id: 'demo-3',
-    title: 'Hiring AI Screens Out Workers Over 40',
-    quote: 'I applied 100 times. Never got a single interview.',
-    source_url: 'https://example.com/workday-lawsuit',
-    segments: {
-      who: 'A federal court allowed a class action to proceed against Workday\'s AI-powered applicant screening system.',
-      what: 'The algorithm automatically filters and scores hundreds of millions of resumes, allegedly discriminating against age.',
-      whom: 'Millions of job seekers over 40 whose applications were processed and rejected without any human ever reading them.'
-    },
-    choices: {
-      who: ['Workday AI', 'Hundreds of employers', 'The Algorithm', 'HR Automation'],
-      what: ['Auto-rejects', 'Scores unfairly', 'Screens out', 'Discriminates'],
-      whom: ['Workers over 40', 'Millions of seekers', 'The experienced', 'Qualified candidates']
-    },
-    ability: { name: 'THANKS ANYWAY', text: 'Instantly reject target. No explanation given. Cannot be appealed.' },
-    stats: { atk: 6, def: 2, evl: 5 },
-    rarity: 'rare'
-  }
-];
+// Casebook
+const renderCases=list=>{
+  document.getElementById('caseList').innerHTML=list.map(c=>`
+    <div class="case-card" onclick="openCase('${c.id}')">
+      <h3>${esc(c.title||c.raw_title)}</h3>
+      ${c.article_quote?`<div class="quote">"${esc(trunc(c.article_quote,70))}"</div>`:''}
+      <div class="meta">IMPACT ${'★'.repeat(c.impact||1)}</div>
+    </div>`).join('');
+};
 
-/* ========== NAVIGATION ========== */
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
+const handleSearch=v=>{
+  const fp=document.getElementById('filePrompt');
+  if(/^https?:\/\/.+\..+/.test(v.trim())){fp.style.display='block';fp.dataset.url=v}
+  else{fp.style.display='none';const q=v.toLowerCase();renderCases(CASES.filter(c=>(c.title||'').toLowerCase().includes(q)||(c.article_quote||'').toLowerCase().includes(q)))}
+};
+
+const fileCase=()=>{toast('📬 In the mail!');document.getElementById('search').value='';document.getElementById('filePrompt').style.display='none'};
+
+// Case
+function openCase(id){
+  CURRENT=CASES.find(c=>c.id===id);
+  if(!CURRENT||!CURRENT.extraction)return toast('Not ready');
+  PICKS={who:null,what:null,whom:null};
+
+  document.getElementById('caseTitle').textContent=CURRENT.title||CURRENT.raw_title;
+  document.getElementById('storyBox').textContent=CURRENT.summary||'';
+  const q=CURRENT.article_quote||CURRENT.extraction.article_quote;
+  document.getElementById('storyQuote').textContent=q?`"${q}"`:'';
+  document.getElementById('storyQuote').style.display=q?'block':'none';
+  document.getElementById('sourceLink').href=CURRENT.source_url||'#';
+
+  const ex=CURRENT.extraction;
+  renderTriple('who',ex.who_choices||[]);
+  renderTriple('what',ex.action_choices||[]);
+  renderTriple('whom',ex.whom_choices||[]);
+  checkReady();
+  show('case');
 }
 
-function goHome() {
-  CURRENT = null;
-  PICKS = { who: null, what: null, whom: null };
-  showScreen('casebook');
+function renderTriple(slot,choices){
+  document.getElementById(`choices-${slot}`).innerHTML=choices.map((c,i)=>`<button class="triple-btn" onclick="pick('${slot}',${i},this)">${esc(c)}</button>`).join('');
 }
 
-/* ========== CASEBOOK ========== */
-function renderCases(cases) {
-  const list = document.getElementById('caseList');
-  list.innerHTML = cases.map(c => {
-    const tint = c.stats.evl >= 4 ? 'evil-tint' : c.stats.evl <= 1 ? 'good-tint' : '';
-    return `
-    <div class="case-card ${tint}" onclick="openCase('${c.id}')">
-      <div class="case-card-inner">
-        <h3>${esc(c.title)}</h3>
-        ${c.quote ? `<div class="quote">"${esc(truncate(c.quote, 80))}"</div>` : ''}
-        <div class="stats-row">
-          <div class="stat">ATK <span class="stat-val">${c.stats.atk}</span></div>
-          <div class="stat">DEF <span class="stat-val">${c.stats.def}</span></div>
-          <div class="stat">EVL <span class="stat-val">${c.stats.evl}</span></div>
-          <div class="stat" style="margin-left:auto;color:var(--accent)">${c.rarity?.toUpperCase() || 'COMMON'}</div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function handleSearch(val) {
-  const prompt = document.getElementById('filePrompt');
-  if (isUrl(val)) {
-    prompt.style.display = 'block';
-    prompt.dataset.url = val;
-  } else {
-    prompt.style.display = 'none';
-    const q = val.toLowerCase();
-    const filtered = CASES.filter(c =>
-      c.title.toLowerCase().includes(q) ||
-      (c.quote && c.quote.toLowerCase().includes(q))
-    );
-    renderCases(filtered);
-  }
-}
-
-function isUrl(s) { return /^https?:\/\/.+\..+/.test(s.trim()); }
-
-function fileCase() {
-  toast('📬 It\'s in the mail! Check your inbox later.');
-  document.getElementById('search').value = '';
-  document.getElementById('filePrompt').style.display = 'none';
-}
-
-/* ========== TRIPLE PANELS ========== */
-function openCase(id) {
-  CURRENT = CASES.find(c => c.id === id) || DEMO_CASES.find(c => c.id === id);
-  if (!CURRENT) return;
-  PICKS = { who: null, what: null, whom: null };
-
-  document.getElementById('story-who').textContent = CURRENT.segments.who;
-  document.getElementById('story-what').textContent = CURRENT.segments.what;
-  document.getElementById('story-whom').textContent = CURRENT.segments.whom;
-
-  renderChoices('who', CURRENT.choices.who);
-  renderChoices('what', CURRENT.choices.what);
-  renderChoices('whom', CURRENT.choices.whom);
-
-  document.getElementById('source-link').href = CURRENT.source_url;
-  document.getElementById('next-who').disabled = true;
-  document.getElementById('next-what').disabled = true;
-  document.getElementById('next-whom').disabled = true;
-
-  showScreen('panel-who');
-}
-
-function renderChoices(slot, choices) {
-  document.getElementById(`choices-${slot}`).innerHTML = choices.map((c, i) => `
-    <button class="choice-btn" onclick="selectChoice('${slot}', ${i}, this)">${esc(c)}</button>
-  `).join('');
-}
-
-function selectChoice(slot, idx, btn) {
-  PICKS[slot] = CURRENT.choices[slot][idx];
-  btn.parentElement.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+function pick(slot,idx,btn){
+  const ex=CURRENT.extraction;
+  const arr=slot==='who'?ex.who_choices:slot==='what'?ex.action_choices:ex.whom_choices;
+  PICKS[slot]=arr[idx];
+  btn.parentElement.querySelectorAll('.triple-btn').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
-  document.getElementById(`next-${slot}`).disabled = false;
+  checkReady();
 }
 
-function nextPanel(next) { showScreen(`panel-${next}`); }
+function checkReady(){document.getElementById('submitBtn').disabled=!(PICKS.who&&PICKS.what&&PICKS.whom)}
 
-/* ========== DOOM CLOCK ========== */
-const DOOM_MESSAGES = [
-  'Calculating timeline...',
-  'Scanning probable futures...',
-  'Measuring consequences...',
-  'Weighing outcomes...',
-  'The clock ticks...'
-];
-
-function closeCaseAndSpin() {
-  showScreen('casebook');
+// Doom
+const MSGS=['Scanning...','Calculating...','Processing...','Almost...'];
+function spin(){
+  show('casebook');
   document.getElementById('doomOverlay').classList.add('active');
-
-  ['who', 'what', 'whom'].forEach(s => {
-    const slot = document.getElementById(`slot-${s}`);
-    slot.classList.remove('landed');
-    slot.classList.add('spinning');
-    slot.querySelector('.slot-text').textContent = '???';
-  });
-
-  let msgIdx = 0;
-  const statusEl = document.getElementById('doomStatus');
-  const msgInterval = setInterval(() => {
-    statusEl.textContent = DOOM_MESSAGES[msgIdx++ % DOOM_MESSAGES.length];
-  }, 400);
-
-  setTimeout(() => landSlot('who', PICKS.who), 1000);
-  setTimeout(() => landSlot('what', PICKS.what), 1600);
-  setTimeout(() => landSlot('whom', PICKS.whom), 2200);
-  setTimeout(() => {
-    clearInterval(msgInterval);
-    statusEl.textContent = 'The clock has spoken.';
-    setTimeout(showCard, 1000);
-  }, 2800);
+  ['who','what','whom'].forEach(s=>{const el=document.getElementById(`slot-${s}`);el.classList.remove('landed');el.classList.add('spinning');el.querySelector('.slot-text').textContent='???'});
+  let i=0;const iv=setInterval(()=>{document.getElementById('doomStatus').textContent=MSGS[i++%MSGS.length]},300);
+  setTimeout(()=>land('who',PICKS.who),800);
+  setTimeout(()=>land('what',PICKS.what),1300);
+  setTimeout(()=>land('whom',PICKS.whom),1800);
+  setTimeout(()=>{clearInterval(iv);document.getElementById('doomStatus').textContent='Done.';setTimeout(showCard,700)},2400);
 }
 
-function landSlot(slot, value) {
-  const el = document.getElementById(`slot-${slot}`);
-  el.classList.remove('spinning');
-  el.classList.add('landed');
-  el.querySelector('.slot-text').textContent = truncate(value, 10);
-}
+function land(slot,val){const el=document.getElementById(`slot-${slot}`);el.classList.remove('spinning');el.classList.add('landed');el.querySelector('.slot-text').textContent=trunc(val,9)}
+function skipDoom(){document.getElementById('doomOverlay').classList.remove('active');showCard()}
 
-function closeDoom() {
+// Card
+function showCard(){
   document.getElementById('doomOverlay').classList.remove('active');
-  goHome();
-}
+  const c=CURRENT,ex=c.extraction||{};
+  const evl=Math.min(10,Math.abs(ex.valence||0)+(c.impact||1));
+  const verdict=evl>=5?'evil':evl<=2?'good':'neutral';
+  const rarity=c.impact>=5?'legendary':c.impact>=4?'rare':c.impact>=3?'uncommon':'common';
 
-/* ========== CARD ========== */
-function showCard() {
-  document.getElementById('doomOverlay').classList.remove('active');
-  const c = CURRENT;
-  const verdict = c.stats.evl >= 4 ? 'evil' : c.stats.evl <= 1 ? 'good' : 'neutral';
+  const card=document.getElementById('card');
+  card.className='card '+verdict+(rarity==='rare'||rarity==='legendary'?' rare':'');
 
-  const card = document.getElementById('card');
-  card.className = 'card ' + verdict + (c.rarity === 'rare' ? ' rare' : '');
+  document.getElementById('cardRarity').textContent=rarity.toUpperCase();
+  document.getElementById('cardIcon').textContent=verdict==='evil'?'👁':verdict==='good'?'🛡':'⚖';
+  document.getElementById('cardName').textContent=c.title||c.raw_title;
+  document.getElementById('cardTriple').textContent=`${PICKS.who} → ${PICKS.what} → ${PICKS.whom}`;
+  document.getElementById('cardQuote').textContent=c.article_quote?`"${trunc(c.article_quote,50)}"`:'';
 
-  document.getElementById('cardTitle').textContent = c.title;
-  document.getElementById('cardQuote').textContent = `"${c.quote}"`;
-  document.getElementById('abilityName').textContent = c.ability.name;
-  document.getElementById('abilityText').textContent = c.ability.text;
-  document.getElementById('statAtk').textContent = c.stats.atk;
-  document.getElementById('statDef').textContent = c.stats.def;
-  document.getElementById('statEvl').textContent = c.stats.evl;
-  document.getElementById('cardRarity').textContent = (c.rarity || 'common').toUpperCase();
-  document.getElementById('cardArt').innerHTML = generateCardArt(c, verdict);
-  document.getElementById('cardQr').innerHTML = generateQR();
+  const ab=genAbility(PICKS,evl);
+  document.getElementById('abilityName').textContent='⚡ '+ab.name;
+  document.getElementById('abilityText').textContent=ab.text;
 
-  addScratchers();
+  document.getElementById('statAtk').textContent=(c.impact||1)*2+Math.floor(Math.random()*2);
+  document.getElementById('statDef').textContent=(c.impact||1)+Math.floor(Math.random()*3);
+  document.getElementById('statEvl').textContent=evl;
+
+  document.getElementById('scratcher').classList.remove('revealed');
   document.getElementById('cardOverlay').classList.add('active');
 }
 
-function generateCardArt(c, verdict) {
-  const colors = {
-    good: { bg1:'#0a1a0f', bg2:'#051008', accent:'#2D8B4A', glow:'#4ADE80' },
-    evil: { bg1:'#1a0a0a', bg2:'#100505', accent:'#C1121F', glow:'#FF4444' },
-    neutral: { bg1:'#12121a', bg2:'#08080c', accent:'#6B6560', glow:'#999' }
+function genAbility(p,evl){
+  const t={
+    evil:[{name:'MASS SCRAPE',text:`Collect all ${p.whom}. No opt-out.`},{name:'AUTO-REJECT',text:`Deny ${p.whom} instantly.`},{name:'SILENT WATCH',text:`Monitor ${p.whom} indefinitely.`}],
+    good:[{name:'EARLY WARNING',text:`Alert ${p.whom} before harm.`},{name:'OPT-OUT',text:`${p.whom} can leave.`}],
+    neutral:[{name:'EFFICIENCY',text:`Process ${p.whom} faster.`},{name:'SCALE',text:`Handle millions of ${p.whom}.`}]
   };
-  const col = colors[verdict];
-  const seed = c.id.split('').reduce((a,b) => a + b.charCodeAt(0), 0);
-
-  // Generate pseudo-random elements based on seed
-  const r = (n) => ((seed * 9301 + 49297) % 233280) / 233280 * n;
-  const circles = Array.from({length: 5}, (_, i) =>
-    `<circle cx="${60 + i*50 + r(30)}" cy="${60 + r(60)}" r="${10 + r(20)}"
-      fill="none" stroke="${col.accent}" stroke-width="1" opacity="${0.1 + r(0.2)}"/>`
-  ).join('');
-
-  const icon = verdict === 'evil' ? '👁' : verdict === 'good' ? '🛡' : '⚖';
-
-  return `<svg viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <radialGradient id="glow-${c.id}" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="${col.glow}" stop-opacity="0.3"/>
-        <stop offset="100%" stop-color="${col.bg1}" stop-opacity="0"/>
-      </radialGradient>
-      <linearGradient id="bg-${c.id}" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="${col.bg1}"/>
-        <stop offset="100%" stop-color="${col.bg2}"/>
-      </linearGradient>
-    </defs>
-    <rect width="300" height="160" fill="url(#bg-${c.id})"/>
-    <circle cx="150" cy="80" r="60" fill="url(#glow-${c.id})"/>
-    ${circles}
-    <circle cx="150" cy="80" r="35" fill="none" stroke="${col.accent}" stroke-width="2" opacity="0.5"/>
-    <circle cx="150" cy="80" r="20" fill="none" stroke="${col.accent}" stroke-width="3" opacity="0.8"/>
-    <text x="150" y="88" text-anchor="middle" font-size="24">${icon}</text>
-    <text x="150" y="145" text-anchor="middle" font-size="8" fill="${col.accent}" letter-spacing="1" opacity="0.6">
-      ${PICKS.who?.toUpperCase().slice(0,15)} → ${PICKS.what?.toUpperCase().slice(0,12)} → ${PICKS.whom?.toUpperCase().slice(0,12)}
-    </text>
-  </svg>`;
+  const l=t[evl>=5?'evil':evl<=2?'good':'neutral'];
+  return l[Math.floor(Math.random()*l.length)];
 }
 
-function generateQR() {
-  // Simple placeholder QR pattern
-  const cells = [];
-  for(let y=0; y<7; y++) {
-    for(let x=0; x<7; x++) {
-      const isBorder = x===0||x===6||y===0||y===6;
-      const isCorner = (x<3&&y<3)||(x>3&&y<3)||(x<3&&y>3);
-      const fill = (isBorder && isCorner) || Math.random() > 0.5;
-      if(fill) cells.push(`<rect x="${x*5+2}" y="${y*5+2}" width="4" height="4" fill="#000"/>`);
-    }
-  }
-  return `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-    <rect width="40" height="40" fill="#fff"/>
-    ${cells.join('')}
-  </svg>`;
-}
+function closeCard(){document.getElementById('cardOverlay').classList.remove('active');goHome()}
 
-function addScratchers() {
-  document.querySelectorAll('.scratcher').forEach(s => s.remove());
-  const card = document.getElementById('card');
+// Utils
+const esc=s=>{const d=document.createElement('div');d.textContent=s||'';return d.innerHTML};
+const trunc=(s,n)=>(!s||s.length<=n)?(s||''):s.slice(0,n).trim()+'…';
+const toast=m=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('active');setTimeout(()=>t.classList.remove('active'),2500)};
 
-  const zones = [
-    { top:'195px', left:'12px', width:'calc(100% - 24px)', height:'76px', label:'⬛ SCRATCH TO REVEAL' }
-  ];
-
-  zones.forEach(z => {
-    const s = document.createElement('div');
-    s.className = 'scratcher';
-    s.style.cssText = `top:${z.top};left:${z.left};width:${z.width};height:${z.height};`;
-    s.textContent = z.label;
-    s.onclick = () => s.classList.add('revealed');
-    card.appendChild(s);
-  });
+// Init
+async function init(){
+  try{
+    const r=await fetch(API+'search-cases',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+KEY},body:'{}'});
+    const d=await r.json();
+    CASES=(d.results||[]).filter(c=>c.extraction);
+    renderCases(CASES);
+  }catch(e){toast('Load failed')}
 }
-
-function closeCard() {
-  document.getElementById('cardOverlay').classList.remove('active');
-  goHome();
-}
-
-/* ========== UTILITIES ========== */
-function esc(s) {
-  const d = document.createElement('div');
-  d.textContent = s || '';
-  return d.innerHTML;
-}
-function truncate(s, n) {
-  return (!s || s.length <= n) ? (s || '') : s.slice(0, n).trim() + '…';
-}
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('active');
-  setTimeout(() => t.classList.remove('active'), 3000);
-}
-
-/* ========== INIT ========== */
-CASES = DEMO_CASES;
-renderCases(CASES);
+init();
 </script>
 </body>
 </html>
