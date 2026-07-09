@@ -44,19 +44,6 @@ const GAZETTEER: Record<string, { name: string; type: string }> = {
   "tsa": { name: "TSA", type: "government" },
 };
 
-const CATEGORY_KEYWORDS: Record<string, string[]> = {
-  "Surveillance": ["surveillance", "facial recognition", "face recognition", "tracking", "monitoring", "spying", "wiretap", "cctv", "camera", "biometric"],
-  "Healthcare": ["hospital", "patient", "medical", "health", "diagnosis", "treatment", "clinical", "doctor", "nurse", "sepsis", "cancer"],
-  "Education": ["school", "student", "teacher", "university", "college", "classroom", "education", "academic", "campus"],
-  "Law Enforcement": ["police", "arrest", "crime", "officer", "detective", "investigation", "criminal", "enforcement"],
-  "Employment": ["hiring", "recruitment", "employee", "worker", "job", "resume", "interview", "workplace", "hr"],
-  "Financial": ["bank", "loan", "credit", "insurance", "mortgage", "financial", "fraud", "trading"],
-  "Government": ["government", "federal", "state", "agency", "regulation", "policy", "public sector"],
-  "Transportation": ["driving", "vehicle", "traffic", "autonomous", "self-driving", "uber", "lyft", "transit"],
-  "Social Media": ["social media", "content moderation", "recommendation", "algorithm", "feed", "viral"],
-  "Retail": ["retail", "shopping", "store", "customer", "checkout", "inventory"],
-};
-
 const RIGHTS_TERMS = ["arrest", "detain", "deny", "reject", "terminate", "fire", "evict", "deport", "suspend", "expel", "ban"];
 const SCALE_TERMS = ["nationwide", "statewide", "citywide", "million", "billion", "thousands", "mass", "widespread"];
 const AI_TERMS = ["ai", "artificial intelligence", "machine learning", "algorithm", "automated", "predictive", "neural", "deep learning"];
@@ -73,17 +60,6 @@ function extractOrg(text: string): string | null {
   const matches = text.match(/(?:[A-Z][a-z]+\s+){1,3}(?:Department|Agency|Police|School|University|Hospital|Corporation|Inc|LLC|Company)/g);
   if (matches?.length) return matches[0].trim();
   return null;
-}
-
-function extractCategory(text: string): string {
-  const lower = text.toLowerCase();
-  let best = "Automation";
-  let bestScore = 0;
-  for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-    const score = keywords.filter(k => lower.includes(k)).length;
-    if (score > bestScore) { bestScore = score; best = cat; }
-  }
-  return best;
 }
 
 function extractImpact(text: string, sourceTier: number): number {
@@ -193,19 +169,19 @@ Deno.serve(async (req) => {
   const combinedText = article ? `${article.title} ${article.text}` : parsed.hostname;
   const sourceTier = /\.(gov|mil|edu)$/.test(parsed.hostname) ? 1 : 2;
 
-  const category = extractCategory(combinedText);
   const impact = extractImpact(combinedText, sourceTier);
   const triple = extractTriple(combinedText);
   const org = extractOrg(combinedText);
 
   // Build case row - go straight to 'live' with basic extraction
+  // Note: schema uses 'faction' not 'category' - faction is heaven/hell/unaligned
   const row = {
     external_id: externalId,
     raw_title: article?.title || `Filed from ${parsed.hostname}`,
     title: article?.title || `AI deployment at ${org || parsed.hostname}`,
     source_url: parsed.href,
     source_tier: sourceTier,
-    category,
+    faction: "unaligned", // Deterministic extraction can't judge good/evil
     impact,
     status: "live", // Instant live! Not staged.
     extraction: {
