@@ -66,10 +66,11 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
   font:inherit;min-height:52px;font-size:17px}
 #q::placeholder{color:var(--muted)}
 .qclear{position:absolute;right:12px;top:50%;transform:translateY(-50%);
-  width:32px;height:32px;border:none;background:var(--muted);color:var(--bg);
-  border-radius:50%;font-size:20px;line-height:1;cursor:pointer;display:none;
-  align-items:center;justify-content:center}
+  width:36px;height:36px;border:none;background:var(--muted);color:var(--bg);
+  border-radius:50%;font-size:18px;line-height:1;cursor:pointer;display:none;
+  align-items:center;justify-content:center;font-weight:700}
 .qclear.on{display:flex}
+.qclear.file{background:var(--accent);font-size:15px}
 #parseRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 #parseRow:empty{display:none}
 .pchip{border:1.5px solid var(--accent);color:var(--accent);border-radius:9px;
@@ -80,27 +81,57 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 #latency{color:var(--muted);font-size:11px;letter-spacing:1px;margin:6px 2px 2px}
 /* ============ LOADING SCREEN (quotes + minigame) ============ */
 #loadscreen{display:none;margin:12px 0}
-#loadscreen.on{display:block}
-#loadquotes{min-height:70px;border-left:3px solid var(--accent);padding:10px 14px;
-  margin-bottom:12px;background:var(--card);border-radius:0 12px 12px 0}
-#loadquotes .lq{font-size:14px;line-height:1.5;color:var(--fg);
-  animation:fadeQuote .4s ease}
-#loadquotes .lq-src{font-size:11.5px;color:var(--muted);margin-top:5px;
-  letter-spacing:.3px}
-@keyframes fadeQuote{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
-#loadgame{border:2px dashed var(--line);border-radius:14px;padding:14px;
-  background:var(--card)}
-#loadgame .lg-title{font-size:11px;letter-spacing:2px;color:var(--muted);
-  text-transform:uppercase;margin-bottom:8px}
-#loadgame .lg-q{font-size:14px;line-height:1.45;margin-bottom:10px}
+#loadscreen.on{display:block;animation:snapIn .15s ease}
+@keyframes snapIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+#loadquotes{min-height:64px;border:2px solid var(--fg);border-left-width:4px;
+  padding:12px 16px;margin-bottom:10px;background:var(--card);border-radius:12px;
+  position:relative;overflow:hidden}
+#loadquotes::before{content:'CASE NOTES';position:absolute;top:0;right:0;
+  background:var(--fg);color:var(--bg);font-size:9px;letter-spacing:2px;
+  padding:3px 10px;border-radius:0 10px 0 8px;font-weight:700}
+#loadquotes .lq{font-size:14.5px;line-height:1.55;color:var(--fg);
+  font-weight:500;animation:fadeQuote .35s ease;padding-right:60px}
+#loadquotes .lq-src{font-size:11px;color:var(--muted);margin-top:6px;
+  letter-spacing:.5px;text-transform:uppercase}
+@keyframes fadeQuote{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+#loadgame{border:2px solid var(--fg);border-radius:12px;padding:14px 16px;
+  background:var(--card);position:relative}
+#loadgame::before{content:'⚡ QUICK';position:absolute;top:0;right:0;
+  background:var(--accent);color:var(--bg);font-size:9px;letter-spacing:1px;
+  padding:3px 10px;border-radius:0 10px 0 8px;font-weight:700}
+#loadgame .lg-title{font-size:11px;letter-spacing:2px;color:var(--accent);
+  text-transform:uppercase;margin-bottom:6px;font-weight:700}
+#loadgame .lg-q{font-size:14px;line-height:1.45;margin-bottom:12px;
+  padding-right:50px;font-weight:500}
 #loadgame .lg-opts{display:flex;gap:8px;flex-wrap:wrap}
-#loadgame .lg-opt{border:2px solid var(--fg);border-radius:10px;padding:10px 14px;
-  font-size:13px;font-weight:600;cursor:pointer;background:none;
-  min-width:80px;text-align:center}
-#loadgame .lg-opt:hover{background:var(--fg);color:var(--bg)}
+#loadgame .lg-opt{border:2.5px solid var(--fg);border-radius:10px;padding:10px 16px;
+  font-size:12.5px;font-weight:700;cursor:pointer;background:var(--bg);
+  min-width:90px;text-align:center;letter-spacing:.3px;text-transform:uppercase;
+  transition:all .1s}
+#loadgame .lg-opt:hover{background:var(--fg);color:var(--bg);transform:scale(1.03)}
+#loadgame .lg-opt:active{transform:scale(.97)}
 #loadgame .lg-opt.picked{background:var(--accent);border-color:var(--accent);color:#fff}
 #loadgame .lg-opt.correct{background:var(--halo);border-color:var(--halo);color:#000}
-#loadgame .lg-opt.wrong{opacity:.5}
+#loadgame .lg-opt.wrong{opacity:.4;transform:scale(.95)}
+/* ============ PENDING CASES WIDGET ============ */
+#pendingWidget{display:none;margin:10px 0;padding:10px 14px;
+  border:2px solid var(--accent);border-radius:12px;background:var(--card)}
+#pendingWidget.on{display:block}
+#pendingWidget .pw-title{font-size:10px;letter-spacing:2px;color:var(--accent);
+  text-transform:uppercase;font-weight:700;margin-bottom:6px}
+#pendingWidget .pw-list{display:flex;flex-direction:column;gap:6px}
+#pendingWidget .pw-item{display:flex;align-items:center;gap:8px;
+  font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line)}
+#pendingWidget .pw-item:last-child{border-bottom:none}
+#pendingWidget .pw-status{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+#pendingWidget .pw-status.pending{background:var(--muted);animation:pulse 1.5s infinite}
+#pendingWidget .pw-status.ready{background:var(--halo)}
+#pendingWidget .pw-status.error{background:var(--horns)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#pendingWidget .pw-url{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:var(--muted)}
+#pendingWidget .pw-action{font-size:11px;font-weight:700;color:var(--accent);
+  cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
 /* categories */
 .catrow{display:flex;gap:8px;overflow-x:auto;padding:8px 2px 10px;
   -webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -134,7 +165,8 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 .qt{font-family:Georgia,serif;font-style:italic;font-size:13px;color:var(--muted);
   border-left:3px solid var(--accent);padding-left:8px;margin:5px 0 2px}
 .srcline{font-size:12px;color:var(--muted);margin:4px 0 2px}
-.srcline a{color:var(--muted)}
+.srcline a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.srcline a:hover{color:var(--fg)}
 /* votes */
 .votecol{position:absolute;top:12px;right:10px;display:flex;flex-direction:column;
   gap:5px;align-items:center}
@@ -235,7 +267,13 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
 .toast{position:fixed;left:50%;transform:translateX(-50%);
   bottom:calc(18px + env(safe-area-inset-bottom));background:var(--fg);
   color:var(--bg);padding:11px 18px;border-radius:12px;font-size:13px;
-  z-index:60;display:none;max-width:90vw;text-align:center}
+  z-index:60;display:none;max-width:90vw;text-align:center;
+  box-shadow:0 4px 20px rgba(0,0,0,.25);animation:toastIn .2s ease}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}
+  to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.toast .toast-action{display:inline-block;margin-left:12px;padding:4px 10px;
+  background:var(--accent);color:#fff;border-radius:6px;font-size:12px;
+  font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
 </style>
 </head>
 <body>
@@ -259,11 +297,16 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
     <div class="qbox">
       <input id="q" placeholder="Search: who did what to whom … or paste a URL to file a case"
         autocomplete="off" autocapitalize="off">
-      <button id="qclear" class="qclear" onclick="clearSearch()" aria-label="Clear search">×</button>
+      <button id="qclear" class="qclear" onclick="handleClearOrFile()" aria-label="Clear search">×</button>
     </div>
     <div id="parseRow"></div>
   </div>
   <div id="latency"></div>
+  <!-- Pending cases widget -->
+  <div id="pendingWidget">
+    <div class="pw-title">📁 Your Filed Cases</div>
+    <div class="pw-list" id="pendingList"></div>
+  </div>
   <!-- Loading screen: quotes flash up top, minigame below -->
   <div id="loadscreen">
     <div id="loadquotes"></div>
@@ -339,9 +382,13 @@ function anonId(){
     return id;
   }catch(e){return crypto.randomUUID();}
 }
-function toast(msg){const t=document.getElementById('toast');
-  t.textContent=msg;t.style.display='block';
-  clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600);}
+function toast(msg,opts={}){const t=document.getElementById('toast');
+  t.innerHTML=esc(msg)+(opts.action?'<span class="toast-action">VIEW</span>':'');
+  if(opts.action)t.querySelector('.toast-action').onclick=()=>{t.style.display='none';opts.action();};
+  t.style.display='block';
+  clearTimeout(t._h);
+  if(!opts.sticky)t._h=setTimeout(()=>t.style.display='none',opts.action?5000:2600);
+}
 function api(path,body,extra){
   return fetch(CONFIG.FN(path),{method:'POST',
     headers:Object.assign({'Content-Type':'application/json',
@@ -632,7 +679,17 @@ function pickGameOpt(btn,answer){
 function currentQuery(){return document.getElementById('q').value.trim();}
 function updateClearBtn(){
   const q=currentQuery();
-  document.getElementById('qclear').classList.toggle('on',q.length>0);
+  const btn=document.getElementById('qclear');
+  const isUrl=isURL(q);
+  btn.classList.toggle('on',q.length>0);
+  btn.classList.toggle('file',isUrl);
+  btn.textContent=isUrl?'📁':'×';
+  btn.setAttribute('aria-label',isUrl?'File this URL':'Clear search');
+}
+function handleClearOrFile(){
+  const q=currentQuery();
+  if(isURL(q)){fileCaseFromSearch(q);}
+  else{clearSearch();}
 }
 function clearSearch(){
   document.getElementById('q').value='';
@@ -642,6 +699,55 @@ function clearSearch(){
   renderResults('');renderParse(null);
   setText('latency','');
   document.getElementById('q').focus();
+}
+/* ============ PENDING CASES WIDGET ============ */
+let PENDING=[];
+try{PENDING=JSON.parse(localStorage.getItem('ucar_pending')||'[]');}catch(e){}
+function savePending(){try{localStorage.setItem('ucar_pending',JSON.stringify(PENDING));}catch(e){}}
+function addPending(url,id){
+  PENDING=PENDING.filter(p=>p.url!==url);/* no dupes */
+  PENDING.unshift({url,id,status:'pending',filed_at:Date.now()});
+  if(PENDING.length>10)PENDING.pop();
+  savePending();renderPending();
+}
+function updatePendingStatus(id,status){
+  const p=PENDING.find(x=>x.id===id);
+  if(p){p.status=status;savePending();renderPending();}
+}
+function renderPending(){
+  const widget=document.getElementById('pendingWidget');
+  const list=document.getElementById('pendingList');
+  /* Prune old ones (>1 hour) */
+  const cutoff=Date.now()-3600000;
+  PENDING=PENDING.filter(p=>p.filed_at>cutoff||p.status==='ready');
+  savePending();
+  if(!PENDING.length){widget.classList.remove('on');return;}
+  widget.classList.add('on');
+  list.innerHTML=PENDING.map(p=>`
+    <div class="pw-item">
+      <span class="pw-status ${p.status}"></span>
+      <span class="pw-url">${esc(domainOf(p.url)||p.url)}</span>
+      ${p.status==='ready'?`<span class="pw-action" onclick="viewPendingCase('${p.id}')">VIEW →</span>`:''}
+      ${p.status==='pending'?'<span style="color:var(--muted);font-size:11px">extracting…</span>':''}
+      ${p.status==='error'?'<span style="color:var(--horns);font-size:11px">failed</span>':''}
+    </div>
+  `).join('');
+}
+function viewPendingCase(id){
+  PENDING=PENDING.filter(p=>p.id!==id);savePending();renderPending();
+  location.hash='case='+id;
+}
+async function fileCaseFromSearch(url){
+  const btn=document.getElementById('qclear');
+  btn.textContent='⏳';btn.disabled=true;
+  const ok=await fileURL(url);
+  btn.disabled=false;
+  if(ok){
+    document.getElementById('q').value='';
+    updateClearBtn();renderResults('');
+  }else{
+    btn.textContent='❌';setTimeout(()=>updateClearBtn(),1500);
+  }
 }
 document.getElementById('q').addEventListener('input',()=>{
   const q=currentQuery();lastParsed=null;webFresh=false;
@@ -711,7 +817,9 @@ async function boot(){
     try{const data=await api('search-cases',{browse:true});
       (data.results||[]).forEach(c=>CACHE.set(c.id,c));}catch(e){}
   }
-  renderCategories();renderResults('');
+  renderCategories();renderResults('');renderPending();
+  /* Resume polling for any pending cases */
+  PENDING.filter(p=>p.status==='pending').forEach(p=>pollCaseStatus(p.id));
 }
 /* categories from the live cache */
 function renderCategories(){
@@ -861,9 +969,31 @@ function renderFilePrompt(url,host){
 async function fileURL(url){
   if(DEMO){toast('DEMO: deploys to the staged queue when configured.');return false;}
   try{const d=await api('file-case',{url});
-    if(d.ok){toast('Filed! The steward will process it.');return true;}
+    if(d.ok){
+      toast('Filed! Extracting case details…');
+      if(d.case_id)addPending(url,d.case_id);
+      /* Poll for completion */
+      if(d.case_id)pollCaseStatus(d.case_id);
+      return true;
+    }
     toast(d.error||'Could not file.');return false;
   }catch(e){toast('Could not reach the registry.');return false;}
+}
+async function pollCaseStatus(id){
+  for(let i=0;i<20;i++){/* poll up to ~60s */
+    await new Promise(r=>setTimeout(r,3000));
+    try{
+      const d=await api('search-cases',{id});
+      const c=(d.results||[])[0];
+      if(c&&c.status==='live'){
+        updatePendingStatus(id,'ready');
+        CACHE.set(c.id,c);
+        toast('✓ Case ready: '+c.title?.slice(0,50),{sticky:true,action:()=>location.hash='case='+id});
+        return;
+      }
+    }catch(e){}
+  }
+  updatePendingStatus(id,'error');
 }
 
 /* ============ MODIFIER SHEET ============ */
