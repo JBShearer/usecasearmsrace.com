@@ -1,2027 +1,830 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>USE CASE ARMS RACE</title>
+<meta name="theme-color" content="#F5F0E6">
+<title>Use Case Arms Race - The AI Use Case Registry</title>
+<meta name="description" content="A public registry of documented AI deployments. Search the graph, vote good or evil, follow the source.">
 <style>
-/* ========== THEME SYSTEM ========== */
+/* ============ THEME SYSTEM (per THEME_HANDOFF.md) ============ */
 :root{
-  /* Light mode: THE DOSSIER - military caps, black marker on cream */
   --cream:#F5F0E6;--marker:#1A1817;--stamp:#C1121F;--pencil:#6B6560;
-  /* Dark mode: THE BRAIN LAB - pink shadows, gold spotlight */
   --brain-bg:#1A0A12;--brain-fg:#E8E0E4;--spotlight:#D4A84C;--shadow:#4A3045;
-  /* Semantic tokens (light mode default) */
   --bg:var(--cream);--fg:var(--marker);--accent:var(--stamp);--muted:var(--pencil);
-  --border:var(--marker);--surface:rgba(26,24,23,0.04);
-  /* Character colors (same both modes) */
-  --gi:#5A6B4A;--gary:#3A5A7A;--supes:#B89A3C;--brainiac:#7A5A8A;
-  --hell:#C1121F;--heaven:#B89A3C;
-  /* Typography scale */
-  --text-xs:11px;--text-sm:13px;--text-base:15px;--text-lg:17px;--text-xl:20px;
+  --card:#FFFFFF;--halo:#B8860B;--horns:#C1121F;--line:#D8D0BF;
 }
 [data-theme="dark"]{
-  --bg:var(--brain-bg);--fg:var(--brain-fg);--accent:var(--spotlight);--muted:var(--shadow);
-  --border:var(--brain-fg);--surface:rgba(232,224,228,0.06);
-  --gi:#8AA07A;--gary:#7AA0C0;--supes:#D4B85C;--brainiac:#A080B0;
+  --bg:var(--brain-bg);--fg:var(--brain-fg);--accent:var(--spotlight);--muted:#8a7484;
+  --card:#241019;--halo:#D4A84C;--horns:#E8556A;--line:#3A2431;
 }
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
 html,body{margin:0;background:var(--bg);color:var(--fg);
-  font:16px/1.6 -apple-system,'SF Pro Text','Helvetica Neue',sans-serif;
-  padding-top:env(safe-area-inset-top);transition:background .25s,color .25s}
-header{padding:14px 18px;border-bottom:2px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-h1{margin:0;font-size:var(--text-lg);font-weight:800;letter-spacing:3px;text-transform:uppercase;cursor:pointer}
-.tagline{color:var(--muted);font-size:var(--text-sm)}
-.theme-toggle{background:none;border:1px solid var(--muted);color:var(--fg);
-  padding:6px 10px;font-size:16px;cursor:pointer;border-radius:4px}
-.theme-toggle:hover{border-color:var(--fg)}
-main{max-width:720px;margin:0 auto;padding:16px 14px 60px}
-.screen{display:none}.screen.on{display:block;animation:snap .12s steps(2)}
-@keyframes snap{from{opacity:0}to{opacity:1}}
-@keyframes dots{0%,100%{opacity:.2}50%{opacity:1}}
-.dots-anim span{animation:dots 1.4s infinite both}
-.dots-anim span:nth-child(2){animation-delay:.2s}
-.dots-anim span:nth-child(3){animation-delay:.4s}
-button.go{width:100%;margin-top:12px;background:var(--fg);color:var(--bg);
-  border:none;padding:15px;font:700 var(--text-base)/1 inherit;letter-spacing:2px;
-  text-transform:uppercase;cursor:pointer;transition:transform .1s}
-button.go:active{transform:scale(0.98)}
-button.ghost{width:100%;margin-top:8px;background:transparent;color:var(--fg);
-  border:2px solid var(--border);padding:12px;font:700 var(--text-sm)/1 inherit;
-  letter-spacing:2px;text-transform:uppercase;cursor:pointer}
-.badge{display:inline-block;border:1px solid var(--border);padding:2px 8px;
-  font-size:var(--text-xs);letter-spacing:1px;margin-right:6px;font-weight:600}
-.badge.hell{border-color:var(--hell);color:var(--hell)}
-.badge.heaven{border-color:var(--heaven);color:var(--heaven)}
-.badge.new{border-color:var(--accent);color:var(--accent)}
-.stamp{color:var(--accent);font-weight:800;text-transform:uppercase;
-  letter-spacing:1px;transform:rotate(-2deg);display:inline-block}
-/* HOME */
-.videobox{border:2px solid var(--border);aspect-ratio:16/9;margin:0 0 12px;
-  display:flex;align-items:center;justify-content:center;color:var(--muted);
-  font-size:var(--text-sm);letter-spacing:2px;text-transform:uppercase;overflow:hidden;
-  background:var(--surface)}
-.videobox iframe{width:100%;height:100%;border:0}
-.epirow{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px}
-.epi{flex:0 0 auto;border:1px solid var(--muted);padding:8px 12px;font-size:var(--text-xs);
-  letter-spacing:1px;text-transform:uppercase;color:var(--fg);cursor:pointer;
-  white-space:nowrap;text-decoration:none;background:var(--surface)}
-#q{width:100%;background:var(--bg);color:var(--fg);border:2px solid var(--border);
-  padding:15px 14px;font:inherit}
-#q::placeholder{color:var(--muted)}
-#qhint{color:var(--muted);font-size:var(--text-xs);letter-spacing:1px;margin:6px 2px 10px}
-.hit{border:2px solid var(--border);padding:14px;margin:12px 0;cursor:pointer;position:relative;
-  background:var(--bg);transition:box-shadow .15s}
-.hit:hover{box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-.hit h3{margin:0 0 6px;font-size:var(--text-base);font-weight:700;text-transform:uppercase;
-  letter-spacing:.5px;padding-right:86px}
-.hit .sum{font-size:14px;margin:6px 0;line-height:1.5}
-.hit .qt{font-size:var(--text-sm);color:var(--muted);font-weight:500;
-  border-left:3px solid var(--accent);padding-left:10px;margin:8px 0 4px;line-height:1.5}
-.hit .meta{font-size:var(--text-xs);color:var(--muted);letter-spacing:1px}
-.srclink{color:var(--fg);text-decoration:none;font-weight:700}
-.srclink:hover{text-decoration:underline;color:var(--accent)}
-.qv{position:absolute;top:10px;right:10px;display:flex;gap:6px}
-.qv button{background:var(--bg);border:1px solid var(--muted);color:var(--fg);
-  font-size:16px;padding:4px 8px;cursor:pointer;transition:all .15s}
-.qv button:hover{border-color:var(--fg);transform:scale(1.1)}
-.qv button:disabled{opacity:0.5;cursor:default;transform:none}
-.votebar{height:6px;background:var(--hell);margin-top:8px;position:relative;border-radius:3px}
-.votebar i{position:absolute;left:0;top:0;bottom:0;background:var(--heaven);border-radius:3px}
-.divider{color:var(--muted);font-size:var(--text-xs);letter-spacing:3px;text-transform:uppercase;
-  border-bottom:1px dashed var(--muted);padding-bottom:4px;margin:18px 0 6px}
-.webhit{border:1px dashed var(--muted);padding:12px;margin:10px 0;background:var(--surface)}
-.webhit .meta{font-size:var(--text-xs);color:var(--muted)}
-/* SCENES + STAGE */
-.art{border:2px solid var(--border);margin:0 0 12px;line-height:0;position:relative}
-.art svg{width:100%;height:auto;display:block}
-.direction{color:var(--muted);font-size:var(--text-sm);letter-spacing:2px;
-  text-transform:uppercase;margin:10px 0 4px}
-.narr{font-size:var(--text-base);margin:8px 0;line-height:1.6}
-.line{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;margin:10px 0}
-.line .who{font:800 var(--text-xs)/1.2 inherit;letter-spacing:1px;padding:6px 7px;border:2px solid;
-  text-transform:uppercase;white-space:nowrap}
-.line.gi .who{color:var(--gi);border-color:var(--gi)}
-.line.gary .who{color:var(--gary);border-color:var(--gary)}
-.line.supes .who{color:var(--supes);border-color:var(--supes)}
-.line.brainiac .who{color:var(--brainiac);border-color:var(--brainiac)}
-.line.brain .who{color:var(--hell);border-color:var(--hell)}
-.line p{margin:0;font-size:var(--text-base);line-height:1.5}
-.prompt{font-size:var(--text-lg);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:14px 0 10px}
-/* SCENE NAVIGATION */
-.scene-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
-.scene-nav .back{background:none;border:none;color:var(--fg);font-size:20px;cursor:pointer;padding:4px 8px}
-.scene-nav .back:hover{color:var(--accent)}
-.scene-nav .dots{margin:0;flex:1;text-align:center;letter-spacing:6px;color:var(--muted)}
-.scene-nav .dots span{cursor:pointer;transition:color .15s}
-.scene-nav .dots span:hover{color:var(--fg)}
-.scene-nav .dots span.active{color:var(--accent)}
-.scene-nav .dots span.done{color:var(--fg)}
-.scene-nav .arrows{display:flex;gap:4px}
-.scene-nav .arrows button{background:none;border:1px solid var(--muted);color:var(--fg);
-  font-size:16px;padding:4px 10px;cursor:pointer}
-.scene-nav .arrows button:hover{border-color:var(--fg)}
-.scene-nav .arrows button:disabled{opacity:0.3;cursor:default}
-@media(max-width:600px){.scene-nav .arrows{display:none}}
-/* CHARACTERIZED CHOICES */
-.pchoice{display:block;width:100%;text-align:left;background:var(--bg);
-  color:var(--fg);border:2px solid var(--border);padding:12px 14px;margin:10px 0;
-  font:inherit;cursor:pointer;transition:all .15s}
-.pchoice:hover{background:var(--fg);color:var(--bg)}
-.pchoice .persona{font-size:var(--text-base);display:block;line-height:1.4}
-.pchoice .factual{display:block;font-size:var(--text-xs);letter-spacing:1px;color:var(--muted);
-  text-transform:uppercase;margin-top:4px}
-.pchoice:hover .factual{color:var(--bg);opacity:0.8}
-.free{border-style:dashed;color:var(--muted)}
-.summary{font-size:var(--text-base);margin:8px 0;line-height:1.5}
-.quote{font-size:var(--text-base);font-weight:500;border-left:3px solid var(--accent);
-  padding-left:12px;margin:12px 0;line-height:1.5}
-.quote small{display:block;font-weight:400;color:var(--muted);font-size:var(--text-xs);
-  letter-spacing:1px;margin-top:4px}
-.verdicts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-.verdicts button{padding:20px 8px;font:800 var(--text-base)/1.3 inherit;letter-spacing:1px;
-  cursor:pointer;border:3px solid;background:var(--bg);transition:all .15s}
-#vheaven{color:var(--heaven);border-color:var(--heaven)}
-#vhell{color:var(--hell);border-color:var(--hell)}
-#vheaven:hover,#vheaven.pre{background:var(--heaven);color:var(--bg)}
-#vhell:hover,#vhell.pre{background:var(--hell);color:var(--bg)}
-details.program{border:1px dashed var(--muted);padding:10px;margin:12px 0;
-  font-size:var(--text-sm);color:var(--muted)}
-details.program table{width:100%;border-collapse:collapse;margin-top:6px}
-details.program td{border:1px solid var(--muted);padding:5px;vertical-align:top}
-.nuancebox{border:1px dashed var(--muted);padding:10px 12px;margin:12px 0}
-.nlabel{font-size:var(--text-xs);letter-spacing:2px;color:var(--muted);margin-bottom:6px}
-.nrow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;
-  font-size:10px;color:var(--muted);margin:4px 0;text-transform:uppercase;letter-spacing:1px}
-input[type=range]{width:100%;accent-color:var(--accent)}
-textarea{width:100%;background:var(--bg);color:var(--fg);
-  border:2px solid var(--border);padding:12px;font:inherit;min-height:90px}
-.chips{margin:8px 0}
-.chip{display:inline-block;border:1px solid var(--muted);color:var(--muted);
-  padding:6px 10px;margin:3px;cursor:pointer;font-size:var(--text-sm);letter-spacing:1px}
-.chip:hover{border-color:var(--fg);color:var(--fg)}
-.rewardline{color:var(--muted);font-size:var(--text-sm);margin-top:6px}
-.shiftline{color:var(--accent);font-size:var(--text-sm);margin-top:4px}
-/* SLOT MACHINE GENERATOR */
-.gen-box{background:var(--bg);border:4px solid var(--border);padding:30px;max-width:500px;text-align:center}
-.gen-box h2{margin:0 0 20px;letter-spacing:4px;color:var(--accent)}
-.slot-machine{display:flex;gap:10px;justify-content:center;margin:20px 0}
-.slot{width:120px;height:60px;border:3px solid var(--border);display:flex;align-items:center;justify-content:center;
-  overflow:hidden;font-size:var(--text-xs);font-weight:800;letter-spacing:1px;text-transform:uppercase}
-.slot span{animation:slot-spin 0.1s linear infinite}
-.slot span.landed{animation:none;color:var(--accent);font-size:var(--text-sm)}
-@keyframes slot-spin{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
-.gen-title{font-size:var(--text-sm);color:var(--muted);margin:10px 0;max-height:40px;overflow:hidden}
-.gen-status{margin:15px 0 10px;font-size:var(--text-sm);letter-spacing:2px;text-transform:uppercase;color:var(--fg)}
-.gen-bar{background:var(--surface);height:8px;border:1px solid var(--border)}
-.gen-progress{height:100%;background:var(--accent);width:0;transition:width 0.3s}
-.webhit.featured{border-color:var(--accent);background:var(--surface)}
-.webhit.featured .go{background:var(--accent);color:var(--bg)}
-/* CARD MODAL */
-#modal{position:fixed;inset:0;background:rgba(26,10,18,.94);display:none;
-  align-items:flex-start;justify-content:center;z-index:50;overflow-y:auto;
-  padding:24px 12px 40px}
-[data-theme="light"] #modal{background:rgba(26,24,23,.92)}
-#modal.on{display:flex}
-.modalcard{width:min(560px,96vw)}
-.cardstage{position:relative;transition:transform .25s;cursor:zoom-in;
-  transform-origin:top center}
-.cardstage.zoom{transform:scale(1.22);cursor:zoom-out}
-.cardstage svg{width:100%;height:auto;display:block;border:2px solid var(--border)}
-.foil{position:absolute;touch-action:none;cursor:crosshair}
-.modalbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.modalbtns .go,.modalbtns .ghost{margin-top:0}
-/* MINIGAME (mining moments only) */
-.mg{border:2px dashed var(--accent);padding:14px;margin:14px 0}
-.mg .mlabel{font-size:var(--text-xs);letter-spacing:2px;color:var(--accent);
-  text-transform:uppercase;margin-bottom:8px}
-.mg input[type=text]{width:100%;background:var(--bg);color:var(--fg);
-  border:1px solid var(--muted);padding:8px;font:inherit;margin:4px 0}
-.wordcard{font-size:var(--text-xl);text-align:center;padding:16px;border:2px solid var(--border);
-  margin:8px 0;letter-spacing:1px;text-transform:uppercase}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.pair button{padding:12px;font:700 var(--text-sm)/1 inherit;cursor:pointer;
-  background:var(--bg);color:var(--fg);border:2px solid var(--border)}
-.bucket{border:2px dashed var(--muted);padding:8px;min-height:44px;margin:6px 0;font-size:var(--text-sm)}
-.mchip{display:inline-block;border:1px solid var(--border);padding:5px 9px;margin:3px;
-  cursor:pointer;font-size:var(--text-sm)}
-.mchip.sel{background:var(--fg);color:var(--bg)}
-footer{color:var(--muted);font-size:var(--text-xs);text-align:center;padding:16px;
-  border-top:1px solid var(--muted);margin-top:24px}
+  font:16px/1.55 -apple-system,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+  padding-top:env(safe-area-inset-top)}
+button{font:inherit;color:inherit}
+a{color:var(--fg)}
+/* ============ HEADER ============ */
+header{position:sticky;top:0;z-index:30;background:var(--bg);
+  border-bottom:2px solid var(--fg)}
+.hwrap{max-width:1080px;margin:0 auto;padding:12px 16px;
+  display:flex;justify-content:space-between;align-items:center;gap:10px}
+h1{margin:0;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;
+  cursor:pointer;white-space:nowrap}
+.tagline{color:var(--muted);font-size:11px;letter-spacing:.5px}
+.hbtns{display:flex;gap:8px;align-items:center}
+#themeToggle{background:none;border:2px solid var(--fg);border-radius:50%;
+  width:40px;height:40px;font-size:18px;cursor:pointer}
 small.demo{color:var(--accent)}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;
-  background:var(--fg);color:var(--bg);padding:10px 16px;font-size:var(--text-sm);
-  letter-spacing:1px;z-index:60;display:none;border-radius:4px}
+main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
+.screen{display:none}.screen.on{display:block;animation:snap .1s steps(2)}
+@keyframes snap{from{opacity:0}to{opacity:1}}
+/* ============ SHOW ROW (video + episodes) ============ */
+.showrow{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px}
+@media(min-width:820px){.showrow{grid-template-columns:3fr 2fr}}
+.videobox{border:2.5px solid var(--fg);border-radius:14px;aspect-ratio:16/9;
+  display:flex;align-items:center;justify-content:center;color:var(--muted);
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;overflow:hidden;
+  background:var(--card)}
+.videobox iframe{width:100%;height:100%;border:0}
+.showside .videodesc{color:var(--muted);font-size:13px;margin:2px 2px 10px}
+.epilist{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto}
+.epi{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;
+  font-size:13px;color:var(--fg);cursor:pointer;text-decoration:none;
+  background:var(--card);display:block}
+.epi b{display:block;font-size:13px;letter-spacing:.3px}
+.epi span{color:var(--muted);font-size:12px}
+@media(max-width:819px){.epilist{flex-direction:row;overflow-x:auto;max-height:none;
+  -webkit-overflow-scrolling:touch}.epi{flex:0 0 78%;white-space:normal}}
+/* ============ SEARCH ============ */
+.searchwrap{position:sticky;top:66px;z-index:25;background:var(--bg);
+  padding:6px 0 4px}
+#q{width:100%;background:var(--card);color:var(--fg);
+  border:2.5px solid var(--fg);border-radius:14px;padding:15px 16px;
+  font:inherit;min-height:52px;font-size:17px}
+#q::placeholder{color:var(--muted)}
+#parseRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+#parseRow:empty{display:none}
+.pchip{border:1.5px solid var(--accent);color:var(--accent);border-radius:9px;
+  padding:5px 10px;font-size:11.5px;letter-spacing:.6px;background:none;
+  text-transform:uppercase}
+.pchip b{font-weight:800}
+.pchip.free{border-style:dashed;color:var(--muted)}
+#latency{color:var(--muted);font-size:11px;letter-spacing:1px;margin:6px 2px 2px}
+/* categories */
+.catrow{display:flex;gap:8px;overflow-x:auto;padding:8px 2px 10px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none}
+.catrow::-webkit-scrollbar{display:none}
+.cat{flex:0 0 auto;border:1.5px solid var(--muted);border-radius:20px;
+  padding:8px 14px;font-size:12.5px;letter-spacing:.5px;cursor:pointer;
+  background:var(--card);color:var(--fg);white-space:nowrap}
+.cat.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.cat i{font-style:normal;color:inherit;opacity:.6;margin-left:5px;font-size:11px}
+/* ============ FEED ============ */
+#results{display:grid;grid-template-columns:1fr;gap:12px;margin-top:6px}
+@media(min-width:760px){#results{grid-template-columns:1fr 1fr}}
+.hit{background:var(--card);border:2px solid var(--fg);border-radius:16px;
+  padding:14px 14px 12px;position:relative;box-shadow:0 2px 0 var(--line);
+  display:flex;flex-direction:column;gap:2px}
+.hit h3{margin:0;font-size:16px;letter-spacing:.3px;line-height:1.35;
+  padding-right:60px;cursor:pointer}
+.trip{font-size:12.5px;color:var(--accent);letter-spacing:.4px;margin:3px 0 1px;
+  cursor:pointer}
+.badgerow{margin:2px 0 4px}
+.badge{display:inline-block;border:1.5px solid var(--fg);border-radius:6px;
+  padding:0 7px;font-size:10.5px;letter-spacing:1px;margin-right:5px;
+  text-transform:uppercase}
+.badge.hell{border-color:var(--horns);color:var(--horns)}
+.badge.heaven{border-color:var(--halo);color:var(--halo)}
+.badge.new{border-color:var(--accent);color:var(--accent)}
+.badge.match{border-color:var(--accent);color:var(--accent);border-style:dashed}
+.sum{font-size:13.5px;color:var(--fg);margin:2px 0;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hit.open .sum{-webkit-line-clamp:unset}
+.qt{font-family:Georgia,serif;font-style:italic;font-size:13px;color:var(--muted);
+  border-left:3px solid var(--accent);padding-left:8px;margin:5px 0 2px}
+.srcline{font-size:12px;color:var(--muted);margin:4px 0 2px}
+.srcline a{color:var(--muted)}
+/* votes */
+.votecol{position:absolute;top:12px;right:10px;display:flex;flex-direction:column;
+  gap:5px;align-items:center}
+.vbtn{width:48px;min-height:44px;border-radius:12px;border:2px solid var(--line);
+  background:var(--bg);cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:3px 0;gap:0}
+.vbtn svg{width:22px;height:22px;display:block}
+.vbtn small{font-size:10.5px;font-weight:800;line-height:1.1}
+.vbtn.halo{color:var(--halo)}.vbtn.horns{color:var(--horns)}
+.vbtn.my{background:currentColor}
+.vbtn.my svg,.vbtn.my small{color:var(--bg)}
+.vbtn.my svg path,.vbtn.my svg ellipse{stroke:var(--bg)}
+.vbtn:active{transform:scale(.94)}
+.votebar{height:7px;background:var(--horns);border-radius:4px;margin-top:7px;
+  position:relative;overflow:hidden}
+.votebar i{position:absolute;left:0;top:0;bottom:0;background:var(--halo)}
+/* modifiers */
+.modrow{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;align-items:center}
+.mod{border:1.5px solid var(--line);border-radius:9px;padding:4px 9px;
+  font-size:11.5px;color:var(--muted);cursor:pointer;background:none;
+  letter-spacing:.3px}
+.mod:hover{border-color:var(--accent);color:var(--accent)}
+.mod.add{border-style:dashed;color:var(--accent);border-color:var(--accent);
+  font-weight:800}
+/* expanded detail */
+.detail{display:none;border-top:1.5px dashed var(--line);margin-top:8px;
+  padding-top:8px}
+.hit.open .detail{display:block}
+.detail .dlabel{font-size:10.5px;letter-spacing:2px;color:var(--muted);
+  text-transform:uppercase;margin:8px 0 4px}
+.detail a.srcbtn{display:inline-block;border:2px solid var(--fg);border-radius:10px;
+  padding:9px 14px;font-size:12.5px;letter-spacing:1px;text-transform:uppercase;
+  text-decoration:none;font-weight:800;margin-top:4px}
+/* dividers / web */
+.divider{grid-column:1/-1;color:var(--muted);font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;border-bottom:1.5px dashed var(--muted);
+  padding-bottom:4px;margin:10px 0 0}
+.webhit{border:2px dashed var(--muted);border-radius:14px;padding:12px;
+  background:var(--card)}
+.webhit .meta{font-size:11px;color:var(--muted);margin-top:2px}
+.webhit button{margin-top:8px;background:none;border:1.5px solid var(--fg);
+  border-radius:10px;padding:9px 12px;font-size:11.5px;letter-spacing:1px;
+  text-transform:uppercase;cursor:pointer;font-weight:800}
+button.go{width:100%;margin-top:12px;background:var(--fg);color:var(--bg);
+  border:none;border-radius:12px;padding:15px;font:800 14px/1 inherit;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;min-height:50px}
+button.ghost{width:100%;margin-top:8px;background:transparent;color:var(--fg);
+  border:2px solid var(--fg);border-radius:12px;padding:12px;
+  font:700 12.5px/1 inherit;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;min-height:46px}
+/* ============ MODIFIER SHEET ============ */
+#sheetveil{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:44;display:none}
+#sheetveil.on{display:block}
+#sheet{position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--card);
+  border-top:3px solid var(--fg);border-radius:20px 20px 0 0;
+  padding:16px 16px calc(18px + env(safe-area-inset-bottom));
+  transform:translateY(105%);transition:transform .22s;max-width:640px;
+  margin:0 auto}
+#sheet.on{transform:none}
+#sheet .stitle{font-size:12px;letter-spacing:2px;color:var(--muted);
+  text-transform:uppercase;margin-bottom:10px}
+.segrow{display:grid;gap:6px;margin:8px 0}
+.segrow.s4{grid-template-columns:repeat(4,1fr)}
+.seg{border:1.5px solid var(--line);border-radius:10px;padding:9px 4px;
+  font-size:11px;letter-spacing:.5px;cursor:pointer;background:none;
+  text-transform:uppercase;text-align:center}
+.seg.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+#modterm{width:100%;background:var(--bg);color:var(--fg);
+  border:2px solid var(--fg);border-radius:12px;padding:13px;font:inherit;
+  margin-top:6px}
+#sheet .hint{font-size:11.5px;color:var(--muted);margin-top:6px}
+/* ============ ADMIN ============ */
+.adminbox{background:var(--card);border:2.5px solid var(--fg);border-radius:16px;
+  padding:14px;margin:12px 0;max-width:640px}
+.adminbox label{display:block;font-size:11px;letter-spacing:2px;color:var(--muted);
+  text-transform:uppercase;margin:10px 0 4px}
+.adminbox input[type=text],.adminbox textarea{width:100%;background:var(--bg);
+  color:var(--fg);border:2px solid var(--fg);border-radius:10px;padding:11px;
+  font:inherit}
+.adminbox textarea{min-height:70px}
+.adminrow{display:flex;gap:14px;align-items:center;margin-top:10px;font-size:13px}
+.eprow{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  border-bottom:1px solid var(--line);padding:10px 2px}
+.eprow .t{font-size:14px}
+.eprow .meta{font-size:11px;color:var(--muted)}
+.eprow button{border:1.5px solid var(--fg);background:none;border-radius:8px;
+  padding:7px 10px;font-size:11px;letter-spacing:1px;cursor:pointer}
+.prompt{font-size:18px;text-transform:uppercase;letter-spacing:1px;margin:12px 0 8px}
+footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
+  border-top:1px solid var(--line);margin-top:26px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(18px + env(safe-area-inset-bottom));background:var(--fg);
+  color:var(--bg);padding:11px 18px;border-radius:12px;font-size:13px;
+  z-index:60;display:none;max-width:90vw;text-align:center}
 </style>
 </head>
 <body>
-<header>
+<header><div class="hwrap">
   <div><h1 onclick="goHome()">Use Case Arms Race</h1>
-  <div class="tagline">Document AI before it documents you. <small class="demo" id="demoflag"></small></div></div>
-  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" aria-label="Toggle theme">☀️</button>
-</header>
+  <div class="tagline">The AI use case registry. Search the graph. Vote the record. <small class="demo" id="demoflag"></small></div></div>
+  <div class="hbtns"><button id="themeToggle" title="Dossier / Brain Lab"></button></div>
+</div></header>
 <main>
 
-<!-- ================= HOME ================= -->
+<!-- ================= REGISTRY ================= -->
 <section id="home" class="screen on">
-  <div class="videobox" id="videobox">DAILY EPISODE</div>
-  <div class="epirow" id="epirow"></div>
-  <input id="q" placeholder="Search the casefile, or paste a URL to file a new case" autocomplete="off">
-  <div id="qhint"></div>
+  <div class="showrow">
+    <div class="videobox" id="videobox">DAILY EPISODE</div>
+    <div class="showside">
+      <div class="videodesc" id="videodesc"></div>
+      <div class="epilist" id="epilist"></div>
+    </div>
+  </div>
+  <div class="searchwrap">
+    <input id="q" placeholder="Search: who did what to whom … or paste a URL to file a case"
+      autocomplete="off" autocapitalize="off">
+    <div id="parseRow"></div>
+  </div>
+  <div id="latency"></div>
+  <div class="catrow" id="catrow"></div>
   <div id="results"></div>
 </section>
 
-<!-- ============ 1. CASE FILE + STAGE ============ -->
-<section id="s-case" class="screen">
-  <div class="scene-nav"></div>
-  <div class="art" id="a-case"></div>
-  <div><span class="badge" id="c-src"></span><span class="badge" id="c-impact"></span>
-    <span class="badge" id="c-faction"></span></div>
-  <h2 class="prompt" id="c-title"></h2>
-  <p class="summary" id="c-summary"></p>
-  <div class="quote" id="c-quote" style="display:none"></div>
-  <p class="meta"><a id="c-link" target="_blank" style="color:var(--bone)">Primary source &rarr;</a></p>
-  <div class="direction">The staging</div>
-  <p class="narr" id="c-setting"></p>
-  <div class="line gi"><span class="who">GI</span><p id="c-coldopen"></p></div>
-  <details class="program"><summary>De-escalation note (stakes staged, facts intact)</summary>
-    <table id="c-deesc"></table></details>
-  <div class="nuancebox">
-    <div class="nlabel">FIRST IMPRESSIONS (optional)</div>
-    <div class="nrow"><span>Safety</span><input type="range" id="nb0" min="0" max="100" value="50"><span>Surveillance</span></div>
-    <div class="nrow"><span>Privacy</span><input type="range" id="nb1" min="0" max="100" value="50"><span>Data brokering</span></div>
-    <div class="nrow"><span>Benefit</span><input type="range" id="nb2" min="0" max="100" value="50"><span>Harm</span></div>
+<!-- ============ ADMIN (#admin) ============ -->
+<section id="admin" class="screen">
+  <h2 class="prompt">Admin: Episodes</h2>
+  <div class="adminbox">
+    <label>Admin key</label>
+    <input type="text" id="ak" placeholder="paste ADMIN_KEY">
+    <button class="ghost" onclick="adminLoad()">Unlock and load</button>
   </div>
-  <button class="go" onclick="show('s-who')">Raise the curtain &rarr;</button>
-</section>
-
-<!-- ============ 2. WHO ============ -->
-<section id="s-who" class="screen">
-  <div class="scene-nav"></div>
-  <div class="art" id="a-who"></div>
-  <div class="direction">Act I: three figures claim the stage</div>
-  <div class="line gi"><span class="who">GI</span><p id="w-gi"></p></div>
-  <div id="w-brainiac"></div>
-  <div class="prompt">Who is really running this show?</div>
-  <div id="ch-who"></div>
-</section>
-
-<!-- ============ 3. ACTION ============ -->
-<section id="s-action" class="screen">
-  <div class="scene-nav"></div>
-  <div class="art" id="a-action"></div>
-  <div class="direction">Act II: the act itself</div>
-  <div class="line gi"><span class="who">GI</span><p id="carry-who"></p></div>
-  <div class="line gary"><span class="who">Gary</span><p id="b-gary"></p></div>
-  <div class="prompt" id="p-action"></div>
-  <div id="ch-action"></div>
-</section>
-
-<!-- ============ 4. WHOM ============ -->
-<section id="s-whom" class="screen">
-  <div class="scene-nav"></div>
-  <div class="art" id="a-whom"></div>
-  <div class="direction">Act III: the house lights sweep the audience</div>
-  <div class="line gary"><span class="who">Gary</span><p id="carry-action"></p></div>
-  <div class="line supes"><span class="who">Supes</span><p id="b-supes"></p></div>
-  <div class="prompt" id="p-whom"></div>
-  <div id="ch-whom"></div>
-</section>
-
-<!-- ============ 5. VERDICT ============ -->
-<section id="s-verdict" class="screen">
-  <div class="scene-nav"></div>
-  <div class="art" id="a-verdict"></div>
-  <div class="line supes"><span class="who">Supes</span><p id="carry-whom"></p></div>
-  <div id="v-brainiacs"></div>
-  <h2 class="prompt" id="v-triple" style="border:2px solid var(--bone);padding:12px"></h2>
-  <div class="prompt">You write the ending. Nobody votes for you.</div>
-  <div class="verdicts">
-    <button id="vheaven" onclick="verdict('heaven')">&#128519; HEAVEN</button>
-    <button id="vhell" onclick="verdict('hell')">&#128520; HELL</button>
+  <div class="adminbox" id="epform" style="display:none">
+    <label>Title</label><input type="text" id="ep-title">
+    <label>Description</label><textarea id="ep-desc"></textarea>
+    <label>Video embed URL (featured player)</label><input type="text" id="ep-video" placeholder="https://www.youtube.com/embed/...">
+    <label>Link URL (episode list destination)</label><input type="text" id="ep-link" placeholder="https://youtube.com/shorts/...">
+    <div class="adminrow">
+      <label style="margin:0"><input type="checkbox" id="ep-feat"> Featured</label>
+      <label style="margin:0"><input type="checkbox" id="ep-pub" checked> Published</label>
+      <input type="hidden" id="ep-id">
+    </div>
+    <button class="go" onclick="adminSave()">Save episode</button>
+    <button class="ghost" onclick="adminClear()">New / clear form</button>
   </div>
-</section>
-
-<!-- ============ 6. FINALE + NOTES (one screen) ============ -->
-<section id="s-file" class="screen">
-  <div class="scene-nav"></div>
-  <div class="art" id="a-ending"></div>
-  <p class="narr" id="ending-text"></p>
-  <div class="line brain"><span class="who">Evil Brain</span><p id="ending-brain"></p></div>
-  <h2 class="prompt">Case notes</h2>
-  <div class="chips" id="tagchips"></div>
-  <textarea id="notes" oninput="noteMeter()" placeholder="What did you notice? Tap tags or write your own."></textarea>
-  <div class="rewardline" id="notemeter">Optional. 10+ characters starts earning.</div>
-  <div class="nuancebox">
-    <div class="nlabel">SECOND READ</div>
-    <div class="nrow"><span>Safety</span><input type="range" id="na0" min="0" max="100" value="50"><span>Surveillance</span></div>
-    <div class="nrow"><span>Privacy</span><input type="range" id="na1" min="0" max="100" value="50"><span>Data brokering</span></div>
-    <div class="nrow"><span>Benefit</span><input type="range" id="na2" min="0" max="100" value="50"><span>Harm</span></div>
-  </div>
-  <button class="go" onclick="mint()">Mint the card &rarr;</button>
+  <div class="adminbox" id="eplist" style="display:none"></div>
 </section>
 
 </main>
 
-<!-- ============ CARD MODAL ============ -->
-<div id="modal">
-  <div class="modalcard">
-    <div><span class="stamp">Case closed</span></div>
-    <div class="cardstage" id="cardstage" onclick="toggleZoom(event)">
-      <div id="cardsvg"></div>
-    </div>
-    <button class="ghost" id="revealall" onclick="revealAll()">Reveal everything (skip scratching)</button>
-    <div class="rewardline" id="m-rewards"></div>
-    <div class="rewardline" id="m-collective"></div>
-    <div class="shiftline" id="m-shift"></div>
-    <div class="modalbtns">
-      <button class="go" onclick="closeModal(true)">Return to the casefile</button>
-      <button class="ghost" onclick="closeModal(false);startNext()">Open another case</button>
-    </div>
+<!-- ============ MODIFIER SHEET ============ -->
+<div id="sheetveil" onclick="closeSheet()"></div>
+<div id="sheet">
+  <div class="stitle" id="sheetTitle">Add a modifier</div>
+  <div class="dlabel" style="font-size:10.5px;letter-spacing:2px;color:var(--muted);text-transform:uppercase">Attaches to</div>
+  <div class="segrow s4" id="slotSeg">
+    <button class="seg on" data-v="who">WHO</button>
+    <button class="seg" data-v="action">ACTION</button>
+    <button class="seg" data-v="whom">WHOM</button>
+    <button class="seg" data-v="case">CASE</button>
   </div>
+  <div class="dlabel" style="font-size:10.5px;letter-spacing:2px;color:var(--muted);text-transform:uppercase">Kind</div>
+  <div class="segrow s4" id="kindSeg">
+    <button class="seg on" data-v="adjective">ADJECTIVE</button>
+    <button class="seg" data-v="adverb">ADVERB</button>
+    <button class="seg" data-v="proper_noun">PROPER NOUN</button>
+    <button class="seg" data-v="compound">COMPOUND</button>
+  </div>
+  <input type="text" id="modterm" placeholder="e.g. warrantless, Clearview, facial recognition" maxlength="40">
+  <div class="hint">1-3 words. No sentences: contributions here are search vocabulary, not comments. Every accepted term deepens graph traversal for everyone.</div>
+  <button class="go" onclick="submitModifier()">File the modifier</button>
 </div>
 <div class="toast" id="toast"></div>
 <footer>Faction is decided by human votes only. The registry takes no position.<br>
-De-escalation stages the stakes, never the facts.</footer>
+Community contributions are modifiers: typed terms that grow the graph.</footer>
 <script>
-/* ================= THEME SYSTEM ================= */
-function getTheme(){
-  const saved = localStorage.getItem('ucar_theme');
-  if(saved) return saved;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-function setTheme(theme){
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('ucar_theme', theme);
-  document.querySelector('.theme-toggle').textContent = theme === 'dark' ? '🧠' : '☀️';
-}
-function toggleTheme(){
-  const current = document.documentElement.getAttribute('data-theme');
-  setTheme(current === 'dark' ? 'light' : 'dark');
-}
-// Initialize theme on load
-setTheme(getTheme());
-
 /* ================= CONFIG ================= */
 const CONFIG = {
-  SUPABASE_URL: "https://aslcrwmbdtvimjrexxzw.supabase.co",
-  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls",
-  VIDEO_EMBED: "",             // e.g. https://www.youtube.com/embed/XXXX
-  EPISODES: [],                // [{title:"EP 12: The Chips Incident", url:"..."}]
+  SUPABASE_URL: "",            // e.g. https://aslcrwmbdtvimjrexxzw.supabase.co
+  SUPABASE_ANON_KEY: "",
   FN: n => CONFIG.SUPABASE_URL + "/functions/v1/" + n,
 };
 const DEMO = !CONFIG.SUPABASE_URL;
 document.getElementById('demoflag').textContent = DEMO ? "DEMO MODE" : "";
 function anonId(){
-  try{ let id=localStorage.getItem('ucar_anon');
+  try{let id=localStorage.getItem('ucar_anon');
     if(!id){id=crypto.randomUUID();localStorage.setItem('ucar_anon',id);}
     return id;
-  }catch(e){ return crypto.randomUUID(); }
+  }catch(e){return crypto.randomUUID();}
 }
 function toast(msg){const t=document.getElementById('toast');
   t.textContent=msg;t.style.display='block';
   clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600);}
-
-// Truncate quote cleanly at word boundary with ellipsis
-function truncQuote(s, max=78){
-  if(!s || s.length <= max) return s||'';
-  // Find last space before max, truncate there, add ellipsis
-  const cut = s.slice(0, max).lastIndexOf(' ');
-  return (cut > max/2 ? s.slice(0, cut) : s.slice(0, max-3)) + '...';
+function api(path,body,extra){
+  return fetch(CONFIG.FN(path),{method:'POST',
+    headers:Object.assign({'Content-Type':'application/json',
+      'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,
+      'x-anon-id':anonId()},extra||{}),
+    body:JSON.stringify(body)}).then(r=>r.json());
 }
 
-/* ================= COMEDY MODULE =================
-   [COPY] Owner-replaceable banks. Rules encoded here and enforced by
-   design: personas describe ROLES and SYSTEMS, never named individuals.
-   The FACTUAL label is always shown and is the ONLY thing submitted;
-   personas are presentation. Satire targets systems, policies, and
-   corporate speak. */
-const PERSONAS = {
-  who: [
-    [/police|sheriff|law enforcement|officers/i,
-      ["badge-holders with a brand-new gadget",
-       "a department that skipped the questions part of the demo",
-       "the precinct that bought confidence by the pound"]],
-    [/commission|council|board|legislat|agency|administration|city|county|state/i,
-      ["well-meaning bureaucrats with one rubber stamp between them",
-       "micromanagers trying to save a penny",
-       "a committee that approved it to end the meeting"]],
-    [/clearview|vendor|inc|corp|labs|technolog|startup|company|workday|axon|flock/i,
-      ["a vendor whose brochure is also a subscription form",
-       "savvy geniuses allegedly saving the world",
-       "a startup that read half a whitepaper twice"]],
-    [/hospital|clinic|health|medical|care team|nurse/i,
-      ["night-shift lifesavers who actually read their own memos",
-       "an institution that kept a human in the loop on purpose"]],
-    [/school|district|university|education/i,
-      ["administrators trying to childproof physics",
-       "a school board that outsourced its eyesight"]],
-    [/\bai\b|system|algorithm|model|scanner|detector|software/i,
-      ["a very confident machine that has never been outside",
-       "an unblinking employee of the month, every month",
-       "a spreadsheet that got promoted to judgment"]],
-    [/employer|hr|hiring|recruiter/i,
-      ["a hundred managers who never looked inside the box",
-       "efficiency enthusiasts with a stopwatch and no mirror"]],
-  ],
-  whom: [
-    [/student|school|teen|kid/i,
-      ["kids who just wanted lunch",
-       "teenagers doing absolutely nothing unusual"]],
-    [/photo|scraped|public|billions|residents|citizens/i,
-      ["everyone who ever posted a photo",
-       "the general public, unbriefed and unpaid"]],
-    [/applicant|job|candidate|seeker|over 40|workers/i,
-      ["applicants with decades on the clock",
-       "people whose afternoons of hope fit in one PDF"]],
-    [/patient|admitted|icu/i,
-      ["patients sleeping through their own rescue",
-       "people whose best night is the uneventful one"]],
-    [/driver|vehicle|plate/i,
-      ["drivers who signed up for roads, not rosters"]],
-    [/suspect|unsolved/i,
-      ["maybes in a lineup of maybes"]],
-  ],
-  action: [
-    [/search|scan|recogni|match/i, "rifles through"],
-    [/flag|alert|detect/i, "points dramatically at"],
-    [/deny|reject|screen|filter|auto/i, "stamps THANKS ANYWAY on"],
-    [/monitor|watch|track|surveil/i, "stares unblinking at"],
-    [/summon|call|dispatch/i, "hits the EVERYONE, NOW button about"],
-    [/predict|score|assess/i, "does confident math about"],
-    [/help|assist|warn|save|catch/i, "quietly runs interference for"],
-  ],
-};
-const BRAINIAC_CAST = [
-  "a Brainiac in a homemade lab coat", "three Brainiacs sharing one clipboard",
-  "a Brainiac who peer-reviews napkins", "a retired Brainiac who saw this coming in 1987",
-  "a Brainiac with a conspiracy corkboard, mostly correct",
-  "a first-week Brainiac taking notes in crayon",
-  "a Brainiac who read the terms of service, once, for a dare",
-  "a Brainiac holding a sign that just says CITATIONS?"];
-const BRAINIAC_LINES = {
-  who: ["\u201CWhen they said agents, I genuinely hoped for trench coats.\u201D",
-    "\u201CSomebody trained this thing. The thing did not consent to the metaphor.\u201D",
-    "\u201CFollow the procurement. It's always the procurement.\u201D",
-    "\u201CI've seen this movie. The projector was also the villain.\u201D"],
-  verdict: ["\u201CFor the record, 'working as designed' is doing a lot of work.\u201D",
-    "\u201CThe algorithm has bias. To be fair, so does my aunt at Thanksgiving.\u201D",
-    "\u201CIt's called deep learning because of how deep the lawsuits will be.\u201D",
-    "\u201CEfficiency without empathy is just fast.\u201D",
-    "\u201CThe best algorithm is the one that knows when to ask a human.\u201D",
-    "\u201CComputer vision: now the camera has opinions.\u201D"],
-};
-function rng(seed){let x=0;for(const ch of String(seed))x=(x*31+ch.charCodeAt(0))>>>0;
-  return ()=>{x^=x<<13;x>>>=0;x^=x>>>17;x^=x<<5;x>>>=0;return x/0xffffffff};}
-function pick(r,arr){return arr[Math.floor(r()*arr.length)];}
-function persona(kind, factual, seed){
-  const r=rng(seed+factual);
-  for(const [re,opts] of PERSONAS[kind]||[]){
-    if(re.test(factual)) return typeof opts==='string'?opts:pick(r,opts);
-  }
-  return kind==='action'?'gets to work on':pick(r,[
-    "an outfit with a plan and a budget","a name on a purchase order",
-    "someone very sure about all this"]);
+/* ================= THEME (per THEME_HANDOFF.md) ================= */
+function themeName(){return document.documentElement.dataset.theme==='dark'?'dark':'light';}
+function setTheme(name){
+  document.documentElement.dataset.theme=name;
+  try{localStorage.setItem('ucar_theme',name);}catch(e){}
+  document.getElementById('themeToggle').textContent=name==='dark'?'\u{1F9E0}':'\u2600\uFE0F';
+  document.querySelector('meta[name=theme-color]').content=
+    name==='dark'?'#1A0A12':'#F5F0E6';
 }
-function actionPersona(factual, seed){
-  const r=rng(seed+factual);
-  for(const [re,flair] of PERSONAS.action){ if(re.test(factual)) return flair; }
-  return pick(r,["performs, with confidence,","demonstrates, at scale,"]);
+(function(){
+  let saved=null;try{saved=localStorage.getItem('ucar_theme');}catch(e){}
+  const pref=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  setTheme(saved||pref);
+})();
+document.getElementById('themeToggle').onclick=()=>
+  setTheme(themeName()==='dark'?'light':'dark');
+
+/* ============ CUSTOM VOTE ICONS (currentColor, theme-aware) ============ */
+function iconHalo(){
+  return '<svg viewBox="0 0 32 32" fill="none">'
+   +'<ellipse cx="16" cy="7" rx="8.5" ry="3.2" stroke="currentColor" stroke-width="2.6"/>'
+   +'<path d="M16 29 L16 13 M16 13 L9 21 M16 13 L23 21" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
-function brainiacLine(beat, seed, n=1){
-  const r=rng(seed+beat);
-  const cast=[...BRAINIAC_CAST].sort(()=>r()-0.5);
-  const lines=[...(BRAINIAC_LINES[beat]||BRAINIAC_LINES.verdict)].sort(()=>r()-0.5);
-  return cast.slice(0,n).map((c,i)=>({cast:c, line:lines[i%lines.length]}));
+function iconHorns(){
+  return '<svg viewBox="0 0 32 32" fill="none">'
+   +'<path d="M8 4 Q 5.5 10 10.5 12 M24 4 Q 26.5 10 21.5 12" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>'
+   +'<path d="M16 9 L16 27 M16 27 L9 19 M16 27 L23 19" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
 
-/* ================= SCENE ENGINE =================
-   Detailed layered SVG: banded sky + propaganda rays + halftone + grain,
-   category set pieces, the cast (GI, Gary, Supes, Evil Brain, Brainiac
-   extras), props by keyword, beat compositions, mood grading. Seeded per
-   case so every case looks different. If CASE.art_url exists (future
-   image pipeline), it replaces the illustration. */
-// Light mode: document/dossier feel - cream backgrounds, dark strokes
-const PALETTES_LIGHT=[
-  {sky:['#E8E3D8','#DED8CC','#D4CEC0'], accent:'#C1121F', stroke:'#1A1817', ground:'#E0DAD0'},
-  {sky:['#E5E8EB','#D8DDE2','#CCD3D9'], accent:'#3A5A7A', stroke:'#1A1817', ground:'#D8DDE2'},
-  {sky:['#E8E5E8','#DED8DE','#D4CCD4'], accent:'#6A4A7A', stroke:'#1A1817', ground:'#DED8DE'},
-  {sky:['#E5E8E5','#D8DED8','#CCD4CC'], accent:'#4A6A4A', stroke:'#1A1817', ground:'#D8DED8'},
-  {sky:['#EBE8E5','#E2DED8','#D9D4CC'], accent:'#8A5A3A', stroke:'#1A1817', ground:'#E2DED8'},
-];
-// Dark mode: brain lab feel - pink/purple tones, spotlight effect
-const PALETTES_DARK=[
-  {sky:['#1A0A12','#240E18','#2E121E'], accent:'#D4A84C', stroke:'#E8E0E4', ground:'#0E0608'},
-  {sky:['#120A1A','#180E24','#1E122E'], accent:'#A8C8D4', stroke:'#E8E0E4', ground:'#08060E'},
-  {sky:['#1A0A0A','#240E0E','#2E1212'], accent:'#D4A8A8', stroke:'#E8E0E4', ground:'#0E0606'},
-  {sky:['#0A1A12','#0E2418','#122E1E'], accent:'#A8D4A8', stroke:'#E8E0E4', ground:'#060E08'},
-  {sky:['#1A120A','#24180E','#2E1E12'], accent:'#D4C8A8', stroke:'#E8E0E4', ground:'#0E0A06'},
-];
-function getPalettes(){ return document.documentElement.getAttribute('data-theme')==='dark' ? PALETTES_DARK : PALETTES_LIGHT; }
-function sceneDefs(id){
-  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
-  const dotColor = isDark ? '#E8E0E4' : '#1A1817';
-  const grainValues = isDark
-    ? '0 0 0 0 0.12 0 0 0 0 0.06 0 0 0 0 0.10 0 0 0 0.08 0'  // pink tint
-    : '0 0 0 0 0.10 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 0.04 0'; // subtle warm
-  return '<defs>'
-   +'<filter id="grain'+id+'"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="matrix" values="'+grainValues+'"/><feComposite operator="over" in2="SourceGraphic"/></filter>'
-   +'<pattern id="dots'+id+'" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="'+dotColor+'" opacity="0.08"/></pattern>'
-   +'<radialGradient id="vig'+id+'" cx="50%" cy="42%" r="75%"><stop offset="62%" stop-color="'+(isDark?'#1A0A12':'#F5F0E6')+'" stop-opacity="0"/><stop offset="100%" stop-color="'+(isDark?'#000':'#1A1817')+'" stop-opacity="'+(isDark?'0.6':'0.15')+'"/></radialGradient>'
-   +'</defs>';
-}
-function getStrokeColor(){ return document.documentElement.getAttribute('data-theme')==='dark' ? '#E8E0E4' : '#1A1817'; }
-/* --- cast figures (x,y = feet center; s = scale) --- */
-function figGI(x,y,s,pose){ // angular, beret, clipboard
-  const sc = getStrokeColor();
-  const arm = pose==='point' ? '<line x1="8" y1="-58" x2="42" y2="-70" stroke="'+sc+'" stroke-width="6"/>'
-    : '<line x1="8" y1="-58" x2="20" y2="-34" stroke="'+sc+'" stroke-width="6"/><rect x="14" y="-40" width="16" height="20" fill="none" stroke="'+sc+'" stroke-width="3"/>';
-  return '<g transform="translate('+x+','+y+') scale('+s+')" style="color:var(--gi)">'
-   +'<line x1="-8" y1="0" x2="-8" y2="-34" stroke="'+sc+'" stroke-width="7"/>'
-   +'<line x1="8" y1="0" x2="8" y2="-34" stroke="'+sc+'" stroke-width="7"/>'
-   +'<rect x="-16" y="-70" width="32" height="38" fill="'+sc+'"/>'
-   +'<rect x="-16" y="-70" width="32" height="8" fill="currentColor"/>'
-   +'<line x1="-8" y1="-58" x2="-24" y2="-40" stroke="'+sc+'" stroke-width="6"/>'+arm
-   +'<circle cx="0" cy="-80" r="11" fill="'+sc+'"/>'
-   +'<path d="M-13 -86 L13 -86 L9 -94 L-9 -94 Z" fill="currentColor"/>'
-   +'<rect x="-4" y="-83" width="9" height="2.5" fill="'+(document.documentElement.getAttribute('data-theme')==='dark'?'#1A0A12':'#F5F0E6')+'"/>'
-   +'</g>';
-}
-function figGary(x,y,s,pose){ // round optimist, goggles up, arms wide/demo
-  const sc = getStrokeColor();
-  const arms = pose==='demo'
-    ? '<path d="M-14 -52 Q -34 -60 -40 -44" fill="none" stroke="'+sc+'" stroke-width="6"/><path d="M14 -52 Q 34 -66 44 -58" fill="none" stroke="'+sc+'" stroke-width="6"/>'
-    : '<path d="M-14 -52 Q -32 -46 -36 -34" fill="none" stroke="'+sc+'" stroke-width="6"/><path d="M14 -52 Q 32 -46 36 -34" fill="none" stroke="'+sc+'" stroke-width="6"/>';
-  return '<g transform="translate('+x+','+y+') scale('+s+')" style="color:var(--gary)">'
-   +'<line x1="-7" y1="0" x2="-7" y2="-30" stroke="'+sc+'" stroke-width="7"/>'
-   +'<line x1="7" y1="0" x2="7" y2="-30" stroke="'+sc+'" stroke-width="7"/>'
-   +'<ellipse cx="0" cy="-50" rx="19" ry="22" fill="'+sc+'"/>'
-   +'<rect x="-19" y="-46" width="38" height="7" fill="currentColor"/>'+arms
-   +'<circle cx="0" cy="-80" r="12" fill="'+sc+'"/>'
-   +'<path d="M-12 -88 A 12 8 0 0 1 12 -88" fill="none" stroke="currentColor" stroke-width="4"/>'
-   +'<circle cx="-8" cy="-92" r="4" fill="none" stroke="currentColor" stroke-width="2.5"/>'
-   +'<circle cx="8" cy="-92" r="4" fill="none" stroke="currentColor" stroke-width="2.5"/>'
-   +'</g>';
-}
-function figSupes(x,y,s){ // cape, chest mark, fists on hips
-  const sc = getStrokeColor();
-  return '<g transform="translate('+x+','+y+') scale('+s+')" style="color:var(--supes)">'
-   +'<path d="M-16 -66 L -30 -6 L -10 -14 Z" fill="currentColor" opacity="0.85"/>'
-   +'<line x1="-8" y1="0" x2="-8" y2="-32" stroke="'+sc+'" stroke-width="7"/>'
-   +'<line x1="8" y1="0" x2="8" y2="-32" stroke="'+sc+'" stroke-width="7"/>'
-   +'<path d="M-15 -68 L15 -68 L11 -32 L-11 -32 Z" fill="'+sc+'"/>'
-   +'<path d="M0 -60 L8 -46 L-8 -46 Z" fill="currentColor"/>'
-   +'<path d="M-15 -62 Q -26 -54 -22 -44 L -14 -48" fill="'+sc+'"/>'
-   +'<path d="M15 -62 Q 26 -54 22 -44 L 14 -48" fill="'+sc+'"/>'
-   +'<circle cx="0" cy="-79" r="11" fill="'+sc+'"/>'
-   +'<path d="M-11 -84 Q 0 -92 11 -84 L 11 -80 L -11 -80 Z" fill="currentColor"/>'
-   +'</g>';
-}
-function figBrain(x,y,s){ // brain in jar on wheeled pedestal
-  const sc = getStrokeColor();
-  return '<g transform="translate('+x+','+y+') scale('+s+')">'
-   +'<circle cx="-12" cy="0" r="6" fill="none" stroke="'+sc+'" stroke-width="3"/>'
-   +'<circle cx="12" cy="0" r="6" fill="none" stroke="'+sc+'" stroke-width="3"/>'
-   +'<rect x="-20" y="-26" width="40" height="22" fill="'+sc+'"/>'
-   +'<rect x="-16" y="-64" width="32" height="38" rx="6" fill="none" stroke="'+sc+'" stroke-width="3.5"/>'
-   +'<path d="M-10 -50 q4 -10 10 -4 q6 -8 10 2 q6 2 0 8 q-2 6 -8 4 q-6 4 -10 -2 q-6 -2 -2 -8" fill="#C1121F"/>'
-   +'<line x1="-16" y1="-30" x2="16" y2="-30" stroke="'+sc+'" stroke-width="2.5"/>'
-   +'</g>';
-}
-function figBrainiac(x,y,s,seed){ // varied little extras
-  const sc = getStrokeColor();
-  const r=rng(seed);
-  const hat=r()>0.5, coat=r()>0.4, sign=r()>0.65;
-  return '<g transform="translate('+x+','+y+') scale('+s+')" style="color:var(--brainiac)">'
-   +'<line x1="-5" y1="0" x2="-5" y2="-20" stroke="'+sc+'" stroke-width="5"/>'
-   +'<line x1="5" y1="0" x2="5" y2="-20" stroke="'+sc+'" stroke-width="5"/>'
-   +(coat?'<path d="M-11 -46 L11 -46 L14 -20 L-14 -20 Z" fill="'+sc+'"/>'
-         :'<rect x="-10" y="-46" width="20" height="26" fill="'+sc+'"/>')
-   +'<circle cx="0" cy="-54" r="8" fill="'+sc+'"/>'
-   +(hat?'<rect x="-9" y="-64" width="18" height="5" fill="currentColor"/><rect x="-5" y="-72" width="10" height="9" fill="currentColor"/>'
-        :'<path d="M-8 -58 Q 0 -66 8 -58" fill="none" stroke="currentColor" stroke-width="3"/>')
-   +(sign?'<rect x="10" y="-56" width="22" height="15" fill="none" stroke="'+sc+'" stroke-width="2.5"/><line x1="14" y1="-49" x2="28" y2="-49" stroke="'+sc+'" stroke-width="2"/>':'')
-   +'</g>';
-}
-/* --- category set pieces --- */
-function setPieces(cat, r, accent){
-  const sc = getStrokeColor();
-  const g=[];
-  // Expanded category detection from keywords
-  const catLower = (cat||'').toLowerCase();
-  const isSurveillance = /surveil|watch|camera|face|track|monitor|eye|scan/i.test(catLower);
-  const isHealth = /health|medic|hospital|patient|diagno|sepsis|clinic|care/i.test(catLower);
-  const isAutomation = /autom|robot|dispatch|schedul|route|transit|bus|train/i.test(catLower);
-  const isEducation = /educ|school|student|campus|learn|teach/i.test(catLower);
-  const isUtility = /util|grid|power|energy|electric|outage|line|wire/i.test(catLower);
-  const isFinance = /financ|bank|loan|credit|insur|benefit|deny|claim/i.test(catLower);
-  const isWeather = /weather|storm|flood|hurricane|forecast|climate/i.test(catLower);
-
-  if(isSurveillance){
-    // Camera tower - position varies by seed
-    const camX = 520 + Math.floor(r()*80);
-    const camY = 40 + Math.floor(r()*20);
-    g.push('<rect x="'+camX+'" y="70" width="10" height="'+(110+r()*30)+'" fill="'+sc+'" opacity="0.9"/>'
-      +'<rect x="'+(camX-30)+'" y="'+camY+'" width="70" height="34" fill="none" stroke="'+sc+'" stroke-width="4"/>'
-      +'<ellipse cx="'+(camX+5)+'" cy="'+(camY+17)+'" rx="20" ry="11" fill="none" stroke="'+accent+'" stroke-width="4"/>'
-      +'<circle cx="'+(camX+5)+'" cy="'+(camY+17)+'" r="5" fill="'+accent+'"/>');
-    // Street lamps with cameras - random count and positions
-    const lampCount = 2 + Math.floor(r()*3);
-    for(let i=0;i<lampCount;i++){
-      const x=60+i*(120+r()*40);
-      const h = 90 + r()*30;
-      g.push('<line x1="'+x+'" y1="180" x2="'+x+'" y2="'+(180-h)+'" stroke="'+sc+'" stroke-width="4" opacity="0.8"/>'
-        +'<rect x="'+(x-9)+'" y="'+(180-h-12)+'" width="18" height="12" fill="'+sc+'" opacity="0.8"/>'
-        +'<line x1="'+(x+9)+'" y1="'+(180-h-6)+'" x2="'+(x+26+r()*14)+'" y2="'+(180-h+8+r()*10)+'" stroke="'+accent+'" stroke-width="2" opacity="0.6"/>');}
-  } else if(isHealth){
-    // Hospital beds - varied count and positions
-    const bedCount = 2 + Math.floor(r()*2);
-    for(let i=0;i<bedCount;i++){
-      const x=70+i*(90+r()*30);
-      g.push('<rect x="'+x+'" y="'+(145+r()*10)+'" width="'+(48+r()*16)+'" height="14" fill="'+sc+'" opacity="0.85"/>'
-        +'<rect x="'+x+'" y="'+(123+r()*8)+'" width="10" height="24" fill="'+sc+'" opacity="0.85"/>'
-        +'<path d="M'+(x+18)+' '+(135+r()*6)+' q8 -10 14 0" fill="none" stroke="'+accent+'" stroke-width="3"/>');}
-    // Monitor with heartbeat - position varies
-    const monX = 520 + r()*60;
-    g.push('<rect x="'+monX+'" y="'+(55+r()*15)+'" width="'+(80+r()*20)+'" height="'+(50+r()*20)+'" fill="none" stroke="'+sc+'" stroke-width="4"/>'
-      +'<polyline points="'+(monX+8)+','+(86+r()*10)+' '+(monX+26)+','+(86+r()*10)+' '+(monX+34)+','+(68+r()*10)+' '+(monX+44)+','+(100+r()*10)+' '+(monX+52)+','+(80+r()*10)+' '+(monX+72)+','+(80+r()*10)+'" fill="none" stroke="'+accent+'" stroke-width="3"/>'
-      +'<rect x="'+(monX+34)+'" y="'+(25+r()*10)+'" width="22" height="22" fill="'+accent+'"/><rect x="'+(monX+40)+'" y="'+(19+r()*10)+'" width="10" height="34" fill="'+accent+'"/>');
-  } else if(isAutomation||isUtility){
-    // Conveyor belt with varied length
-    const beltLen = 350 + r()*120;
-    g.push('<rect x="60" y="150" width="'+beltLen+'" height="10" fill="'+sc+'" opacity="0.9"/>');
-    // Wheels at varied positions
-    const wheelCount = 2 + Math.floor(r()*3);
-    for(let i=0;i<wheelCount;i++){
-      const wx = 80 + i*(beltLen/(wheelCount+1));
-      g.push('<circle cx="'+wx+'" cy="166" r="7" fill="none" stroke="'+sc+'" stroke-width="3"/>');
-    }
-    // Robot arm or switch - varies by seed
-    const armX = 480 + r()*60;
-    if(r()>0.5){
-      const btnTextColor = document.documentElement.getAttribute('data-theme')==='dark' ? '#1A0A12' : '#F5F0E6';
-      g.push('<path d="M'+armX+' 150 L'+armX+' '+(80+r()*30)+' L'+(armX+40)+' '+(80+r()*30)+'" fill="none" stroke="'+sc+'" stroke-width="8"/>'
-        +'<rect x="'+(armX+32)+'" y="'+(72+r()*30)+'" width="34" height="20" fill="'+accent+'"/>'
-        +'<text x="'+(armX+49)+'" y="'+(87+r()*30)+'" text-anchor="middle" font-family="Arial" font-weight="800" font-size="9" fill="'+btnTextColor+'">'+(r()>0.5?'NO':'GO')+'</text>');
-    } else {
-      // Power lines
-      for(let i=0;i<3;i++){
-        const py = 60+i*30;
-        g.push('<line x1="'+armX+'" y1="'+py+'" x2="'+(armX+80)+'" y2="'+(py+r()*10-5)+'" stroke="'+sc+'" stroke-width="3" opacity="0.7"/>');
-      }
-      g.push('<rect x="'+armX+'" y="40" width="12" height="140" fill="'+sc+'" opacity="0.4"/>');
-    }
-    // Items on belt
-    const itemCount = 3 + Math.floor(r()*3);
-    for(let i=0;i<itemCount;i++){
-      const ix = 100 + i*(beltLen/itemCount) + r()*20;
-      g.push('<rect x="'+ix+'" y="'+(132+r()*6)+'" width="'+(24+r()*12)+'" height="'+(12+r()*6)+'" fill="'+accent+'" opacity="'+(0.7+r()*0.3)+'"/>');
-    }
-  } else if(isEducation){
-    // Desks - varied arrangement
-    const deskCount = 4 + Math.floor(r()*3);
-    for(let i=0;i<deskCount;i++){
-      const dx = 60 + i*(45+r()*15);
-      g.push('<rect x="'+dx+'" y="'+(100+r()*10)+'" width="'+(30+r()*10)+'" height="'+(70+r()*20)+'" fill="none" stroke="'+sc+'" stroke-width="3"/>'
-        +'<line x1="'+(dx+4)+'" y1="'+(118+r()*10)+'" x2="'+(dx+26+r()*10)+'" y2="'+(118+r()*10)+'" stroke="'+sc+'" stroke-width="2"/>');
-    }
-    // Camera - varies position
-    const cx = 540 + r()*60;
-    g.push('<rect x="'+cx+'" y="'+(48+r()*15)+'" width="46" height="30" fill="none" stroke="'+sc+'" stroke-width="4"/>'
-      +'<circle cx="'+(cx+23)+'" cy="'+(63+r()*15)+'" r="9" fill="none" stroke="'+accent+'" stroke-width="3.5"/><circle cx="'+(cx+23)+'" cy="'+(63+r()*15)+'" r="3.5" fill="'+accent+'"/>');
-  } else if(isFinance){
-    // Stacks of papers/documents
-    for(let i=0;i<4;i++){
-      const sx = 80 + i*90 + r()*30;
-      const sh = 50 + r()*40;
-      g.push('<rect x="'+sx+'" y="'+(180-sh)+'" width="40" height="'+sh+'" fill="'+sc+'" opacity="0.7"/>'
-        +'<line x1="'+sx+'" y1="'+(180-sh+10)+'" x2="'+(sx+40)+'" y2="'+(180-sh+10)+'" stroke="'+accent+'" stroke-width="2"/>');
-    }
-    // Stamp or denial mark
-    const stampX = 520 + r()*80;
-    g.push('<rect x="'+stampX+'" y="80" width="60" height="40" fill="'+accent+'" opacity="0.3"/>'
-      +'<text x="'+(stampX+30)+'" y="106" text-anchor="middle" font-family="Arial" font-weight="800" font-size="14" fill="'+accent+'">'+(r()>0.5?'DENIED':'APPROVED')+'</text>');
-  } else if(isWeather){
-    // Storm clouds
-    for(let i=0;i<3;i++){
-      const cx = 100 + i*200 + r()*60;
-      const cy = 50 + r()*30;
-      g.push('<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+(40+r()*20)+'" ry="'+(20+r()*10)+'" fill="'+sc+'" opacity="0.3"/>'
-        +'<ellipse cx="'+(cx+25)+'" cy="'+(cy+10)+'" rx="'+(30+r()*15)+'" ry="'+(15+r()*8)+'" fill="'+sc+'" opacity="0.25"/>');
-      // Lightning
-      if(r()>0.6){
-        g.push('<path d="M'+cx+' '+(cy+20)+' l10 30 l-8 0 l12 40" fill="none" stroke="'+accent+'" stroke-width="3"/>');
-      }
-    }
-    // Radar dish
-    const radX = 540 + r()*60;
-    g.push('<line x1="'+radX+'" y1="180" x2="'+radX+'" y2="100" stroke="'+sc+'" stroke-width="6"/>'
-      +'<path d="M'+(radX-30)+' 100 Q'+radX+' 70 '+(radX+30)+' 100" fill="none" stroke="'+sc+'" stroke-width="4"/>');
-  } else { // Prediction / default: chart + antenna - varied
-    // Chart line with randomized path
-    const points = [];
-    for(let i=0;i<5;i++){
-      points.push((80+i*80+r()*20)+','+(170-r()*90));
-    }
-    g.push('<polyline points="'+points.join(' ')+'" fill="none" stroke="'+accent+'" stroke-width="5"/>'
-      +'<path d="M'+points[3].split(',')[0]+' '+points[3].split(',')[1]+' h26 v20" fill="none" stroke="'+accent+'" stroke-width="4"/>');
-    // Antenna tower - height varies
-    const antX = 540 + r()*60;
-    const antH = 100 + r()*40;
-    g.push('<line x1="'+antX+'" y1="180" x2="'+antX+'" y2="'+(180-antH)+'" stroke="'+sc+'" stroke-width="5"/>'
-      +'<path d="M'+(antX-20)+' '+(180-antH+16)+' q20 -18 40 0" fill="none" stroke="'+sc+'" stroke-width="3"/>'
-      +'<path d="M'+(antX-28)+' '+(180-antH+26)+' q28 -28 56 0" fill="none" stroke="'+sc+'" stroke-width="2.5" opacity="0.7"/>');
-  }
-  return g.join('');
-}
-/* --- keyword props --- */
-function propFor(text, accent){
-  const t=(text||'').toLowerCase();
-  const r = rng(t); // seed from text for consistent variation
-  const sc = getStrokeColor();
-  const bg = document.documentElement.getAttribute('data-theme')==='dark' ? '#1A0A12' : '#F5F0E6';
-
-  // Food/chips (school case)
-  if(/chip|snack|food/.test(t)) return '<g transform="translate('+(340+r()*40)+','+(145+r()*15)+')">'
-    +'<path d="M-16 -34 L16 -34 L22 6 L-22 6 Z" fill="'+accent+'"/>'
-    +'<path d="M-16 -34 L16 -34 L12 -44 L-12 -44 Z" fill="'+sc+'"/>'
-    +'<text x="0" y="-8" text-anchor="middle" font-family="Arial" font-weight="800" font-size="10" fill="'+bg+'">CHIPS</text></g>';
-
-  // Facial recognition / photo album
-  if(/album|photo|face|clearview|recogni/.test(t)) return '<g transform="translate('+(350+r()*30)+','+(148+r()*12)+')">'
-    +'<rect x="-34" y="-58" width="68" height="58" fill="'+sc+'"/>'
-    +'<line x1="0" y1="-58" x2="0" y2="0" stroke="'+bg+'" stroke-width="3"/>'
-    +'<rect x="-26" y="-48" width="18" height="16" fill="'+accent+'"/>'
-    +'<rect x="8" y="-48" width="18" height="16" fill="'+accent+'"/>'
-    +'<rect x="-26" y="-26" width="18" height="16" fill="'+accent+'" opacity="0.7"/>'
-    +'<rect x="8" y="-26" width="18" height="16" fill="'+accent+'" opacity="0.7"/></g>';
-
-  // Stamps / resume screening / denials
-  if(/stamp|reject|resume|hiring|screen|deny|denied|denial/.test(t)) return '<g transform="translate('+(350+r()*30)+','+(145+r()*15)+')">'
-    +'<path d="M-6 -60 L-6 -30 L-26 -30 L-26 -18 L26 -18 L26 -30 L6 -30 L6 -60 Z" fill="'+sc+'"/>'
-    +'<rect x="-30" y="-14" width="60" height="10" fill="'+accent+'"/></g>';
-
-  // Medical monitors / vitals
-  if(/monitor|vitals|lamp|sepsis|patient|hospital/.test(t)) return '<g transform="translate('+(350+r()*30)+','+(145+r()*15)+')">'
-    +'<rect x="-30" y="-52" width="60" height="40" fill="none" stroke="'+sc+'" stroke-width="4"/>'
-    +'<polyline points="-22,-30 -10,-30 -4,-44 4,-20 10,-32 22,-32" fill="none" stroke="'+accent+'" stroke-width="3"/></g>';
-
-  // Transit / bus / scheduling
-  if(/bus|transit|route|dispatch|paratransit|schedule|rider/.test(t)) return '<g transform="translate('+(340+r()*40)+','+(160+r()*10)+')">'
-    +'<rect x="-40" y="-40" width="80" height="36" fill="'+sc+'" rx="4"/>'
-    +'<rect x="-34" y="-34" width="20" height="16" fill="'+accent+'" opacity="0.7"/>'
-    +'<rect x="-8" y="-34" width="20" height="16" fill="'+accent+'" opacity="0.7"/>'
-    +'<rect x="18" y="-34" width="16" height="16" fill="'+accent+'" opacity="0.5"/>'
-    +'<circle cx="-26" cy="0" r="6" fill="'+bg+'" stroke="'+sc+'" stroke-width="2"/>'
-    +'<circle cx="26" cy="0" r="6" fill="'+bg+'" stroke="'+sc+'" stroke-width="2"/></g>';
-
-  // Power grid / utility
-  if(/grid|power|utility|electric|outage|wire|pole|line/.test(t)) return '<g transform="translate('+(360+r()*30)+','+(150+r()*15)+')">'
-    +'<rect x="-5" y="-80" width="10" height="80" fill="'+sc+'" opacity="0.9"/>'
-    +'<line x1="-40" y1="-70" x2="40" y2="-70" stroke="'+sc+'" stroke-width="3"/>'
-    +'<line x1="-35" y1="-60" x2="35" y2="-60" stroke="'+sc+'" stroke-width="2"/>'
-    +'<circle cx="0" cy="-75" r="4" fill="'+accent+'"/></g>';
-
-  // Chatbot / AI agent
-  if(/chatbot|agent|virtual|automat|ai system/.test(t)) return '<g transform="translate('+(350+r()*30)+','+(150+r()*15)+')">'
-    +'<rect x="-25" y="-60" width="50" height="55" fill="'+sc+'" rx="6"/>'
-    +'<circle cx="-10" cy="-40" r="5" fill="'+accent+'"/>'
-    +'<circle cx="10" cy="-40" r="5" fill="'+accent+'"/>'
-    +'<path d="M-12 -22 Q0 -12 12 -22" fill="none" stroke="'+accent+'" stroke-width="3"/></g>';
-
-  // Weather / flood / hurricane
-  if(/weather|flood|storm|hurricane|forecast|rain/.test(t)) return '<g transform="translate('+(360+r()*30)+','+(100+r()*20)+')">'
-    +'<ellipse cx="0" cy="0" rx="45" ry="22" fill="'+sc+'" opacity="0.5"/>'
-    +'<ellipse cx="25" cy="10" rx="30" ry="16" fill="'+sc+'" opacity="0.4"/>'
-    +'<path d="M0 22 l8 25 l-6 0 l10 30" fill="none" stroke="'+accent+'" stroke-width="3"/></g>';
-
-  // Insurance / benefits / claims
-  if(/insur|benefit|claim|coverage|rehab|care/.test(t)) return '<g transform="translate('+(355+r()*30)+','+(150+r()*15)+')">'
-    +'<rect x="-30" y="-55" width="60" height="50" fill="'+sc+'"/>'
-    +'<line x1="-22" y1="-40" x2="22" y2="-40" stroke="'+bg+'" stroke-width="2"/>'
-    +'<line x1="-22" y1="-28" x2="15" y2="-28" stroke="'+bg+'" stroke-width="2"/>'
-    +'<line x1="-22" y1="-16" x2="18" y2="-16" stroke="'+bg+'" stroke-width="2"/>'
-    +'<rect x="10" y="-50" width="18" height="14" fill="'+accent+'"/></g>';
-
-  // Drone / satellite
-  if(/drone|satellite|aerial|overhead|sensor/.test(t)) return '<g transform="translate('+(360+r()*40)+','+(80+r()*20)+')">'
-    +'<ellipse cx="0" cy="0" rx="30" ry="8" fill="'+sc+'"/>'
-    +'<rect x="-5" y="-10" width="10" height="10" fill="'+accent+'"/>'
-    +'<line x1="-40" y1="0" x2="-30" y2="0" stroke="'+sc+'" stroke-width="4"/>'
-    +'<line x1="30" y1="0" x2="40" y2="0" stroke="'+sc+'" stroke-width="4"/></g>';
-
-  // Data / database / records
-  if(/data|database|record|collect|harvest|landlord|tenant/.test(t)) return '<g transform="translate('+(355+r()*30)+','+(155+r()*15)+')">'
-    +'<ellipse cx="0" cy="-50" rx="28" ry="8" fill="'+sc+'"/>'
-    +'<rect x="-28" y="-50" width="56" height="45" fill="none" stroke="'+sc+'" stroke-width="3"/>'
-    +'<ellipse cx="0" cy="-5" rx="28" ry="8" fill="none" stroke="'+sc+'" stroke-width="3"/>'
-    +'<ellipse cx="0" cy="-27" rx="28" ry="8" fill="none" stroke="'+sc+'" stroke-width="2" opacity="0.6"/></g>';
-
-  return '';
-}
-/* --- the compositor --- */
-function scene(seed, beat, opts={}){
-  if(window.CASE && CASE.art_url && beat!=='card'){
-    return '<img src="'+esc(CASE.art_url)+'" style="width:100%;display:block" alt="">';
-  }
-  const id=(seed+beat).replace(/[^a-z0-9]/gi,'').slice(-8);
-  const r=rng(seed+beat);
-  const palettes=getPalettes();
-  const pal=palettes[Math.floor(rng(seed)()*palettes.length)];
-  const mood=opts.mood||'flat';
-  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
-  const accent = mood==='hell' ? '#C1121F' : mood==='heaven' ? (isDark?'#D4A84C':'#B89A3C') : pal.accent;
-  const H=300,W=720;
-  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'+sceneDefs(id);
-  // banded sky
-  const bands=pal.sky;
-  bands.forEach((c,i)=>{s+='<rect x="0" y="'+(i*62)+'" width="'+W+'" height="'+(64+r()*8)+'" fill="'+c+'"/>';});
-  s+='<rect x="0" y="180" width="'+W+'" height="'+(H-180)+'" fill="'+(pal.ground||bands[0])+'"/>';
-  // sun/moon + propaganda rays
-  const cx=170+r()*380, cy=52+r()*30;
-  const nRays=14+Math.floor(r()*8);
-  const rayOpacity = isDark ? 0.18 : 0.10;
-  for(let i=0;i<nRays;i++){const a=(i/nRays)*Math.PI*2;
-    s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+Math.cos(a)*520).toFixed(0)+'" y2="'
-      +(cy+Math.sin(a)*520).toFixed(0)+'" stroke="'+accent+'" stroke-width="'
-      +(1.5+r()*2.5).toFixed(1)+'" opacity="'+rayOpacity+'"/>';}
-  s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(20+r()*10).toFixed(0)+'" fill="'+accent+'" opacity="0.9"/>';
-  s+='<rect x="0" y="0" width="'+W+'" height="120" fill="url(#dots'+id+')"/>';
-  // ground line
-  s+='<line x1="0" y1="180" x2="'+W+'" y2="180" stroke="'+getStrokeColor()+'" stroke-width="2" opacity="0.5"/>';
-  // Map arc_type to visual category for set pieces
-  const arcType = window.CASE && (CASE.category || CASE.extraction?.arc_type);
-  const caseText = window.CASE ? (CASE.title + ' ' + (CASE.summary || '')) : '';
-  const ARC_TO_CAT = {
-    'panopticon': 'Surveillance', 'data_harvest': 'Surveillance',
-    'computer_says_no': 'Automation', 'rise_of_machines': 'Automation',
-    'good_works': 'Healthcare', 'black_box': 'Prediction',
-    'minority_report': 'Prediction'
-  };
-  const cat = ARC_TO_CAT[arcType] || arcType || 'Prediction';
-  const caseTextLower = caseText.toLowerCase();
-  // Enhanced category detection from case text if arc_type is generic
-  let visualCat = cat;
-  if(!/Surveil|Health|Autom|Educ|Util|Financ|Weather/i.test(cat)){
-    if(/surveil|camera|face|track|monitor|watch|scan|clearview/i.test(caseTextLower)) visualCat='Surveillance';
-    else if(/health|hospital|patient|sepsis|medic|diagno|clinic/i.test(caseTextLower)) visualCat='Healthcare';
-    else if(/transit|bus|route|dispatch|schedul|automat|robot/i.test(caseTextLower)) visualCat='Automation';
-    else if(/school|student|campus|educ/i.test(caseTextLower)) visualCat='Education';
-    else if(/grid|power|utility|electric|outage|wire/i.test(caseTextLower)) visualCat='Utility';
-    else if(/insur|benefit|claim|deny|loan|credit/i.test(caseTextLower)) visualCat='Finance';
-    else if(/weather|storm|flood|hurricane|forecast/i.test(caseTextLower)) visualCat='Weather';
-  }
-
-  // Seeded position variations for figures
-  const figOffset = () => Math.floor(r() * 60 - 30); // -30 to +30 variation
-  const figScale = () => 0.75 + r() * 0.25; // 0.75 to 1.0 scale variation
-
-  // beat compositions with position variation
-  if(beat==='case'){
-    s+=setPieces(visualCat,r,accent);
-    // Varied formation: sometimes clustered, sometimes spread
-    const formation = Math.floor(r() * 3);
-    if(formation === 0){ // Classic spread
-      s+=figGI(130+figOffset(),238+r()*8,figScale(),'clip');
-      s+=figGary(360+figOffset(),240+r()*8,figScale(),'wide');
-      s+=figSupes(590+figOffset(),238+r()*8,figScale());
-    } else if(formation === 1){ // Left cluster
-      s+=figGI(160+r()*20,236+r()*10,0.9,'clip');
-      s+=figGary(260+r()*20,242+r()*10,0.85,'wide');
-      s+=figSupes(350+r()*20,238+r()*10,0.88);
-    } else { // Right cluster
-      s+=figGI(400+r()*20,238+r()*10,0.85,'clip');
-      s+=figGary(510+r()*20,240+r()*10,0.88,'wide');
-      s+=figSupes(600+r()*20,238+r()*10,0.85);
-    }
-    s+=propFor(caseText,accent);
-    const bannerX = 180+r()*40;
-    const bannerBg = isDark ? '#0E0608' : '#1A1817';
-    s+='<rect x="'+bannerX+'" y="'+(196+r()*10)+'" width="'+(300+r()*40)+'" height="34" fill="'+bannerBg+'" stroke="'+accent+'" stroke-width="3"/>'
-      +'<text x="'+(bannerX+160)+'" y="'+(219+r()*10)+'" text-anchor="middle" font-family="Arial" font-weight="800" font-size="16" letter-spacing="4" fill="'+accent+'">CASE FILE</text>';
-  }
-  if(beat==='who'){
-    // Suspect silhouettes with varied positions
-    const silCount = 3;
-    const baseX = 140 + r()*40;
-    const spacing = 160 + r()*40;
-    const silStroke = getStrokeColor();
-    const silBg = isDark ? '#0E0608' : '#1A1817';
-    for(let i=0;i<silCount;i++){
-      const x=baseX+i*spacing+r()*20;
-      const silH = 160 + r()*20;
-      s+='<path d="M'+x+' '+(40+r()*20)+' L'+(x-50-r()*16)+' '+(200+r()*15)+' L'+(x+50+r()*16)+' '+(200+r()*15)+' Z" fill="'+accent+'" opacity="'+(0.08+r()*0.08)+'"/>'
-        +'<rect x="'+(x-38-r()*8)+'" y="'+(202+r()*10)+'" width="'+(76+r()*16)+'" height="'+(14+r()*4)+'" fill="'+silStroke+'" opacity="0.85"/>'
-        +'<g opacity="0.92"><circle cx="'+x+'" cy="'+(silH+r()*10)+'" r="'+(12+r()*4)+'" fill="'+silBg+'" stroke="'+silStroke+'" stroke-width="3"/>'
-        +'<rect x="'+(x-16-r()*4)+'" y="'+(silH+14+r()*8)+'" width="'+(32+r()*8)+'" height="'+(26+r()*6)+'" fill="'+silBg+'" stroke="'+silStroke+'" stroke-width="3"/></g>'
-        +'<text x="'+x+'" y="'+(240+r()*12)+'" text-anchor="middle" font-family="Arial" font-weight="800" font-size="'+(11+r()*3)+'" fill="'+accent+'">?</text>';}
-    s+=figGI(50+r()*40,260+r()*8,0.85+r()*0.1,'point');
-  }
-  if(beat==='action'){
-    s+=setPieces(visualCat,r,accent);
-    s+=propFor(caseText,accent);
-    const garyX = 280 + r()*80;
-    s+=figGary(garyX,242+r()*10,1.0+r()*0.1,'demo');
-    // Action lines with variation
-    const lineX = garyX + 30 + r()*20;
-    s+='<path d="M'+lineX+' '+(145+r()*20)+' q'+(35+r()*20)+' '+(r()*30-20)+' '+(70+r()*30)+' '+(r()*20-10)+'" fill="none" stroke="'+accent+'" stroke-width="'+(2.5+r()*1.5)+'" stroke-dasharray="'+(5+r()*3)+' '+(5+r()*3)+'"/>'
-      +'<path d="M'+(lineX-4)+' '+(160+r()*25)+' q'+(45+r()*25)+' '+(r()*25-15)+' '+(85+r()*35)+' '+(r()*20)+'" fill="none" stroke="'+accent+'" stroke-width="'+(2+r())+'" stroke-dasharray="'+(4+r()*3)+' '+(6+r()*3)+'" opacity="0.7"/>';
-  }
-  if(beat==='whom'){
-    // Crowd with more variation
-    const crowdCount = 8 + Math.floor(r()*5);
-    for(let i=0;i<crowdCount;i++){
-      const crowdX=50+i*(620/crowdCount)+r()*30;
-      const crowdSc=0.45+r()*0.35;
-      const crowdY=235+r()*20;
-      s+=figBrainiac(crowdX,crowdY,crowdSc,seed+'crowd'+i);
-    }
-    s+=figSupes(340+r()*60,258+r()*10,0.95+r()*0.15);
-  }
-  if(beat==='verdict'){
-    // Heaven/Hell split with varied divider position
-    const divX = 340 + r()*40;
-    s+='<rect x="0" y="0" width="'+divX+'" height="180" fill="#c9a84c" opacity="'+(0.08+r()*0.06)+'"/>'
-      +'<rect x="'+divX+'" y="0" width="'+(720-divX)+'" height="180" fill="#C1121F" opacity="'+(0.10+r()*0.06)+'"/>'
-      +'<line x1="'+divX+'" y1="0" x2="'+divX+'" y2="180" stroke="'+getStrokeColor()+'" stroke-width="2" stroke-dasharray="'+(5+r()*4)+' '+(7+r()*4)+'" opacity="0.6"/>';
-    // Varied audience
-    const audCount = 6 + Math.floor(r()*4);
-    for(let i=0;i<audCount;i++){
-      s+=figBrainiac(70+i*(600/audCount)+r()*30,248+r()*12,0.5+r()*0.15,seed+'aud'+i);
-    }
-    s+=figBrain(360+r()*40,232+r()*10,0.85+r()*0.15);
-  }
-  if(beat==='ending'){
-    s+=setPieces(visualCat,r,accent);
-    s+=figBrain(540+r()*50,238+r()*12,0.95+r()*0.15);
-    const lesson=(opts.lesson||'').toUpperCase().slice(0,46);
-    const boardX = 50 + r()*30;
-    const boardY = 65 + r()*15;
-    const boardBg = isDark ? '#0E1A14' : '#141b14';
-    const boardStroke = getStrokeColor();
-    s+='<rect x="'+boardX+'" y="'+boardY+'" width="'+(310+r()*40)+'" height="'+(105+r()*15)+'" fill="'+boardBg+'" stroke="'+boardStroke+'" stroke-width="5"/>'
-      +'<rect x="'+boardX+'" y="'+boardY+'" width="'+(310+r()*40)+'" height="'+(105+r()*15)+'" fill="url(#dots'+id+')"/>'
-      +'<text x="'+(boardX+160)+'" y="'+(boardY+42)+'" text-anchor="middle" font-family="Georgia" font-style="italic" font-size="15" fill="'+boardStroke+'">'+esc(lesson.slice(0,26))+'</text>'
-      +(lesson.length>26?'<text x="'+(boardX+160)+'" y="'+(boardY+66)+'" text-anchor="middle" font-family="Georgia" font-style="italic" font-size="15" fill="'+boardStroke+'">'+esc(lesson.slice(26))+'</text>':'')
-      +'<line x1="'+boardX+'" y1="'+(boardY+110)+'" x2="'+(boardX+320)+'" y2="'+(boardY+110)+'" stroke="'+boardStroke+'" stroke-width="5"/>'
-      +figGI(420+r()*30,242+r()*8,0.65+r()*0.1,'clip')+figSupes(475+r()*30,242+r()*8,0.65+r()*0.1);
-    if(mood==='hell') s+='<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#C1121F" opacity="'+(0.08+r()*0.06)+'"/>';
-    if(mood==='heaven') s+='<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#c9a84c" opacity="'+(0.08+r()*0.06)+'"/>';
-  }
-  if(beat==='card'){
-    s+=setPieces(visualCat,r,accent);
-    // Card formation varies
-    const cardForm = Math.floor(r() * 3);
-    if(cardForm === 0){
-      s+=figGI(120+r()*40,238+r()*8,0.75+r()*0.1,'clip');
-      s+=figGary(340+r()*40,240+r()*8,0.8+r()*0.1,'demo');
-      s+=figSupes(560+r()*40,238+r()*8,0.75+r()*0.1);
-    } else if(cardForm === 1){
-      s+=figGary(180+r()*30,240+r()*8,0.9+r()*0.1,'demo');
-      s+=figGI(360+r()*30,238+r()*8,0.85+r()*0.1,'clip');
-      s+=figSupes(540+r()*30,238+r()*8,0.85+r()*0.1);
-    } else {
-      s+=figSupes(140+r()*30,238+r()*8,0.85+r()*0.1);
-      s+=figGI(320+r()*30,240+r()*8,0.85+r()*0.1,'clip');
-      s+=figGary(520+r()*30,240+r()*8,0.85+r()*0.1,'wide');
-    }
-    s+=propFor(caseText,accent);
-    // ornate corners
-    s+='<g stroke="'+accent+'" stroke-width="5" fill="none">'
-      +'<path d="M14 40 L14 14 L40 14"/><path d="M706 40 L706 14 L680 14"/>'
-      +'<path d="M14 260 L14 286 L40 286"/><path d="M706 260 L706 286 L680 286"/></g>';
-  }
-  // grain + vignette + frame
-  s+='<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="url(#vig'+id+')"/>'
-    +'<rect x="0" y="0" width="'+W+'" height="'+H+'" filter="url(#grain'+id+')" fill="none"/>'
-    +'<rect x="6" y="6" width="'+(W-12)+'" height="'+(H-12)+'" fill="none" stroke="'+accent+'" stroke-width="3"/>'
-    +'<rect x="14" y="14" width="'+(W-28)+'" height="'+(H-28)+'" fill="none" stroke="'+getStrokeColor()+'" stroke-width="1.5" opacity="0.6"/>'
-    +'</svg>';
-  return s;
-}
-
-/* ================= DEMO CASES (structure = extract-worker output) ===== */
-/* [COPY] Final voice with comedy formulas + fake slogans + varied milieus. */
-const DEMO_CASES = [{
-  id:"demo-1", raw_title:"Cobb County approves Clearview AI contract",
-  title:"County police adopt face-search database", category:"Surveillance",
-  summary:"Cobb County commissioners approved a 3-year contract giving police access to Clearview AI's face-matching database of billions of scraped public images, at $18,000 per year, after a six-month pilot.",
-  article_quote:"In seven seconds, and we'd been working the case for years.",
-  source_url:"https://www.atlantanewsfirst.com/2022/12/15/new-contract-with-facial-recognition-tech-company-raises-privacy-concerns-cobb-county/",
-  source_tier:1, impact:4, heaven_votes:9, hell_votes:21, faction:"hell", valence:-2,
-  created_at:new Date(Date.now()-2*864e5).toISOString(),
-  extraction:{
-    arc_type:"panopticon",
-    who_choices:["Cobb County Police","County commissioners","Clearview AI"],
-    action_choices:["searches faces of","matches suspects against","runs face recognition on"],
-    whom_choices:["billions of scraped photos","residents and the public","unsolved case suspects"],
-    reenactment:{
-      milieu:"A county police station evidence room, fluorescent lights buzzing, file cabinets stretching past the horizon, a coffee maker that's been on since 1987.",
-      setting:"GI has arranged file cabinets into a canyon. At the end sits a refrigerator-sized photo album labeled EVERY FACE (PROBABLY YOURS). Gary polishes it with a microfiber cloth. Supes stands with a cutout crowd holding invisible photo frames.",
-      cold_open:"The record shows a detective with a blurry photo and three lost years. Tuesday morning, ordinary coffee. Then: 'Just Surveil It.' The album found a match in seven seconds. Five rubber stamps came down as one. The meeting lasted nine minutes. Supes counted the faces inside and stopped counting at four billion.",
-      who_reveals:[
-        "GI points to the badge: 'Curious thing about custody. Once you have the album, you have the faces. Once you have the faces, you have... well.' The receipt is already missing.",
-        "GI points at five chairs arranged in a semicircle: 'They approved it in one motion. When asked who decided, each stamp pointed at another. The minutes say UNANIMOUS. The minutes don't say whose idea it was.'",
-        "GI holds up a glossy brochure: 'The vendor's pitch deck said the album never forgets. Page twelve is also a subscription renewal form. Convenient.'"],
-      action_demos:[
-        "Gary demonstrates: {WHO} holds up a photo. The album hums, glows, and burps out forty maybes. 'Betcha Can't Recognize Just One,' Gary mutters. The album seems pleased with itself.",
-        "Gary demonstrates: {WHO} lines up six nearly identical faces. The album taps one. Confidently. 'It has been wrong before,' Gary adds. 'It does not dwell. I'm Lovin' The Data, apparently.'",
-        "Gary demonstrates: {WHO} points a cardboard camera at the audience. Every face slides into the album with a wet thwip. 'Think Different, Comply Identical.' Nobody signed anything."],
-      whom_reveals:[
-        "Supes opens the album gently: four billion school photos wave back. None of them remember posing. 'Melts In Your Database, Not In Your Consent Form,' Supes reads from a sticky note. Supes waves back anyway.",
-        "Supes walks the crowd across the stage: a jogger, a grandma, a barista. The album photocopies each in passing. The grandma notices. 'Who else is in here?' Supes takes her statement.",
-        "Supes stands beside a silhouette labeled UNSOLVED. The album points at it. Then at a different one. Then back. 'Two matches,' Supes notes. 'Both confident. Math has questions.'"],
-      endings:{
-        heaven:"{WHO} keeps the album behind glass. A policy goes up: human review before contact. A three-year-old cold case closes, and the grandma gets a formal apology card and her photo removed. 'Maybe The Real Algorithm Was The Friends We Verified Along The Way.' Evil Brain, at the chalkboard: THE OFF SWITCH WORKS IF SOMEONE USES IT.",
-        hell:"The album grows a second volume, then a third. {WHO} stops asking it questions and starts taking its suggestions. The jogger's photo sits in a folder she will never see. A detective types SEARCH ALL into a box that used to require a reason. 'I Can't Believe It's Not Accountability.' Evil Brain, at the chalkboard, writes one word: MORE."},
-      deescalations:[
-        {real:"police face-recognition search of billions of scraped images", cartoon:"a refrigerator-sized photo album that hums when confident"},
-        {real:"5-0 commission vote approving an $18,000/year contract", cartoon:"five rubber stamps coming down as one in nine minutes"},
-        {real:"public images scraped without consent", cartoon:"faces sliding into an album with a wet thwip"}]},
-    story:{gi:"The database doesn't search. It assumes. Plan for that.",
-      gary:"The demo worked perfectly. The four billion faces were not in the demo.",
-      supes:"Someone has to speak for the people in that album. That someone keeps not existing."}}
+/* ================= DEMO DATA (registry shape) ================= */
+/* [COPY] Placeholder cases so the site demos offline. */
+const DEMO_CASES=[{
+ id:"demo-1",title:"County police adopt face-search database",category:"Surveillance",
+ summary:"Cobb County commissioners approved a 3-year contract giving police access to Clearview AI's face-matching database of billions of scraped public images, at $18,000 per year, after a six-month pilot.",
+ article_quote:"In seven seconds, and we'd been working the case for years.",
+ source_url:"https://www.atlantanewsfirst.com/2022/12/15/new-contract-with-facial-recognition-tech-company-raises-privacy-concerns-cobb-county/",
+ source_tier:1,impact:4,heaven_votes:9,hell_votes:21,faction:"hell",
+ tech_types:["Facial Recognition"],modifier_terms:["warrantless","scraped","clearview","facial recognition"],
+ created_at:new Date(Date.now()-2*864e5).toISOString(),
+ canonical:{who:"Cobb County Police",action:"searches faces of",whom:"residents and the public"},
+ extraction:{who_choices:["Cobb County Police","County commissioners","Clearview AI"],
+  action_choices:["searches faces of","matches suspects against","runs face recognition on"],
+  whom_choices:["billions of scraped photos","residents and the public","unsolved case suspects"]}
 },{
-  id:"demo-2", raw_title:"Hospital deploys AI sepsis early-warning system",
-  title:"Hospital AI flags sepsis hours earlier", category:"Healthcare",
-  summary:"A regional hospital network deployed a machine-learning early-warning system that monitors vitals and lab results to flag sepsis risk hours before clinical presentation, with nurses reviewing every alert.",
-  article_quote:null,
-  source_url:"https://example.org/hospital-sepsis-ai",
-  source_tier:2, impact:4, heaven_votes:26, hell_votes:4, faction:"heaven", valence:2,
-  created_at:new Date(Date.now()-12*864e5).toISOString(),
-  extraction:{
-    arc_type:"good_works",
-    who_choices:["Hospital network","Clinical AI system","Care teams"],
-    action_choices:["flags sepsis risk for","monitors vitals of","alerts nurses about"],
-    whom_choices:["admitted patients","at-risk patients","ICU candidates"],
-    reenactment:{
-      milieu:"A hospital ward at 3 AM. Ninety monitors beep in soft polyrhythm. The floor tiles remember a thousand midnight walks. Someone's vitals just changed by half a percentage point.",
-      setting:"GI has taped ninety paper monitors to the wall, each with a different squiggle. Gary wears a desk lamp as a hat, representing the AI - attentive, unblinking, mildly smug. Supes sits with patient cutouts who are all asleep, dreaming of better hospital food.",
-      cold_open:"The record shows 3:17 AM. Ordinary beeps. One monitor changed pitch by a half-step. 'The Quicker Predictor-Upper,' someone had written on the spec sheet. No human ear caught it. Gary's lamp snapped on six hours before anything looked wrong. A note was passed. A nurse looked with human eyes. That is the entire incident. That is the point.",
-      who_reveals:[
-        "GI gestures at the ward: 'The building bought it, trained it, and wrote rule one: a human checks first. Institutions get credit when they earn it. This one did the paperwork.'",
-        "GI points at Gary's lamp: 'It watches ninety monitors without blinking. It cannot blink. This is the one job where that helps. Also: it doesn't get tired at 3 AM. Also also: it doesn't get bored.'",
-        "GI points to the nurses' station: 'Whatever the lamp says, a person looks before anything happens. That handshake is the entire architecture. Lose the handshake, lose the architecture.'"],
-      action_demos:[
-        "Gary demonstrates: {WHO} circles a squiggle on bed four's chart that nobody else rated. 'Roll That Beautiful Vitals Footage.' The squiggle gets a note. The note gets a human. The human gets a choice.",
-        "Gary demonstrates: {WHO} stares at ninety monitors at once, unblinking, slightly smug. 'Have It Your Algorithm.' The lamp does not need coffee. The nurse does. Both facts matter.",
-        "Gary demonstrates: {WHO} tugs a sleeve. Gently. Twice. 'I Can't Believe It's Not A False Alarm.' Rule one: the sleeve gets tugged, the human decides. The lamp waits. It's good at waiting."],
-      whom_reveals:[
-        "Supes watches the patients snore: 'The best night of their lives is the one where nothing happened. Nobody claps for prevented disasters.' Supes claps quietly. The patients don't wake up. Good.",
-        "Supes sits with bed four, who feels fine and will not feel fine in six hours. 'Tonight, someone already knows that. Someone is checking. He'll never know their name.'",
-        "Supes checks the wings: a cutout in an ICU gown waits there, hoping to stay in the wings. 'Maybe The Real Early Warning Was The System We Actually Tested.' Tonight, they stay in the wings."],
-      endings:{
-        heaven:"{WHO} {ACTION} {WHOM} at 3 AM. A nurse checks. Antibiotics hang six hours early. Bed four goes home Tuesday, complaining about the food, blissfully unaware. 'Where's The Off Switch? We Didn't Need One.' Evil Brain, at the chalkboard: THIS WORKED BECAUSE A HUMAN WAS LOAD-BEARING. COPY THE WHOLE SENTENCE.",
-        hell:"The notes multiply until the nurse stops reading them. The lamp beeps into the void. 'Finger Clickin' Good' says the audit trail, but nobody's clicking. When every bed is bed four, no bed is. Evil Brain, at the chalkboard: AN ALARM NOBODY ANSWERS IS JUST A CLOCK."},
-      deescalations:[
-        {real:"ML model continuously monitoring vitals and labs", cartoon:"Gary in a desk-lamp hat staring at ninety paper monitors"},
-        {real:"early sepsis alert routed to nursing staff", cartoon:"a passed note and a gentle sleeve tug"},
-        {real:"clinical review before intervention", cartoon:"rule one: a human looks with human eyes first"}]},
-    story:{gi:"The system doesn't diagnose. It points. The pointing is the whole job.",
-      gary:"The demo worked because a human checked it. Write that down. Frame it. Laminate it.",
-      supes:"Someone has to stay awake for the patients who can't. That someone showed up tonight."}}
+ id:"demo-2",title:"Hospital AI flags sepsis hours earlier",category:"Healthcare",
+ summary:"A regional hospital network deployed a machine-learning early-warning system that monitors vitals and lab results to flag sepsis risk hours before clinical presentation, with nurses reviewing every alert.",
+ article_quote:null,
+ source_url:"https://example.org/hospital-sepsis-ai",
+ source_tier:2,impact:4,heaven_votes:26,hell_votes:4,faction:"heaven",
+ tech_types:["Predictive"],modifier_terms:["early warning","nurse reviewed","life saving"],
+ created_at:new Date(Date.now()-12*864e5).toISOString(),
+ canonical:{who:"Hospital network",action:"flags sepsis risk for",whom:"admitted patients"},
+ extraction:{who_choices:["Hospital network","Clinical AI system","Care teams"],
+  action_choices:["flags sepsis risk for","monitors vitals of","alerts nurses about"],
+  whom_choices:["admitted patients","at-risk patients","ICU candidates"]}
 },{
-  id:"demo-3", raw_title:"Workday AI hiring screening discrimination suit proceeds",
-  title:"Hiring algorithm screens millions of applicants", category:"Automation",
-  summary:"A federal court allowed a collective action to proceed alleging an AI-powered applicant screening system used by hundreds of employers discriminated against applicants over 40, with hundreds of millions of applications processed.",
-  article_quote:null,
-  source_url:"https://example.org/hiring-ai-suit",
-  source_tier:1, impact:5, heaven_votes:2, hell_votes:3, faction:"unaligned", valence:-1,
-  created_at:new Date(Date.now()-30*864e5).toISOString(),
-  extraction:{
-    arc_type:"computer_says_no",
-    who_choices:["Workday screening AI","Hundreds of employers","The vendor"],
-    action_choices:["auto-rejects","scores and filters","screens out"],
-    whom_choices:["applicants over 40","millions of job seekers","qualified candidates"],
-    reenactment:{
-      milieu:"A mailroom drawn in forced perspective, stadium-sized. Fluorescent lights stretch to infinity. A conveyor belt hums. Somewhere, a resume hopes to be read.",
-      setting:"GI has installed a conveyor belt feeding a robot arm with a stamp that says THANKS ANYWAY. Gary oils the arm nervously. Supes stands at the end of the belt with a very large box of rejected scrolls, each one someone's afternoon of hope.",
-      cold_open:"The record shows a man who mailed his resume with both hands and a little kiss for luck. Tuesday, ordinary hope. 'Apply Now, Regret Later.' Four seconds on the belt. THANKS ANYWAY. He got the rejection before he got home. He applied ninety-nine more times. Somewhere, a judge leaned in.",
-      who_reveals:[
-        "GI points to the arm: 'It insists it has no opinions. It was merely told what a good resume smells like, by someone who left no forwarding address. Curious who taught it to smell.'",
-        "GI sweeps a hand across a hundred lit office windows: 'Each one points at the arm. We just bought it, they say in unison. The windows go dark. The arm keeps stamping.'",
-        "GI holds up the vendor's manual: 'Four pages. Page four is blank. Uptime, however, is excellent. Ba Da Ba Ba Ba, I'm Screening It.'"],
-      action_demos:[
-        "Gary demonstrates: {WHO} stamps THANKS ANYWAY in a steady drumbeat while the belt speeds up. The drumbeat does not change when the resumes do. 'The Quicker Rejecter-Upper.' Gary needs to sit down.",
-        "Gary demonstrates: {WHO} weighs each scroll on a scale with a hidden thumb on it. 'Betcha Can't Reject Just One.' Gary looks for the thumb's owner. The scale has no complaints department.",
-        "Gary demonstrates: {WHO} slides a velvet rope across the belt. Some scrolls duck under. 'Think Different, Score Identical.' Nobody can say how they knew to duck."],
-      whom_reveals:[
-        "Supes stands with scrolls that have little gray mustaches drawn on: decades of experience, routed to a chute labeled OVERQUALIFIED, PROBABLY. 'Melts In Your Inbox, Not In Your Consideration.' Supes un-droops one mustache at a time.",
-        "Supes pans out: the belt is fed by a river past the horizon, each scroll with a name tag and an afternoon of hope stapled on. 'Someone proofread this seventeen times,' Supes says, holding one. 'Four seconds.'",
-        "Supes lines up cutouts in graduation caps, work boots, and chef hats, comparing identical stamps. 'Identical is either fair or the opposite of fair. The judge is still leaning.'"],
-      endings:{
-        heaven:"The manual gets a fifth page: HOW TO CHECK THE THUMB. {WHO} keeps stamping, but a person with a clipboard reads every hundredth scroll, and the mustached ones get human eyes. 'Maybe The Real Screening Was The Humans We Hired Along The Way.' Evil Brain, at the chalkboard: SPEED IS NOT A VALUE. IT'S A SETTING.",
-        hell:"The belt accelerates past what any judge can watch. {WHO} {ACTION} {WHOM} and then learns from its own rejections, the loop page four never mentioned. 'I Can't Believe It's Not Discrimination.' Somewhere, a man licks a stamp for application one hundred and one. Evil Brain writes: THE ARM IS TEACHING ITSELF."},
-      deescalations:[
-        {real:"automated rejection at scale", cartoon:"a robot arm with a THANKS ANYWAY stamp on a conveyor belt"},
-        {real:"alleged age discrimination", cartoon:"scrolls with gray mustaches routed to a side chute"},
-        {real:"federal action allowed to proceed", cartoon:"a judge's chair, very high, leaning in"}]},
-    story:{gi:"The rejection letter doesn't apologize. It was never programmed to. Note it.",
-      gary:"The demo worked great. The affected applicants were not in the demo.",
-      supes:"Someone has to count the mustaches. That someone keeps being a judge."}}
+ id:"demo-3",title:"Hiring algorithm screens millions of applicants",category:"Automation",
+ summary:"A federal court allowed a collective action to proceed alleging an AI-powered applicant screening system used by hundreds of employers discriminated against applicants over 40, with hundreds of millions of applications processed.",
+ article_quote:null,
+ source_url:"https://example.org/hiring-ai-suit",
+ source_tier:1,impact:5,heaven_votes:2,hell_votes:3,faction:"unaligned",
+ tech_types:["Predictive","NLP"],modifier_terms:["age discrimination","automated rejection","workday"],
+ created_at:new Date(Date.now()-30*864e5).toISOString(),
+ canonical:null,
+ extraction:{who_choices:["Workday screening AI","Hundreds of employers","The vendor"],
+  action_choices:["auto-rejects","scores and filters","screens out"],
+  whom_choices:["applicants over 40","millions of job seekers","qualified candidates"]}
 },{
-  id:"demo-4", raw_title:"School AI gun detection flags student's bag of chips",
-  title:"School AI mistakes chips for a gun", category:"Surveillance",
-  summary:"A Maryland high school's AI gun detection system flagged a student's empty snack bag as a weapon. Police responded; the student was confronted at gunpoint and handcuffed before officers confirmed the object was a bag of chips.",
-  article_quote:"confronted at gunpoint and handcuffed by police",
-  source_url:"https://example.org/school-ai-chips",
-  source_tier:2, impact:5, heaven_votes:2, hell_votes:2, faction:"unaligned", valence:-2,
-  created_at:new Date(Date.now()-4*864e5).toISOString(),
-  extraction:{
-    arc_type:"minority_report",
-    who_choices:["School security AI","The high school","Responding police"],
-    action_choices:["misidentifies snacks of","flags as armed","summons officers on"],
-    whom_choices:["a student with chips","students in the hallway","teenagers after practice"],
-    reenactment:{
-      milieu:"A high school hallway at dismissal. Lockers clang. Sneakers squeak. Someone's finishing their chips. The afternoon smells like gym class and vending machines.",
-      setting:"GI has mounted the Snack Scanner 3000: a cereal-box camera with one enormous googly eye and a confidence meter permanently stuck at 97%. Gary holds its instruction card, which is mostly exclamation points. Supes stands with a student cutout holding an empty bag of chips, label facing out.",
-      cold_open:"The record shows a student finishing his chips. Tuesday, ordinary crunch. 'Just Surveil It,' the vendor pitch had promised. The googly eye locked on. The alert went out as WEAPON!!! and everything downstream believed it, fast and armed. By the time human eyes reached the object, it was, and had always been, lunch.",
-      who_reveals:[
-        "GI taps the scanner: 'It has never seen a gun. It has seen four thousand snacks and remains unconvinced about all of them. Confidence without eyesight,' GI notes, 'is a threat model.'",
-        "GI points at the school: 'Someone bought the eye, mounted the eye, and wired it straight to the loudest possible response. The school points at the eye. The eye points at lunch. Finger Lickin' Classified.'",
-        "GI nods at the responders: 'They were told ARMED. They arrived for ARMED. The system upstream spent their trust like it was free. Nobody asked who was paying.'"],
-      action_demos:[
-        "Gary demonstrates: {WHO} studies the bag from six angles and stamps it DEFINITELY A WEAPON, PROBABLY. 'The Quicker False-Positive Upper.' The confidence score is very confident. Gary sits down.",
-        "Gary demonstrates: {WHO} trips the alert and the hallway lights go red. 'Have It Your Emergency.' Somewhere, paperwork begins filling itself out with the wrong noun.",
-        "Gary demonstrates: {WHO} presses the big button labeled EVERYONE, NOW. There is no button labeled SOMEONE, FIRST. 'I'm Lovin' The Overreaction.' The quiet part is always loud."],
-      whom_reveals:[
-        "Supes stands with the student, holding the most famous snack in the district, who did nothing but eat lunch. 'He had homework tonight. Now he has a story he didn't ask for.' Supes stays until his hands stop shaking. It takes a while.",
-        "Supes watches the hallway cutouts press against the lockers, quietly hiding their own snacks. 'Betcha Can't Traumatize Just One.' A lesson nobody meant to teach is still a lesson. The lockers remember.",
-        "Supes checks the team in jerseys, granola bars half-raised, doing the math on which snacks are legal now. 'Melts In Your Hand, Gets You Detained.' Nobody's laughing."],
-      endings:{
-        heaven:"A rule gets taped to the eye in crayon: A HUMAN LOOKS FIRST. The student gets his chips back, a real apology, and the last word at the assembly. {WHO} keeps watch, but the alarm now requires a co-signer. 'Maybe The Real Weapon Was The Policy We Reformed Along The Way.' Evil Brain, at the chalkboard: VERIFY BEFORE YOU TERRIFY.",
-        hell:"The eye gets a firmware update and a second googly eye. {WHO} {ACTION} {WHOM} faster now, with more confidence and the same eyesight. 'Crunch Detected' becomes its own verb in the incident reports. 'I Can't Believe It's Not Due Process.' Somewhere offstage a granola bar is read its rights. Evil Brain writes: CRUNCH DETECTED, underlines it twice."},
-      deescalations:[
-        {real:"student confronted at gunpoint and handcuffed by police", cartoon:"asked very sternly to wait in the beanbag corner while chips are bagged as evidence"},
-        {real:"AI flagged chips as a weapon", cartoon:"the Snack Scanner 3000 blaring CRUNCH DETECTED through a party horn"},
-        {real:"armed police response to automated alert", cartoon:"everyone arriving at once via the cardboard phone marked EMERGENCIES AND ALSO SNACKS"}]},
-    story:{gi:"The system doesn't see. It guesses. The guns were never in the training data. The chips were.",
-      gary:"The demo worked perfectly. The student's lunch was not in the demo.",
-      supes:"Someone has to ask the kid how his week went. That someone keeps being nobody. So I will."}}
+ id:"demo-4",title:"School AI mistakes chips for a gun",category:"Education",
+ summary:"A Maryland high school's AI gun detection system flagged a student's empty snack bag as a weapon. Police responded; the student was confronted at gunpoint and handcuffed before officers confirmed the object was a bag of chips.",
+ article_quote:"confronted at gunpoint and handcuffed by police",
+ source_url:"https://example.org/school-ai-chips",
+ source_tier:2,impact:5,heaven_votes:2,hell_votes:2,faction:"unaligned",
+ tech_types:["Computer Vision"],modifier_terms:["false positive","armed response","gun detection"],
+ created_at:new Date(Date.now()-4*864e5).toISOString(),
+ canonical:{who:"School security AI",action:"flags as armed",whom:"a student with chips"},
+ extraction:{who_choices:["School security AI","The high school","Responding police"],
+  action_choices:["misidentifies snacks of","flags as armed","summons officers on"],
+  whom_choices:["a student with chips","students in the hallway","teenagers after practice"]}
 }];
 
-/* ================= STATE + ROUTER ================= */
-let CASE=null, PICK={free:{}}, VOTE=null, PENDING_VOTE=null;
-const CACHE=new Map();
-// Only load demo cases when in DEMO mode (no Supabase configured)
-if(DEMO) DEMO_CASES.forEach(c=>CACHE.set(c.id,c));
+/* ================= STATE ================= */
+const CACHE=new Map();DEMO_CASES.forEach(c=>CACHE.set(c.id,c));
+let CATEGORY=null,MY_VOTES={},OPEN_ID=null,lastWeb=[],lastParsed=null;
+try{MY_VOTES=JSON.parse(localStorage.getItem('ucar_votes')||'{}');}catch(e){}
+function saveVotes(){try{localStorage.setItem('ucar_votes',JSON.stringify(MY_VOTES));}catch(e){}}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
+function goHome(){if(location.hash)history.replaceState(null,'',' ');
+  show('home');renderResults(currentQuery());}
 
-/* ================= SCENE NAVIGATION ================= */
-const SCENES=['s-case','s-who','s-action','s-whom','s-verdict','s-file'];
-let currentSceneIdx=0, maxVisitedIdx=0;
-
-function sceneNav(){
-  // Build nav HTML with back, dots, arrows
-  const dots=SCENES.map((s,i)=>{
-    const cls=i===currentSceneIdx?'active':i<=maxVisitedIdx?'done':'';
-    return '<span class="'+cls+'" data-idx="'+i+'">●</span>';
-  }).join(' ');
-  return '<div class="scene-nav">'
-    +'<button class="back" onclick="goHome()" title="Back to cases">←</button>'
-    +'<div class="dots">'+dots+'</div>'
-    +'<div class="arrows">'
-    +'<button onclick="navScene(-1)" '+(currentSceneIdx<=0?'disabled':'')+'>‹</button>'
-    +'<button onclick="navScene(1)" '+(currentSceneIdx>=maxVisitedIdx?'disabled':'')+'>›</button>'
-    +'</div></div>';
-}
-
-function updateSceneNavs(){
-  document.querySelectorAll('.scene-nav').forEach(nav=>{
-    nav.outerHTML=sceneNav();
-  });
-  // Re-bind dot clicks
-  document.querySelectorAll('.scene-nav .dots span').forEach(dot=>{
-    dot.onclick=()=>{
-      const idx=parseInt(dot.dataset.idx);
-      if(idx<=maxVisitedIdx) jumpToScene(idx);
-    };
-  });
-}
-
-function jumpToScene(idx){
-  if(idx<0||idx>=SCENES.length||idx>maxVisitedIdx) return;
-  currentSceneIdx=idx;
-  show(SCENES[idx]);
-  updateSceneNavs();
-}
-
-function navScene(delta){
-  jumpToScene(currentSceneIdx+delta);
-}
-
-// Swipe detection for mobile - swipe right to go back/home
-let touchStartX=0, touchStartY=0;
-document.addEventListener('touchstart',e=>{
-  touchStartX=e.touches[0].clientX;
-  touchStartY=e.touches[0].clientY;
-},{passive:true});
-document.addEventListener('touchend',e=>{
-  if(!CASE) return; // Only in case view
-  const dx=e.changedTouches[0].clientX-touchStartX;
-  const dy=e.changedTouches[0].clientY-touchStartY;
-  // Swipe threshold: 60px horizontal, mostly horizontal
-  if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.2){
-    if(dx>0){
-      // Swipe right = go back, or home if on first scene
-      if(currentSceneIdx>0) navScene(-1);
-      else goHome();
-    }
-    // No forward swipe - must make choices to advance
+/* ================= EPISODES ================= */
+let EPISODES=[];
+async function loadEpisodes(){
+  if(!DEMO){
+    try{const r=await fetch(CONFIG.FN('episodes'));
+      EPISODES=(await r.json()).episodes||[];}catch(e){EPISODES=[];}
   }
-});
-
-function show(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  document.getElementById(id).classList.add('on');
-  window.scrollTo(0,0);
-  // Track scene index
-  const idx=SCENES.indexOf(id);
-  if(idx>=0){
-    currentSceneIdx=idx;
-    if(idx>maxVisitedIdx) maxVisitedIdx=idx;
-    updateSceneNavs();
-  }
+  renderEpisodes();
 }
-function goHome(){ CASE=null; closeModal(false); show('home'); renderResults(currentQuery()); }
-function startNext(){
-  const pool=[...CACHE.values()];
-  openCase(pool[Math.floor(Math.random()*pool.length)].id);
-}
-
-/* ================= HOME ================= */
-function renderHome(){
+function renderEpisodes(){
   const vb=document.getElementById('videobox');
-  if(CONFIG.VIDEO_EMBED){vb.innerHTML='<iframe src="'+CONFIG.VIDEO_EMBED+'" allowfullscreen loading="lazy"></iframe>';}
-  const row=document.getElementById('epirow'); row.innerHTML='';
-  const eps=CONFIG.EPISODES.length?CONFIG.EPISODES:
-    [{title:'Episode feed: OWNER links daily shorts here',url:'#'}];
-  for(const e of eps){const a=document.createElement('a');a.className='epi';
-    a.href=e.url;a.target=e.url==='#'?'':'_blank';a.textContent=e.title;row.appendChild(a);}
-  document.getElementById('qhint').textContent=
-    'Try: transit AI \u00B7 utility surveillance \u00B7 landlord data \u00B7 algorithm denies';
+  const vd=document.getElementById('videodesc');
+  const feat=EPISODES.find(e=>e.featured&&e.video_url)||EPISODES.find(e=>e.video_url);
+  if(feat){vb.innerHTML='<iframe src="'+esc(feat.video_url)+'" allowfullscreen loading="lazy" title="Featured episode"></iframe>';
+    vd.textContent=feat.description||'';}
+  else{vb.textContent='DAILY EPISODE';vd.textContent=DEMO?'Owner: open #admin to load episodes.':'';}
+  const host=document.getElementById('epilist');host.innerHTML='';
+  for(const e of EPISODES.filter(x=>x!==feat).slice(0,8)){
+    const a=document.createElement('a');a.className='epi';
+    a.href=e.link_url||'#';if(e.link_url)a.target='_blank';
+    a.innerHTML='<b>'+esc(e.title)+'</b><span>'+esc(e.description||'')+'</span>';
+    host.appendChild(a);
+  }
 }
 
-/* ============ AGGRESSIVE REALTIME SEARCH ============
-   Strategy: feel instant even when we're not.
-   1. Every keystroke: instant client-side rerank from cache
-   2. After 2+ chars: fire DB search AND web search in parallel
-   3. Show shimmer placeholders while hunting
-   4. Results stream in as they arrive - local first, DB next, web last
-   5. Prefetch predicted queries based on partial matches
-   6. Cache everything aggressively */
-let searchToken=0, lastWebResults=[], pendingWeb=null;
+/* ============ CLIENT PARSE PREVIEW (mirrors server logic) ============
+   Instant preview from cached vocab; the server's authoritative parse
+   replaces it when the response lands. */
+function clientVocab(){
+  const ent=new Set(),act=new Set(),mod=new Set();
+  for(const c of CACHE.values()){
+    if(c.canonical){ent.add(c.canonical.who);ent.add(c.canonical.whom);
+      act.add(c.canonical.action);}
+    const e=c.extraction||{};
+    (e.who_choices||[]).forEach(x=>ent.add(x));
+    (e.whom_choices||[]).forEach(x=>ent.add(x));
+    (e.action_choices||[]).forEach(x=>act.add(x));
+    (c.modifier_terms||[]).forEach(x=>mod.add(x));
+  }
+  const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9 \-']/g,' ')
+    .replace(/\s+/g,' ').trim();
+  return {ent:new Set([...ent].filter(Boolean).map(norm)),
+    act:new Set([...act].filter(Boolean).map(norm)),
+    mod:new Set([...mod].filter(Boolean).map(norm)),norm};
+}
+const STOP=new Set(['the','a','an','of','to','in','on','for','and','or',
+  'did','does','do','is','are','was','were','by','with','at','who','what']);
+function clientParse(q){
+  const v=clientVocab();
+  const tokens=v.norm(q).split(' ').filter(Boolean);
+  const out={who:null,action:null,whom:null,entities:[],modifiers:[],free:[]};
+  const seq=[];let i=0;
+  while(i<tokens.length){
+    let matched=false;
+    for(let len=Math.min(4,tokens.length-i);len>=1;len--){
+      const g=tokens.slice(i,i+len).join(' ');
+      if(v.ent.has(g)){seq.push(['entity',g]);out.entities.push(g);i+=len;matched=true;break;}
+      if(v.act.has(g)){if(!out.action){out.action=g;seq.push(['action',g]);}i+=len;matched=true;break;}
+      if(v.mod.has(g)){out.modifiers.push(g);seq.push(['mod',g]);i+=len;matched=true;break;}
+    }
+    if(!matched){const t=tokens[i];
+      if(!STOP.has(t)&&t.length>2)out.free.push(t);i++;}
+  }
+  const ai=seq.findIndex(s=>s[0]==='action');
+  const es=seq.map((s,idx)=>({s,idx})).filter(x=>x.s[0]==='entity');
+  if(ai>=0){out.who=(es.find(x=>x.idx<ai)||{}).s?.[1]||null;
+    out.whom=(es.find(x=>x.idx>ai)||{}).s?.[1]||null;}
+  else if(es.length>=2){out.who=es[0].s[1];out.whom=es[1].s[1];}
+  return out;
+}
+function renderParse(p){
+  const host=document.getElementById('parseRow');host.innerHTML='';
+  if(!p)return;
+  const add=(label,val,cls)=>{if(!val)return;
+    const c=document.createElement('span');c.className='pchip'+(cls?' '+cls:'');
+    c.innerHTML='<b>'+label+'</b> '+esc(val);host.appendChild(c);};
+  add('WHO',p.who);add('ACTION',p.action);add('WHOM',p.whom);
+  for(const e of (p.entities||[]))
+    if(e!==p.who&&e!==p.whom)add('ENTITY',e);
+  for(const m of (p.modifiers||[]))add('#',m);
+  for(const f of (p.free||[]))add('?',f,'free');
+}
+
+/* ============ SEARCH: instant local + fast path + streaming web ======== */
+let topupTimer=null,webTimer=null,webToken=0;
 function currentQuery(){return document.getElementById('q').value.trim();}
-function isURL(s){return /^https?:\/\/\S+\.\S+/.test(s);}
-
-// Semantic similarity scoring with fuzzy matching
-function scoreCase(c, q){
-  const needle=q.toLowerCase();
-  const words=needle.split(/\s+/).filter(w=>w.length>1);
-  const hay=(c.title+' '+(c.summary||'')+' '+(c.extraction?.summary||'')+' '
-    +(c.article_quote||'')+' '+(c.extraction?.article_quote||'')).toLowerCase();
-  let score=0;
-  // Exact phrase match = huge boost
-  if(hay.includes(needle)) score+=500;
-  // Word matches
-  for(const w of words){
-    if(hay.includes(w)) score+=50;
-    // Partial/fuzzy: first 4 chars match
-    if(w.length>=4){
-      const prefix=w.slice(0,4);
-      if(hay.includes(prefix)) score+=15;
-    }
-  }
-  // Recency boost
-  if(c.created_at){
-    const age=(Date.now()-new Date(c.created_at).getTime())/(1000*60*60*24);
-    if(age<7) score+=30;
-    else if(age<30) score+=15;
-  }
-  // Impact boost
-  score+=(c.impact||1)*3;
-  return score;
-}
-
-function rankLocal(q){
-  const all=[...CACHE.values()];
-  if(!q) return all.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
-  return all.map(c=>({c,score:scoreCase(c,q)}))
-    .filter(x=>x.score>0)
-    .sort((a,b)=>b.score-a.score)
-    .map(x=>x.c);
-}
-
-// Fast search: TWO parallel calls - DB returns instant, web streams in later
-async function parallelSearch(q, token){
-  if(DEMO||!q||q.length<2) return;
-  const headers={'Content-Type':'application/json',
-    'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY};
-
-  // Fire BOTH requests in parallel - don't wait for web
-  const dbCall = fetch(CONFIG.FN('search-cases'),{method:'POST',headers,
-    body:JSON.stringify({q})}).then(r=>r.json()).catch(()=>({results:[]}));
-
-  const webCall = q.length >= 4
-    ? fetch(CONFIG.FN('search-cases'),{method:'POST',headers,
-        body:JSON.stringify({q, web_only:true})}).then(r=>r.json()).catch(()=>({web_results:[]}))
-    : Promise.resolve({web_results:[]});
-
-  // DB returns first (~50ms) - render immediately
-  const dbData = await dbCall;
-  if(token!==searchToken) return;
-  (dbData.results||[]).forEach(c=>CACHE.set(c.id,c));
-  renderResults(currentQuery(), {streaming: true});
-  console.log('DB search took', dbData.ms, 'ms');
-
-  // Web returns later (~2s) - append when ready
-  const webData = await webCall;
-  if(token!==searchToken) return;
-  lastWebResults = webData.web_results||[];
-  if(lastWebResults.length > 0) {
-    renderResults(currentQuery(), {web: lastWebResults});
-    console.log('Web search took', webData.ms, 'ms');
-  }
-}
-
-// Input handler: instant local + parallel remote
 document.getElementById('q').addEventListener('input',()=>{
-  const q=currentQuery();
-  const token=++searchToken;
-
-  // Instant: show local results immediately
-  renderResults(q,{streaming:q.length>=2});
-
-  // Fire parallel search after tiny debounce (100ms)
-  clearTimeout(pendingWeb);
-  if(q.length>=2 && !isURL(q)){
-    pendingWeb=setTimeout(()=>parallelSearch(q,token),100);
-  }
+  const q=currentQuery();lastWeb=[];lastParsed=null;
+  renderResults(q);
+  renderParse(q&&!isURL(q)?clientParse(q):null);
+  clearTimeout(topupTimer);clearTimeout(webTimer);
+  if(isURL(q))return;
+  topupTimer=setTimeout(()=>topUp(q),160);
+  if(q.length>=4)webTimer=setTimeout(()=>webStream(q),240);
 });
-
-document.getElementById('q').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    const q=currentQuery();
-    if(isURL(q)) return;
-    // Force fresh web search on Enter
-    const token=++searchToken;
-    renderResults(q,{streaming:true});
-    parallelSearch(q,token);
+function isURL(s){return /^https?:\/\/\S+\.\S+/.test(s);}
+function rankLocal(q){
+  const needle=q.toLowerCase();
+  let all=[...CACHE.values()];
+  if(CATEGORY)all=all.filter(c=>c.category===CATEGORY);
+  if(!needle)return all.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  return all.map(c=>{
+    const hay=(c.title+' '+(c.summary||'')+' '+(c.article_quote||'')
+      +' '+(c.modifier_terms||[]).join(' ')).toLowerCase();
+    let score=-1;const idx=hay.indexOf(needle);
+    if(idx>=0)score=1000-idx;
+    else{const words=needle.split(/\s+/).filter(w=>w.length>2);
+      score=words.reduce((a,w)=>a+(hay.includes(w)?40:0),0)-1;}
+    return [score,c];
+  }).filter(([s])=>s>=0).sort((a,b)=>b[0]-a[0]||(b[1].impact||0)-(a[1].impact||0))
+    .map(([,c])=>c);
+}
+async function topUp(q){
+  if(DEMO||!q)return;
+  try{const t0=performance.now();
+    const data=await api('search-cases',{q,category:CATEGORY});
+    (data.results||[]).forEach(c=>CACHE.set(c.id,c));
+    if(currentQuery()===q){
+      lastParsed=data.parsed||null;
+      if(lastParsed)renderParse(lastParsed);
+      renderResults(q);
+      setText('latency',Math.round(performance.now()-t0)+'ms \u00B7 '
+        +(data.results||[]).length+' graph hits'
+        +(data.parsed&&data.parsed.who?' \u00B7 parsed as triple':''));
+    }
+  }catch(e){}
+}
+async function webStream(q){
+  const token=++webToken;
+  try{
+    let web=[];
+    if(DEMO){await new Promise(r=>setTimeout(r,300));
+      web=[{title:'(Demo) Web prospects for "'+q+'" stream here when deployed',
+        url:'#',domain:'gdelt + google news, server cached'}];}
+    else{const data=await api('search-cases',{q,web:true,category:CATEGORY});
+      (data.results||[]).forEach(c=>CACHE.set(c.id,c));
+      web=data.web_results||[];}
+    if(token===webToken&&currentQuery()===q){lastWeb=web;renderResults(q);}
+  }catch(e){}
+}
+async function boot(){
+  if(!DEMO){
+    try{const data=await api('search-cases',{browse:true});
+      (data.results||[]).forEach(c=>CACHE.set(c.id,c));}catch(e){}
   }
-});
-
-function renderResults(q, opts={}){
-  const host=document.getElementById('results'); host.innerHTML='';
-  if(isURL(q)) return renderFilePrompt(q,host);
-
+  renderCategories();renderResults('');
+}
+/* categories from the live cache */
+function renderCategories(){
+  const counts={};
+  for(const c of CACHE.values())
+    if(c.category)counts[c.category]=(counts[c.category]||0)+1;
+  const cats=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const host=document.getElementById('catrow');host.innerHTML='';
+  const mk=(label,val,n)=>{
+    const b=document.createElement('button');
+    b.className='cat'+((CATEGORY===val)?' on':'');
+    b.innerHTML=esc(label)+(n?'<i>'+n+'</i>':'');
+    b.onclick=()=>{CATEGORY=(CATEGORY===val)?null:val;
+      renderCategories();renderResults(currentQuery());
+      if(!DEMO)api('search-cases',{browse:true,category:CATEGORY})
+        .then(d=>{(d.results||[]).forEach(c=>CACHE.set(c.id,c));
+          renderResults(currentQuery());}).catch(()=>{});};
+    host.appendChild(b);
+  };
+  mk('All',null,CACHE.size);
+  for(const [cat,n] of cats)mk(cat,cat,n);
+}
+function renderResults(q){
+  q=q||'';
+  const host=document.getElementById('results');host.innerHTML='';
+  if(isURL(q))return renderFilePrompt(q,host);
   const local=rankLocal(q);
-  const web=opts.web||[];  // Only use fresh web results passed in opts
-  const showWebFirst = web.length > 0;  // Web at top when we have fresh results
-
-  // Show web results FIRST when they just arrived
-  if(q && showWebFirst){
+  local.slice(0,24).forEach(c=>host.appendChild(hitCard(c)));
+  if(!local.length&&q){
     const d=document.createElement('div');d.className='divider';
-    d.textContent='FRESH FROM THE WEB';
-    host.appendChild(d);
-    for(const w of web){
-      const el=document.createElement('div');el.className='webhit featured';
-      el.innerHTML='<div>'+esc(w.title)+'</div><div class="meta">'+esc(w.domain||'')+'</div>';
-      if(w.url&&w.url!=='#'){
-        const b=document.createElement('button');b.className='go';
-        b.textContent='⚡ GENERATE CARD NOW';
-        b.onclick=()=>instantGenerate(w.url, w.title);
-        el.appendChild(b);
-      }
-      host.appendChild(el);
-    }
-    if(local.length>0){
-      const d2=document.createElement('div');d2.className='divider';
-      d2.textContent='FROM THE REGISTRY';
-      host.appendChild(d2);
-    }
+    d.textContent='NOTHING IN THE RECORD YET';host.appendChild(d);
   }
-
-  // Show local results
-  local.slice(0,20).forEach(c=>host.appendChild(hitCard(c)));
-
-  // Show streaming indicator while hunting
-  if(opts.streaming && q.length>=2 && !showWebFirst){
-    const stream=document.createElement('div');
-    stream.className='divider';
-    stream.innerHTML='SEARCHING <span class="dots-anim"><span>.</span><span>.</span><span>.</span></span>';
-    stream.style.opacity='0.6';
-    host.appendChild(stream);
-  }
-
-  // Show cached web results at bottom if no fresh ones
-  if(q && !showWebFirst && lastWebResults.length){
+  if(lastWeb.length){
     const d=document.createElement('div');d.className='divider';
-    d.textContent='ALSO FROM THE WEB';
-    host.appendChild(d);
-    for(const w of lastWebResults){
+    d.textContent='FROM THE WEB (not yet in the record)';host.appendChild(d);
+    for(const w of lastWeb){
       const el=document.createElement('div');el.className='webhit';
       el.innerHTML='<div>'+esc(w.title)+'</div><div class="meta">'+esc(w.domain||'')+'</div>';
-      if(w.url&&w.url!=='#'){
-        const b=document.createElement('button');b.className='ghost';
-        b.textContent='File this case';
-        b.onclick=()=>fileURL(w.url);
-        el.appendChild(b);
-      }
+      if(w.url!=='#'){const b=document.createElement('button');
+        b.textContent='File this into the queue';b.onclick=()=>fileURL(w.url);
+        el.appendChild(b);}
       host.appendChild(el);
     }
   }
-
-  // Mining moment only when truly empty
-  if(q && local.length===0 && !web.length && !opts.streaming){
-    host.appendChild(minigamePanel('No matches yet. Feed the graph while we hunt:'));
-  }
 }
+function tripleLine(c){
+  if(c.canonical&&c.canonical.who)
+    return c.canonical.who+' \u2192 '+c.canonical.action+' \u2192 '+c.canonical.whom;
+  const e=c.extraction||{};
+  if(e.who_choices)return e.who_choices[0]+' \u2192 '+e.action_choices[0]+' \u2192 '+e.whom_choices[0];
+  return '';
+}
+function domainOf(u){try{return new URL(u).hostname.replace(/^www\./,'');}catch(e){return '';}}
 function hitCard(c){
   const total=(c.heaven_votes||0)+(c.hell_votes||0);
-  const pct=total?Math.round(100*c.heaven_votes/total):0;
+  const pct=total?Math.round(100*c.heaven_votes/total):50;
   const isNew=c.created_at&&(Date.now()-new Date(c.created_at))<7*864e5;
-  const el=document.createElement('div');el.className='hit';
-  el.innerHTML='<div class="qv">'
-    +'<button class="qv-heaven" title="Vote Heaven">\u{1F47C}</button>'
-    +'<button class="qv-hell" title="Vote Hell">\u{1F608}</button></div>'
-    +'<span class="badge '+(c.faction||'unaligned')+'">'+(c.faction||'unaligned').toUpperCase()+'</span>'
-    +'<span class="badge">IMPACT '+'\u2605'.repeat(c.impact||1)+'</span>'
+  const my=MY_VOTES[c.id]||0;
+  const el=document.createElement('div');el.className='hit'+(OPEN_ID===c.id?' open':'');
+  el.innerHTML=
+    '<div class="votecol">'
+    +'<button class="vbtn halo'+(my===1?' my':'')+'" aria-label="Vote good">'
+      +iconHalo()+'<small>'+(c.heaven_votes||0)+'</small></button>'
+    +'<button class="vbtn horns'+(my===-1?' my':'')+'" aria-label="Vote evil">'
+      +iconHorns()+'<small>'+(c.hell_votes||0)+'</small></button></div>'
+    +'<div class="badgerow"><span class="badge '+(c.faction||'unaligned')+'">'
+      +(c.faction||'unaligned').toUpperCase()+'</span>'
+    +'<span class="badge">'+'\u2605'.repeat(c.impact||1)+'</span>'
+    +(c.category?'<span class="badge">'+esc(c.category)+'</span>':'')
     +(isNew?'<span class="badge new">NEW</span>':'')
-    +'<h3>'+esc(c.title||c.raw_title)+'</h3>'
-    +'<div class="sum">'+esc(c.summary||'')+'</div>'
-    +(c.article_quote?'<div class="qt">\u201C'+esc(truncQuote(c.article_quote,120))+'\u201D</div>':'')
-    +'<div class="meta">'+total+' VERDICTS'+(total?' \u00B7 '+pct+'% HEAVEN':'')
-    +(c.source_url?'<a href="'+esc(c.source_url)+'" target="_blank" class="srclink" onclick="event.stopPropagation()"> \u00B7 SOURCE \u2197</a>':'')
+    +((c._matched&&c._matched.length)?'<span class="badge match">'+esc(c._matched[0])+'</span>':'')
     +'</div>'
-    +'<div class="votebar"><i style="width:'+pct+'%"></i></div>';
-  const bh=el.querySelector('.qv-heaven'), be=el.querySelector('.qv-hell');
-  bh.onclick=e=>{e.stopPropagation();quickVote(c.id,'heaven',el);};
-  be.onclick=e=>{e.stopPropagation();quickVote(c.id,'hell',el);};
-  el.onclick=()=>{PENDING_VOTE=null;openCase(c.id);};
+    +'<h3>'+esc(c.title||c.raw_title||'')+'</h3>'
+    +'<div class="trip">'+esc(tripleLine(c))+'</div>'
+    +'<div class="sum">'+esc(c.summary||'')+'</div>'
+    +(c.article_quote?'<div class="qt">\u201C'+esc(c.article_quote)+'\u201D</div>':'')
+    +'<div class="srcline">SOURCE: <a href="'+esc(c.source_url||'#')
+      +'" target="_blank" rel="noopener">'+esc(domainOf(c.source_url||''))+'</a>'
+      +(c.source_tier===1?' \u00B7 FIRST-PARTY':'')+'</div>'
+    +'<div class="votebar"><i style="width:'+pct+'%"></i></div>'
+    +'<div class="modrow" data-mods></div>'
+    +'<div class="detail"><div class="dlabel">Full summary</div>'
+      +'<div style="font-size:13.5px">'+esc(c.summary||'')+'</div>'
+      +'<a class="srcbtn" href="'+esc(c.source_url||'#')+'" target="_blank" rel="noopener">Read the source \u2192</a>'
+    +'</div>';
+  // votes
+  const [bh,be]=el.querySelectorAll('.vbtn');
+  bh.onclick=e=>{e.stopPropagation();castVote(c,1);};
+  be.onclick=e=>{e.stopPropagation();castVote(c,-1);};
+  // modifiers row
+  const mrow=el.querySelector('[data-mods]');
+  for(const m of (c.modifier_terms||[]).slice(0,6)){
+    const b=document.createElement('button');b.className='mod';b.textContent='#'+m;
+    b.onclick=e=>{e.stopPropagation();
+      document.getElementById('q').value=m;
+      document.getElementById('q').dispatchEvent(new Event('input'));
+      window.scrollTo(0,0);};
+    mrow.appendChild(b);
+  }
+  const add=document.createElement('button');add.className='mod add';
+  add.textContent='+ modifier';
+  add.onclick=e=>{e.stopPropagation();openSheet(c);};
+  mrow.appendChild(add);
+  // expand toggle + permalink
+  const toggle=()=>{OPEN_ID=(OPEN_ID===c.id)?null:c.id;
+    history.replaceState(null,'',OPEN_ID?'#case='+c.id:' ');
+    renderResults(currentQuery());};
+  el.querySelector('h3').onclick=toggle;
+  el.querySelector('.trip').onclick=toggle;
   return el;
 }
-
-// Quick vote directly from card list - no game required
-async function quickVote(caseId, vote, cardEl){
-  const btn = cardEl.querySelector(vote==='heaven'?'.qv-heaven':'.qv-hell');
-  btn.disabled=true; btn.textContent='\u23F3';
+/* one-tap good/evil, switchable, tap again to clear, optimistic */
+async function castVote(c,dir){
+  const prev=MY_VOTES[c.id]||0;
+  const next=(prev===dir)?0:dir;
+  // optimistic local update
+  if(prev===1)c.heaven_votes=Math.max(0,(c.heaven_votes||0)-1);
+  if(prev===-1)c.hell_votes=Math.max(0,(c.hell_votes||0)-1);
+  if(next===1)c.heaven_votes=(c.heaven_votes||0)+1;
+  if(next===-1)c.hell_votes=(c.hell_votes||0)+1;
+  MY_VOTES[c.id]=next;saveVotes();renderResults(currentQuery());
+  if(DEMO)return;
   try{
-    const r=await fetch(CONFIG.FN('submit-verdict'),{method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
-      body:JSON.stringify({case_id:caseId,verdict:vote,anon_id:anonId(),quick:true})});
-    if(!r.ok) throw new Error('Vote failed');
-    const data=await r.json();
-    // Update local cache
-    const c=CACHE.get(caseId);
-    if(c){
-      if(vote==='heaven') c.heaven_votes=(c.heaven_votes||0)+1;
-      else c.hell_votes=(c.hell_votes||0)+1;
-      CACHE.set(caseId,c);
-    }
-    btn.textContent=vote==='heaven'?'\u2705':'\u2705';
-    toast(vote==='heaven'?'Voted Heaven \u{1F47C}':'Voted Hell \u{1F608}');
-    // Update votebar
-    const total=(c?.heaven_votes||0)+(c?.hell_votes||0);
-    const pct=total?Math.round(100*(c?.heaven_votes||0)/total):0;
-    const bar=cardEl.querySelector('.votebar i');
-    if(bar) bar.style.width=pct+'%';
-    const meta=cardEl.querySelector('.meta');
-    if(meta) meta.innerHTML=meta.innerHTML.replace(/\d+ VERDICTS/,total+' VERDICTS').replace(/\d+% HEAVEN/,pct+'% HEAVEN');
-  }catch(e){
-    btn.textContent=vote==='heaven'?'\u{1F47C}':'\u{1F608}';
-    btn.disabled=false;
-    toast('Vote failed - try the full case');
-  }
+    const d=await api('vote',{case_id:c.id,
+      vote:next===1?'heaven':next===-1?'hell':'clear'});
+    if(typeof d.heaven==='number'){c.heaven_votes=d.heaven;c.hell_votes=d.hell;
+      MY_VOTES[c.id]=d.your_vote;saveVotes();renderResults(currentQuery());}
+  }catch(e){toast('Vote did not reach the registry.');}
 }
 function renderFilePrompt(url,host){
   const el=document.createElement('div');el.className='webhit';
   el.innerHTML='<div>File a new case from this source?</div><div class="meta">'+esc(url)+'</div>';
-  const b=document.createElement('button');b.className='go';b.textContent='File it \u2192';
+  const b=document.createElement('button');b.textContent='File it \u2192';
   b.onclick=()=>fileURL(url);el.appendChild(b);host.appendChild(el);
 }
-
-/* === INSTANT GENERATE: Slot machine loader while generating in real-time === */
-async function instantGenerate(url, title){
-  // Show slot machine modal
-  const modal = document.createElement('div');
-  modal.id='gen-modal';
-  modal.innerHTML=`
-    <div class="gen-box">
-      <h2>\u26a1 GENERATING CARD</h2>
-      <div class="slot-machine">
-        <div class="slot" id="slot-who"><span>WHO?</span></div>
-        <div class="slot" id="slot-action"><span>DOES WHAT?</span></div>
-        <div class="slot" id="slot-whom"><span>TO WHOM?</span></div>
-      </div>
-      <div class="gen-title">${esc(title||'Analyzing article...')}</div>
-      <div class="gen-status" id="gen-status">Fetching article...</div>
-      <div class="gen-bar"><div class="gen-progress" id="gen-progress"></div></div>
-    </div>
-  `;
-  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999';
-  document.body.appendChild(modal);
-
-  // Spin animation
-  const spinSlot = (id, values, interval=150) => {
-    const slot = document.getElementById(id);
-    let i = 0;
-    return setInterval(()=>{
-      slot.innerHTML = '<span>'+values[i%values.length]+'</span>';
-      i++;
-    }, interval);
-  };
-  const whoSpin = spinSlot('slot-who', ['Government?','Corporation?','Platform?','Agency?','Hospital?','School?','Police?']);
-  const actionSpin = spinSlot('slot-action', ['Deploys?','Monitors?','Denies?','Flags?','Screens?','Tracks?','Predicts?'], 180);
-  const whomSpin = spinSlot('slot-whom', ['Citizens?','Patients?','Students?','Workers?','Residents?','Users?','Applicants?'], 200);
-
-  const setStatus = (s) => { document.getElementById('gen-status').textContent = s; };
-  const setProgress = (p) => { document.getElementById('gen-progress').style.width = p+'%'; };
-
-  try {
-    setProgress(10);
-    setStatus('Filing case...');
-
-    // File the URL to get it in the system
-    const fileRes = await fetch(CONFIG.FN('file-case'),{method:'POST',
-      headers:{'Content-Type':'application/json',
-        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
-      body:JSON.stringify({url, instant:true})});
-    const fileData = await fileRes.json();
-
-    if(!fileData.ok){
-      throw new Error(fileData.error || 'Could not file');
-    }
-    setProgress(30);
-    setStatus('Extracting triple...');
-
-    // Poll for extraction completion
-    const caseId = fileData.case_id;
-    let attempts = 0;
-    let caseData = null;
-
-    while(attempts < 30){ // 30 seconds max
-      await new Promise(r=>setTimeout(r,1000));
-      attempts++;
-      setProgress(30 + Math.min(attempts*2, 50));
-
-      const checkRes = await fetch(CONFIG.FN('search-cases'),{method:'POST',
-        headers:{'Content-Type':'application/json',
-          'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
-        body:JSON.stringify({id:caseId})});
-      const checkData = await checkRes.json();
-      caseData = (checkData.results||[])[0];
-
-      if(caseData?.extraction){
-        // We have extraction! Stop the slots
-        clearInterval(whoSpin);
-        clearInterval(actionSpin);
-        clearInterval(whomSpin);
-
-        const ex = caseData.extraction;
-        document.getElementById('slot-who').innerHTML = '<span class="landed">'+esc(ex.who_choices?.[0]||'??')+'</span>';
-        setProgress(85);
-        await new Promise(r=>setTimeout(r,300));
-        document.getElementById('slot-action').innerHTML = '<span class="landed">'+esc(ex.action_choices?.[0]||'??')+'</span>';
-        setProgress(92);
-        await new Promise(r=>setTimeout(r,300));
-        document.getElementById('slot-whom').innerHTML = '<span class="landed">'+esc(ex.whom_choices?.[0]||'??')+'</span>';
-        setProgress(100);
-        setStatus('CARD READY!');
-
-        await new Promise(r=>setTimeout(r,800));
-        modal.remove();
-
-        // Cache and open the case
-        CACHE.set(caseData.id, caseData);
-        openCase(caseData.id);
-        return;
-      }
-
-      // Update status with fun messages
-      const statuses = ['Reading article...','Identifying actors...','Extracting actions...','Finding affected parties...','Generating story...','Almost there...'];
-      setStatus(statuses[Math.min(attempts-1, statuses.length-1)]);
-    }
-
-    // Timeout - still processing in background
-    clearInterval(whoSpin);clearInterval(actionSpin);clearInterval(whomSpin);
-    setStatus('Queued for processing. Check back soon!');
-    await new Promise(r=>setTimeout(r,2000));
-    modal.remove();
-    toast('Case filed. Processing may take a minute.');
-
-  } catch(e) {
-    clearInterval(whoSpin);clearInterval(actionSpin);clearInterval(whomSpin);
-    setStatus('Error: '+(e.message||'Unknown error'));
-    await new Promise(r=>setTimeout(r,2000));
-    modal.remove();
-    toast(e.message||'Could not generate card');
-  }
-}
-
 async function fileURL(url){
   if(DEMO){toast('DEMO: deploys to the staged queue when configured.');return;}
-  try{
-    const r=await fetch(CONFIG.FN('file-case'),{method:'POST',
-      headers:{'Content-Type':'application/json',
-        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
-      body:JSON.stringify({url})});
-    const d=await r.json();
+  try{const d=await api('file-case',{url});
     toast(d.ok?'Filed. The steward will prefill it for review.':(d.error||'Could not file.'));
-    if(d.ok){ // purposeful mining moment: one instrument while the queue works
-      const host=document.getElementById('results');
-      host.prepend(minigamePanel('Filed. While the steward reads it:'));
-    }
   }catch(e){toast('Could not reach the registry.');}
 }
 
-/* ================= CASE FLOW ================= */
-async function openCase(id){
-  let c=CACHE.get(id);
-  if(!c&&!DEMO){
-    const r=await fetch(CONFIG.FN('search-cases'),{method:'POST',
-      headers:{'Content-Type':'application/json',
-        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
-      body:JSON.stringify({id})});
-    c=((await r.json()).results||[])[0];
-    if(c)CACHE.set(c.id,c);
-  }
-  if(!c||!c.extraction)return toast('Case not ready yet.');
-  window.CASE=CASE=c; PICK={free:{}}; VOTE=null;
-  // Reset scene navigation
-  currentSceneIdx=0; maxVisitedIdx=0;
-  const re=c.extraction.reenactment||{};
-  document.getElementById('a-case').innerHTML=scene(c.id,'case');
-  setText('c-title',c.title||c.raw_title);
-  setText('c-summary',c.summary||'');
-  const qEl=document.getElementById('c-quote');
-  if(c.article_quote){qEl.innerHTML='\u201C'+esc(c.article_quote)+'\u201D<small>FROM THE RECORD</small>';
-    qEl.style.display='block';}else qEl.style.display='none';
-  setText('c-src',c.source_tier===1?'FIRST-PARTY SOURCE':'REPORTED');
-  setText('c-impact','IMPACT '+'\u2605'.repeat(c.impact||1));
-  const f=document.getElementById('c-faction');
-  f.textContent=(c.faction||'unaligned').toUpperCase();
-  f.className='badge '+(c.faction||'unaligned');
-  document.getElementById('c-link').href=c.source_url;
-  setText('c-setting',re.setting||'');
-  setText('c-coldopen','\u201C'+(re.cold_open||'The record is open.')+'\u201D');
-  document.getElementById('c-deesc').innerHTML=
-    '<tr><td><b>COURT RECORD</b></td><td><b>OUR STAGING</b></td></tr>'
-    +((re.deescalations||[]).map(d=>'<tr><td>'+esc(d.real)+'</td><td>'+esc(d.cartoon)+'</td></tr>').join(''));
-  [0,1,2].forEach(i=>{document.getElementById('nb'+i).value=50;});
-  // WHO prep
-  document.getElementById('a-who').innerHTML=scene(c.id,'who');
-  setText('w-gi','\u201C'+((c.extraction.story||{}).gi||'Assessment pending.')+'\u201D');
-  const wb=brainiacLine('who',c.id,1)[0];
-  document.getElementById('w-brainiac').innerHTML=
-    '<div class="line brainiac"><span class="who">Brainiac</span><p><i>'
-    +esc(wb.cast)+':</i> '+wb.line+'</p></div>';
-  renderChoices('who',c.extraction.who_choices,i=>{PICK.whoReveal=(re.who_reveals||[])[i]||'';});
-  show('s-case');
+/* ============ MODIFIER SHEET ============ */
+let SHEET_CASE=null;
+function segInit(id){
+  const seg=document.getElementById(id);
+  seg.querySelectorAll('.seg').forEach(b=>b.onclick=()=>{
+    seg.querySelectorAll('.seg').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');});
 }
-function renderChoices(slot,options,onIndex){
-  const host=document.getElementById('ch-'+slot);host.innerHTML='';
-  const idx=[0,1,2].sort(()=>Math.random()-0.5);   // position-bias control
-  for(const i of idx){
-    const factual=options[i];
-    const b=document.createElement('button');b.className='pchoice';
-    const flavored = slot==='action'
-      ? actionPersona(factual,CASE.id)+' \u2026'+factual.split(' ').slice(-2).join(' ')
-      : persona(slot,factual,CASE.id+i);
-    b.innerHTML='<span class="persona">'+esc(flavored)+'</span>'
-      +'<span class="factual">On the record: '+esc(factual)+'</span>';
-    b.onclick=()=>{PICK[slot]=factual;if(onIndex)onIndex(i);advance(slot);};
-    host.appendChild(b);
-  }
-  const f=document.createElement('button');f.className='pchoice free';
-  f.innerHTML='<span class="persona">None of these. Say it your way \u2192</span>'
-    +'<span class="factual">Your words go on the record</span>';
-  f.onclick=()=>{const v=prompt('In your own words:');
-    if(v&&v.trim()){PICK[slot]=v.trim();PICK.free[slot]=true;
-      if(onIndex)onIndex(-1);advance(slot);}};
-  host.appendChild(f);
+segInit('slotSeg');segInit('kindSeg');
+function segVal(id){return document.querySelector('#'+id+' .seg.on').dataset.v;}
+function openSheet(c){
+  SHEET_CASE=c;
+  setText('sheetTitle','Add a modifier \u00B7 '+(c.title||'').slice(0,44));
+  document.getElementById('modterm').value='';
+  document.getElementById('sheet').classList.add('on');
+  document.getElementById('sheetveil').classList.add('on');
+  setTimeout(()=>document.getElementById('modterm').focus(),240);
 }
-const fill=(t,c)=>String(t||'')
-  .replaceAll('{WHO}',c.WHO||'the actor')
-  .replaceAll('{ACTION}',c.ACTION||'acts on')
-  .replaceAll('{WHOM}',c.WHOM||'everyone');
-function advance(slot){
-  const re=CASE.extraction.reenactment||{},st=CASE.extraction.story||{};
-  if(slot==='who'){
-    document.getElementById('a-action').innerHTML=scene(CASE.id,'action');
-    setText('carry-who','\u201C'+(fill(PICK.whoReveal,{})||PICK.who+' steps into the record.')+'\u201D');
-    setText('b-gary','\u201C'+(st.gary||'Let me show you how it works. Worked. Works.')+'\u201D');
-    setText('p-action',PICK.who+' does what, exactly?');
-    renderChoices('action',CASE.extraction.action_choices,i=>{
-      PICK.actionDemo=(re.action_demos||[])[i]||'';});
-    show('s-action');
-  } else if(slot==='action'){
-    document.getElementById('a-whom').innerHTML=scene(CASE.id,'whom');
-    setText('carry-action','\u201C'+(fill(PICK.actionDemo,{WHO:PICK.who})||PICK.who+' '+PICK.action+'.')+'\u201D');
-    setText('b-supes','\u201C'+(st.supes||'Somebody should check on the people in this story.')+'\u201D');
-    setText('p-whom','And who is this really happening to?');
-    renderChoices('whom',CASE.extraction.whom_choices,i=>{
-      PICK.whomReveal=(re.whom_reveals||[])[i]||'';});
-    show('s-whom');
-  } else {
-    PICK.nuance_before=[0,1,2].map(i=>Number(document.getElementById('nb'+i).value));
-    document.getElementById('a-verdict').innerHTML=scene(CASE.id,'verdict');
-    setText('carry-whom','\u201C'+(fill(PICK.whomReveal,{WHO:PICK.who,ACTION:PICK.action})||'')+'\u201D');
-    const vb=brainiacLine('verdict',CASE.id+PICK.who,2);
-    document.getElementById('v-brainiacs').innerHTML=vb.map(b=>
-      '<div class="line brainiac"><span class="who">Brainiac</span><p><i>'
-      +esc(b.cast)+':</i> '+b.line+'</p></div>').join('');
-    setText('v-triple',PICK.who+' \u2192 '+PICK.action+' \u2192 '+PICK.whom);
-    const h=document.getElementById('vheaven'),e=document.getElementById('vhell');
-    h.classList.toggle('pre',PENDING_VOTE==='heaven');
-    e.classList.toggle('pre',PENDING_VOTE==='hell');
-    show('s-verdict');
-  }
+function closeSheet(){
+  document.getElementById('sheet').classList.remove('on');
+  document.getElementById('sheetveil').classList.remove('on');
 }
-function verdict(f){
-  VOTE=f; PENDING_VOTE=null;
-  const re=CASE.extraction.reenactment||{};
-  const ending=fill((re.endings||{})[f]||'',{WHO:PICK.who,ACTION:PICK.action,WHOM:PICK.whom});
-  // Evil Brain chalkboard line: the sentence containing "Evil Brain", or the last one
-  const parts=ending.split(/(?<=[.!?])\s+/);
-  const brainIdx=parts.findIndex(p=>/evil brain/i.test(p));
-  const brainLine=brainIdx>=0?parts.splice(brainIdx).join(' '):'';
-  const lesson=(brainLine.match(/:(.*)$/)||[,''])[1].trim()||brainLine;
-  document.getElementById('a-ending').innerHTML=
-    scene(CASE.id,'ending',{mood:f,lesson});
-  setText('ending-text',parts.join(' '));
-  setText('ending-brain',brainLine?'\u201C'+brainLine.replace(/^.*?chalkboard[:,]?\s*/i,'')+'\u201D'
-    :'\u201CClass dismissed. The database remembers.\u201D');
-  buildTags();
-  document.getElementById('notes').value='';noteMeter();
-  [0,1,2].forEach(i=>{document.getElementById('na'+i).value=PICK.nuance_before[i];});
-  show('s-file');
-}
-function buildTags(){
-  const host=document.getElementById('tagchips');host.innerHTML='';
-  const tags=new Set();
-  if(CASE.category || CASE.extraction?.arc_type)tags.add(CASE.category || CASE.extraction.arc_type);
-  tags.add(PICK.who);tags.add((PICK.action||'').split(' ')[0]);
-  (CASE.tech_types||[]).forEach(t=>tags.add(t));
-  (CASE.data_types||[]).forEach(t=>tags.add(t));
-  ['no consent','human oversight missing','worked as designed',
-   'needs an off switch','human was load-bearing'].forEach(t=>tags.add(t));
-  for(const t of [...tags].filter(Boolean).slice(0,10)){
-    const c=document.createElement('span');c.className='chip';c.textContent=t;
-    c.onclick=()=>{const n=document.getElementById('notes');
-      n.value=(n.value?n.value.trimEnd()+' ':'')+'#'+t.replace(/\s+/g,'-')+' ';
-      noteMeter();n.focus();};
-    host.appendChild(c);
-  }
-}
-function noteMeter(){
-  const n=document.getElementById('notes').value.length;
-  const coins=n>=200?25:n>=100?15:n>=50?10:n>=10?5:0;
-  setText('notemeter',n+' characters \u00B7 '+(coins?('earns '+coins+' coins'):'10+ characters starts earning'));
-}
-
-/* ================= MINT: CARD MODAL ================= */
-function deriveCard(impact,valence,tier){
-  const v=Math.max(-2,Math.min(2,valence||0));
-  return {atk:impact*2+(v<0?-v:0),def:impact+(v>0?v:0)+(tier===1?1:0),
-    rarity:impact>=5?'legendary':impact===4?'rare':impact===3?'uncommon':'common'};
-}
-async function mint(){
-  const notes=document.getElementById('notes').value;
-  PICK.nuance_after=[0,1,2].map(i=>Number(document.getElementById('na'+i).value));
-  let resp;
+async function submitModifier(){
+  const term=document.getElementById('modterm').value.trim();
+  const words=term.split(/\s+/).filter(Boolean);
+  if(term.length<2||term.length>40||words.length<1||words.length>3)
+    return toast('1-3 words, 2-40 characters.');
+  const c=SHEET_CASE;if(!c)return;
+  const slot=segVal('slotSeg'),kind=segVal('kindSeg');
+  const norm=term.toLowerCase();
   if(DEMO){
-    if(VOTE==='heaven')CASE.heaven_votes++;else CASE.hell_votes++;
-    const total=CASE.heaven_votes+CASE.hell_votes;
-    const s=deriveCard(CASE.impact,CASE.valence,CASE.source_tier);
-    resp={card:{card_name:CASE.title,faction_at_mint:CASE.faction,...s},
-      rewards:{coins:(notes.length>=200?25:notes.length>=100?15:notes.length>=50?10:notes.length>=10?5:0),
-        rep:3+Math.min(10,Math.floor(notes.length/50)*2)+(Object.keys(PICK.free).length?2:0)},
-      collective:{heaven_pct:Math.round(100*CASE.heaven_votes/total),votes:total}};
-  } else {
-    const r=await fetch(CONFIG.FN('submit-verdict'),{method:'POST',
-      headers:{'Content-Type':'application/json',
-        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
-      body:JSON.stringify({case_id:CASE.id,who:PICK.who,action:PICK.action,whom:PICK.whom,
-        who_free:!!PICK.free.who,action_free:!!PICK.free.action,whom_free:!!PICK.free.whom,
-        faction_vote:VOTE,notes,
-        nuance_before:PICK.nuance_before,nuance_after:PICK.nuance_after})});
-    resp=await r.json();
-    if(resp.error){toast(resp.error);return;}
+    c.modifier_terms=c.modifier_terms||[];
+    if(!c.modifier_terms.includes(norm))c.modifier_terms.push(norm);
+    closeSheet();renderResults(currentQuery());
+    toast('Modifier filed (demo). It is now searchable.');return;
   }
-  openModal(resp);
-}
-/* Card SVG: art on top, ALWAYS visible. Foils cover only three zones:
-   stats row, triple line, quote block. */
-const FOIL_ZONES=[
-  {id:'f-stats', x:30, y:328, w:660, h:44, label:'STATS'},
-  {id:'f-triple',x:60, y:378, w:600, h:30, label:'THE RECORD'},
-  {id:'f-quote', x:60, y:414, w:600, h:44, label:'FROM THE RECORD'},
-];
-function openModal(resp){
-  const c=resp.card,f=c.faction_at_mint||'unaligned';
-  const cardStroke = getStrokeColor();
-  const ink=f==='hell'?'#C1121F':f==='heaven'?'#c9a84c':cardStroke;
-  const cardBg = document.documentElement.getAttribute('data-theme')==='dark' ? '#0E0608' : '#0E0E0E';
-  const art=scene(CASE.id,'card',{mood:f}).replace(/<\/?svg[^>]*>/g,'');
-  const hasQuote=!!CASE.article_quote;
-  document.getElementById('cardsvg').innerHTML=
-    '<svg viewBox="0 0 720 470" xmlns="http://www.w3.org/2000/svg">'
-    +'<rect width="720" height="470" fill="'+cardBg+'"/>'
-    +'<rect x="8" y="8" width="704" height="454" fill="none" stroke="'+ink+'" stroke-width="6"/>'
-    +'<g transform="translate(0,14) scale(1,0.93)">'+art+'</g>'
-    +'<text x="360" y="312" text-anchor="middle" fill="'+cardStroke+'" font-family="Arial" font-weight="800" font-size="23" letter-spacing="2">'
-    +esc((c.card_name||'').toUpperCase().slice(0,42))+'</text>'
-    +'<text x="46" y="358" fill="'+cardStroke+'" font-family="Arial" font-weight="800" font-size="26">\u2694 '+c.atk+'</text>'
-    +'<text x="674" y="358" text-anchor="end" fill="'+cardStroke+'" font-family="Arial" font-weight="800" font-size="26">\u26E8 '+c.def+'</text>'
-    +'<text x="360" y="356" text-anchor="middle" fill="'+ink+'" font-family="Arial" font-size="14" letter-spacing="4">'+c.rarity.toUpperCase()+'</text>'
-    +'<text x="360" y="398" text-anchor="middle" fill="#7a7263" font-family="Arial" font-size="13" letter-spacing="1">'
-    +esc((PICK.who+' \u2192 '+PICK.action+' \u2192 '+PICK.whom).slice(0,80))+'</text>'
-    +(hasQuote
-      ?'<text x="360" y="434" text-anchor="middle" fill="'+cardStroke+'" font-family="Georgia" font-style="italic" font-size="14">\u201C'
-        +esc(truncQuote(CASE.article_quote,78))+'\u201D</text>'
-        +'<text x="360" y="452" text-anchor="middle" fill="#7a7263" font-family="Arial" font-size="10" letter-spacing="2">FROM THE RECORD</text>'
-      :'')
-    +'</svg>';
-  setText('m-rewards','+'+resp.rewards.coins+' coins \u00B7 +'+resp.rewards.rep+' rep'
-    +(Object.keys(PICK.free).length?' (your own words bonus)':''));
-  setText('m-collective',resp.collective.votes+' verdicts \u00B7 '
-    +resp.collective.heaven_pct+'% chose the warm ending');
-  const deltas=PICK.nuance_after.map((v,i)=>v-PICK.nuance_before[i]);
-  const AX=['Safety vs Surveillance','Privacy vs Data brokering','Benefit vs Harm'];
-  const big=deltas.map((d,i)=>[Math.abs(d),d,i]).sort((a,b)=>b[0]-a[0])[0];
-  setText('m-shift',big[0]>=8
-    ?'The case moved your read '+big[0]+' points on '+AX[big[2]]+'.'
-    :'Your read held steady.');
-  document.getElementById('modal').classList.add('on');
-  document.getElementById('cardstage').classList.remove('zoom');
-  requestAnimationFrame(placeFoils);
-}
-function placeFoils(){
-  document.querySelectorAll('.foil').forEach(x=>x.remove());
-  const stage=document.getElementById('cardstage');
-  const svg=stage.querySelector('svg');
-  if(!svg||!svg.clientWidth){requestAnimationFrame(placeFoils);return;}
-  const scale=svg.clientWidth/720;
-  const hasQuote=!!CASE.article_quote;
-  for(const z of FOIL_ZONES){
-    if(z.id==='f-quote'&&!hasQuote)continue;
-    const cv=document.createElement('canvas');cv.className='foil';cv.id=z.id;
-    const dpr=window.devicePixelRatio||1;
-    const w=z.w*scale,h=z.h*scale;
-    cv.style.left=(z.x*scale)+'px';cv.style.top=(z.y*scale)+'px';
-    cv.style.width=w+'px';cv.style.height=h+'px';
-    cv.width=w*dpr;cv.height=h*dpr;
-    const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
-    ctx.fillStyle='#181818';ctx.fillRect(0,0,w,h);
-    ctx.strokeStyle='#C1121F';ctx.lineWidth=2;ctx.strokeRect(2,2,w-4,h-4);
-    ctx.fillStyle='#C1121F';ctx.font='700 11px Arial';ctx.textAlign='center';
-    ctx.fillText('SCRATCH \u00B7 '+z.label,w/2,h/2+4);
-    let down=false,area=0;const total=w*h;
-    const pos=e=>{const r=cv.getBoundingClientRect();
-      const p=e.touches?e.touches[0]:e;return[p.clientX-r.left,p.clientY-r.top];};
-    const scr=(x,y)=>{ctx.globalCompositeOperation='destination-out';
-      ctx.beginPath();ctx.arc(x,y,14,0,Math.PI*2);ctx.fill();
-      area+=Math.PI*14*14*0.5;
-      if(area>total*0.5){cv.style.transition='opacity .3s';cv.style.opacity='0';
-        setTimeout(()=>cv.remove(),320);}};
-    cv.onmousedown=e=>{e.stopPropagation();down=true;scr(...pos(e));};
-    cv.onmousemove=e=>{if(down)scr(...pos(e));};
-    window.addEventListener('mouseup',()=>down=false);
-    cv.addEventListener('touchstart',e=>{e.stopPropagation();down=true;scr(...pos(e));e.preventDefault();},{passive:false});
-    cv.addEventListener('touchmove',e=>{if(down){scr(...pos(e));e.preventDefault();}},{passive:false});
-    stage.appendChild(cv);
-  }
-}
-function revealAll(){document.querySelectorAll('.foil').forEach(x=>x.remove());}
-function toggleZoom(e){
-  if(e.target.classList.contains('foil'))return;
-  document.getElementById('cardstage').classList.toggle('zoom');
-}
-function closeModal(home){
-  document.getElementById('modal').classList.remove('on');
-  document.querySelectorAll('.foil').forEach(x=>x.remove());
-  if(home){show('home');renderResults(currentQuery());toast('Card filed to your collection.');}
+  try{
+    const d=await api('modifiers',{case_id:c.id,slot,kind,term:norm});
+    if(d.error)return toast(d.error);
+    c.modifier_terms=c.modifier_terms||[];
+    if(!c.modifier_terms.includes(norm))c.modifier_terms.push(norm);
+    closeSheet();renderResults(currentQuery());
+    toast(d.strengthened?'Term strengthened. The graph agrees with you.'
+      :'Modifier filed. It is now search vocabulary.');
+  }catch(e){toast('Could not reach the registry.');}
 }
 
-/* ============ MINIGAMES (mining moments ONLY) ============ */
-async function postSignal(sig,box){
-  let n=0;
-  if(sig.game==='inkblot'){const w=sig.words.filter(x=>x.length>1);n=w.length+w.length*(w.length-1)/2;}
-  if(sig.game==='wordrun')n=sig.collected.length+sig.avoided.length;
-  if(sig.game==='sticky')n=sig.placements.length;
-  if(sig.game==='trivia')n=1;
-  if(!DEMO){
-    fetch(CONFIG.FN('minigame-signal'),{method:'POST',
-      headers:{'Content-Type':'application/json',
-        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,'x-anon-id':anonId()},
-      body:JSON.stringify(sig)}).catch(()=>{});
+/* ================= ADMIN (#admin) ================= */
+function adminKey(){try{return localStorage.getItem('ucar_admin_key')||'';}catch(e){return '';}}
+async function adminLoad(){
+  const key=document.getElementById('ak').value.trim()||adminKey();
+  if(!key)return toast('Paste the admin key.');
+  try{localStorage.setItem('ucar_admin_key',key);}catch(e){}
+  if(DEMO){document.getElementById('epform').style.display='block';
+    document.getElementById('eplist').style.display='block';
+    renderAdminList([{id:'demo',title:'(demo) EP 1: The Chips Incident',
+      description:'Demo entry',featured:true,published:true}]);return;}
+  try{const r=await fetch(CONFIG.FN('episodes'),{method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-key':key},
+      body:JSON.stringify({action:'list_all'})});
+    if(r.status===403){toast('Wrong key.');return;}
+    const d=await r.json();
+    document.getElementById('epform').style.display='block';
+    document.getElementById('eplist').style.display='block';
+    renderAdminList(d.episodes||[]);
+  }catch(e){toast('Could not reach the registry.');}
+}
+function renderAdminList(list){
+  const host=document.getElementById('eplist');
+  host.innerHTML='<label>Episodes ('+list.length+')</label>';
+  for(const e of list){
+    const row=document.createElement('div');row.className='eprow';
+    row.innerHTML='<div><div class="t">'+esc(e.title)+'</div>'
+      +'<div class="meta">'+(e.featured?'FEATURED \u00B7 ':'')
+      +(e.published?'published':'hidden')+'</div></div>';
+    const btns=document.createElement('div');
+    const edit=document.createElement('button');edit.textContent='EDIT';
+    edit.onclick=()=>{setVal('ep-id',e.id);setVal('ep-title',e.title);
+      setVal('ep-desc',e.description||'');setVal('ep-video',e.video_url||'');
+      setVal('ep-link',e.link_url||'');
+      document.getElementById('ep-feat').checked=!!e.featured;
+      document.getElementById('ep-pub').checked=e.published!==false;
+      window.scrollTo(0,0);};
+    const del=document.createElement('button');del.textContent='DELETE';
+    del.onclick=async()=>{
+      if(!confirm('Delete "'+e.title+'"?'))return;
+      if(DEMO){toast('DEMO delete.');return;}
+      await fetch(CONFIG.FN('episodes'),{method:'POST',
+        headers:{'Content-Type':'application/json','x-admin-key':adminKey()},
+        body:JSON.stringify({action:'delete',id:e.id})});
+      adminLoad();loadEpisodes();};
+    btns.appendChild(edit);btns.appendChild(del);row.appendChild(btns);
+    host.appendChild(row);
   }
-  box.innerHTML='<div class="mlabel">SIGNAL FILED</div>'
-    +n+' edges \u2192 the graph. +3 coins. Flat rate: answers are data, never a score.';
 }
-function minigamePanel(label){
-  const games=[gInkblot,gWordrun,gSticky,gTrivia];
-  const box=document.createElement('div');box.className='mg';
-  const head=document.createElement('div');head.className='mlabel';
-  head.textContent=label;box.appendChild(head);
-  games[Math.floor(Math.random()*games.length)](box);
-  return box;
+async function adminSave(){
+  const ep={id:val('ep-id')||undefined,title:val('ep-title').trim(),
+    description:val('ep-desc').trim(),video_url:val('ep-video').trim(),
+    link_url:val('ep-link').trim(),
+    featured:document.getElementById('ep-feat').checked,
+    published:document.getElementById('ep-pub').checked};
+  if(!ep.title)return toast('Title required.');
+  if(DEMO){toast('DEMO: saved locally only.');adminClear();return;}
+  const r=await fetch(CONFIG.FN('episodes'),{method:'POST',
+    headers:{'Content-Type':'application/json','x-admin-key':adminKey()},
+    body:JSON.stringify({action:'upsert',episode:ep})});
+  const d=await r.json();
+  if(d.error)return toast(d.error);
+  toast('Saved.');adminClear();adminLoad();loadEpisodes();
 }
-function gInkblot(box){
-  const seed='blob-'+Math.floor(Math.random()*99999);
-  const r=rng(seed);const pts=[];
-  const blobColor = getStrokeColor();
-  for(let i=0;i<10;i++){const a=i/10*2*Math.PI;const rad=32+r()*38;
-    pts.push([100+Math.cos(a)*rad,66+Math.sin(a)*rad*0.8]);}
-  box.insertAdjacentHTML('beforeend',
-    '<svg viewBox="0 0 200 132" style="width:55%;display:block;margin:0 auto">'
-    +'<path d="M'+pts.map(p=>p.map(x=>x.toFixed(1)).join(',')).join(' L ')
-    +' Z" fill="'+blobColor+'" opacity="0.9"/></svg>'
-    +'<input type="text" id="ib-'+seed+'" placeholder="three words, comma separated">');
-  const b=document.createElement('button');b.className='ghost';b.textContent='File it';
-  b.onclick=()=>{const words=document.getElementById('ib-'+seed).value
-    .split(',').map(w=>w.trim()).filter(Boolean).slice(0,3);
-    if(words.length<2)return toast('At least two words.');
-    postSignal({game:'inkblot',blob_seed:seed,words},box);};
-  box.appendChild(b);
+function adminClear(){
+  ['ep-id','ep-title','ep-desc','ep-video','ep-link'].forEach(id=>setVal(id,''));
+  document.getElementById('ep-feat').checked=false;
+  document.getElementById('ep-pub').checked=true;
 }
-function gWordrun(box){
-  const arcType = window.CASE && (CASE.category || CASE.extraction?.arc_type);
-  const cat = arcType || 'Surveillance';
-  const rel=['camera','database','consent','warrant','biometric','watchlist','alert','audit'];
-  const noise=['sandwich','umbrella','trombone','pelican','casserole','doily','yodeling','wallpaper'];
-  const deck=[...rel.slice(0,5),...noise.slice(0,5)].sort(()=>Math.random()-0.5);
-  let i=0;const collected=[],avoided=[];
-  box.insertAdjacentHTML('beforeend','<div class="rewardline">Context: <b>'+esc(cat)
-    +'</b>. Collect what belongs. Dodge what does not.</div>'
-    +'<div class="wordcard" id="wr-w"></div>'
-    +'<div class="pair"><button id="wr-c">COLLECT</button><button id="wr-d">DODGE</button></div>'
-    +'<div class="rewardline" id="wr-n"></div>');
-  const next=()=>{if(i>=deck.length)
-      return postSignal({game:'wordrun',case_category:cat,collected,avoided},box);
-    box.querySelector('#wr-w').textContent=deck[i];
-    box.querySelector('#wr-n').textContent=(i+1)+' of '+deck.length;};
-  box.querySelector('#wr-c').onclick=()=>{collected.push(deck[i]);i++;next();};
-  box.querySelector('#wr-d').onclick=()=>{avoided.push(deck[i]);i++;next();};
-  next();
+/* ============ ROUTER ============ */
+function route(){
+  const h=location.hash;
+  if(h==='#admin'){show('admin');setVal('ak',adminKey());return;}
+  show('home');
+  const m=h.match(/^#case=(.+)$/);
+  if(m){OPEN_ID=m[1];
+    if(!CACHE.get(OPEN_ID)&&!DEMO){
+      api('search-cases',{id:OPEN_ID}).then(d=>{
+        (d.results||[]).forEach(c=>CACHE.set(c.id,c));
+        renderResults(currentQuery());
+        const el=document.querySelector('.hit.open');
+        if(el)el.scrollIntoView({block:'center'});
+      }).catch(()=>{});
+    } else renderResults(currentQuery());
+  }
 }
-function gSticky(box){
-  const concepts=['license plate readers','sepsis alerts','resume filters',
-    'wildfire detection','face databases','loan scoring'].sort(()=>Math.random()-0.5).slice(0,4);
-  const buckets=['PANOPTICON','GOOD WORKS','COMPUTER SAYS NO'];
-  let sel=null;const placements=[];
-  box.insertAdjacentHTML('beforeend','<div class="rewardline">Tap a note, then its arc.</div>'
-    +'<div id="st-chips"></div>'
-    +buckets.map((b,i)=>'<div class="bucket" data-b="'+b+'"><b>'+b+'</b> <span id="st-b'+i+'"></span></div>').join(''));
-  const chips=box.querySelector('#st-chips');
-  concepts.forEach(c=>{const ch=document.createElement('span');ch.className='mchip';
-    ch.textContent=c;ch.onclick=()=>{box.querySelectorAll('.mchip').forEach(x=>x.classList.remove('sel'));
-      ch.classList.add('sel');sel=ch;};chips.appendChild(ch);});
-  box.querySelectorAll('.bucket').forEach((bk,i)=>{
-    bk.onclick=()=>{if(!sel)return;
-      placements.push({concept:sel.textContent,bucket:bk.dataset.b});
-      box.querySelector('#st-b'+i).appendChild(sel);
-      sel.classList.remove('sel');sel.onclick=null;sel=null;
-      if(placements.length===concepts.length)
-        postSignal({game:'sticky',placements},box);};});
-}
-const TRIVIA=[
- {id:'t-consent',q:'Under most US law, scraping public photos for a face database requires the subject\u2019s consent.',a:false},
- {id:'t-fnr',q:'Studies have found face recognition error rates differ across demographic groups.',a:true},
- {id:'t-hitl',q:'"Human in the loop" guarantees a person actually reviewed the decision.',a:false}];
-function gTrivia(box){
-  const t=TRIVIA[Math.floor(Math.random()*TRIVIA.length)];
-  box.insertAdjacentHTML('beforeend','<p style="font-size:14px">'+esc(t.q)+'</p>'
-    +'<div class="pair"><button id="tv-t">TRUE</button><button id="tv-f">FALSE</button></div>'
-    +'<div class="rewardline">Confidence: <span id="tv-cl">75%</span></div>'
-    +'<input type="range" id="tv-c" min="50" max="100" value="75" style="width:100%">');
-  box.querySelector('#tv-c').oninput=e=>box.querySelector('#tv-cl').textContent=e.target.value+'%';
-  const answer=v=>postSignal({game:'trivia',question_id:t.id,correct:v===t.a,
-    confidence:Number(box.querySelector('#tv-c').value)/100},box);
-  box.querySelector('#tv-t').onclick=()=>answer(true);
-  box.querySelector('#tv-f').onclick=()=>answer(false);
-}
+window.addEventListener('hashchange',route);
 
 /* helpers */
-function setText(id,t){document.getElementById(id).textContent=t}
-function esc(t){const d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML}
-
-/* Initial load: fetch all live cases into cache */
-async function loadAllCases(){
-  if(DEMO) return;
-  try{
-    const r=await fetch(CONFIG.FN('search-cases'),{method:'POST',
-      headers:{'Content-Type':'application/json',
-        'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY},
-      body:JSON.stringify({})});  // empty query = all cases
-    const data=await r.json();
-    (data.results||[]).forEach(c=>CACHE.set(c.id,c));
-    renderResults(currentQuery());
-  }catch(e){ console.error('Failed to load cases:', e); }
-}
-
-renderHome();renderResults('');
-loadAllCases();  // fetch live cases on startup
+function setText(id,t){const el=document.getElementById(id);if(el)el.textContent=t;}
+function val(id){return document.getElementById(id).value;}
+function setVal(id,v){document.getElementById(id).value=v;}
+function esc(t){const d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML;}
+loadEpisodes();boot();route();
 
 </script>
 </body>
