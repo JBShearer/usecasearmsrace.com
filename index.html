@@ -531,7 +531,7 @@ async function webStream(q){
     if(DEMO){await new Promise(r=>setTimeout(r,300));
       web=[{title:'(Demo) Web prospects for "'+q+'" stream here when deployed',
         url:'#',domain:'gdelt + google news, server cached'}];}
-    else{const data=await api('search-cases',{q,web:true,category:CATEGORY});
+    else{const data=await api('search-cases',{q,web_only:true});
       (data.results||[]).forEach(c=>CACHE.set(c.id,c));
       web=data.web_results||[];}
     if(token===webToken&&currentQuery()===q){lastWeb=web;renderResults(q);}

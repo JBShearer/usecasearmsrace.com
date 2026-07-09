@@ -66,6 +66,12 @@ Deno.serve(async (req) => {
   // Text search - split words, OR them together
   const q = String(b.q ?? "").trim();
   if (q) {
+    // web_only mode: skip DB, just return web results (for parallel call pattern)
+    if (b.web_only) {
+      const web_results = q.length >= 3 ? await webSearch(q.slice(0, 120)) : [];
+      return json({ results: [], web_results, ms: Date.now() - t0 });
+    }
+
     const words = q.toLowerCase().split(/\s+/).filter(w => w.length > 2);
     const ors = words.length
       ? words.flatMap(w => [`title.ilike.%${w}%`, `summary.ilike.%${w}%`])
@@ -74,7 +80,7 @@ Deno.serve(async (req) => {
     const { data } = await supa.from("cases").select(COLS).eq("status", "live")
       .or(ors.join(",")).limit(20);
 
-    // Web results only if requested
+    // Web results only if requested (sequential, adds ~2s)
     const web_results = b.web && q.length >= 3 ? await webSearch(q.slice(0, 120)) : [];
 
     return json({ results: data ?? [], web_results, ms: Date.now() - t0 });
