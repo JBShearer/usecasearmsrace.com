@@ -1255,10 +1255,25 @@ async function fileURL(url){
   if(DEMO){toast('DEMO: deploys to the staged queue when configured.');return false;}
   try{const d=await api('file-case',{url});
     if(d.ok){
+      /* v2: instant extraction means case is already live! */
+      if(d.instant&&d.case_id){
+        toast('✓ Case filed and live!',{action:()=>location.hash='case='+d.case_id});
+        /* Fetch and cache it immediately */
+        try{
+          const cd=await api('search-cases',{id:d.case_id});
+          const c=(cd.results||[])[0];
+          if(c)CACHE.set(c.id,c);
+        }catch(e){}
+        return true;
+      }
+      /* Fallback for old backend: poll for completion */
       toast('Filed! Extracting case details…');
       if(d.case_id)addPending(url,d.case_id);
-      /* Poll for completion */
       if(d.case_id)pollCaseStatus(d.case_id);
+      return true;
+    }
+    if(d.dedupe&&d.case_id){
+      toast('Already in the registry!',{action:()=>location.hash='case='+d.case_id});
       return true;
     }
     toast(d.error||'Could not file.');return false;
