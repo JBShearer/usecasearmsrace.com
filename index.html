@@ -1023,8 +1023,34 @@ try{if(localStorage.getItem('ucar_mycases_collapsed')==='true'){
 }}catch(e){}
 
 function viewMyCase(id){
-  clearSearch();
+  /* Clear search and filters so the case can appear */
+  document.getElementById('q').value='';
+  updateClearBtn();
+  CATEGORY=null;
+  OPEN_ID=id;
+  lastWeb=[];lastParsed=null;
+
+  /* Fetch case if not cached */
+  if(!CACHE.get(id)&&!DEMO){
+    api('search-cases',{id}).then(d=>{
+      (d.results||[]).forEach(c=>CACHE.set(c.id,c));
+      renderCategories();
+      renderResults('');
+      scrollToOpenCase();
+    }).catch(()=>{});
+  }else{
+    renderCategories();
+    renderResults('');
+    scrollToOpenCase();
+  }
   location.hash='case='+id;
+}
+
+function scrollToOpenCase(){
+  setTimeout(()=>{
+    const el=document.querySelector('.hit.open');
+    if(el)el.scrollIntoView({block:'center',behavior:'smooth'});
+  },50);
 }
 
 function clearMyCases(){
