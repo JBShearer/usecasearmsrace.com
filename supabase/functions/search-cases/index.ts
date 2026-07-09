@@ -1,4 +1,4 @@
-// search-cases: pure ILIKE, no vocab, maximum speed
+// search-cases: pure ILIKE + Tavily news (fast warm path)
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const CORS = {
@@ -12,36 +12,81 @@ const supa = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
+const TAVILY_KEY = Deno.env.get("TAVILY_API_KEY") || "";
 const COLS = "id, title, raw_title, summary, article_quote, faction, impact, heaven_votes, hell_votes, source_url, source_tier, tech_types, data_types, extraction, status, created_at";
 
 function json(body: unknown) {
   return new Response(JSON.stringify(body), { headers: { ...CORS, "Content-Type": "application/json" } });
 }
 
-// Web search: GDELT + Google News in parallel (only when requested)
+// Web cache (10 min TTL)
+const webCache = new Map<string, { t: number; r: any[] }>();
+const WEB_TTL = 10 * 60 * 1000;
+
 async function webSearch(q: string) {
-  const enc = encodeURIComponent;
-  const [gdelt, google] = await Promise.all([
-    fetch("https://api.gdeltproject.org/api/v2/doc/doc?query=" + enc(q + " sourcelang:english")
-      + "&mode=artlist&maxrecords=5&timespan=30d&format=json",
-      { signal: AbortSignal.timeout(2000) })
-      .then(async r => r.ok ? ((await r.json()).articles ?? []).slice(0, 5).map((a: any) => ({
-        title: a.title ?? "", url: a.url ?? "", domain: a.domain ?? ""
-      })) : []).catch(() => []),
-    fetch("https://news.google.com/rss/search?q=" + enc(q) + "&hl=en-US&gl=US&ceid=US:en",
-      { signal: AbortSignal.timeout(2000) })
-      .then(async r => {
-        if (!r.ok) return [];
+  const cached = webCache.get(q);
+  if (cached && Date.now() - cached.t < WEB_TTL) return cached.r;
+
+  const out: { title: string; url: string; domain: string }[] = [];
+
+  // Tavily: fast news search (~500-800ms)
+  if (TAVILY_KEY) {
+    try {
+      const r = await fetch("https://api.tavily.com/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          api_key: TAVILY_KEY,
+          query: q,
+          search_depth: "basic",
+          topic: "news",
+          max_results: 6
+        }),
+        signal: AbortSignal.timeout(2000)
+      });
+      if (r.ok) {
+        const data = await r.json();
+        for (const item of data.results ?? []) {
+          out.push({
+            title: item.title ?? "",
+            url: item.url ?? "",
+            domain: item.url ? new URL(item.url).hostname.replace(/^www\./, "") : ""
+          });
+        }
+      }
+    } catch (_) { /* timeout or error */ }
+  }
+
+  // Fallback to Google News RSS if Tavily fails or no key
+  if (!out.length) {
+    try {
+      const r = await fetch(
+        "https://news.google.com/rss/search?q=" + encodeURIComponent(q) + "&hl=en-US&gl=US&ceid=US:en",
+        { signal: AbortSignal.timeout(1500) }
+      );
+      if (r.ok) {
         const xml = await r.text();
-        return (xml.match(/<item>[\s\S]*?<\/item>/g) ?? []).slice(0, 5).map((it: string) => ({
-          title: ((it.match(/<title>([\s\S]*?)<\/title>/) ?? [])[1] ?? "").replace(/<[^>]*>/g, ""),
-          url: (it.match(/<link>([\s\S]*?)<\/link>/) ?? [])[1] ?? "",
-          domain: (it.match(/<source url="([^"]*)"/) ?? [])[1] ?? ""
-        })).filter((x: any) => x.url);
-      }).catch(() => [])
-  ]);
+        const items = xml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
+        for (const it of items.slice(0, 6)) {
+          const title = ((it.match(/<title>([\s\S]*?)<\/title>/) ?? [])[1] ?? "").replace(/<[^>]*>/g, "");
+          const url = (it.match(/<link>([\s\S]*?)<\/link>/) ?? [])[1] ?? "";
+          const domain = (it.match(/<source url="([^"]*)"/) ?? [])[1] ?? "";
+          if (url) out.push({ title, url, domain });
+        }
+      }
+    } catch (_) { /* timeout */ }
+  }
+
   const seen = new Set<string>();
-  return [...gdelt, ...google].filter(r => r.url && !seen.has(r.url) && seen.add(r.url)).slice(0, 8);
+  const deduped = out.filter(r => r.url && !seen.has(r.url) && seen.add(r.url)).slice(0, 8);
+
+  webCache.set(q, { t: Date.now(), r: deduped });
+  if (webCache.size > 200) {
+    const oldest = [...webCache.entries()].sort((a, b) => a[1].t - b[1].t)[0];
+    if (oldest) webCache.delete(oldest[0]);
+  }
+
+  return deduped;
 }
 
 Deno.serve(async (req) => {
@@ -49,24 +94,20 @@ Deno.serve(async (req) => {
   const b = req.method === "POST" ? await req.json().catch(() => ({})) : {};
   const t0 = Date.now();
 
-  // Single case by ID
   if (b.id) {
     const { data } = await supa.from("cases").select(COLS)
       .eq("id", b.id).in("status", ["live", "under_review"]).limit(1);
     return json({ results: data ?? [], ms: Date.now() - t0 });
   }
 
-  // Browse: load recent cases
   if (b.browse) {
     const { data } = await supa.from("cases").select(COLS).eq("status", "live")
       .order("created_at", { ascending: false }).limit(60);
     return json({ results: data ?? [], ms: Date.now() - t0 });
   }
 
-  // Text search - split words, OR them together
   const q = String(b.q ?? "").trim();
   if (q) {
-    // web_only mode: skip DB, just return web results (for parallel call pattern)
     if (b.web_only) {
       const web_results = q.length >= 3 ? await webSearch(q.slice(0, 120)) : [];
       return json({ results: [], web_results, ms: Date.now() - t0 });
@@ -80,13 +121,10 @@ Deno.serve(async (req) => {
     const { data } = await supa.from("cases").select(COLS).eq("status", "live")
       .or(ors.join(",")).limit(20);
 
-    // Web results only if requested (sequential, adds ~2s)
     const web_results = b.web && q.length >= 3 ? await webSearch(q.slice(0, 120)) : [];
-
     return json({ results: data ?? [], web_results, ms: Date.now() - t0 });
   }
 
-  // Empty query = browse
   const { data } = await supa.from("cases").select(COLS).eq("status", "live")
     .order("created_at", { ascending: false }).limit(60);
   return json({ results: data ?? [], ms: Date.now() - t0 });
