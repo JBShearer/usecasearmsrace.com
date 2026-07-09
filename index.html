@@ -122,15 +122,21 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 #myCasesWidget{display:none;margin:10px 0;padding:12px 14px;
   border:2px solid var(--fg);border-radius:12px;background:var(--card)}
 #myCasesWidget.on{display:block}
+#myCasesWidget.collapsed .mc-list{display:none}
+#myCasesWidget.collapsed .mc-toggle{transform:rotate(-90deg)}
+#myCasesWidget.collapsed{padding:10px 14px}
 #myCasesWidget .mc-header{display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:8px}
+  margin-bottom:8px;cursor:pointer}
+#myCasesWidget.collapsed .mc-header{margin-bottom:0}
 #myCasesWidget .mc-title{font-size:10px;letter-spacing:2px;color:var(--fg);
   text-transform:uppercase;font-weight:700}
+#myCasesWidget .mc-count{color:var(--muted);font-weight:400}
 #myCasesWidget .mc-actions{display:flex;gap:6px}
 #myCasesWidget .mc-btn{font-size:10px;letter-spacing:1px;text-transform:uppercase;
   background:none;border:1.5px solid var(--fg);border-radius:6px;padding:4px 8px;
   cursor:pointer;font-weight:600}
 #myCasesWidget .mc-btn:hover{background:var(--fg);color:var(--bg)}
+#myCasesWidget .mc-toggle{border:none;padding:4px 6px;transition:transform .2s}
 #myCasesWidget .mc-list{display:flex;flex-direction:column;gap:4px;max-height:200px;
   overflow-y:auto}
 #myCasesWidget .mc-item{display:flex;align-items:center;gap:8px;
@@ -326,12 +332,13 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
   <div id="latency"></div>
   <!-- My Cases widget (personal case list) -->
   <div id="myCasesWidget">
-    <div class="mc-header">
-      <span class="mc-title">📋 My Cases</span>
-      <div class="mc-actions">
+    <div class="mc-header" onclick="toggleMyCases()">
+      <span class="mc-title">📋 My Cases <span class="mc-count"></span></span>
+      <div class="mc-actions" onclick="event.stopPropagation()">
         <button class="mc-btn" onclick="exportMyCases('json')">Export</button>
         <button class="mc-btn" onclick="exportMyCases('share')">Share</button>
         <button class="mc-btn" onclick="clearMyCases()">Clear</button>
+        <button class="mc-btn mc-toggle" onclick="toggleMyCases()">▼</button>
       </div>
     </div>
     <div class="mc-list" id="myCasesList"></div>
@@ -988,19 +995,32 @@ function updateMyCaseStatus(id,status){
 function renderMyCases(){
   const widget=document.getElementById('myCasesWidget');
   const list=document.getElementById('myCasesList');
+  const countEl=widget.querySelector('.mc-count');
   if(!MY_CASES.length){widget.classList.remove('on');return;}
   widget.classList.add('on');
+  if(countEl)countEl.textContent='('+MY_CASES.length+')';
   list.innerHTML=MY_CASES.map(c=>`
     <div class="mc-item" data-id="${c.id}">
       <span class="mc-status ${c.status}"></span>
       <div class="mc-info" onclick="viewMyCase('${c.id}')">
         <div class="mc-title-text">${esc(c.title||'Pending...')}</div>
-        <div class="mc-meta">${esc(domainOf(c.source_url||c.url)||'')}${c.status==='pending'?' • extracting...':''}</div>
+        <div class="mc-meta">${esc(domainOf(c.source_url||c.url)||'')}${c.status==='pending'?' • extracting...':(c.status==='error'?' • failed':'')}</div>
       </div>
-      <button class="mc-remove" onclick="removeFromMyCases('${c.id}')" title="Remove">×</button>
+      <button class="mc-remove" onclick="event.stopPropagation();removeFromMyCases('${c.id}')" title="Remove">×</button>
     </div>
   `).join('');
 }
+
+function toggleMyCases(){
+  const widget=document.getElementById('myCasesWidget');
+  widget.classList.toggle('collapsed');
+  try{localStorage.setItem('ucar_mycases_collapsed',widget.classList.contains('collapsed'));}catch(e){}
+}
+
+/* Restore collapsed state on load */
+try{if(localStorage.getItem('ucar_mycases_collapsed')==='true'){
+  document.getElementById('myCasesWidget').classList.add('collapsed');
+}}catch(e){}
 
 function viewMyCase(id){
   clearSearch();
