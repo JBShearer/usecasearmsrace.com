@@ -25,9 +25,8 @@ CREATE TABLE IF NOT EXISTS rate_limits (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Index for cleanup query
-CREATE INDEX idx_rate_limits_cleanup ON rate_limits(minute_bucket)
-  WHERE minute_bucket < NOW() - INTERVAL '5 minutes';
+-- Index for cleanup query (no WHERE clause - simpler, no IMMUTABLE issue)
+CREATE INDEX IF NOT EXISTS idx_rate_limits_cleanup ON rate_limits(minute_bucket);
 
 COMMENT ON TABLE rate_limits IS
   'Per-user per-function rate limiting (30 calls/min default). Buckets auto-expire after 5min.';
