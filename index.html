@@ -397,7 +397,7 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
     <div class="mc-header" onclick="toggleMyCases()">
       <span class="mc-title">📋 My Cases <span class="mc-count"></span></span>
       <div class="mc-actions" onclick="event.stopPropagation()">
-        <button class="mc-btn" onclick="exportMyCases('json')">Export</button>
+        <button class="mc-btn" onclick="exportMyCases('csv')">CSV</button>
         <button class="mc-btn" onclick="exportMyCases('share')">Share</button>
         <button class="mc-btn" onclick="clearMyCases()">Clear</button>
         <button class="mc-btn mc-toggle" onclick="toggleMyCases()">▼</button>
@@ -1411,16 +1411,18 @@ async function fileURLForMining(url,tempId){
           if(fullCase){
             CACHE.set(fullCase.id,fullCase);
             updateCaseState(d.case_id,'done',{
-              title:fullCase.title,
+              title:fullCase.title||fullCase.raw_title,
               quote:fullCase.article_quote,
               summary:fullCase.summary,
               canonical:fullCase.canonical
             });
           }else{
-            updateCaseState(d.case_id,'done');
+            /* Fallback: at least mark done, title will update on next view */
+            updateCaseState(d.case_id,'done',{title:'Case filed - tap to view'});
           }
         }catch(e){
-          updateCaseState(d.case_id,'done');
+          console.error('Failed to fetch case after filing:',e);
+          updateCaseState(d.case_id,'done',{title:'Case filed - tap to view'});
         }
         return true;
       }

@@ -260,14 +260,17 @@ Deno.serve(async (req) => {
     const impact = extractImpact(combinedText, sourceTier);
     const triple = extractTriple(combinedText);
 
-    // Build better title from triple
+    // Build title: prefer article title, only use triple if no title
     let smartTitle = article?.title || "";
-    if (triple.who && triple.action && triple.whom) {
-      smartTitle = `${triple.who} ${triple.action} ${triple.whom}`;
-    } else if (triple.who && triple.action) {
-      smartTitle = `${triple.who} ${triple.action} AI`;
-    } else if (!smartTitle) {
-      smartTitle = `AI deployment at ${triple.who || parsed.hostname}`;
+    if (!smartTitle) {
+      // No article title - generate from triple
+      if (triple.who && triple.action && triple.whom) {
+        smartTitle = `${triple.who} ${triple.action} ${triple.whom}`;
+      } else if (triple.who && triple.action) {
+        smartTitle = `${triple.who} ${triple.action} AI`;
+      } else {
+        smartTitle = `AI deployment at ${triple.who || parsed.hostname}`;
+      }
     }
 
     // Build case row - go straight to 'live' with basic extraction
@@ -301,13 +304,13 @@ Deno.serve(async (req) => {
       const { data: kase2, error: error2 } = await supa.from("cases")
         .insert(row).select("id").single();
       if (error2 || !kase2) return json(500, { error: error2?.message ?? "insert failed" });
-      // Queue for LLM enrichment
-      await supa.from("extraction_queue").insert({ case_id: kase2.id }).catch(() => {});
+      // Queue for LLM enrichment (ignore errors)
+      try { await supa.from("extraction_queue").insert({ case_id: kase2.id }); } catch {}
       return json(200, { ok: true, case_id: kase2.id, instant: true, ms: Date.now() - t0 });
     }
 
     // Queue for LLM enrichment (reenactment, story, etc.)
-    await supa.from("extraction_queue").insert({ case_id: kase.id }).catch(() => {});
+    try { await supa.from("extraction_queue").insert({ case_id: kase.id }); } catch {}
 
     return json(200, { ok: true, case_id: kase.id, instant: true, ms: Date.now() - t0 });
   } catch (e) {
