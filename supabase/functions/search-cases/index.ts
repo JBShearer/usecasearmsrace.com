@@ -232,10 +232,15 @@ Deno.serve(async (req) => {
     if (hasStructure) {
       results = await search(q, parsed);
     } else {
-      // Pure text search - faster
+      // Pure text search - search each word with OR
+      const words = q.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+      const ors = words.flatMap(w => [
+        `title.ilike.%${w}%`,
+        `summary.ilike.%${w}%`
+      ]);
+      if (!ors.length) ors.push(`title.ilike.%${q}%`);
       const { data } = await supa.from("cases").select(COLS).eq("status", "live")
-        .or(`title.ilike.%${q}%,raw_title.ilike.%${q}%,summary.ilike.%${q}%`)
-        .limit(20);
+        .or(ors.join(",")).limit(20);
       results = data ?? [];
     }
 
