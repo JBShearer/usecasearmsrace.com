@@ -118,43 +118,37 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 #loadgame .lg-opt.picked{background:var(--accent);border-color:var(--accent);color:#fff}
 #loadgame .lg-opt.correct{background:var(--halo);border-color:var(--halo);color:#000}
 #loadgame .lg-opt.wrong{opacity:.4;transform:scale(.95)}
-/* ============ PENDING CASES WIDGET ============ */
-#pendingWidget{display:none;margin:10px 0;padding:10px 14px;
-  border:2px solid var(--accent);border-radius:12px;background:var(--card)}
-#pendingWidget.on{display:block}
-#pendingWidget .pw-title{font-size:10px;letter-spacing:2px;color:var(--accent);
-  text-transform:uppercase;font-weight:700;margin-bottom:6px}
-#pendingWidget .pw-list{display:flex;flex-direction:column;gap:6px}
-#pendingWidget .pw-item{display:flex;align-items:center;gap:8px;
-  font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line)}
-#pendingWidget .pw-item:last-child{border-bottom:none}
-#pendingWidget .pw-status{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-#pendingWidget .pw-status.pending{background:var(--muted);animation:pulse 1.5s infinite}
-#pendingWidget .pw-status.ready{background:var(--halo)}
-#pendingWidget .pw-status.error{background:var(--horns)}
+/* ============ MY CASES WIDGET (personal case list) ============ */
+#myCasesWidget{display:none;margin:10px 0;padding:12px 14px;
+  border:2px solid var(--fg);border-radius:12px;background:var(--card)}
+#myCasesWidget.on{display:block}
+#myCasesWidget .mc-header{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:8px}
+#myCasesWidget .mc-title{font-size:10px;letter-spacing:2px;color:var(--fg);
+  text-transform:uppercase;font-weight:700}
+#myCasesWidget .mc-actions{display:flex;gap:6px}
+#myCasesWidget .mc-btn{font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  background:none;border:1.5px solid var(--fg);border-radius:6px;padding:4px 8px;
+  cursor:pointer;font-weight:600}
+#myCasesWidget .mc-btn:hover{background:var(--fg);color:var(--bg)}
+#myCasesWidget .mc-list{display:flex;flex-direction:column;gap:4px;max-height:200px;
+  overflow-y:auto}
+#myCasesWidget .mc-item{display:flex;align-items:center;gap:8px;
+  font-size:12.5px;padding:8px;border-radius:8px;background:var(--bg)}
+#myCasesWidget .mc-item:hover{background:var(--line)}
+#myCasesWidget .mc-status{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+#myCasesWidget .mc-status.pending{background:var(--muted);animation:pulse 1.5s infinite}
+#myCasesWidget .mc-status.ready{background:var(--halo)}
+#myCasesWidget .mc-status.error{background:var(--horns)}
+#myCasesWidget .mc-status.saved{background:var(--fg)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-@keyframes readyPulse{
-  0%,100%{box-shadow:0 0 0 0 var(--halo)}
-  50%{box-shadow:0 0 0 8px transparent}
-}
-@keyframes readyBounce{
-  0%,100%{transform:scale(1)}
-  25%{transform:scale(1.02)}
-  50%{transform:scale(1)}
-  75%{transform:scale(1.01)}
-}
-#pendingWidget.has-ready{animation:readyBounce .6s ease;border-color:var(--halo)}
-#pendingWidget .pw-url{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  color:var(--muted)}
-#pendingWidget .pw-action{font-size:11px;font-weight:700;color:var(--accent);
-  cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
-#pendingWidget .pw-item.just-ready{animation:readyPulse 1s ease 2}
-#pendingWidget .pw-status.ready{animation:pulse 1s infinite}
-/* Notification settings toggle */
-.pw-settings{display:flex;gap:12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);
-  font-size:11px;color:var(--muted)}
-.pw-toggle{display:flex;align-items:center;gap:4px;cursor:pointer}
-.pw-toggle input{width:14px;height:14px;cursor:pointer}
+#myCasesWidget .mc-info{flex:1;overflow:hidden;cursor:pointer}
+#myCasesWidget .mc-title-text{font-weight:600;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;font-size:12px}
+#myCasesWidget .mc-meta{font-size:10px;color:var(--muted)}
+#myCasesWidget .mc-remove{font-size:18px;color:var(--muted);cursor:pointer;
+  padding:4px;line-height:1;background:none;border:none}
+#myCasesWidget .mc-remove:hover{color:var(--horns)}
 /* categories */
 .catrow{display:flex;gap:8px;overflow-x:auto;padding:8px 2px 10px;
   -webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -214,6 +208,7 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 .mod:hover{border-color:var(--accent);color:var(--accent)}
 .mod.add{border-style:dashed;color:var(--accent);border-color:var(--accent);
   font-weight:800}
+.mod.saved{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 /* expanded detail */
 .detail{display:none;border-top:1.5px dashed var(--line);margin-top:8px;
   padding-top:8px}
@@ -329,10 +324,17 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
     <div id="parseRow"></div>
   </div>
   <div id="latency"></div>
-  <!-- Pending cases widget -->
-  <div id="pendingWidget">
-    <div class="pw-title">📁 Your Filed Cases</div>
-    <div class="pw-list" id="pendingList"></div>
+  <!-- My Cases widget (personal case list) -->
+  <div id="myCasesWidget">
+    <div class="mc-header">
+      <span class="mc-title">📋 My Cases</span>
+      <div class="mc-actions">
+        <button class="mc-btn" onclick="exportMyCases('json')">Export</button>
+        <button class="mc-btn" onclick="exportMyCases('share')">Share</button>
+        <button class="mc-btn" onclick="clearMyCases()">Clear</button>
+      </div>
+    </div>
+    <div class="mc-list" id="myCasesList"></div>
   </div>
   <!-- Loading screen: quotes flash up top, minigame below -->
   <div id="loadscreen">
@@ -478,11 +480,12 @@ function playNotifSound(){
 }
 let originalTitle='Use Case Arms Race - The AI Use Case Registry';
 function updateTitleBadge(){
-  const pendingReady=PENDING.filter(p=>p.status==='ready').length;
-  const pendingPending=PENDING.filter(p=>p.status==='pending').length;
-  const total=pendingReady+pendingPending;
-  if(total>0){
-    document.title='('+total+') '+originalTitle.split(' - ')[0];
+  const pendingCount=MY_CASES.filter(c=>c.status==='pending').length;
+  const savedCount=MY_CASES.length;
+  if(pendingCount>0){
+    document.title='('+pendingCount+' pending) '+originalTitle.split(' - ')[0];
+  }else if(savedCount>0){
+    document.title='('+savedCount+') '+originalTitle.split(' - ')[0];
   }else{
     document.title=originalTitle;
   }
@@ -944,88 +947,114 @@ function clearSearch(){
   setText('latency','');
   document.getElementById('q').focus();
 }
-/* ============ PENDING CASES WIDGET ============ */
-let PENDING=[];
-try{PENDING=JSON.parse(localStorage.getItem('ucar_pending')||'[]');}catch(e){}
-function savePending(){try{localStorage.setItem('ucar_pending',JSON.stringify(PENDING));}catch(e){}}
-function addPending(url,id){
-  PENDING=PENDING.filter(p=>p.url!==url);/* no dupes */
-  PENDING.unshift({url,id,status:'pending',filed_at:Date.now()});
-  if(PENDING.length>10)PENDING.pop();
-  savePending();renderPending();updateTitleBadge();
-}
-function updatePendingStatus(id,status,isNew=false){
-  const p=PENDING.find(x=>x.id===id);
-  if(p){
-    const wasNotReady=p.status!=='ready';
-    p.status=status;
-    p.justReady=isNew&&status==='ready'&&wasNotReady;
-    savePending();renderPending();updateTitleBadge();
-    /* Clear justReady flag after animation */
-    if(p.justReady)setTimeout(()=>{p.justReady=false;renderPending();},2500);
+/* ============ MY CASES (personal case list + pending filings) ============ */
+let MY_CASES=[];
+try{MY_CASES=JSON.parse(localStorage.getItem('ucar_mycases')||'[]');}catch(e){}
+function saveMyCases(){try{localStorage.setItem('ucar_mycases',JSON.stringify(MY_CASES));}catch(e){}}
+
+function addToMyCases(c,status='saved'){
+  /* c can be a full case object or {id,url,title} for pending */
+  const existing=MY_CASES.find(x=>x.id===c.id);
+  if(existing){
+    Object.assign(existing,c,{status});
+    existing.updated_at=Date.now();
+  }else{
+    MY_CASES.unshift({
+      id:c.id,
+      title:c.title||c.raw_title||'Untitled',
+      url:c.source_url||c.url||'',
+      summary:c.summary||'',
+      faction:c.faction||'unaligned',
+      source_url:c.source_url||c.url||'',
+      modifier_terms:c.modifier_terms||[],
+      status,
+      added_at:Date.now()
+    });
   }
+  if(MY_CASES.length>50)MY_CASES.pop();
+  saveMyCases();renderMyCases();updateTitleBadge();
 }
-function renderPending(){
-  const widget=document.getElementById('pendingWidget');
-  const list=document.getElementById('pendingList');
-  /* Prune old ones (>1 hour) */
-  const cutoff=Date.now()-3600000;
-  PENDING=PENDING.filter(p=>p.filed_at>cutoff||p.status==='ready');
-  savePending();updateTitleBadge();
-  if(!PENDING.length){widget.classList.remove('on');widget.classList.remove('has-ready');return;}
+
+function removeFromMyCases(id){
+  MY_CASES=MY_CASES.filter(c=>c.id!==id);
+  saveMyCases();renderMyCases();updateTitleBadge();
+}
+
+function updateMyCaseStatus(id,status){
+  const c=MY_CASES.find(x=>x.id===id);
+  if(c){c.status=status;c.updated_at=Date.now();saveMyCases();renderMyCases();updateTitleBadge();}
+}
+
+function renderMyCases(){
+  const widget=document.getElementById('myCasesWidget');
+  const list=document.getElementById('myCasesList');
+  if(!MY_CASES.length){widget.classList.remove('on');return;}
   widget.classList.add('on');
-  /* Add highlight class if any cases are ready */
-  const hasReady=PENDING.some(p=>p.status==='ready');
-  widget.classList.toggle('has-ready',hasReady);
-  list.innerHTML=PENDING.map(p=>`
-    <div class="pw-item${p.justReady?' just-ready':''}">
-      <span class="pw-status ${p.status}"></span>
-      <span class="pw-url">${esc(domainOf(p.url)||p.url)}</span>
-      ${p.status==='ready'?`<span class="pw-action" onclick="viewPendingCase('${p.id}')">VIEW</span>`:''}
-      ${p.status==='pending'?'<span style="color:var(--muted);font-size:11px">extracting...</span>':''}
-      ${p.status==='error'?'<span style="color:var(--horns);font-size:11px">failed</span>':''}
+  list.innerHTML=MY_CASES.map(c=>`
+    <div class="mc-item" data-id="${c.id}">
+      <span class="mc-status ${c.status}"></span>
+      <div class="mc-info" onclick="viewMyCase('${c.id}')">
+        <div class="mc-title-text">${esc(c.title||'Pending...')}</div>
+        <div class="mc-meta">${esc(domainOf(c.source_url||c.url)||'')}${c.status==='pending'?' • extracting...':''}</div>
+      </div>
+      <button class="mc-remove" onclick="removeFromMyCases('${c.id}')" title="Remove">×</button>
     </div>
   `).join('');
-  /* Notification settings row */
-  const notifSupported='Notification' in window;
-  const notifGranted=getNotifPermission()==='granted';
-  const notifDenied=getNotifPermission()==='denied'||NOTIF.permission==='never-ask';
-  list.innerHTML+=`
-    <div class="pw-settings">
-      ${notifSupported&&!notifDenied?`
-        <label class="pw-toggle" title="Browser notifications when cases are ready">
-          <input type="checkbox" id="notifToggle" ${notifGranted?'checked':''} onchange="toggleNotifications(this.checked)">
-          <span>Notify</span>
-        </label>
-      `:''}
-      <label class="pw-toggle" title="Play a sound when cases are ready">
-        <input type="checkbox" id="soundToggle" ${NOTIF.sound?'checked':''} onchange="toggleSound(this.checked)">
-        <span>Sound</span>
-      </label>
-    </div>
-  `;
 }
-function toggleNotifications(on){
-  if(on){
-    requestNotifPermission().then(result=>{
-      if(result!=='granted'){
-        const el=document.getElementById('notifToggle');
-        if(el)el.checked=false;
-        toast('Notifications blocked by browser');
-      }
-    });
-  }else{
-    NOTIF.permission='never-ask';saveNotifPrefs();
-  }
-}
-function toggleSound(on){
-  NOTIF.sound=on;saveNotifPrefs();
-  if(on)playNotifSound();/* preview the sound */
-}
-function viewPendingCase(id){
-  PENDING=PENDING.filter(p=>p.id!==id);savePending();renderPending();updateTitleBadge();
+
+function viewMyCase(id){
+  clearSearch();
   location.hash='case='+id;
 }
+
+function clearMyCases(){
+  if(!confirm('Clear all saved cases?'))return;
+  MY_CASES=[];saveMyCases();renderMyCases();updateTitleBadge();
+}
+
+function exportMyCases(format){
+  if(!MY_CASES.length){toast('No cases to export');return;}
+  /* Enrich with full data from cache */
+  const enriched=MY_CASES.map(mc=>{
+    const full=CACHE.get(mc.id)||mc;
+    return {
+      title:full.title||mc.title,
+      summary:full.summary||mc.summary||'',
+      source_url:full.source_url||mc.source_url||mc.url,
+      faction:full.faction||mc.faction||'unaligned',
+      impact:full.impact||1,
+      community_notes:(full.modifier_terms||mc.modifier_terms||[]).join(', '),
+      registry_url:'https://usecasearmsrace.com/#case='+mc.id
+    };
+  });
+
+  if(format==='share'){
+    /* Create shareable text */
+    const text=enriched.map((c,i)=>
+      `${i+1}. ${c.title}\n   ${c.source_url}\n   ${c.community_notes?'Notes: '+c.community_notes:''}`
+    ).join('\n\n');
+    if(navigator.share){
+      navigator.share({title:'My AI Use Cases',text}).catch(()=>{});
+    }else{
+      navigator.clipboard.writeText(text).then(()=>toast('Copied to clipboard!'));
+    }
+  }else{
+    /* JSON download */
+    const blob=new Blob([JSON.stringify(enriched,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download='my-cases-'+new Date().toISOString().slice(0,10)+'.json';
+    a.click();URL.revokeObjectURL(url);
+    toast('Downloaded '+enriched.length+' cases');
+  }
+}
+
+/* Legacy alias for pending filings */
+function addPending(url,id){addToMyCases({id,url,title:'Filing: '+domainOf(url)},'pending');}
+function updatePendingStatus(id,status){updateMyCaseStatus(id,status);}
+function viewPendingCase(id){viewMyCase(id);}
+function renderPending(){renderMyCases();}/* compatibility */
+
 async function fileCaseFromSearch(url){
   const btn=document.getElementById('qclear');
   btn.textContent='⏳';btn.disabled=true;
@@ -1106,9 +1135,9 @@ async function boot(){
     try{const data=await api('search-cases',{browse:true});
       (data.results||[]).forEach(c=>CACHE.set(c.id,c));}catch(e){}
   }
-  renderCategories();renderResults('');renderPending();updateTitleBadge();
+  renderCategories();renderResults('');renderMyCases();updateTitleBadge();
   /* Resume polling for any pending cases */
-  PENDING.filter(p=>p.status==='pending').forEach(p=>pollCaseStatus(p.id));
+  MY_CASES.filter(c=>c.status==='pending').forEach(c=>pollCaseStatus(c.id));
 }
 /* categories from the live cache */
 function renderCategories(){
@@ -1223,6 +1252,17 @@ function hitCard(c){
   add.textContent='+ modifier';
   add.onclick=e=>{e.stopPropagation();openSheet(c);};
   mrow.appendChild(add);
+  /* Save to My Cases button */
+  const isSaved=MY_CASES.some(mc=>mc.id===c.id);
+  const save=document.createElement('button');
+  save.className='mod'+(isSaved?' saved':'');
+  save.textContent=isSaved?'✓ saved':'+ save';
+  save.style.marginLeft='auto';
+  save.onclick=e=>{e.stopPropagation();
+    if(isSaved){removeFromMyCases(c.id);toast('Removed from My Cases');}
+    else{addToMyCases(c);toast('Saved to My Cases');}
+    renderResults(currentQuery());};
+  mrow.appendChild(save);
   // expand toggle + permalink
   const toggle=()=>{OPEN_ID=(OPEN_ID===c.id)?null:c.id;
     history.replaceState(null,'',OPEN_ID?'#case='+c.id:' ');
