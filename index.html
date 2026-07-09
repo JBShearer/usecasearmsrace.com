@@ -580,9 +580,10 @@ function renderResults(q){
     d.textContent='FROM THE WEB (not yet in the record)';host.appendChild(d);
     for(const w of lastWeb){
       const el=document.createElement('div');el.className='webhit';
-      el.innerHTML='<div>'+esc(w.title)+'</div><div class="meta">'+esc(w.domain||'')+'</div>';
-      if(w.url!=='#'){const b=document.createElement('button');
-        b.textContent='File this into the queue';b.onclick=()=>fileURL(w.url);
+      el.innerHTML='<a href="'+esc(w.url)+'" target="_blank" rel="noopener">'+esc(w.title)+'</a>'
+        +'<div class="meta">'+esc(w.domain||domainOf(w.url))+'</div>';
+      if(w.url&&w.url!=='#'){const b=document.createElement('button');
+        b.textContent='+File';b.onclick=()=>fileURL(w.url);
         el.appendChild(b);}
       host.appendChild(el);
     }
