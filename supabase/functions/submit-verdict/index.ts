@@ -4,10 +4,13 @@
 // 3. recompute canonical triple consensus            [pure TS, tested]
 // 4. mint the player's card deterministically        [pure TS, tested]
 // Collective stats return ONLY after the vote is recorded: no anchoring.
+//
+// PHASE 0 UPDATE: Added rate limiting (30 calls/min default)
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { consensus, makeResolver, Submission } from "../../shared/consensus.ts";
 import { deriveCard, noteReward, repDelta } from "../../shared/cardstats.ts";
+import { checkRateLimit } from "../../shared/rateLimit.ts";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -43,6 +46,14 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   const userId = await resolveUser(req);
   if (!userId) return json(401, { error: "auth required" });
+
+  // PHASE 0: Rate limiting (30 calls/min default from economy.ts)
+  if (await checkRateLimit(userId, 'submit-verdict')) {
+    return json(429, {
+      error: "Too many requests. Please wait a minute.",
+      retryAfter: 60
+    });
+  }
 
   const b = await req.json();
   const { case_id, who, action, whom, faction_vote, notes = "",
