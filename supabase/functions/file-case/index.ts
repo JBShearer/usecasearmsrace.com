@@ -135,81 +135,87 @@ function json(status: number, body: unknown) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  const t0 = Date.now();
 
-  const userId = await resolveUser(req);
-  if (!userId) return json(401, { error: "identity required" });
+  try {
+    const t0 = Date.now();
 
-  const b = await req.json().catch(() => ({}));
-  const url = String(b.url ?? "").trim();
-  let parsed: URL;
-  try { parsed = new URL(url); } catch { return json(400, { error: "invalid url" }); }
-  if (!["http:", "https:"].includes(parsed.protocol)) {
-    return json(400, { error: "invalid url" });
+    const userId = await resolveUser(req);
+    if (!userId) return json(401, { error: "identity required" });
+
+    const b = await req.json().catch(() => ({}));
+    const url = String(b.url ?? "").trim();
+    let parsed: URL;
+    try { parsed = new URL(url); } catch { return json(400, { error: "invalid url" }); }
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      return json(400, { error: "invalid url" });
+    }
+
+    // dedupe by url hash (do this first, before rate limit check)
+    const digest = await crypto.subtle.digest("SHA-1",
+      new TextEncoder().encode(parsed.href));
+    const externalId = "web:" + Array.from(new Uint8Array(digest))
+      .map((x) => x.toString(16).padStart(2, "0")).join("").slice(0, 20);
+    const { data: existing } = await supa.from("cases").select("id, status")
+      .eq("external_id", externalId).maybeSingle();
+    if (existing) return json(200, { ok: true, dedupe: true, case_id: existing.id });
+
+    // rate limit: 5 filings/hour/identity (skip if submitter column doesn't exist)
+    try {
+      const since = new Date(Date.now() - 3600_000).toISOString();
+      const { count } = await supa.from("cases")
+        .select("id", { count: "exact", head: true })
+        .eq("submitter", userId).gte("created_at", since);
+      if ((count ?? 0) >= 5) return json(429, { error: "filing cooldown, try later" });
+    } catch { /* submitter column may not exist, skip rate limit */ }
+
+    // Fetch and extract (deterministic, fast)
+    const article = await fetchArticle(parsed.href);
+    const combinedText = article ? `${article.title} ${article.text}` : parsed.hostname;
+    const sourceTier = /\.(gov|mil|edu)$/.test(parsed.hostname) ? 1 : 2;
+
+    const impact = extractImpact(combinedText, sourceTier);
+    const triple = extractTriple(combinedText);
+    const org = extractOrg(combinedText);
+
+    // Build case row - go straight to 'live' with basic extraction
+    // Note: schema uses 'faction' not 'category' - faction is heaven/hell/unaligned
+    const row: Record<string, unknown> = {
+      external_id: externalId,
+      raw_title: article?.title || `Filed from ${parsed.hostname}`,
+      title: article?.title || `AI deployment at ${org || parsed.hostname}`,
+      source_url: parsed.href,
+      source_tier: sourceTier,
+      faction: "unaligned", // Deterministic extraction can't judge good/evil
+      impact,
+      status: "live", // Instant live! Not staged.
+      extraction: {
+        deterministic: true,
+        who_choices: triple.who ? [triple.who] : [],
+        action_choices: triple.action ? [triple.action] : [],
+        whom_choices: triple.whom ? [triple.whom] : [],
+        extracted_at: new Date().toISOString(),
+      },
+    };
+
+    // Try with submitter first
+    const { data: kase, error } = await supa.from("cases")
+      .insert({ ...row, submitter: userId }).select("id").single();
+
+    if (error || !kase) {
+      // Fallback: try without submitter column (older schema)
+      const { data: kase2, error: error2 } = await supa.from("cases")
+        .insert(row).select("id").single();
+      if (error2 || !kase2) return json(500, { error: error2?.message ?? "insert failed" });
+      // Queue for LLM enrichment
+      await supa.from("extraction_queue").insert({ case_id: kase2.id }).catch(() => {});
+      return json(200, { ok: true, case_id: kase2.id, instant: true, ms: Date.now() - t0 });
+    }
+
+    // Queue for LLM enrichment (reenactment, story, etc.)
+    await supa.from("extraction_queue").insert({ case_id: kase.id }).catch(() => {});
+
+    return json(200, { ok: true, case_id: kase.id, instant: true, ms: Date.now() - t0 });
+  } catch (e) {
+    return json(500, { error: e instanceof Error ? e.message : "unknown error" });
   }
-
-  // rate limit: 5 filings/hour/identity
-  const since = new Date(Date.now() - 3600_000).toISOString();
-  const { count } = await supa.from("cases")
-    .select("id", { count: "exact", head: true })
-    .eq("submitter", userId).gte("created_at", since);
-  if ((count ?? 0) >= 5) return json(429, { error: "filing cooldown, try later" });
-
-  // dedupe by url hash
-  const digest = await crypto.subtle.digest("SHA-1",
-    new TextEncoder().encode(parsed.href));
-  const externalId = "web:" + Array.from(new Uint8Array(digest))
-    .map((x) => x.toString(16).padStart(2, "0")).join("").slice(0, 20);
-  const { data: existing } = await supa.from("cases").select("id, status")
-    .eq("external_id", externalId).maybeSingle();
-  if (existing) return json(200, { ok: true, dedupe: true, case_id: existing.id });
-
-  // Fetch and extract (deterministic, fast)
-  const article = await fetchArticle(parsed.href);
-  const combinedText = article ? `${article.title} ${article.text}` : parsed.hostname;
-  const sourceTier = /\.(gov|mil|edu)$/.test(parsed.hostname) ? 1 : 2;
-
-  const impact = extractImpact(combinedText, sourceTier);
-  const triple = extractTriple(combinedText);
-  const org = extractOrg(combinedText);
-
-  // Build case row - go straight to 'live' with basic extraction
-  // Note: schema uses 'faction' not 'category' - faction is heaven/hell/unaligned
-  const row = {
-    external_id: externalId,
-    raw_title: article?.title || `Filed from ${parsed.hostname}`,
-    title: article?.title || `AI deployment at ${org || parsed.hostname}`,
-    source_url: parsed.href,
-    source_tier: sourceTier,
-    faction: "unaligned", // Deterministic extraction can't judge good/evil
-    impact,
-    status: "live", // Instant live! Not staged.
-    extraction: {
-      deterministic: true,
-      who_choices: triple.who ? [triple.who] : [],
-      action_choices: triple.action ? [triple.action] : [],
-      whom_choices: triple.whom ? [triple.whom] : [],
-      extracted_at: new Date().toISOString(),
-    },
-    submitter: userId,
-  };
-
-  const { data: kase, error } = await supa.from("cases")
-    .insert(row).select("id").single();
-
-  if (error || !kase) {
-    // Fallback: try without submitter column (older schema)
-    const { submitter, ...rowNoSubmitter } = row;
-    const { data: kase2, error: error2 } = await supa.from("cases")
-      .insert(rowNoSubmitter).select("id").single();
-    if (error2 || !kase2) return json(500, { error: error2?.message ?? "insert failed" });
-    // Queue for LLM enrichment
-    await supa.from("extraction_queue").insert({ case_id: kase2.id }).catch(() => {});
-    return json(200, { ok: true, case_id: kase2.id, instant: true, ms: Date.now() - t0 });
-  }
-
-  // Queue for LLM enrichment (reenactment, story, etc.)
-  await supa.from("extraction_queue").insert({ case_id: kase.id }).catch(() => {});
-
-  return json(200, { ok: true, case_id: kase.id, instant: true, ms: Date.now() - t0 });
 });
