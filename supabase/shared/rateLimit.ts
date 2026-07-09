@@ -18,7 +18,7 @@
  * Source: TASKS.md Phase 0, Task 0.3
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from 'npm:@supabase/supabase-js@2';
 import { UCAR_CONFIG } from '../../config/economy.ts';
 
 /**
