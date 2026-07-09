@@ -155,6 +155,64 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 #myCasesWidget .mc-remove{font-size:18px;color:var(--muted);cursor:pointer;
   padding:4px;line-height:1;background:none;border:none}
 #myCasesWidget .mc-remove:hover{color:var(--horns)}
+/* State indicators for My Cases */
+#myCasesWidget .mc-status.processing{background:var(--accent);animation:pulse 1.2s infinite}
+#myCasesWidget .mc-status.done{background:var(--halo)}
+#myCasesWidget .mc-status.failed{background:var(--horns)}
+#myCasesWidget .mc-status-wrap{position:relative;width:16px;height:16px;flex-shrink:0}
+#myCasesWidget .mc-spinner{position:absolute;inset:0;border:2px solid var(--line);
+  border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;display:none}
+#myCasesWidget .mc-item[data-state="pending"] .mc-spinner,
+#myCasesWidget .mc-item[data-state="processing"] .mc-spinner{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+#myCasesWidget .mc-quote{font-size:10px;font-style:italic;color:var(--muted);
+  margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#myCasesWidget .mc-retry{font-size:10px;color:var(--horns);background:none;
+  border:1px solid var(--horns);border-radius:4px;padding:2px 6px;cursor:pointer;margin-top:2px}
+/* Selected case panel */
+#myCasesWidget .mc-selected{display:none;padding:12px;border-bottom:2px solid var(--line);background:var(--bg)}
+#myCasesWidget.has-selected .mc-selected{display:block}
+#myCasesWidget.has-selected .mc-list{max-height:120px}
+.mc-selected-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.mc-back{background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;padding:4px 8px}
+.mc-selected-state{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:4px}
+.mc-selected-state.pending{background:var(--muted);color:var(--bg)}
+.mc-selected-state.processing{background:var(--accent);color:var(--bg)}
+.mc-selected-state.done{background:var(--halo);color:var(--bg)}
+.mc-selected-state.failed{background:var(--horns);color:#fff}
+.mc-selected-title{font-size:15px;margin:0 0 6px;line-height:1.3}
+.mc-selected-meta{font-size:11px;color:var(--muted);display:flex;gap:12px}
+.mc-selected-url{color:var(--accent);text-decoration:underline}
+.mc-progress{margin:12px 0;text-align:center;font-size:12px;color:var(--muted)}
+.mc-progress-bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:6px}
+.mc-progress-bar::after{content:'';display:block;width:30%;height:100%;background:var(--accent);animation:progress-slide 1.5s infinite}
+@keyframes progress-slide{0%{transform:translateX(-100%)}100%{transform:translateX(400%)}}
+.mc-selected-body{margin:10px 0}
+.mc-selected-summary{font-size:13px;line-height:1.45;margin-bottom:8px}
+.mc-selected-quote{font-family:Georgia,serif;font-style:italic;font-size:12px;color:var(--muted);
+  border-left:3px solid var(--accent);padding-left:10px;margin:8px 0}
+.mc-selected-triple{font-size:11px;color:var(--accent);letter-spacing:0.5px}
+.mc-error{text-align:center;padding:12px}
+.mc-error-msg{display:block;color:var(--horns);font-size:12px;margin-bottom:8px}
+.mc-retry-big{background:var(--horns);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer}
+.mc-selected-actions{display:flex;gap:8px;margin-top:10px}
+.mc-action-btn{flex:1;padding:8px;border:2px solid var(--fg);border-radius:8px;
+  background:var(--fg);color:var(--bg);font-size:11px;font-weight:700;cursor:pointer}
+.mc-action-btn.secondary{background:transparent;color:var(--fg)}
+/* MINE ALL Button */
+.mine-all-btn{display:none;width:100%;padding:16px 24px;margin:12px 0;
+  background:linear-gradient(135deg,var(--horns),#ff4444);border:3px solid var(--horns);
+  border-radius:14px;color:#fff;font-size:18px;font-weight:900;letter-spacing:2px;
+  text-transform:uppercase;cursor:pointer;animation:mine-pulse 2s infinite;
+  box-shadow:0 4px 20px rgba(255,68,68,0.4);transition:transform 0.15s,box-shadow 0.15s;
+  align-items:center;justify-content:center}
+.mine-all-btn:hover{transform:scale(1.02);box-shadow:0 6px 30px rgba(255,68,68,0.6)}
+.mine-all-btn:active{transform:scale(0.98)}
+.mine-all-btn.mining{animation:none;background:var(--muted);cursor:not-allowed}
+.mine-all-btn .mine-icon{margin-right:8px;font-size:22px}
+.mine-all-btn .mine-count{margin-left:8px;opacity:0.8}
+@keyframes mine-pulse{0%,100%{box-shadow:0 4px 20px rgba(255,68,68,0.4)}
+  50%{box-shadow:0 4px 40px rgba(255,68,68,0.8),0 0 60px rgba(255,68,68,0.3)}}
 /* categories */
 .catrow{display:flex;gap:8px;overflow-x:auto;padding:8px 2px 10px;
   -webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -335,6 +393,7 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
   <div id="latency"></div>
   <!-- My Cases widget (personal case list) -->
   <div id="myCasesWidget">
+    <div class="mc-selected" id="mcSelected"></div>
     <div class="mc-header" onclick="toggleMyCases()">
       <span class="mc-title">📋 My Cases <span class="mc-count"></span></span>
       <div class="mc-actions" onclick="event.stopPropagation()">
@@ -504,7 +563,7 @@ function playNotifSound(){
 }
 let originalTitle='Use Case Arms Race - The AI Use Case Registry';
 function updateTitleBadge(){
-  const pendingCount=MY_CASES.filter(c=>c.status==='pending').length;
+  const pendingCount=MY_CASES.filter(c=>c.state==='pending'||c.state==='processing').length;
   const savedCount=MY_CASES.length;
   if(pendingCount>0){
     document.title='('+pendingCount+' pending) '+originalTitle.split(' - ')[0];
@@ -973,14 +1032,17 @@ function clearSearch(){
 }
 /* ============ MY CASES (personal case list + pending filings) ============ */
 let MY_CASES=[];
+let SELECTED_CASE_ID=null;
+let MINING_IN_PROGRESS=false;
 try{MY_CASES=JSON.parse(localStorage.getItem('ucar_mycases')||'[]');}catch(e){}
 function saveMyCases(){try{localStorage.setItem('ucar_mycases',JSON.stringify(MY_CASES));}catch(e){}}
 
-function addToMyCases(c,status='saved'){
+function addToMyCases(c,state='saved'){
   /* c can be a full case object or {id,url,title} for pending */
   const existing=MY_CASES.find(x=>x.id===c.id);
   if(existing){
-    Object.assign(existing,c,{status});
+    Object.assign(existing,c);
+    existing.state=state;
     existing.updated_at=Date.now();
   }else{
     MY_CASES.unshift({
@@ -991,7 +1053,9 @@ function addToMyCases(c,status='saved'){
       faction:c.faction||'unaligned',
       source_url:c.source_url||c.url||'',
       modifier_terms:c.modifier_terms||[],
-      status,
+      quote:c.article_quote||null,
+      error:null,
+      state,
       added_at:Date.now()
     });
   }
@@ -1001,12 +1065,121 @@ function addToMyCases(c,status='saved'){
 
 function removeFromMyCases(id){
   MY_CASES=MY_CASES.filter(c=>c.id!==id);
+  if(SELECTED_CASE_ID===id)deselectMyCase();
   saveMyCases();renderMyCases();updateTitleBadge();
 }
 
-function updateMyCaseStatus(id,status){
+function updateCaseState(id,state,data={}){
   const c=MY_CASES.find(x=>x.id===id);
-  if(c){c.status=status;c.updated_at=Date.now();saveMyCases();renderMyCases();updateTitleBadge();}
+  if(c){
+    c.state=state;
+    if(data.quote)c.quote=data.quote;
+    if(data.summary)c.summary=data.summary;
+    if(data.title)c.title=data.title;
+    if(data.canonical)c.canonical=data.canonical;
+    if(data.error)c.error=data.error;
+    c.updated_at=Date.now();
+    saveMyCases();
+    renderMyCases();
+    if(SELECTED_CASE_ID===id)renderSelectedCase();
+    updateTitleBadge();
+  }
+}
+
+function selectMyCase(id){
+  SELECTED_CASE_ID=id;
+  const widget=document.getElementById('myCasesWidget');
+  widget.classList.add('has-selected');
+  renderSelectedCase();
+}
+
+function deselectMyCase(){
+  SELECTED_CASE_ID=null;
+  const widget=document.getElementById('myCasesWidget');
+  widget.classList.remove('has-selected');
+  document.getElementById('mcSelected').innerHTML='';
+}
+
+function renderSelectedCase(){
+  const panel=document.getElementById('mcSelected');
+  if(!SELECTED_CASE_ID){panel.innerHTML='';return;}
+  const c=MY_CASES.find(x=>x.id===SELECTED_CASE_ID);
+  if(!c){panel.innerHTML='';return;}
+  const full=CACHE.get(c.id)||c;
+  const state=c.state||'saved';
+  const stateLabels={pending:'Filing...',processing:'Processing',done:'Ready',failed:'Failed',saved:'Saved'};
+  const domain=domainOf(c.source_url||c.url||'');
+  const timeAgo=c.added_at?getTimeAgo(c.added_at):'';
+  const triple=full.canonical?`${full.canonical.who} → ${full.canonical.action} → ${full.canonical.whom}`:'';
+
+  let bodyHtml='';
+  if(state==='pending'||state==='processing'){
+    bodyHtml=`<div class="mc-progress"><div class="mc-progress-bar"></div><span>Extracting case details...</span></div>`;
+  }else if(state==='done'||state==='saved'){
+    bodyHtml=`<div class="mc-selected-body">
+      <div class="mc-selected-summary">${esc(c.summary||full.summary||'')}</div>
+      ${c.quote||full.article_quote?`<blockquote class="mc-selected-quote">"${esc((c.quote||full.article_quote||'').slice(0,200))}"</blockquote>`:''}
+      ${triple?`<div class="mc-selected-triple">${esc(triple)}</div>`:''}
+    </div>`;
+  }else if(state==='failed'){
+    bodyHtml=`<div class="mc-error">
+      <span class="mc-error-msg">${esc(c.error||'Extraction failed')}</span>
+      <button class="mc-retry-big" onclick="retryCase('${c.id}')">Retry Extraction</button>
+    </div>`;
+  }
+
+  panel.innerHTML=`
+    <div class="mc-selected-header">
+      <button class="mc-back" onclick="deselectMyCase()">← Back</button>
+      <span class="mc-selected-state ${state}">${stateLabels[state]||state}</span>
+    </div>
+    <h3 class="mc-selected-title">${esc(c.title||'Pending...')}</h3>
+    <div class="mc-selected-meta">
+      <a href="${esc(c.source_url||c.url||'#')}" target="_blank" rel="noopener" class="mc-selected-url">${esc(domain)}</a>
+      <span class="mc-selected-time">${timeAgo}</span>
+    </div>
+    ${bodyHtml}
+    <div class="mc-selected-actions">
+      <button class="mc-action-btn" onclick="viewFullCase('${c.id}')">View Full Case</button>
+      <button class="mc-action-btn secondary" onclick="shareCase('${c.id}')">Share</button>
+    </div>
+  `;
+}
+
+function getTimeAgo(ts){
+  const diff=Date.now()-ts;
+  const mins=Math.floor(diff/60000);
+  if(mins<1)return 'just now';
+  if(mins<60)return mins+'m ago';
+  const hrs=Math.floor(mins/60);
+  if(hrs<24)return hrs+'h ago';
+  const days=Math.floor(hrs/24);
+  return days+'d ago';
+}
+
+function viewFullCase(id){
+  deselectMyCase();
+  viewMyCase(id);
+}
+
+function shareCase(id){
+  const c=MY_CASES.find(x=>x.id===id);
+  if(!c)return;
+  const url='https://usecasearmsrace.com/#case='+id;
+  const text=c.title+'\n'+url;
+  if(navigator.share){
+    navigator.share({title:c.title,text,url}).catch(()=>{});
+  }else{
+    navigator.clipboard.writeText(text).then(()=>toast('Link copied!'));
+  }
+}
+
+async function retryCase(id){
+  const c=MY_CASES.find(x=>x.id===id);
+  if(!c)return;
+  updateCaseState(id,'pending',{error:null});
+  const ok=await fileURLForMining(c.source_url||c.url,id);
+  if(!ok)updateCaseState(id,'failed',{error:'Could not reach server'});
 }
 
 function renderMyCases(){
@@ -1016,16 +1189,28 @@ function renderMyCases(){
   if(!MY_CASES.length){widget.classList.remove('on');return;}
   widget.classList.add('on');
   if(countEl)countEl.textContent='('+MY_CASES.length+')';
-  list.innerHTML=MY_CASES.map(c=>`
-    <div class="mc-item" data-id="${c.id}">
-      <span class="mc-status ${c.status}"></span>
-      <div class="mc-info" onclick="viewMyCase('${c.id}')">
+  list.innerHTML=MY_CASES.map(c=>{
+    const state=c.state||'saved';
+    const domain=domainOf(c.source_url||c.url||'');
+    const metaText=state==='pending'?' • extracting...':(state==='processing'?' • processing...':(state==='failed'?' • failed':''));
+    const quoteSnippet=(state==='done'||state==='saved')&&c.quote?`<div class="mc-quote">"${esc(c.quote.slice(0,60))}..."</div>`:'';
+    const retryBtn=state==='failed'?`<button class="mc-retry" onclick="event.stopPropagation();retryCase('${c.id}')">↻ Retry</button>`:'';
+    return `
+    <div class="mc-item" data-id="${c.id}" data-state="${state}">
+      <div class="mc-status-wrap">
+        <span class="mc-status ${state}"></span>
+        <span class="mc-spinner"></span>
+      </div>
+      <div class="mc-info" onclick="selectMyCase('${c.id}')">
         <div class="mc-title-text">${esc(c.title||'Pending...')}</div>
-        <div class="mc-meta">${esc(domainOf(c.source_url||c.url)||'')}${c.status==='pending'?' • extracting...':(c.status==='error'?' • failed':'')}</div>
+        <div class="mc-meta">${esc(domain)}${metaText}</div>
+        ${quoteSnippet}
+        ${retryBtn}
       </div>
       <button class="mc-remove" onclick="event.stopPropagation();removeFromMyCases('${c.id}')" title="Remove">×</button>
     </div>
-  `).join('');
+  `;}).join('');
+  if(SELECTED_CASE_ID)renderSelectedCase();
 }
 
 function toggleMyCases(){
@@ -1118,9 +1303,212 @@ function exportMyCases(format){
 
 /* Legacy alias for pending filings */
 function addPending(url,id){addToMyCases({id,url,title:'Filing: '+domainOf(url)},'pending');}
-function updatePendingStatus(id,status){updateMyCaseStatus(id,status);}
+function updatePendingStatus(id,status){
+  const stateMap={ready:'done',error:'failed',pending:'pending'};
+  updateCaseState(id,stateMap[status]||status);
+}
 function viewPendingCase(id){viewMyCase(id);}
 function renderPending(){renderMyCases();}/* compatibility */
+
+/* ============ MINE ALL FEATURE ============ */
+async function mineAllWebResults(){
+  if(MINING_IN_PROGRESS)return;
+  const unfiledHits=lastWeb.filter(w=>w.url&&w.url!=='#'&&!w.filed);
+  if(!unfiledHits.length){toast('No web results to mine');return;}
+
+  MINING_IN_PROGRESS=true;
+  const btn=document.getElementById('mineAllBtn');
+  if(btn){
+    btn.classList.add('mining');
+    btn.querySelector('.mine-text').textContent='MINING';
+  }
+
+  const total=unfiledHits.length;
+  let completed=0;
+  const concurrencyLimit=3;
+  const queue=[...unfiledHits];
+  const active=[];
+
+  async function processOne(hit){
+    /* Generate temp ID for tracking */
+    const tempId='mine_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+
+    /* Add to MY_CASES immediately with pending state */
+    addToMyCases({
+      id:tempId,
+      url:hit.url,
+      source_url:hit.url,
+      title:hit.title||'Mining: '+domainOf(hit.url)
+    },'pending');
+
+    try{
+      const ok=await fileURLForMining(hit.url,tempId);
+      if(ok){
+        hit.filed=true;
+      }else{
+        updateCaseState(tempId,'failed',{error:'Could not file URL'});
+      }
+    }catch(e){
+      updateCaseState(tempId,'failed',{error:e.message||'Network error'});
+    }
+
+    completed++;
+    if(btn){
+      btn.querySelector('.mine-count').textContent=`(${completed}/${total})`;
+    }
+  }
+
+  /* Process with concurrency limit */
+  async function worker(){
+    while(queue.length){
+      const hit=queue.shift();
+      if(hit)await processOne(hit);
+    }
+  }
+
+  const workers=[];
+  for(let i=0;i<Math.min(concurrencyLimit,queue.length);i++){
+    workers.push(worker());
+  }
+  await Promise.all(workers);
+
+  MINING_IN_PROGRESS=false;
+  if(btn){
+    btn.classList.remove('mining');
+    btn.querySelector('.mine-text').textContent='MINE ALL';
+    btn.querySelector('.mine-count').textContent='';
+  }
+  renderResults(currentQuery());
+  toast('Mined '+total+' web results');
+}
+
+async function fileURLForMining(url,tempId){
+  if(DEMO){
+    /* Demo mode: simulate success after delay */
+    await new Promise(r=>setTimeout(r,1500));
+    updateCaseState(tempId,'done',{
+      quote:'This is a demo quote from the mined article.',
+      summary:'Demo summary of the case details extracted from '+domainOf(url)
+    });
+    return true;
+  }
+
+  try{
+    const d=await api('file-case',{url});
+    if(d.ok){
+      /* Update temp ID to real case ID */
+      const c=MY_CASES.find(x=>x.id===tempId);
+      if(c&&d.case_id){
+        c.id=d.case_id;
+        saveMyCases();
+      }
+
+      if(d.instant&&d.case_id){
+        /* Instant extraction - fetch full case data */
+        try{
+          const cd=await api('search-cases',{id:d.case_id});
+          const fullCase=(cd.results||[])[0];
+          if(fullCase){
+            CACHE.set(fullCase.id,fullCase);
+            updateCaseState(d.case_id,'done',{
+              title:fullCase.title,
+              quote:fullCase.article_quote,
+              summary:fullCase.summary,
+              canonical:fullCase.canonical
+            });
+          }else{
+            updateCaseState(d.case_id,'done');
+          }
+        }catch(e){
+          updateCaseState(d.case_id,'done');
+        }
+        return true;
+      }
+
+      /* Need to poll for completion */
+      if(d.case_id){
+        pollCaseWithStateUpdates(d.case_id);
+      }
+      return true;
+    }
+
+    if(d.dedupe&&d.case_id){
+      /* Already exists - update our record */
+      const c=MY_CASES.find(x=>x.id===tempId);
+      if(c){
+        c.id=d.case_id;
+        saveMyCases();
+      }
+      /* Fetch the existing case */
+      try{
+        const cd=await api('search-cases',{id:d.case_id});
+        const fullCase=(cd.results||[])[0];
+        if(fullCase){
+          CACHE.set(fullCase.id,fullCase);
+          updateCaseState(d.case_id,'done',{
+            title:fullCase.title,
+            quote:fullCase.article_quote,
+            summary:fullCase.summary,
+            canonical:fullCase.canonical
+          });
+        }
+      }catch(e){}
+      return true;
+    }
+
+    return false;
+  }catch(e){
+    return false;
+  }
+}
+
+async function pollCaseWithStateUpdates(id){
+  /* Request notification permission on first file if not already asked */
+  if(!NOTIF.asked&&'Notification' in window&&Notification.permission==='default'){
+    requestNotifPermission();
+  }
+
+  /* Update to processing state on first poll attempt */
+  updateCaseState(id,'processing');
+
+  for(let i=0;i<20;i++){
+    await new Promise(r=>setTimeout(r,3000));
+    try{
+      const d=await api('search-cases',{id});
+      const c=(d.results||[])[0];
+      if(c&&c.status==='live'){
+        CACHE.set(c.id,c);
+        updateCaseState(id,'done',{
+          title:c.title,
+          quote:c.article_quote,
+          summary:c.summary,
+          canonical:c.canonical
+        });
+        /* Send browser notification */
+        sendBrowserNotification(
+          'Case Ready',
+          c.title?.slice(0,80)||'Your filed case is ready to view',
+          ()=>location.hash='case='+id
+        );
+        playNotifSound();
+        return;
+      }
+    }catch(e){}
+  }
+  updateCaseState(id,'failed',{error:'Extraction timed out'});
+}
+
+function showMineAllButton(){
+  const btn=document.getElementById('mineAllBtn');
+  if(!btn)return;
+  const unfiledCount=lastWeb.filter(w=>w.url&&w.url!=='#'&&!w.filed).length;
+  if(unfiledCount>0&&!MINING_IN_PROGRESS){
+    btn.style.display='flex';
+    btn.querySelector('.mine-count').textContent='('+unfiledCount+')';
+  }else{
+    btn.style.display='none';
+  }
+}
 
 async function fileCaseFromSearch(url){
   const btn=document.getElementById('qclear');
@@ -1203,8 +1591,8 @@ async function boot(){
       (data.results||[]).forEach(c=>CACHE.set(c.id,c));}catch(e){}
   }
   renderCategories();renderResults('');renderMyCases();updateTitleBadge();
-  /* Resume polling for any pending cases */
-  MY_CASES.filter(c=>c.status==='pending').forEach(c=>pollCaseStatus(c.id));
+  /* Resume polling for any pending/processing cases */
+  MY_CASES.filter(c=>c.state==='pending'||c.state==='processing').forEach(c=>pollCaseWithStateUpdates(c.id));
 }
 /* categories from the live cache */
 function renderCategories(){
@@ -1241,6 +1629,20 @@ function renderResults(q){
     const d=document.createElement('div');d.className='divider';
     d.textContent=webFresh?'FROM THE WEB':'FROM THE WEB • cached';
     host.appendChild(d);
+
+    /* Add MINE ALL button */
+    const unfiledCount=lastWeb.filter(w=>w.url&&w.url!=='#'&&!w.filed).length;
+    if(unfiledCount>0){
+      const mineBtn=document.createElement('button');
+      mineBtn.id='mineAllBtn';
+      mineBtn.className='mine-all-btn'+(MINING_IN_PROGRESS?' mining':'');
+      mineBtn.onclick=mineAllWebResults;
+      mineBtn.innerHTML=`<span class="mine-icon">⛏️</span><span class="mine-text">${MINING_IN_PROGRESS?'MINING':'MINE ALL'}</span><span class="mine-count">(${unfiledCount})</span>`;
+      mineBtn.style.display='flex';
+      mineBtn.style.gridColumn='1 / -1';
+      host.appendChild(mineBtn);
+    }
+
     for(const w of lastWeb){
       const el=document.createElement('div');el.className='webhit'+(w.filed?' filed':'');
       el.innerHTML='<a href="'+esc(w.url)+'" target="_blank" rel="noopener">'+esc(w.title)+'</a>'
@@ -1401,13 +1803,20 @@ async function pollCaseStatus(id){
   if(!NOTIF.asked&&'Notification' in window&&Notification.permission==='default'){
     requestNotifPermission();
   }
+  /* Update to processing state */
+  updateCaseState(id,'processing');
   for(let i=0;i<20;i++){/* poll up to ~60s */
     await new Promise(r=>setTimeout(r,3000));
     try{
       const d=await api('search-cases',{id});
       const c=(d.results||[])[0];
       if(c&&c.status==='live'){
-        updatePendingStatus(id,'ready',true);
+        updateCaseState(id,'done',{
+          title:c.title,
+          quote:c.article_quote,
+          summary:c.summary,
+          canonical:c.canonical
+        });
         CACHE.set(c.id,c);
         /* Send browser notification */
         sendBrowserNotification(
@@ -1422,7 +1831,7 @@ async function pollCaseStatus(id){
       }
     }catch(e){}
   }
-  updatePendingStatus(id,'error');
+  updateCaseState(id,'failed',{error:'Extraction timed out'});
 }
 
 /* ============ MODIFIER SHEET ============ */

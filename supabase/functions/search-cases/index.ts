@@ -227,18 +227,37 @@ async function webSearch(q: string) {
   const cached = webCache.get(q);
   if (cached && Date.now() - cached.t < WEB_TTL) return cached.r;
 
+  // Always add AI context to searches for relevance
+  const aiQuery = /\b(ai|artificial intelligence|machine learning|algorithm|automated)\b/i.test(q)
+    ? q
+    : `${q} AI artificial intelligence`;
+
   const out: { title: string; url: string; domain: string; snippet: string }[] = [];
   if (TAVILY_KEY) {
     try {
       const r = await fetch("https://api.tavily.com/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ api_key: TAVILY_KEY, query: q, search_depth: "basic", topic: "news", max_results: 6 }),
-        signal: AbortSignal.timeout(2000)
+        body: JSON.stringify({
+          api_key: TAVILY_KEY,
+          query: aiQuery,
+          search_depth: "basic",
+          topic: "news",
+          max_results: 8,
+          include_domains: [], // could restrict to news domains
+          exclude_domains: ["pinterest.com", "instagram.com", "tiktok.com", "youtube.com"]
+        }),
+        signal: AbortSignal.timeout(3000)
       });
       if (r.ok) {
         const data = await r.json();
         for (const item of data.results ?? []) {
+          // Filter out obviously irrelevant results
+          const title = (item.title ?? "").toLowerCase();
+          const snippet = (item.content ?? "").toLowerCase();
+          const hasAI = /\b(ai|artificial intelligence|machine learning|algorithm|automat|facial|recognition|surveillance|predict)\b/.test(title + " " + snippet);
+          if (!hasAI) continue; // Skip non-AI results
+
           out.push({
             title: item.title ?? "",
             url: item.url ?? "",
@@ -249,18 +268,22 @@ async function webSearch(q: string) {
       }
     } catch (_) {}
   }
-  // Fallback to Google News if Tavily fails
+  // Fallback to Google News if Tavily fails or returns nothing
   if (!out.length) {
     try {
-      const r = await fetch("https://news.google.com/rss/search?q=" + encodeURIComponent(q) + "&hl=en-US&gl=US&ceid=US:en",
+      const r = await fetch("https://news.google.com/rss/search?q=" + encodeURIComponent(aiQuery) + "&hl=en-US&gl=US&ceid=US:en",
         { signal: AbortSignal.timeout(1500) });
       if (r.ok) {
         const xml = await r.text();
-        for (const it of (xml.match(/<item>[\s\S]*?<\/item>/g) ?? []).slice(0, 6)) {
+        for (const it of (xml.match(/<item>[\s\S]*?<\/item>/g) ?? []).slice(0, 8)) {
           const title = ((it.match(/<title>([\s\S]*?)<\/title>/) ?? [])[1] ?? "").replace(/<[^>]*>/g, "");
           const url = (it.match(/<link>([\s\S]*?)<\/link>/) ?? [])[1] ?? "";
           const domain = (it.match(/<source url="([^"]*)"/) ?? [])[1] ?? "";
-          if (url) out.push({ title, url, domain, snippet: "" });
+          // Filter for AI relevance
+          if (/\b(ai|artificial|intelligence|machine|learning|algorithm|automat|facial|recognition|surveillance|predict)\b/i.test(title)) {
+            if (url) out.push({ title, url, domain, snippet: "" });
+          }
+        }
         }
       }
     } catch (_) {}
