@@ -89,11 +89,16 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 #loadquotes::before{content:'CASE NOTES';position:absolute;top:0;right:0;
   background:var(--fg);color:var(--bg);font-size:9px;letter-spacing:2px;
   padding:3px 10px;border-radius:0 10px 0 8px;font-weight:700}
+#loadquotes .lq-wrap{position:relative;min-height:48px}
 #loadquotes .lq{font-size:14.5px;line-height:1.55;color:var(--fg);
-  font-weight:500;animation:fadeQuote .35s ease;padding-right:60px}
+  font-weight:500;padding-right:60px;opacity:1;transition:opacity .3s ease}
+#loadquotes .lq.fade-out{opacity:0}
 #loadquotes .lq-src{font-size:11px;color:var(--muted);margin-top:6px;
-  letter-spacing:.5px;text-transform:uppercase}
-@keyframes fadeQuote{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+  letter-spacing:.5px;text-transform:uppercase;opacity:1;transition:opacity .3s ease}
+#loadquotes .lq-src.fade-out{opacity:0}
+#loadquotes .lq-stat{font-size:13px;color:var(--accent);font-weight:700;
+  letter-spacing:.5px;padding-right:60px;opacity:1;transition:opacity .3s ease}
+#loadquotes .lq-stat.fade-out{opacity:0}
 #loadgame{border:2px solid var(--fg);border-radius:12px;padding:14px 16px;
   background:var(--card);position:relative}
 #loadgame::before{content:'⚡ QUICK';position:absolute;top:0;right:0;
@@ -128,10 +133,28 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 #pendingWidget .pw-status.ready{background:var(--halo)}
 #pendingWidget .pw-status.error{background:var(--horns)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes readyPulse{
+  0%,100%{box-shadow:0 0 0 0 var(--halo)}
+  50%{box-shadow:0 0 0 8px transparent}
+}
+@keyframes readyBounce{
+  0%,100%{transform:scale(1)}
+  25%{transform:scale(1.02)}
+  50%{transform:scale(1)}
+  75%{transform:scale(1.01)}
+}
+#pendingWidget.has-ready{animation:readyBounce .6s ease;border-color:var(--halo)}
 #pendingWidget .pw-url{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   color:var(--muted)}
 #pendingWidget .pw-action{font-size:11px;font-weight:700;color:var(--accent);
   cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
+#pendingWidget .pw-item.just-ready{animation:readyPulse 1s ease 2}
+#pendingWidget .pw-status.ready{animation:pulse 1s infinite}
+/* Notification settings toggle */
+.pw-settings{display:flex;gap:12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--muted)}
+.pw-toggle{display:flex;align-items:center;gap:4px;cursor:pointer}
+.pw-toggle input{width:14px;height:14px;cursor:pointer}
 /* categories */
 .catrow{display:flex;gap:8px;overflow-x:auto;padding:8px 2px 10px;
   -webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -389,6 +412,78 @@ function toast(msg,opts={}){const t=document.getElementById('toast');
   clearTimeout(t._h);
   if(!opts.sticky)t._h=setTimeout(()=>t.style.display='none',opts.action?5000:2600);
 }
+
+/* ================= NOTIFICATION SYSTEM ================= */
+const NOTIF={
+  permission:null,/* 'granted'|'denied'|'default'|'never-ask' */
+  sound:false,
+  asked:false
+};
+try{
+  const saved=JSON.parse(localStorage.getItem('ucar_notif')||'{}');
+  NOTIF.permission=saved.permission||null;
+  NOTIF.sound=!!saved.sound;
+  NOTIF.asked=!!saved.asked;
+}catch(e){}
+function saveNotifPrefs(){
+  try{localStorage.setItem('ucar_notif',JSON.stringify({
+    permission:NOTIF.permission,sound:NOTIF.sound,asked:NOTIF.asked
+  }));}catch(e){}
+}
+function getNotifPermission(){
+  if(!('Notification' in window))return 'unsupported';
+  return Notification.permission;
+}
+async function requestNotifPermission(){
+  if(!('Notification' in window))return 'unsupported';
+  if(NOTIF.permission==='never-ask')return 'denied';
+  if(Notification.permission==='granted'){
+    NOTIF.permission='granted';NOTIF.asked=true;saveNotifPrefs();return 'granted';
+  }
+  if(Notification.permission==='denied'){
+    NOTIF.permission='denied';NOTIF.asked=true;saveNotifPrefs();return 'denied';
+  }
+  const result=await Notification.requestPermission();
+  NOTIF.permission=result;NOTIF.asked=true;saveNotifPrefs();
+  return result;
+}
+function sendBrowserNotification(title,body,onClick){
+  if(getNotifPermission()!=='granted')return;
+  try{
+    const n=new Notification(title,{
+      body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="24" font-size="24">📁</text></svg>',
+      tag:'ucar-case',renotify:true
+    });
+    if(onClick)n.onclick=()=>{window.focus();onClick();n.close();};
+    setTimeout(()=>n.close(),8000);
+  }catch(e){}
+}
+function playNotifSound(){
+  if(!NOTIF.sound)return;
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const osc=ctx.createOscillator();
+    const gain=ctx.createGain();
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.type='sine';osc.frequency.setValueAtTime(880,ctx.currentTime);
+    osc.frequency.setValueAtTime(1100,ctx.currentTime+0.1);
+    gain.gain.setValueAtTime(0.15,ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.3);
+    osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.3);
+  }catch(e){}
+}
+let originalTitle='Use Case Arms Race - The AI Use Case Registry';
+function updateTitleBadge(){
+  const pendingReady=PENDING.filter(p=>p.status==='ready').length;
+  const pendingPending=PENDING.filter(p=>p.status==='pending').length;
+  const total=pendingReady+pendingPending;
+  if(total>0){
+    document.title='('+total+') '+originalTitle.split(' - ')[0];
+  }else{
+    document.title=originalTitle;
+  }
+}
+
 function api(path,body,extra){
   return fetch(CONFIG.FN(path),{method:'POST',
     headers:Object.assign({'Content-Type':'application/json',
@@ -607,56 +702,201 @@ function renderParse(p){
 
 /* ============ SEARCH: instant local + fast path + streaming web ======== */
 let topupTimer=null,webTimer=null,webToken=0,webFresh=false;
-let quoteTimer=null,currentGame=null;
+let quoteTimer=null,currentGame=null,loadScreenStartTime=0,loadScreenShown=false;
 
 /* --- Loading screen: quotes + minigame --- */
-function getQuotes(){
-  /* Pull article_quote from cached cases, shuffle */
-  return [...CACHE.values()]
+function getQuotes(searchQuery){
+  /* Pull article_quote from cached cases */
+  const allQuotes=[...CACHE.values()]
     .filter(c=>c.article_quote&&c.article_quote.length>30)
-    .map(c=>({q:c.article_quote,src:c.source_url?domainOf(c.source_url):'',title:c.title}))
-    .sort(()=>Math.random()-.5);
-}
-function showLoadScreen(on){
-  document.getElementById('loadscreen').classList.toggle('on',on);
-  if(!on){clearInterval(quoteTimer);quoteTimer=null;return;}
-  const quotes=getQuotes();
-  let qi=0;
-  function nextQuote(){
-    if(!quotes.length)return;
-    const qh=document.getElementById('loadquotes');
-    const quote=quotes[qi%quotes.length];qi++;
-    qh.innerHTML='<div class="lq">"'+esc(quote.q.slice(0,200)+(quote.q.length>200?'…':'')+'"</div>'
-      +'<div class="lq-src">— '+esc(quote.src||'case notes')+'</div>';
+    .map(c=>({
+      q:c.article_quote,
+      src:c.source_url?domainOf(c.source_url):'',
+      title:c.title,
+      category:c.category,
+      text:(c.article_quote+' '+c.title+' '+(c.category||'')).toLowerCase()
+    }));
+
+  /* If search query provided, prefer quotes with matching words */
+  if(searchQuery&&searchQuery.length>=3){
+    const words=searchQuery.toLowerCase().split(/\s+/).filter(w=>w.length>=3);
+    if(words.length){
+      /* Score quotes by how many query words they contain */
+      allQuotes.forEach(q=>{
+        q.relevance=words.filter(w=>q.text.includes(w)).length;
+      });
+      /* Sort by relevance (desc), then shuffle within same relevance */
+      allQuotes.sort((a,b)=>b.relevance-a.relevance||Math.random()-.5);
+      return allQuotes;
+    }
   }
-  nextQuote();
-  quoteTimer=setInterval(nextQuote,1800);
+  /* Default: shuffle randomly */
+  return allQuotes.sort(()=>Math.random()-.5);
+}
+
+function getRegistryStats(){
+  /* Generate live stats from the cache */
+  const stats=[];
+  const total=CACHE.size;
+  if(total>0)stats.push(total+' cases in the registry');
+
+  /* Count by category */
+  const catCounts={};
+  const weekAgo=Date.now()-7*864e5;
+  let recentCount=0;
+  for(const c of CACHE.values()){
+    if(c.category)catCounts[c.category]=(catCounts[c.category]||0)+1;
+    if(c.created_at&&new Date(c.created_at)>weekAgo)recentCount++;
+  }
+  if(recentCount>0)stats.push(recentCount+' new case'+(recentCount>1?'s':'')+' this week');
+
+  /* Top categories */
+  const topCats=Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  for(const [cat,n] of topCats){
+    stats.push(n+' '+cat.toLowerCase()+' case'+(n>1?'s':''));
+  }
+
+  /* Vote stats */
+  let totalVotes=0;
+  for(const c of CACHE.values()){
+    totalVotes+=(c.heaven_votes||0)+(c.hell_votes||0);
+  }
+  if(totalVotes>0)stats.push(totalVotes+' total votes cast');
+
+  return stats.sort(()=>Math.random()-.5);
+}
+
+function showLoadScreen(on,searchQuery){
+  const el=document.getElementById('loadscreen');
+
+  if(!on){
+    /* Check if we should skip (results arrived in <100ms) */
+    if(loadScreenShown&&(performance.now()-loadScreenStartTime)<100){
+      el.classList.remove('on');
+      clearInterval(quoteTimer);quoteTimer=null;
+      loadScreenShown=false;
+      return;
+    }
+    el.classList.remove('on');
+    clearInterval(quoteTimer);quoteTimer=null;
+    loadScreenShown=false;
+    return;
+  }
+
+  loadScreenStartTime=performance.now();
+  loadScreenShown=true;
+  el.classList.add('on');
+
+  const quotes=getQuotes(searchQuery);
+  const stats=getRegistryStats();
+  let qi=0,si=0;
+
+  function crossfadeContent(renderFn){
+    const qh=document.getElementById('loadquotes');
+    const existing=qh.querySelectorAll('.lq,.lq-src,.lq-stat');
+
+    /* Fade out existing content */
+    existing.forEach(el=>el.classList.add('fade-out'));
+
+    setTimeout(()=>{
+      /* Render new content */
+      renderFn(qh);
+      /* Elements start visible due to CSS transition */
+    },300);
+  }
+
+  function nextItem(){
+    /* Alternate: show stat every 3rd item if stats available */
+    const shouldShowStat=stats.length>0&&(qi+si)%3===2;
+
+    crossfadeContent(qh=>{
+      if(shouldShowStat&&stats.length>0){
+        const stat=stats[si%stats.length];si++;
+        qh.innerHTML='<div class="lq-stat">'+esc(stat)+'</div>';
+      }else if(quotes.length){
+        const quote=quotes[qi%quotes.length];qi++;
+        qh.innerHTML='<div class="lq">"'+esc(quote.q.slice(0,200)+(quote.q.length>200?'...':'')+'"</div>'
+          +'<div class="lq-src">— '+esc(quote.src||'case notes')+'</div>';
+      }
+    });
+  }
+
+  /* Initial render (no fade for first item) */
+  const qh=document.getElementById('loadquotes');
+  if(quotes.length){
+    const quote=quotes[0];qi=1;
+    qh.innerHTML='<div class="lq">"'+esc(quote.q.slice(0,200)+(quote.q.length>200?'...':'')+'"</div>'
+      +'<div class="lq-src">— '+esc(quote.src||'case notes')+'</div>';
+  }else if(stats.length){
+    qh.innerHTML='<div class="lq-stat">'+esc(stats[0])+'</div>';si=1;
+  }
+
+  clearInterval(quoteTimer);
+  quoteTimer=setInterval(nextItem,2200);/* Slightly longer to allow for transition */
+
   /* Set up minigame */
   setupMiniGame();
 }
+
 function setupMiniGame(){
   const gh=document.getElementById('loadgame');
-  /* Pick a random case with extraction choices */
-  const cases=[...CACHE.values()].filter(c=>c.extraction&&
+
+  /* Get cases with different data for different game types */
+  const casesWithChoices=[...CACHE.values()].filter(c=>c.extraction&&
     (c.extraction.who_choices||c.extraction.whom_choices));
-  if(!cases.length){gh.innerHTML='';return;}
-  const c=cases[Math.floor(Math.random()*cases.length)];
-  const ex=c.extraction||{};
-  /* Randomly pick WHO or WHOM game */
-  const isWho=Math.random()>.5&&ex.who_choices?.length;
-  const choices=isWho?(ex.who_choices||[]):(ex.whom_choices||[]);
-  const correct=choices[0];/* first is usually the right one */
-  if(!correct||choices.length<2){gh.innerHTML='';return;}
-  /* Shuffle and take 3 */
-  const opts=[...choices].sort(()=>Math.random()-.5).slice(0,3);
-  if(!opts.includes(correct))opts[0]=correct;
-  opts.sort(()=>Math.random()-.5);
-  currentGame={caseId:c.id,correct,isWho};
-  gh.innerHTML='<div class="lg-title">'+(isWho?'WHO DEPLOYED?':'WHO IS AFFECTED?')+'</div>'
-    +'<div class="lg-q">"'+esc((c.raw_title||c.title||'').slice(0,120))+'"</div>'
-    +'<div class="lg-opts">'+opts.map(o=>
-      '<button class="lg-opt" onclick="pickGameOpt(this,\''+esc(o)+'\')">'+esc(o)+'</button>'
-    ).join('')+'</div>';
+  const casesWithCategory=[...CACHE.values()].filter(c=>c.category&&c.title);
+
+  if(!casesWithChoices.length&&!casesWithCategory.length){gh.innerHTML='';return;}
+
+  /* Get unique categories for category game */
+  const categories=[...new Set([...CACHE.values()].map(c=>c.category).filter(Boolean))];
+
+  /* Randomly pick game type: WHO/WHOM (60%) or CATEGORY (40%) */
+  const gameRoll=Math.random();
+  const playWhoWhom=gameRoll<0.6&&casesWithChoices.length>0;
+  const playCategoryGame=!playWhoWhom&&categories.length>=3&&casesWithCategory.length>0;
+
+  if(playWhoWhom){
+    /* Original WHO/WHOM game */
+    const c=casesWithChoices[Math.floor(Math.random()*casesWithChoices.length)];
+    const ex=c.extraction||{};
+    const isWho=Math.random()>.5&&ex.who_choices?.length;
+    const choices=isWho?(ex.who_choices||[]):(ex.whom_choices||[]);
+    const correct=choices[0];
+    if(!correct||choices.length<2){gh.innerHTML='';return;}
+
+    const opts=[...choices].sort(()=>Math.random()-.5).slice(0,3);
+    if(!opts.includes(correct))opts[0]=correct;
+    opts.sort(()=>Math.random()-.5);
+
+    currentGame={caseId:c.id,correct,type:isWho?'who':'whom'};
+    gh.innerHTML='<div class="lg-title">'+(isWho?'WHO DEPLOYED?':'WHO IS AFFECTED?')+'</div>'
+      +'<div class="lg-q">"'+esc((c.raw_title||c.title||'').slice(0,120))+'"</div>'
+      +'<div class="lg-opts">'+opts.map(o=>
+        '<button class="lg-opt" onclick="pickGameOpt(this,\''+esc(o).replace(/'/g,"\\'")+'\')">'+esc(o)+'</button>'
+      ).join('')+'</div>';
+
+  }else if(playCategoryGame){
+    /* New CATEGORY game: show title, pick category */
+    const c=casesWithCategory[Math.floor(Math.random()*casesWithCategory.length)];
+    const correct=c.category;
+
+    /* Get 2 wrong categories */
+    const wrongCats=categories.filter(cat=>cat!==correct).sort(()=>Math.random()-.5).slice(0,2);
+    if(wrongCats.length<2){gh.innerHTML='';return;}
+
+    const opts=[correct,...wrongCats].sort(()=>Math.random()-.5);
+
+    currentGame={caseId:c.id,correct,type:'category'};
+    gh.innerHTML='<div class="lg-title">WHAT CATEGORY?</div>'
+      +'<div class="lg-q">"'+esc((c.title||'').slice(0,120))+'"</div>'
+      +'<div class="lg-opts">'+opts.map(o=>
+        '<button class="lg-opt" onclick="pickGameOpt(this,\''+esc(o).replace(/'/g,"\\'")+'\')">'+esc(o)+'</button>'
+      ).join('')+'</div>';
+
+  }else{
+    gh.innerHTML='';
+  }
 }
 function pickGameOpt(btn,answer){
   if(!currentGame)return;
@@ -671,7 +911,7 @@ function pickGameOpt(btn,answer){
   /* Emit signal to graph (fire and forget) */
   if(!DEMO)api('search-cases',{signal:{
     case_id:currentGame.caseId,
-    terms:[answer,currentGame.isWho?'who':'whom'],
+    terms:[answer,currentGame.type],
     event:answer===correct?'vote':'open'
   }}).catch(()=>{});
   currentGame=null;
@@ -708,11 +948,18 @@ function addPending(url,id){
   PENDING=PENDING.filter(p=>p.url!==url);/* no dupes */
   PENDING.unshift({url,id,status:'pending',filed_at:Date.now()});
   if(PENDING.length>10)PENDING.pop();
-  savePending();renderPending();
+  savePending();renderPending();updateTitleBadge();
 }
-function updatePendingStatus(id,status){
+function updatePendingStatus(id,status,isNew=false){
   const p=PENDING.find(x=>x.id===id);
-  if(p){p.status=status;savePending();renderPending();}
+  if(p){
+    const wasNotReady=p.status!=='ready';
+    p.status=status;
+    p.justReady=isNew&&status==='ready'&&wasNotReady;
+    savePending();renderPending();updateTitleBadge();
+    /* Clear justReady flag after animation */
+    if(p.justReady)setTimeout(()=>{p.justReady=false;renderPending();},2500);
+  }
 }
 function renderPending(){
   const widget=document.getElementById('pendingWidget');
@@ -720,21 +967,59 @@ function renderPending(){
   /* Prune old ones (>1 hour) */
   const cutoff=Date.now()-3600000;
   PENDING=PENDING.filter(p=>p.filed_at>cutoff||p.status==='ready');
-  savePending();
-  if(!PENDING.length){widget.classList.remove('on');return;}
+  savePending();updateTitleBadge();
+  if(!PENDING.length){widget.classList.remove('on');widget.classList.remove('has-ready');return;}
   widget.classList.add('on');
+  /* Add highlight class if any cases are ready */
+  const hasReady=PENDING.some(p=>p.status==='ready');
+  widget.classList.toggle('has-ready',hasReady);
   list.innerHTML=PENDING.map(p=>`
-    <div class="pw-item">
+    <div class="pw-item${p.justReady?' just-ready':''}">
       <span class="pw-status ${p.status}"></span>
       <span class="pw-url">${esc(domainOf(p.url)||p.url)}</span>
-      ${p.status==='ready'?`<span class="pw-action" onclick="viewPendingCase('${p.id}')">VIEW →</span>`:''}
-      ${p.status==='pending'?'<span style="color:var(--muted);font-size:11px">extracting…</span>':''}
+      ${p.status==='ready'?`<span class="pw-action" onclick="viewPendingCase('${p.id}')">VIEW</span>`:''}
+      ${p.status==='pending'?'<span style="color:var(--muted);font-size:11px">extracting...</span>':''}
       ${p.status==='error'?'<span style="color:var(--horns);font-size:11px">failed</span>':''}
     </div>
   `).join('');
+  /* Notification settings row */
+  const notifSupported='Notification' in window;
+  const notifGranted=getNotifPermission()==='granted';
+  const notifDenied=getNotifPermission()==='denied'||NOTIF.permission==='never-ask';
+  list.innerHTML+=`
+    <div class="pw-settings">
+      ${notifSupported&&!notifDenied?`
+        <label class="pw-toggle" title="Browser notifications when cases are ready">
+          <input type="checkbox" id="notifToggle" ${notifGranted?'checked':''} onchange="toggleNotifications(this.checked)">
+          <span>Notify</span>
+        </label>
+      `:''}
+      <label class="pw-toggle" title="Play a sound when cases are ready">
+        <input type="checkbox" id="soundToggle" ${NOTIF.sound?'checked':''} onchange="toggleSound(this.checked)">
+        <span>Sound</span>
+      </label>
+    </div>
+  `;
+}
+function toggleNotifications(on){
+  if(on){
+    requestNotifPermission().then(result=>{
+      if(result!=='granted'){
+        const el=document.getElementById('notifToggle');
+        if(el)el.checked=false;
+        toast('Notifications blocked by browser');
+      }
+    });
+  }else{
+    NOTIF.permission='never-ask';saveNotifPrefs();
+  }
+}
+function toggleSound(on){
+  NOTIF.sound=on;saveNotifPrefs();
+  if(on)playNotifSound();/* preview the sound */
 }
 function viewPendingCase(id){
-  PENDING=PENDING.filter(p=>p.id!==id);savePending();renderPending();
+  PENDING=PENDING.filter(p=>p.id!==id);savePending();renderPending();updateTitleBadge();
   location.hash='case='+id;
 }
 async function fileCaseFromSearch(url){
@@ -759,7 +1044,7 @@ document.getElementById('q').addEventListener('input',()=>{
   clearTimeout(topupTimer);clearTimeout(webTimer);
   if(isURL(q)){showLoadScreen(false);return;}
   /* Show loading screen while fetching (only if we have quotes to show) */
-  if(q.length>=3&&CACHE.size>5)showLoadScreen(true);
+  if(q.length>=3&&CACHE.size>5)showLoadScreen(true,q);
   else showLoadScreen(false);
   topupTimer=setTimeout(()=>topUp(q),160);
   if(q.length>=4)webTimer=setTimeout(()=>webStream(q),240);
@@ -817,7 +1102,7 @@ async function boot(){
     try{const data=await api('search-cases',{browse:true});
       (data.results||[]).forEach(c=>CACHE.set(c.id,c));}catch(e){}
   }
-  renderCategories();renderResults('');renderPending();
+  renderCategories();renderResults('');renderPending();updateTitleBadge();
   /* Resume polling for any pending cases */
   PENDING.filter(p=>p.status==='pending').forEach(p=>pollCaseStatus(p.id));
 }
@@ -980,15 +1265,27 @@ async function fileURL(url){
   }catch(e){toast('Could not reach the registry.');return false;}
 }
 async function pollCaseStatus(id){
+  /* Request notification permission on first file if not already asked */
+  if(!NOTIF.asked&&'Notification' in window&&Notification.permission==='default'){
+    requestNotifPermission();
+  }
   for(let i=0;i<20;i++){/* poll up to ~60s */
     await new Promise(r=>setTimeout(r,3000));
     try{
       const d=await api('search-cases',{id});
       const c=(d.results||[])[0];
       if(c&&c.status==='live'){
-        updatePendingStatus(id,'ready');
+        updatePendingStatus(id,'ready',true);
         CACHE.set(c.id,c);
-        toast('✓ Case ready: '+c.title?.slice(0,50),{sticky:true,action:()=>location.hash='case='+id});
+        /* Send browser notification */
+        sendBrowserNotification(
+          'Case Ready',
+          c.title?.slice(0,80)||'Your filed case is ready to view',
+          ()=>location.hash='case='+id
+        );
+        /* Play sound if enabled */
+        playNotifSound();
+        toast('Case ready: '+c.title?.slice(0,50),{sticky:true,action:()=>location.hash='case='+id});
         return;
       }
     }catch(e){}
