@@ -1,0 +1,68 @@
+[
+  {
+    "id": "test-case-1",
+    "title": "Federal Agency Catalogs Location Data of Drivers Nationwide",
+    "summary": "Commercial license plate readers deployed by law enforcement partners collect location data on millions of drivers without warrants.",
+    "subject": "ATF + Flock Safety",
+    "verb": "catalogs location data of",
+    "object": "drivers nationwide",
+    "category": "surveillance",
+    "impact": 4,
+    "faction": "hell",
+    "good_votes": 12,
+    "evil_votes": 88,
+    "status": "machine_verified",
+    "source_url": "https://example.com/source1",
+    "source_quality": "trustworthy",
+    "story_arc": "panopticon",
+    "modifiers": {
+      "who": ["government", "commercial", "federal"],
+      "action": ["secretly", "systematically"],
+      "whom": ["citizens", "without consent"]
+    }
+  },
+  {
+    "id": "test-case-2",
+    "title": "Hospital AI Flags Patient for Early Sepsis Detection",
+    "summary": "Machine learning model analyzes vital signs to predict sepsis hours before symptoms appear, improving survival rates.",
+    "subject": "Major Hospital System",
+    "verb": "predicts sepsis onset for",
+    "object": "ICU patients",
+    "category": "healthcare",
+    "impact": 5,
+    "faction": "heaven",
+    "good_votes": 92,
+    "evil_votes": 8,
+    "status": "machine_verified",
+    "source_url": "https://example.com/source2",
+    "source_quality": "trustworthy",
+    "story_arc": "black_box",
+    "modifiers": {
+      "who": ["healthcare", "hospital"],
+      "action": ["automatically", "early detection"],
+      "whom": ["patients", "ICU"]
+    }
+  },
+  {
+    "id": "test-case-3",
+    "title": "School District Surveils Students via Chromebook Webcams",
+    "summary": "Remote learning software grants administrators access to student webcams and screens during school hours.",
+    "subject": "Public School District",
+    "verb": "surveils activities of",
+    "object": "students via webcam",
+    "category": "education",
+    "impact": 3,
+    "faction": "hell",
+    "good_votes": 25,
+    "evil_votes": 75,
+    "status": "machine_verified",
+    "source_url": "https://example.com/source3",
+    "source_quality": "mixed",
+    "story_arc": "panopticon",
+    "modifiers": {
+      "who": ["education", "school", "public"],
+      "action": ["remote", "during school hours"],
+      "whom": ["minors", "students"]
+    }
+  }
+]

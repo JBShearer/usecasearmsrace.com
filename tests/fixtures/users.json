@@ -1,0 +1,26 @@
+[
+  {
+    "id": "test-user-1",
+    "wallet_id": "test-wallet-1",
+    "did": "did:ebl:test1",
+    "reputation": 150,
+    "rank": "verified",
+    "access_level": "public",
+    "cases_submitted": 5,
+    "triples_extracted": 12,
+    "triples_best": 3,
+    "votes_correct": 8
+  },
+  {
+    "id": "test-user-2",
+    "wallet_id": "test-wallet-2",
+    "did": "did:ebl:test2",
+    "reputation": 550,
+    "rank": "expert",
+    "access_level": "full",
+    "cases_submitted": 25,
+    "triples_extracted": 75,
+    "triples_best": 18,
+    "votes_correct": 60
+  }
+]
