@@ -284,7 +284,6 @@ async function webSearch(q: string) {
             if (url) out.push({ title, url, domain, snippet: "" });
           }
         }
-        }
       }
     } catch (_) {}
   }
