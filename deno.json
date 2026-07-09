@@ -1,0 +1,41 @@
+{
+  "tasks": {
+    "test": "deno test --allow-net --allow-env --allow-read tests/",
+    "test:phase0": "deno test tests/phase0/",
+    "test:u1": "deno test tests/phase-u1/",
+    "test:u2": "deno test tests/phase-u2/",
+    "test:u3": "deno test tests/phase-u3/",
+    "test:ebl1": "deno test tests/phase-ebl1/",
+    "test:show": "deno test tests/phase-show/",
+    "test:all": "deno test tests/**/*.test.ts",
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+    "dev": "deno run --watch --allow-net --allow-env --allow-read supabase/functions/dev.ts"
+  },
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.39.0",
+    "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",
+    "@std/testing": "https://deno.land/std@0.224.0/testing/mod.ts",
+    "anthropic": "npm:@anthropic-ai/sdk@^0.20.0"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "allowJs": true,
+    "lib": ["deno.window", "dom"]
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": true
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "test": {
+    "include": ["tests/**/*.test.ts"]
+  }
+}
