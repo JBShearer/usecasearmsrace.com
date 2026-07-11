@@ -60,17 +60,10 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 /* ============ SEARCH ============ */
 .searchwrap{position:sticky;top:66px;z-index:25;background:var(--bg);
   padding:6px 0 4px}
-.qbox{position:relative}
 #q{width:100%;background:var(--card);color:var(--fg);
-  border:2.5px solid var(--fg);border-radius:14px;padding:15px 44px 15px 16px;
+  border:2.5px solid var(--fg);border-radius:14px;padding:15px 16px;
   font:inherit;min-height:52px;font-size:17px}
 #q::placeholder{color:var(--muted)}
-.qclear{position:absolute;right:12px;top:50%;transform:translateY(-50%);
-  width:36px;height:36px;border:none;background:var(--muted);color:var(--bg);
-  border-radius:50%;font-size:18px;line-height:1;cursor:pointer;display:none;
-  align-items:center;justify-content:center;font-weight:700}
-.qclear.on{display:flex}
-.qclear.file{background:var(--accent);font-size:15px}
 #parseRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 #parseRow:empty{display:none}
 .pchip{border:1.5px solid var(--accent);color:var(--accent);border-radius:9px;
@@ -79,147 +72,17 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 .pchip b{font-weight:800}
 .pchip.free{border-style:dashed;color:var(--muted)}
 #latency{color:var(--muted);font-size:11px;letter-spacing:1px;margin:6px 2px 2px}
-/* ============ LOADING SCREEN (quotes + minigame) ============ */
-#loadscreen{display:none;margin:12px 0}
-#loadscreen.on{display:block;animation:snapIn .15s ease}
-@keyframes snapIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-#loadquotes{min-height:64px;border:2px solid var(--fg);border-left-width:4px;
-  padding:12px 16px;margin-bottom:10px;background:var(--card);border-radius:12px;
-  position:relative;overflow:hidden}
-#loadquotes::before{content:'CASE NOTES';position:absolute;top:0;right:0;
-  background:var(--fg);color:var(--bg);font-size:9px;letter-spacing:2px;
-  padding:3px 10px;border-radius:0 10px 0 8px;font-weight:700}
-#loadquotes .lq-wrap{position:relative;min-height:48px}
-#loadquotes .lq{font-size:14.5px;line-height:1.55;color:var(--fg);
-  font-weight:500;padding-right:60px;opacity:1;transition:opacity .3s ease}
-#loadquotes .lq.fade-out{opacity:0}
-#loadquotes .lq-src{font-size:11px;color:var(--muted);margin-top:6px;
-  letter-spacing:.5px;text-transform:uppercase;opacity:1;transition:opacity .3s ease}
-#loadquotes .lq-src.fade-out{opacity:0}
-#loadquotes .lq-stat{font-size:13px;color:var(--accent);font-weight:700;
-  letter-spacing:.5px;padding-right:60px;opacity:1;transition:opacity .3s ease}
-#loadquotes .lq-stat.fade-out{opacity:0}
-#loadgame{border:2px solid var(--fg);border-radius:12px;padding:14px 16px;
-  background:var(--card);position:relative}
-#loadgame::before{content:'⚡ QUICK';position:absolute;top:0;right:0;
-  background:var(--accent);color:var(--bg);font-size:9px;letter-spacing:1px;
-  padding:3px 10px;border-radius:0 10px 0 8px;font-weight:700}
-#loadgame .lg-title{font-size:11px;letter-spacing:2px;color:var(--accent);
-  text-transform:uppercase;margin-bottom:6px;font-weight:700}
-#loadgame .lg-q{font-size:14px;line-height:1.45;margin-bottom:12px;
-  padding-right:50px;font-weight:500}
-#loadgame .lg-opts{display:flex;gap:8px;flex-wrap:wrap}
-#loadgame .lg-opt{border:2.5px solid var(--fg);border-radius:10px;padding:10px 16px;
-  font-size:12.5px;font-weight:700;cursor:pointer;background:var(--bg);
-  min-width:90px;text-align:center;letter-spacing:.3px;text-transform:uppercase;
-  transition:all .1s}
-#loadgame .lg-opt:hover{background:var(--fg);color:var(--bg);transform:scale(1.03)}
-#loadgame .lg-opt:active{transform:scale(.97)}
-#loadgame .lg-opt.picked{background:var(--accent);border-color:var(--accent);color:#fff}
-#loadgame .lg-opt.correct{background:var(--halo);border-color:var(--halo);color:#000}
-#loadgame .lg-opt.wrong{opacity:.4;transform:scale(.95)}
-/* ============ MY CASES WIDGET (personal case list) ============ */
-#myCasesWidget{display:none;margin:10px 0;padding:12px 14px;
-  border:2px solid var(--fg);border-radius:12px;background:var(--card)}
-#myCasesWidget.on{display:block}
-#myCasesWidget.collapsed .mc-list{display:none}
-#myCasesWidget.collapsed .mc-toggle{transform:rotate(-90deg)}
-#myCasesWidget.collapsed{padding:10px 14px}
-#myCasesWidget .mc-header{display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:8px;cursor:pointer}
-#myCasesWidget.collapsed .mc-header{margin-bottom:0}
-#myCasesWidget .mc-title{font-size:10px;letter-spacing:2px;color:var(--fg);
-  text-transform:uppercase;font-weight:700}
-#myCasesWidget .mc-count{color:var(--muted);font-weight:400}
-#myCasesWidget .mc-actions{display:flex;gap:6px}
-#myCasesWidget .mc-btn{font-size:10px;letter-spacing:1px;text-transform:uppercase;
-  background:none;border:1.5px solid var(--fg);border-radius:6px;padding:4px 8px;
-  cursor:pointer;font-weight:600}
-#myCasesWidget .mc-btn:hover{background:var(--fg);color:var(--bg)}
-#myCasesWidget .mc-toggle{border:none;padding:4px 6px;transition:transform .2s}
-#myCasesWidget .mc-list{display:flex;flex-direction:column;gap:4px;max-height:200px;
-  overflow-y:auto}
-#myCasesWidget .mc-item{display:flex;align-items:center;gap:8px;
-  font-size:12.5px;padding:8px;border-radius:8px;background:var(--bg)}
-#myCasesWidget .mc-item:hover{background:var(--line)}
-#myCasesWidget .mc-status{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-#myCasesWidget .mc-status.pending{background:var(--muted);animation:pulse 1.5s infinite}
-#myCasesWidget .mc-status.ready{background:var(--halo)}
-#myCasesWidget .mc-status.error{background:var(--horns)}
-#myCasesWidget .mc-status.saved{background:var(--fg)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-#myCasesWidget .mc-info{flex:1;overflow:hidden;cursor:pointer}
-#myCasesWidget .mc-title-text{font-weight:600;white-space:nowrap;overflow:hidden;
-  text-overflow:ellipsis;font-size:12px}
-#myCasesWidget .mc-meta{font-size:10px;color:var(--muted)}
-#myCasesWidget .mc-remove{font-size:18px;color:var(--muted);cursor:pointer;
-  padding:4px;line-height:1;background:none;border:none}
-#myCasesWidget .mc-remove:hover{color:var(--horns)}
-/* State indicators for My Cases */
-#myCasesWidget .mc-status.processing{background:var(--accent);animation:pulse 1.2s infinite}
-#myCasesWidget .mc-status.done{background:var(--halo)}
-#myCasesWidget .mc-status.failed{background:var(--horns)}
-#myCasesWidget .mc-status-wrap{position:relative;width:16px;height:16px;flex-shrink:0}
-#myCasesWidget .mc-spinner{position:absolute;inset:0;border:2px solid var(--line);
-  border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;display:none}
-#myCasesWidget .mc-item[data-state="pending"] .mc-spinner,
-#myCasesWidget .mc-item[data-state="processing"] .mc-spinner{display:block}
-@keyframes spin{to{transform:rotate(360deg)}}
-#myCasesWidget .mc-quote{font-size:10px;font-style:italic;color:var(--muted);
-  margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#myCasesWidget .mc-retry{font-size:10px;color:var(--horns);background:none;
-  border:1px solid var(--horns);border-radius:4px;padding:2px 6px;cursor:pointer;margin-top:2px}
-/* Selected case panel */
-#myCasesWidget .mc-selected{display:none;padding:12px;border-bottom:2px solid var(--line);background:var(--bg)}
-#myCasesWidget.has-selected .mc-selected{display:block}
-#myCasesWidget.has-selected .mc-list{max-height:120px}
-.mc-selected-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.mc-back{background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;padding:4px 8px}
-.mc-selected-state{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:4px}
-.mc-selected-state.pending{background:var(--muted);color:var(--bg)}
-.mc-selected-state.processing{background:var(--accent);color:var(--bg)}
-.mc-selected-state.done{background:var(--halo);color:var(--bg)}
-.mc-selected-state.failed{background:var(--horns);color:#fff}
-.mc-selected-title{font-size:15px;margin:0 0 6px;line-height:1.3}
-.mc-selected-meta{font-size:11px;color:var(--muted);display:flex;gap:12px}
-.mc-selected-url{color:var(--accent);text-decoration:underline}
-.mc-progress{margin:12px 0;text-align:center;font-size:12px;color:var(--muted)}
-.mc-progress-bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:6px}
-.mc-progress-bar::after{content:'';display:block;width:30%;height:100%;background:var(--accent);animation:progress-slide 1.5s infinite}
-@keyframes progress-slide{0%{transform:translateX(-100%)}100%{transform:translateX(400%)}}
-.mc-selected-body{margin:10px 0}
-.mc-selected-summary{font-size:13px;line-height:1.45;margin-bottom:8px}
-.mc-selected-quote{font-family:Georgia,serif;font-style:italic;font-size:12px;color:var(--muted);
-  border-left:3px solid var(--accent);padding-left:10px;margin:8px 0}
-.mc-selected-triple{font-size:11px;color:var(--accent);letter-spacing:0.5px}
-.mc-error{text-align:center;padding:12px}
-.mc-error-msg{display:block;color:var(--horns);font-size:12px;margin-bottom:8px}
-.mc-retry-big{background:var(--horns);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer}
-.mc-selected-actions{display:flex;gap:8px;margin-top:10px}
-.mc-action-btn{flex:1;padding:8px;border:2px solid var(--fg);border-radius:8px;
-  background:var(--fg);color:var(--bg);font-size:11px;font-weight:700;cursor:pointer}
-.mc-action-btn.secondary{background:transparent;color:var(--fg)}
-.mc-close{background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0 4px}
-.mc-close:hover{color:var(--fg)}
-.mc-vote-row{display:flex;gap:8px;margin-top:10px}
-.mc-vote{flex:1;padding:8px 12px;border:2px solid var(--line);border-radius:8px;
-  background:transparent;font-size:12px;cursor:pointer;transition:all .15s}
-.mc-vote.halo:hover{border-color:var(--halo);background:rgba(76,175,80,0.1)}
-.mc-vote.horns:hover{border-color:var(--horns);background:rgba(244,67,54,0.1)}
-/* MINE ALL Button */
-.mine-all-btn{display:none;width:100%;padding:16px 24px;margin:12px 0;
-  background:linear-gradient(135deg,var(--horns),#ff4444);border:3px solid var(--horns);
-  border-radius:14px;color:#fff;font-size:18px;font-weight:900;letter-spacing:2px;
-  text-transform:uppercase;cursor:pointer;animation:mine-pulse 2s infinite;
-  box-shadow:0 4px 20px rgba(255,68,68,0.4);transition:transform 0.15s,box-shadow 0.15s;
-  align-items:center;justify-content:center}
-.mine-all-btn:hover{transform:scale(1.02);box-shadow:0 6px 30px rgba(255,68,68,0.6)}
-.mine-all-btn:active{transform:scale(0.98)}
-.mine-all-btn.mining{animation:none;background:var(--muted);cursor:not-allowed}
-.mine-all-btn .mine-icon{margin-right:8px;font-size:22px}
-.mine-all-btn .mine-count{margin-left:8px;opacity:0.8}
-@keyframes mine-pulse{0%,100%{box-shadow:0 4px 20px rgba(255,68,68,0.4)}
-  50%{box-shadow:0 4px 40px rgba(255,68,68,0.8),0 0 60px rgba(255,68,68,0.3)}}
+#expandRow{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;align-items:center}
+#expandRow:empty{display:none}
+.xlabel{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.xchip{border:1.5px dotted var(--muted);color:var(--muted);border-radius:9px;
+  padding:4px 9px;font-size:11px;cursor:pointer;background:none;letter-spacing:.3px}
+.xchip:hover{border-color:var(--accent);color:var(--accent)}
+.xchip.off{text-decoration:line-through;opacity:.45}
+.xsep{color:var(--line);font-size:12px}
+.fuzzy{font-size:11.5px;color:var(--accent);margin-top:4px}
+.fuzzy button{background:none;border:none;color:var(--muted);cursor:pointer;
+  text-decoration:underline;font-size:11px;padding:0 0 0 6px}
 /* categories */
 .catrow{display:flex;gap:8px;overflow-x:auto;padding:8px 2px 10px;
   -webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -253,8 +116,7 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 .qt{font-family:Georgia,serif;font-style:italic;font-size:13px;color:var(--muted);
   border-left:3px solid var(--accent);padding-left:8px;margin:5px 0 2px}
 .srcline{font-size:12px;color:var(--muted);margin:4px 0 2px}
-.srcline a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
-.srcline a:hover{color:var(--fg)}
+.srcline a{color:var(--muted)}
 /* votes */
 .votecol{position:absolute;top:12px;right:10px;display:flex;flex-direction:column;
   gap:5px;align-items:center}
@@ -279,13 +141,15 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 .mod:hover{border-color:var(--accent);color:var(--accent)}
 .mod.add{border-style:dashed;color:var(--accent);border-color:var(--accent);
   font-weight:800}
-.mod.saved{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 /* expanded detail */
 .detail{display:none;border-top:1.5px dashed var(--line);margin-top:8px;
   padding-top:8px}
 .hit.open .detail{display:block}
 .detail .dlabel{font-size:10.5px;letter-spacing:2px;color:var(--muted);
   text-transform:uppercase;margin:8px 0 4px}
+.detail .grp{margin:5px 0}
+.detail .grp b{font-size:10.5px;letter-spacing:1.5px;color:var(--muted);
+  margin-right:6px}
 .detail a.srcbtn{display:inline-block;border:2px solid var(--fg);border-radius:10px;
   padding:9px 14px;font-size:12.5px;letter-spacing:1px;text-transform:uppercase;
   text-decoration:none;font-weight:800;margin-top:4px}
@@ -293,23 +157,12 @@ main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 .divider{grid-column:1/-1;color:var(--muted);font-size:11px;letter-spacing:3px;
   text-transform:uppercase;border-bottom:1.5px dashed var(--muted);
   padding-bottom:4px;margin:10px 0 0}
-.webhit{border:2px solid var(--fg);border-radius:14px;padding:14px;
-  background:var(--card);box-shadow:0 2px 0 var(--line);position:relative}
-.webhit a{color:var(--accent);text-decoration:underline;text-underline-offset:2px;
-  font-weight:600;display:block;line-height:1.4;font-size:15px}
-.webhit a:hover{color:var(--fg)}
-.webhit .snippet{font-size:13px;color:var(--fg);margin:6px 0;line-height:1.45;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.webhit .meta{font-size:11px;color:var(--muted);margin-top:4px;
-  letter-spacing:.5px;text-transform:uppercase}
-.webhit button{margin-top:10px;background:var(--fg);color:var(--bg);border:none;
-  border-radius:10px;padding:10px 14px;font-size:12px;letter-spacing:1px;
-  text-transform:uppercase;cursor:pointer;font-weight:700}
-.webhit button:hover{background:var(--accent)}
-.webhit.filed{border-color:var(--halo);opacity:0.7}
-.webhit.filed::after{content:'FILED';position:absolute;top:8px;right:8px;
-  font-size:9px;letter-spacing:1px;color:var(--halo);font-weight:700}
-.webhit.filed button{display:none}
+.webhit{border:2px dashed var(--muted);border-radius:14px;padding:12px;
+  background:var(--card)}
+.webhit .meta{font-size:11px;color:var(--muted);margin-top:2px}
+.webhit button{margin-top:8px;background:none;border:1.5px solid var(--fg);
+  border-radius:10px;padding:9px 12px;font-size:11.5px;letter-spacing:1px;
+  text-transform:uppercase;cursor:pointer;font-weight:800}
 button.go{width:100%;margin-top:12px;background:var(--fg);color:var(--bg);
   border:none;border-radius:12px;padding:15px;font:800 14px/1 inherit;
   letter-spacing:2px;text-transform:uppercase;cursor:pointer;min-height:50px}
@@ -317,30 +170,27 @@ button.ghost{width:100%;margin-top:8px;background:transparent;color:var(--fg);
   border:2px solid var(--fg);border-radius:12px;padding:12px;
   font:700 12.5px/1 inherit;letter-spacing:2px;text-transform:uppercase;
   cursor:pointer;min-height:46px}
-/* ============ MODIFIER SHEET (Smart Picker) ============ */
+/* ============ MODIFIER SHEET ============ */
 #sheetveil{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:44;display:none}
 #sheetveil.on{display:block}
 #sheet{position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--card);
   border-top:3px solid var(--fg);border-radius:20px 20px 0 0;
   padding:16px 16px calc(18px + env(safe-area-inset-bottom));
   transform:translateY(105%);transition:transform .22s;max-width:640px;
-  margin:0 auto;max-height:85vh;overflow-y:auto}
+  margin:0 auto}
 #sheet.on{transform:none}
-#sheet .stitle{font-size:14px;letter-spacing:2px;color:var(--fg);
-  text-transform:uppercase;margin-bottom:14px;font-weight:700}
-.sheet-row{margin-bottom:14px}
-.sheet-label{font-size:11px;letter-spacing:1.5px;color:var(--muted);
-  text-transform:uppercase;margin-bottom:6px;font-weight:600}
-.sheet-chips{display:flex;flex-wrap:wrap;gap:6px}
-.sheet-chip{border:2px solid var(--line);border-radius:10px;padding:8px 12px;
-  font-size:12px;cursor:pointer;background:var(--bg);font-weight:500;
-  transition:all .1s}
-.sheet-chip:hover{border-color:var(--fg)}
-.sheet-chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-.sheet-chip.add{border-style:dashed;border-color:var(--accent);color:var(--accent)}
+#sheet .stitle{font-size:12px;letter-spacing:2px;color:var(--muted);
+  text-transform:uppercase;margin-bottom:10px}
+.segrow{display:grid;gap:6px;margin:8px 0}
+.segrow.s4{grid-template-columns:repeat(4,1fr)}
+.seg{border:1.5px solid var(--line);border-radius:10px;padding:9px 4px;
+  font-size:11px;letter-spacing:.5px;cursor:pointer;background:none;
+  text-transform:uppercase;text-align:center}
+.seg.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 #modterm{width:100%;background:var(--bg);color:var(--fg);
-  border:2px solid var(--fg);border-radius:12px;padding:13px;font:inherit}
-#sheet .hint{font-size:11.5px;color:var(--muted);margin:10px 0 6px}
+  border:2px solid var(--fg);border-radius:12px;padding:13px;font:inherit;
+  margin-top:6px}
+#sheet .hint{font-size:11.5px;color:var(--muted);margin-top:6px}
 /* ============ ADMIN ============ */
 .adminbox{background:var(--card);border:2.5px solid var(--fg);border-radius:16px;
   padding:14px;margin:12px 0;max-width:640px}
@@ -363,13 +213,7 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
 .toast{position:fixed;left:50%;transform:translateX(-50%);
   bottom:calc(18px + env(safe-area-inset-bottom));background:var(--fg);
   color:var(--bg);padding:11px 18px;border-radius:12px;font-size:13px;
-  z-index:60;display:none;max-width:90vw;text-align:center;
-  box-shadow:0 4px 20px rgba(0,0,0,.25);animation:toastIn .2s ease}
-@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}
-  to{opacity:1;transform:translateX(-50%) translateY(0)}}
-.toast .toast-action{display:inline-block;margin-left:12px;padding:4px 10px;
-  background:var(--accent);color:#fff;border-radius:6px;font-size:12px;
-  font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
+  z-index:60;display:none;max-width:90vw;text-align:center}
 </style>
 </head>
 <body>
@@ -390,33 +234,13 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
     </div>
   </div>
   <div class="searchwrap">
-    <div class="qbox">
-      <input id="q" placeholder="Search: who did what to whom … or paste a URL to file a case"
-        autocomplete="off" autocapitalize="off">
-      <button id="qclear" class="qclear" onclick="handleClearOrFile()" aria-label="Clear search">×</button>
-    </div>
+    <input id="q" placeholder="Search: who did what to whom … or paste a URL to file a case"
+      autocomplete="off" autocapitalize="off">
     <div id="parseRow"></div>
+    <div id="expandRow"></div>
+    <div class="fuzzy" id="fuzzyRow" style="display:none"></div>
   </div>
   <div id="latency"></div>
-  <!-- My Cases widget (personal case list) -->
-  <div id="myCasesWidget">
-    <div class="mc-selected" id="mcSelected"></div>
-    <div class="mc-header" onclick="toggleMyCases()">
-      <span class="mc-title">📋 My Cases <span class="mc-count"></span></span>
-      <div class="mc-actions" onclick="event.stopPropagation()">
-        <button class="mc-btn" onclick="exportMyCases('csv')">CSV</button>
-        <button class="mc-btn" onclick="exportMyCases('share')">Share</button>
-        <button class="mc-btn" onclick="clearMyCases()">Clear</button>
-        <button class="mc-btn mc-toggle" onclick="toggleMyCases()">▼</button>
-      </div>
-    </div>
-    <div class="mc-list" id="myCasesList"></div>
-  </div>
-  <!-- Loading screen: quotes flash up top, minigame below -->
-  <div id="loadscreen">
-    <div id="loadquotes"></div>
-    <div id="loadgame"></div>
-  </div>
   <div class="catrow" id="catrow"></div>
   <div id="results"></div>
 </section>
@@ -443,45 +267,37 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
     <button class="ghost" onclick="adminClear()">New / clear form</button>
   </div>
   <div class="adminbox" id="eplist" style="display:none"></div>
+  <div class="adminbox" id="crawlbox" style="display:none">
+    <label>Crawler</label>
+    <div id="crawlcounts" style="font-size:13px;color:var(--muted)"></div>
+    <button class="ghost" onclick="crawlRun()">Run a crawl pass now</button>
+    <div id="crawlpending"></div>
+  </div>
 </section>
 
 </main>
 
-<!-- ============ MODIFIER SHEET (Smart Picker) ============ -->
+<!-- ============ MODIFIER SHEET ============ -->
 <div id="sheetveil" onclick="closeSheet()"></div>
 <div id="sheet">
-  <div class="stitle" id="sheetTitle">Refine this case</div>
-
-  <div class="sheet-row">
-    <div class="sheet-label">WHO deployed this?</div>
-    <div class="sheet-chips" id="whoChips"></div>
+  <div class="stitle" id="sheetTitle">Add a modifier</div>
+  <div class="dlabel" style="font-size:10.5px;letter-spacing:2px;color:var(--muted);text-transform:uppercase">Attaches to</div>
+  <div class="segrow s4" id="slotSeg">
+    <button class="seg on" data-v="who">WHO</button>
+    <button class="seg" data-v="action">ACTION</button>
+    <button class="seg" data-v="whom">WHOM</button>
+    <button class="seg" data-v="case">CASE</button>
   </div>
-
-  <div class="sheet-row">
-    <div class="sheet-label">What did they do?</div>
-    <div class="sheet-chips" id="actionChips"></div>
+  <div class="dlabel" style="font-size:10.5px;letter-spacing:2px;color:var(--muted);text-transform:uppercase">Kind</div>
+  <div class="segrow s4" id="kindSeg">
+    <button class="seg on" data-v="adjective">ADJECTIVE</button>
+    <button class="seg" data-v="adverb">ADVERB</button>
+    <button class="seg" data-v="proper_noun">PROPER NOUN</button>
+    <button class="seg" data-v="compound">COMPOUND</button>
   </div>
-
-  <div class="sheet-row">
-    <div class="sheet-label">Who is affected?</div>
-    <div class="sheet-chips" id="whomChips"></div>
-  </div>
-
-  <div class="sheet-row">
-    <div class="sheet-label">Category</div>
-    <div class="sheet-chips" id="categoryChips"></div>
-  </div>
-
-  <div class="sheet-row">
-    <div class="sheet-label">Custom tag</div>
-    <div style="display:flex;gap:8px">
-      <input type="text" id="modterm" placeholder="Add your own term" maxlength="40" style="flex:1">
-      <button class="ghost" onclick="addCustomTag()" style="width:auto;margin:0;padding:10px 14px">Add</button>
-    </div>
-  </div>
-
-  <div class="hint">Select terms that describe this case. Your picks become searchable tags.</div>
-  <button class="go" onclick="submitRefinement()">Save refinements</button>
+  <input type="text" id="modterm" placeholder="e.g. warrantless, Clearview, facial recognition" maxlength="40">
+  <div class="hint">1-3 words. No sentences: contributions here are search vocabulary, not comments. Every accepted term deepens graph traversal for everyone.</div>
+  <button class="go" onclick="submitModifier()">File the modifier</button>
 </div>
 <div class="toast" id="toast"></div>
 <footer>Faction is decided by human votes only. The registry takes no position.<br>
@@ -489,9 +305,12 @@ Community contributions are modifiers: typed terms that grow the graph.</footer>
 <script>
 /* ================= CONFIG ================= */
 const CONFIG = {
-  SUPABASE_URL: "https://evilbrain.tailfa4d8c.ts.net",
-  SUPABASE_ANON_KEY: "",  // Not needed for Jetson API
-  FN: n => CONFIG.SUPABASE_URL + "/functions/v1/" + n,
+  SUPABASE_URL: "https://aslcrwmbdtvimjrexxzw.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls",
+  // API_BASE: set to your own-domain front (https://api.usecasearmsrace.com)
+  // once DNS fronting is live; empty means talk to SUPABASE_URL directly.
+  API_BASE: "",
+  FN: n => (CONFIG.API_BASE || CONFIG.SUPABASE_URL) + "/functions/v1/" + n,
 };
 const DEMO = !CONFIG.SUPABASE_URL;
 document.getElementById('demoflag').textContent = DEMO ? "DEMO MODE" : "";
@@ -501,86 +320,9 @@ function anonId(){
     return id;
   }catch(e){return crypto.randomUUID();}
 }
-function toast(msg,opts={}){const t=document.getElementById('toast');
-  t.innerHTML=esc(msg)+(opts.action?'<span class="toast-action">VIEW</span>':'');
-  if(opts.action)t.querySelector('.toast-action').onclick=()=>{t.style.display='none';opts.action();};
-  t.style.display='block';
-  clearTimeout(t._h);
-  if(!opts.sticky)t._h=setTimeout(()=>t.style.display='none',opts.action?5000:2600);
-}
-
-/* ================= NOTIFICATION SYSTEM ================= */
-const NOTIF={
-  permission:null,/* 'granted'|'denied'|'default'|'never-ask' */
-  sound:false,
-  asked:false
-};
-try{
-  const saved=JSON.parse(localStorage.getItem('ucar_notif')||'{}');
-  NOTIF.permission=saved.permission||null;
-  NOTIF.sound=!!saved.sound;
-  NOTIF.asked=!!saved.asked;
-}catch(e){}
-function saveNotifPrefs(){
-  try{localStorage.setItem('ucar_notif',JSON.stringify({
-    permission:NOTIF.permission,sound:NOTIF.sound,asked:NOTIF.asked
-  }));}catch(e){}
-}
-function getNotifPermission(){
-  if(!('Notification' in window))return 'unsupported';
-  return Notification.permission;
-}
-async function requestNotifPermission(){
-  if(!('Notification' in window))return 'unsupported';
-  if(NOTIF.permission==='never-ask')return 'denied';
-  if(Notification.permission==='granted'){
-    NOTIF.permission='granted';NOTIF.asked=true;saveNotifPrefs();return 'granted';
-  }
-  if(Notification.permission==='denied'){
-    NOTIF.permission='denied';NOTIF.asked=true;saveNotifPrefs();return 'denied';
-  }
-  const result=await Notification.requestPermission();
-  NOTIF.permission=result;NOTIF.asked=true;saveNotifPrefs();
-  return result;
-}
-function sendBrowserNotification(title,body,onClick){
-  if(getNotifPermission()!=='granted')return;
-  try{
-    const n=new Notification(title,{
-      body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="24" font-size="24">📁</text></svg>',
-      tag:'ucar-case',renotify:true
-    });
-    if(onClick)n.onclick=()=>{window.focus();onClick();n.close();};
-    setTimeout(()=>n.close(),8000);
-  }catch(e){}
-}
-function playNotifSound(){
-  if(!NOTIF.sound)return;
-  try{
-    const ctx=new (window.AudioContext||window.webkitAudioContext)();
-    const osc=ctx.createOscillator();
-    const gain=ctx.createGain();
-    osc.connect(gain);gain.connect(ctx.destination);
-    osc.type='sine';osc.frequency.setValueAtTime(880,ctx.currentTime);
-    osc.frequency.setValueAtTime(1100,ctx.currentTime+0.1);
-    gain.gain.setValueAtTime(0.15,ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.3);
-    osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.3);
-  }catch(e){}
-}
-let originalTitle='Use Case Arms Race - The AI Use Case Registry';
-function updateTitleBadge(){
-  const pendingCount=MY_CASES.filter(c=>c.state==='pending'||c.state==='processing').length;
-  const savedCount=MY_CASES.length;
-  if(pendingCount>0){
-    document.title='('+pendingCount+' pending) '+originalTitle.split(' - ')[0];
-  }else if(savedCount>0){
-    document.title='('+savedCount+') '+originalTitle.split(' - ')[0];
-  }else{
-    document.title=originalTitle;
-  }
-}
-
+function toast(msg){const t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600);}
 function api(path,body,extra){
   return fetch(CONFIG.FN(path),{method:'POST',
     headers:Object.assign({'Content-Type':'application/json',
@@ -673,40 +415,7 @@ const DEMO_CASES=[{
 /* ================= STATE ================= */
 const CACHE=new Map();DEMO_CASES.forEach(c=>CACHE.set(c.id,c));
 let CATEGORY=null,MY_VOTES={},OPEN_ID=null,lastWeb=[],lastParsed=null;
-/* Web result cache: stores ALL web results keyed by query fragments.
-   Typing "utah" instantly shows any cached results mentioning "utah".
-   Acts like a local news index that grows with each search. */
-const WEB_INDEX=new Map();/* query -> {hits:[], ts:number} */
-const WEB_TTL=30*60*1000; /* 30 min - news is semi-stable */
-function indexWeb(q,hits){
-  if(!hits||!hits.length)return;
-  const k=q.toLowerCase().trim();
-  WEB_INDEX.set(k,{hits,ts:Date.now()});
-  if(WEB_INDEX.size>150){/* prune oldest */
-    const oldest=[...WEB_INDEX.entries()].sort((a,b)=>a[1].ts-b[1].ts)[0];
-    if(oldest)WEB_INDEX.delete(oldest[0]);}
-}
-function recallWeb(q){
-  /* Return cached web hits that match ANY word in q */
-  const words=q.toLowerCase().split(/\s+/).filter(w=>w.length>=3);
-  if(!words.length)return[];
-  const now=Date.now(),seen=new Set(),out=[];
-  for(const [k,v] of WEB_INDEX){
-    if(now-v.ts>WEB_TTL)continue;/* expired */
-    const keyWords=k.split(/\s+/);
-    const match=words.some(w=>keyWords.some(kw=>kw.includes(w)||w.includes(kw)));
-    if(match)for(const h of v.hits){
-      const sig=h.url||h.title;
-      if(!seen.has(sig)){seen.add(sig);out.push(h);}
-    }
-  }
-  /* Rank by relevance: hits whose title contains query words first */
-  return out.sort((a,b)=>{
-    const aq=words.filter(w=>(a.title||'').toLowerCase().includes(w)).length;
-    const bq=words.filter(w=>(b.title||'').toLowerCase().includes(w)).length;
-    return bq-aq;
-  }).slice(0,12);
-}
+let EXCLUDE=new Set(),NO_FUZZY=false;
 try{MY_VOTES=JSON.parse(localStorage.getItem('ucar_votes')||'{}');}catch(e){}
 function saveVotes(){try{localStorage.setItem('ucar_votes',JSON.stringify(MY_VOTES));}catch(e){}}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
@@ -797,752 +506,55 @@ function renderParse(p){
   for(const f of (p.free||[]))add('?',f,'free');
 }
 
+/* ---- expansion transparency: SEARCHED AS … tap an alternate to drop it */
+function renderExpansion(expanded){
+  const host=document.getElementById('expandRow');host.innerHTML='';
+  if(!expanded)return;
+  const groups=Object.entries(expanded);
+  if(!groups.length)return;
+  const lab=document.createElement('span');lab.className='xlabel';
+  lab.textContent='SEARCHED AS';host.appendChild(lab);
+  groups.forEach(([term,alts],gi)=>{
+    if(gi>0){const s=document.createElement('span');s.className='xsep';
+      s.textContent='|';host.appendChild(s);}
+    const base=document.createElement('span');base.className='xchip';
+    base.style.borderStyle='solid';base.textContent=term;host.appendChild(base);
+    for(const a of alts.slice(0,4)){
+      const c=document.createElement('button');
+      c.className='xchip'+(EXCLUDE.has(a.alt)?' off':'');
+      c.textContent='+ '+a.alt;
+      c.title='weight '+a.weight+' · tap to include/exclude';
+      c.onclick=()=>{
+        if(EXCLUDE.has(a.alt))EXCLUDE.delete(a.alt);else EXCLUDE.add(a.alt);
+        c.classList.toggle('off');
+        clearTimeout(topupTimer);topupTimer=setTimeout(()=>topUp(currentQuery()),80);
+      };
+      host.appendChild(c);
+    }
+  });
+}
+function renderFuzzy(fuzzy){
+  const host=document.getElementById('fuzzyRow');
+  if(!fuzzy||!fuzzy.length){host.style.display='none';host.innerHTML='';return;}
+  host.style.display='block';
+  host.innerHTML='Reading '+fuzzy.map(f=>'“'+esc(f.from)+'” as “'
+    +esc(f.to)+'”').join(', ');
+  const b=document.createElement('button');b.textContent='search literally';
+  b.onclick=()=>{NO_FUZZY=true;host.style.display='none';
+    topUp(currentQuery());};
+  host.appendChild(b);
+}
+
 /* ============ SEARCH: instant local + fast path + streaming web ======== */
-let topupTimer=null,webTimer=null,webToken=0,webFresh=false;
-let quoteTimer=null,currentGame=null,loadScreenStartTime=0,loadScreenShown=false;
-
-/* --- Loading screen: quotes + minigame --- */
-function getQuotes(searchQuery){
-  /* Pull article_quote from cached cases */
-  const allQuotes=[...CACHE.values()]
-    .filter(c=>c.article_quote&&c.article_quote.length>30)
-    .map(c=>({
-      q:c.article_quote,
-      src:c.source_url?domainOf(c.source_url):'',
-      title:c.title,
-      category:c.category,
-      text:(c.article_quote+' '+c.title+' '+(c.category||'')).toLowerCase()
-    }));
-
-  /* If search query provided, prefer quotes with matching words */
-  if(searchQuery&&searchQuery.length>=3){
-    const words=searchQuery.toLowerCase().split(/\s+/).filter(w=>w.length>=3);
-    if(words.length){
-      /* Score quotes by how many query words they contain */
-      allQuotes.forEach(q=>{
-        q.relevance=words.filter(w=>q.text.includes(w)).length;
-      });
-      /* Sort by relevance (desc), then shuffle within same relevance */
-      allQuotes.sort((a,b)=>b.relevance-a.relevance||Math.random()-.5);
-      return allQuotes;
-    }
-  }
-  /* Default: shuffle randomly */
-  return allQuotes.sort(()=>Math.random()-.5);
-}
-
-function getRegistryStats(){
-  /* Generate live stats from the cache */
-  const stats=[];
-  const total=CACHE.size;
-  if(total>0)stats.push(total+' cases in the registry');
-
-  /* Count by category */
-  const catCounts={};
-  const weekAgo=Date.now()-7*864e5;
-  let recentCount=0;
-  for(const c of CACHE.values()){
-    if(c.category)catCounts[c.category]=(catCounts[c.category]||0)+1;
-    if(c.created_at&&new Date(c.created_at)>weekAgo)recentCount++;
-  }
-  if(recentCount>0)stats.push(recentCount+' new case'+(recentCount>1?'s':'')+' this week');
-
-  /* Top categories */
-  const topCats=Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).slice(0,3);
-  for(const [cat,n] of topCats){
-    stats.push(n+' '+cat.toLowerCase()+' case'+(n>1?'s':''));
-  }
-
-  /* Vote stats */
-  let totalVotes=0;
-  for(const c of CACHE.values()){
-    totalVotes+=(c.heaven_votes||0)+(c.hell_votes||0);
-  }
-  if(totalVotes>0)stats.push(totalVotes+' total votes cast');
-
-  return stats.sort(()=>Math.random()-.5);
-}
-
-function showLoadScreen(on,searchQuery){
-  const el=document.getElementById('loadscreen');
-
-  if(!on){
-    /* Check if we should skip (results arrived in <100ms) */
-    if(loadScreenShown&&(performance.now()-loadScreenStartTime)<100){
-      el.classList.remove('on');
-      clearInterval(quoteTimer);quoteTimer=null;
-      loadScreenShown=false;
-      return;
-    }
-    el.classList.remove('on');
-    clearInterval(quoteTimer);quoteTimer=null;
-    loadScreenShown=false;
-    return;
-  }
-
-  loadScreenStartTime=performance.now();
-  loadScreenShown=true;
-  el.classList.add('on');
-
-  const quotes=getQuotes(searchQuery);
-  const stats=getRegistryStats();
-  let qi=0,si=0;
-
-  function crossfadeContent(renderFn){
-    const qh=document.getElementById('loadquotes');
-    const existing=qh.querySelectorAll('.lq,.lq-src,.lq-stat');
-
-    /* Fade out existing content */
-    existing.forEach(el=>el.classList.add('fade-out'));
-
-    setTimeout(()=>{
-      /* Render new content */
-      renderFn(qh);
-      /* Elements start visible due to CSS transition */
-    },300);
-  }
-
-  function nextItem(){
-    /* Alternate: show stat every 3rd item if stats available */
-    const shouldShowStat=stats.length>0&&(qi+si)%3===2;
-
-    crossfadeContent(qh=>{
-      if(shouldShowStat&&stats.length>0){
-        const stat=stats[si%stats.length];si++;
-        qh.innerHTML='<div class="lq-stat">'+esc(stat)+'</div>';
-      }else if(quotes.length){
-        const quote=quotes[qi%quotes.length];qi++;
-        qh.innerHTML='<div class="lq">"'+esc(quote.q.slice(0,200)+(quote.q.length>200?'...':''))+'"</div>'
-          +'<div class="lq-src">— '+esc(quote.src||'case notes')+'</div>';
-      }
-    });
-  }
-
-  /* Initial render (no fade for first item) */
-  const qh=document.getElementById('loadquotes');
-  if(quotes.length){
-    const quote=quotes[0];qi=1;
-    qh.innerHTML='<div class="lq">"'+esc(quote.q.slice(0,200)+(quote.q.length>200?'...':''))+'"</div>'
-      +'<div class="lq-src">— '+esc(quote.src||'case notes')+'</div>';
-  }else if(stats.length){
-    qh.innerHTML='<div class="lq-stat">'+esc(stats[0])+'</div>';si=1;
-  }
-
-  clearInterval(quoteTimer);
-  quoteTimer=setInterval(nextItem,2200);/* Slightly longer to allow for transition */
-
-  /* Set up minigame */
-  setupMiniGame();
-}
-
-function setupMiniGame(){
-  const gh=document.getElementById('loadgame');
-
-  /* Get cases with different data for different game types */
-  const casesWithChoices=[...CACHE.values()].filter(c=>c.extraction&&
-    (c.extraction.who_choices||c.extraction.whom_choices));
-  const casesWithCategory=[...CACHE.values()].filter(c=>c.category&&c.title);
-
-  if(!casesWithChoices.length&&!casesWithCategory.length){gh.innerHTML='';return;}
-
-  /* Get unique categories for category game */
-  const categories=[...new Set([...CACHE.values()].map(c=>c.category).filter(Boolean))];
-
-  /* Randomly pick game type: WHO/WHOM (60%) or CATEGORY (40%) */
-  const gameRoll=Math.random();
-  const playWhoWhom=gameRoll<0.6&&casesWithChoices.length>0;
-  const playCategoryGame=!playWhoWhom&&categories.length>=3&&casesWithCategory.length>0;
-
-  if(playWhoWhom){
-    /* Original WHO/WHOM game */
-    const c=casesWithChoices[Math.floor(Math.random()*casesWithChoices.length)];
-    const ex=c.extraction||{};
-    const isWho=Math.random()>.5&&ex.who_choices?.length;
-    const choices=isWho?(ex.who_choices||[]):(ex.whom_choices||[]);
-    const correct=choices[0];
-    if(!correct||choices.length<2){gh.innerHTML='';return;}
-
-    const opts=[...choices].sort(()=>Math.random()-.5).slice(0,3);
-    if(!opts.includes(correct))opts[0]=correct;
-    opts.sort(()=>Math.random()-.5);
-
-    currentGame={caseId:c.id,correct,type:isWho?'who':'whom'};
-    gh.innerHTML='<div class="lg-title">'+(isWho?'WHO DEPLOYED?':'WHO IS AFFECTED?')+'</div>'
-      +'<div class="lg-q">"'+esc((c.raw_title||c.title||'').slice(0,120))+'"</div>'
-      +'<div class="lg-opts">'+opts.map(o=>
-        '<button class="lg-opt" onclick="pickGameOpt(this,\''+esc(o).replace(/'/g,"\\'")+'\')">'+esc(o)+'</button>'
-      ).join('')+'</div>';
-
-  }else if(playCategoryGame){
-    /* New CATEGORY game: show title, pick category */
-    const c=casesWithCategory[Math.floor(Math.random()*casesWithCategory.length)];
-    const correct=c.category;
-
-    /* Get 2 wrong categories */
-    const wrongCats=categories.filter(cat=>cat!==correct).sort(()=>Math.random()-.5).slice(0,2);
-    if(wrongCats.length<2){gh.innerHTML='';return;}
-
-    const opts=[correct,...wrongCats].sort(()=>Math.random()-.5);
-
-    currentGame={caseId:c.id,correct,type:'category'};
-    gh.innerHTML='<div class="lg-title">WHAT CATEGORY?</div>'
-      +'<div class="lg-q">"'+esc((c.title||'').slice(0,120))+'"</div>'
-      +'<div class="lg-opts">'+opts.map(o=>
-        '<button class="lg-opt" onclick="pickGameOpt(this,\''+esc(o).replace(/'/g,"\\'")+'\')">'+esc(o)+'</button>'
-      ).join('')+'</div>';
-
-  }else{
-    gh.innerHTML='';
-  }
-}
-function pickGameOpt(btn,answer){
-  if(!currentGame)return;
-  const correct=currentGame.correct;
-  const btns=document.querySelectorAll('#loadgame .lg-opt');
-  btns.forEach(b=>{
-    b.disabled=true;
-    if(b.textContent===correct)b.classList.add('correct');
-    else if(b===btn&&answer!==correct)b.classList.add('wrong');
-  });
-  btn.classList.add('picked');
-  /* Emit signal to graph (fire and forget) */
-  if(!DEMO)api('search-cases',{signal:{
-    case_id:currentGame.caseId,
-    terms:[answer,currentGame.type],
-    event:answer===correct?'vote':'open'
-  }}).catch(()=>{});
-  currentGame=null;
-}
+let topupTimer=null,webTimer=null,webToken=0;
 function currentQuery(){return document.getElementById('q').value.trim();}
-function updateClearBtn(){
-  const q=currentQuery();
-  const btn=document.getElementById('qclear');
-  const isUrl=isURL(q);
-  btn.classList.toggle('on',q.length>0);
-  btn.classList.toggle('file',isUrl);
-  btn.textContent=isUrl?'📁':'×';
-  btn.setAttribute('aria-label',isUrl?'File this URL':'Clear search');
-}
-function handleClearOrFile(){
-  const q=currentQuery();
-  if(isURL(q)){fileCaseFromSearch(q);}
-  else{clearSearch();}
-}
-function clearSearch(){
-  document.getElementById('q').value='';
-  updateClearBtn();
-  lastWeb=[];lastParsed=null;webFresh=false;
-  showLoadScreen(false);
-  renderResults('');renderParse(null);
-  setText('latency','');
-  document.getElementById('q').focus();
-}
-/* ============ MY CASES (personal case list + pending filings) ============ */
-let MY_CASES=[];
-let SELECTED_CASE_ID=null;
-let MINING_IN_PROGRESS=false;
-try{MY_CASES=JSON.parse(localStorage.getItem('ucar_mycases')||'[]');}catch(e){}
-function saveMyCases(){try{localStorage.setItem('ucar_mycases',JSON.stringify(MY_CASES));}catch(e){}}
-
-function addToMyCases(c,state='saved'){
-  /* c can be a full case object or {id,url,title} for pending */
-  const existing=MY_CASES.find(x=>x.id===c.id);
-  if(existing){
-    Object.assign(existing,c);
-    existing.state=state;
-    existing.updated_at=Date.now();
-  }else{
-    MY_CASES.unshift({
-      id:c.id,
-      title:c.title||c.raw_title||'Untitled',
-      url:c.source_url||c.url||'',
-      summary:c.summary||'',
-      faction:c.faction||'unaligned',
-      source_url:c.source_url||c.url||'',
-      modifier_terms:c.modifier_terms||[],
-      quote:c.article_quote||null,
-      error:null,
-      state,
-      added_at:Date.now()
-    });
-  }
-  if(MY_CASES.length>50)MY_CASES.pop();
-  saveMyCases();renderMyCases();updateTitleBadge();
-}
-
-function removeFromMyCases(id){
-  MY_CASES=MY_CASES.filter(c=>c.id!==id);
-  if(SELECTED_CASE_ID===id)deselectMyCase();
-  saveMyCases();renderMyCases();updateTitleBadge();
-}
-
-function updateCaseState(id,state,data={}){
-  const c=MY_CASES.find(x=>x.id===id);
-  if(c){
-    c.state=state;
-    if(data.quote)c.quote=data.quote;
-    if(data.summary)c.summary=data.summary;
-    if(data.title)c.title=data.title;
-    if(data.canonical)c.canonical=data.canonical;
-    if(data.error)c.error=data.error;
-    c.updated_at=Date.now();
-    saveMyCases();
-    renderMyCases();
-    if(SELECTED_CASE_ID===id)renderSelectedCase();
-    updateTitleBadge();
-  }
-}
-
-function selectMyCase(id){
-  SELECTED_CASE_ID=id;
-  const widget=document.getElementById('myCasesWidget');
-  widget.classList.add('has-selected');
-  renderSelectedCase();
-}
-
-function deselectMyCase(){
-  SELECTED_CASE_ID=null;
-  const widget=document.getElementById('myCasesWidget');
-  widget.classList.remove('has-selected');
-  document.getElementById('mcSelected').innerHTML='';
-}
-
-function renderSelectedCase(){
-  const panel=document.getElementById('mcSelected');
-  if(!SELECTED_CASE_ID){panel.innerHTML='';return;}
-  const c=MY_CASES.find(x=>x.id===SELECTED_CASE_ID);
-  if(!c){panel.innerHTML='';return;}
-  const full=CACHE.get(c.id)||c;
-  const state=c.state||'saved';
-  const stateLabels={pending:'Filing...',processing:'Processing',done:'Ready',failed:'Failed',saved:'Saved'};
-  const domain=domainOf(c.source_url||c.url||'');
-  const timeAgo=c.added_at?getTimeAgo(c.added_at):'';
-  const triple=full.canonical?`${full.canonical.who} → ${full.canonical.action} → ${full.canonical.whom}`:'';
-  const summary=c.summary||full.summary||'';
-  const quote=c.quote||full.article_quote||'';
-
-  /* Clean title - remove HTML entities and site suffixes */
-  let title=c.title||full.title||'Pending...';
-  title=title.replace(/&#x27;/g,"'").replace(/&amp;/g,'&').replace(/&quot;/g,'"')
-    .replace(/\s*[-–|]\s*(Let's Data Science|Medium|LinkedIn|Twitter|Facebook).*$/i,'').trim();
-
-  let bodyHtml='';
-  if(state==='pending'||state==='processing'){
-    bodyHtml=`<div class="mc-progress"><div class="mc-progress-bar"></div><span>Extracting case details...</span></div>`;
-  }else if(state==='done'||state==='saved'){
-    bodyHtml=`<div class="mc-selected-body">
-      ${summary?`<div class="mc-selected-summary">${esc(summary)}</div>`:'<div class="mc-selected-summary" style="color:var(--muted)">No summary extracted</div>'}
-      ${quote?`<blockquote class="mc-selected-quote">"${esc(quote.slice(0,250))}"</blockquote>`:''}
-      ${triple?`<div class="mc-selected-triple">${esc(triple)}</div>`:''}
-      <div class="mc-vote-row">
-        <button class="mc-vote halo" onclick="castVote(CACHE.get('${c.id}')||{id:'${c.id}'},1)">😇 Good</button>
-        <button class="mc-vote horns" onclick="castVote(CACHE.get('${c.id}')||{id:'${c.id}'},-1)">😈 Evil</button>
-      </div>
-    </div>`;
-  }else if(state==='failed'){
-    bodyHtml=`<div class="mc-error">
-      <span class="mc-error-msg">${esc(c.error||'Extraction failed')}</span>
-      <button class="mc-retry-big" onclick="retryCase('${c.id}')">Retry Extraction</button>
-    </div>`;
-  }
-
-  panel.innerHTML=`
-    <div class="mc-selected-header">
-      <span class="mc-selected-state ${state}">${stateLabels[state]||state}</span>
-      <button class="mc-close" onclick="deselectMyCase()">×</button>
-    </div>
-    <h3 class="mc-selected-title">${esc(title)}</h3>
-    <div class="mc-selected-meta">
-      <a href="${esc(c.source_url||c.url||'#')}" target="_blank" rel="noopener" class="mc-selected-url">${esc(domain)} ↗</a>
-      <span class="mc-selected-time">${timeAgo}</span>
-    </div>
-    ${bodyHtml}
-    <div class="mc-selected-actions">
-      <button class="mc-action-btn secondary" onclick="shareCase('${c.id}')">Share</button>
-    </div>
-  `;
-}
-
-function getTimeAgo(ts){
-  const diff=Date.now()-ts;
-  const mins=Math.floor(diff/60000);
-  if(mins<1)return 'just now';
-  if(mins<60)return mins+'m ago';
-  const hrs=Math.floor(mins/60);
-  if(hrs<24)return hrs+'h ago';
-  const days=Math.floor(hrs/24);
-  return days+'d ago';
-}
-
-function viewFullCase(id){
-  deselectMyCase();
-  viewMyCase(id);
-}
-
-function shareCase(id){
-  const c=MY_CASES.find(x=>x.id===id);
-  if(!c)return;
-  const url='https://usecasearmsrace.com/#case='+id;
-  const text=c.title+'\n'+url;
-  if(navigator.share){
-    navigator.share({title:c.title,text,url}).catch(()=>{});
-  }else{
-    navigator.clipboard.writeText(text).then(()=>toast('Link copied!'));
-  }
-}
-
-async function retryCase(id){
-  const c=MY_CASES.find(x=>x.id===id);
-  if(!c)return;
-  updateCaseState(id,'pending',{error:null});
-  const ok=await fileURLForMining(c.source_url||c.url,id);
-  if(!ok)updateCaseState(id,'failed',{error:'Could not reach server'});
-}
-
-function renderMyCases(){
-  const widget=document.getElementById('myCasesWidget');
-  const list=document.getElementById('myCasesList');
-  const countEl=widget.querySelector('.mc-count');
-  if(!MY_CASES.length){widget.classList.remove('on');return;}
-  widget.classList.add('on');
-  if(countEl)countEl.textContent='('+MY_CASES.length+')';
-  list.innerHTML=MY_CASES.map(c=>{
-    const state=c.state||'saved';
-    const domain=domainOf(c.source_url||c.url||'');
-    const metaText=state==='pending'?' • extracting...':(state==='processing'?' • processing...':(state==='failed'?' • failed':''));
-    const quoteSnippet=(state==='done'||state==='saved')&&c.quote?`<div class="mc-quote">"${esc(c.quote.slice(0,60))}..."</div>`:'';
-    const retryBtn=state==='failed'?`<button class="mc-retry" onclick="event.stopPropagation();retryCase('${c.id}')">↻ Retry</button>`:'';
-    return `
-    <div class="mc-item" data-id="${c.id}" data-state="${state}">
-      <div class="mc-status-wrap">
-        <span class="mc-status ${state}"></span>
-        <span class="mc-spinner"></span>
-      </div>
-      <div class="mc-info" onclick="selectMyCase('${c.id}')">
-        <div class="mc-title-text">${esc(c.title||'Pending...')}</div>
-        <div class="mc-meta">${esc(domain)}${metaText}</div>
-        ${quoteSnippet}
-        ${retryBtn}
-      </div>
-      <button class="mc-remove" onclick="event.stopPropagation();removeFromMyCases('${c.id}')" title="Remove">×</button>
-    </div>
-  `;}).join('');
-  if(SELECTED_CASE_ID)renderSelectedCase();
-}
-
-function toggleMyCases(){
-  const widget=document.getElementById('myCasesWidget');
-  widget.classList.toggle('collapsed');
-  try{localStorage.setItem('ucar_mycases_collapsed',widget.classList.contains('collapsed'));}catch(e){}
-}
-
-/* Restore collapsed state on load */
-try{if(localStorage.getItem('ucar_mycases_collapsed')==='true'){
-  document.getElementById('myCasesWidget').classList.add('collapsed');
-}}catch(e){}
-
-function viewMyCase(id){
-  /* Clear search and filters so the case can appear */
-  document.getElementById('q').value='';
-  updateClearBtn();
-  CATEGORY=null;
-  OPEN_ID=id;
-  lastWeb=[];lastParsed=null;
-
-  /* Fetch case if not cached */
-  if(!CACHE.get(id)&&!DEMO){
-    api('search-cases',{id}).then(d=>{
-      (d.results||[]).forEach(c=>CACHE.set(c.id,c));
-      renderCategories();
-      renderResults('');
-      scrollToOpenCase();
-    }).catch(()=>{});
-  }else{
-    renderCategories();
-    renderResults('');
-    scrollToOpenCase();
-  }
-  location.hash='case='+id;
-}
-
-function scrollToOpenCase(){
-  setTimeout(()=>{
-    const el=document.querySelector('.hit.open');
-    if(el)el.scrollIntoView({block:'center',behavior:'smooth'});
-  },50);
-}
-
-function clearMyCases(){
-  if(!confirm('Clear all saved cases?'))return;
-  MY_CASES=[];saveMyCases();renderMyCases();updateTitleBadge();
-}
-
-function exportMyCases(format){
-  if(!MY_CASES.length){toast('No cases to export');return;}
-  /* Enrich with full data from cache */
-  const enriched=MY_CASES.map(mc=>{
-    const full=CACHE.get(mc.id)||mc;
-    return {
-      title:full.title||mc.title,
-      summary:full.summary||mc.summary||'',
-      source_url:full.source_url||mc.source_url||mc.url,
-      faction:full.faction||mc.faction||'unaligned',
-      impact:full.impact||1,
-      community_notes:(full.modifier_terms||mc.modifier_terms||[]).join(', '),
-      registry_url:'https://usecasearmsrace.com/#case='+mc.id
-    };
-  });
-
-  if(format==='share'){
-    /* Create shareable text */
-    const text=enriched.map((c,i)=>
-      `${i+1}. ${c.title}\n   ${c.source_url}\n   ${c.community_notes?'Notes: '+c.community_notes:''}`
-    ).join('\n\n');
-    if(navigator.share){
-      navigator.share({title:'My AI Use Cases',text}).catch(()=>{});
-    }else{
-      navigator.clipboard.writeText(text).then(()=>toast('Copied to clipboard!'));
-    }
-  }else{
-    /* CSV download */
-    const headers=['Title','Summary','Source URL','Faction','Impact','Community Notes','Registry URL'];
-    const escCSV=s=>{s=String(s||'');return s.includes(',')||s.includes('"')||s.includes('\n')?'"'+s.replace(/"/g,'""')+'"':s;};
-    const rows=enriched.map(c=>[c.title,c.summary,c.source_url,c.faction,c.impact,c.community_notes,c.registry_url].map(escCSV).join(','));
-    const csv=headers.join(',')+'\n'+rows.join('\n');
-    const blob=new Blob([csv],{type:'text/csv'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;a.download='my-cases-'+new Date().toISOString().slice(0,10)+'.csv';
-    a.click();URL.revokeObjectURL(url);
-    toast('Downloaded '+enriched.length+' cases');
-  }
-}
-
-/* Legacy alias for pending filings */
-function addPending(url,id){addToMyCases({id,url,title:'Filing: '+domainOf(url)},'pending');}
-function updatePendingStatus(id,status){
-  const stateMap={ready:'done',error:'failed',pending:'pending'};
-  updateCaseState(id,stateMap[status]||status);
-}
-function viewPendingCase(id){viewMyCase(id);}
-function renderPending(){renderMyCases();}/* compatibility */
-
-/* ============ MINE ALL FEATURE ============ */
-async function mineAllWebResults(){
-  console.log('mineAllWebResults called, lastWeb:', lastWeb.length, 'MINING_IN_PROGRESS:', MINING_IN_PROGRESS);
-  if(MINING_IN_PROGRESS)return;
-  const unfiledHits=lastWeb.filter(w=>w.url&&w.url!=='#'&&!w.filed);
-  console.log('unfiledHits:', unfiledHits.length);
-  if(!unfiledHits.length){toast('No web results to mine');return;}
-
-  MINING_IN_PROGRESS=true;
-  const btn=document.getElementById('mineAllBtn');
-  if(btn){
-    btn.classList.add('mining');
-    btn.querySelector('.mine-text').textContent='MINING';
-  }
-
-  const total=unfiledHits.length;
-  let completed=0;
-  const concurrencyLimit=3;
-  const queue=[...unfiledHits];
-
-  async function processOne(hit){
-    /* Generate temp ID for tracking */
-    const tempId='mine_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
-    console.log('Processing:', hit.url, 'tempId:', tempId);
-
-    /* Add to MY_CASES immediately with pending state */
-    addToMyCases({
-      id:tempId,
-      url:hit.url,
-      source_url:hit.url,
-      title:hit.title||'Mining: '+domainOf(hit.url)
-    },'pending');
-
-    try{
-      const ok=await fileURLForMining(hit.url,tempId);
-      console.log('fileURLForMining result:', ok, 'for', hit.url);
-      if(ok){
-        hit.filed=true;
-      }else{
-        updateCaseState(tempId,'failed',{error:'Could not file URL'});
-      }
-    }catch(e){
-      console.error('Mining error:', e);
-      updateCaseState(tempId,'failed',{error:e.message||'Network error'});
-    }
-
-    completed++;
-    if(btn){
-      btn.querySelector('.mine-count').textContent=`(${completed}/${total})`;
-    }
-  }
-
-  /* Process with concurrency limit */
-  async function worker(){
-    while(queue.length){
-      const hit=queue.shift();
-      if(hit)await processOne(hit);
-    }
-  }
-
-  const workers=[];
-  for(let i=0;i<Math.min(concurrencyLimit,queue.length);i++){
-    workers.push(worker());
-  }
-  await Promise.all(workers);
-
-  MINING_IN_PROGRESS=false;
-  if(btn){
-    btn.classList.remove('mining');
-    btn.querySelector('.mine-text').textContent='MINE ALL';
-    btn.querySelector('.mine-count').textContent='';
-  }
-  renderResults(currentQuery());
-  toast('Mined '+total+' web results');
-}
-
-async function fileURLForMining(url,tempId){
-  if(DEMO){
-    /* Demo mode: simulate success after delay */
-    await new Promise(r=>setTimeout(r,1500));
-    updateCaseState(tempId,'done',{
-      quote:'This is a demo quote from the mined article.',
-      summary:'Demo summary of the case details extracted from '+domainOf(url)
-    });
-    return true;
-  }
-
-  try{
-    const d=await api('file-case',{url});
-    console.log('file-case response for', url, ':', d);
-
-    if(d.error){
-      console.error('file-case error:', d.error);
-      updateCaseState(tempId,'failed',{error:d.error});
-      return false;
-    }
-
-    if(d.ok||d.dedupe){
-      /* Update temp ID to real case ID */
-      const c=MY_CASES.find(x=>x.id===tempId);
-      if(c&&d.case_id){
-        c.id=d.case_id;
-        saveMyCases();
-      }
-
-      if((d.instant||d.dedupe)&&d.case_id){
-        /* Instant extraction or dedupe - fetch full case data */
-        try{
-          const cd=await api('search-cases',{id:d.case_id});
-          const fullCase=(cd.results||[])[0];
-          if(fullCase){
-            CACHE.set(fullCase.id,fullCase);
-            updateCaseState(d.case_id,'done',{
-              title:fullCase.title||fullCase.raw_title,
-              quote:fullCase.article_quote,
-              summary:fullCase.summary,
-              canonical:fullCase.canonical
-            });
-          }else{
-            updateCaseState(d.case_id,'done',{title:'Case filed - tap to view'});
-          }
-        }catch(e){
-          console.error('Failed to fetch case after filing:',e);
-          updateCaseState(d.case_id,'done',{title:'Case filed - tap to view'});
-        }
-        return true;
-      }
-
-      /* Need to poll for completion */
-      if(d.case_id){
-        pollCaseWithStateUpdates(d.case_id);
-      }
-      return true;
-    }
-
-    /* Unhandled response - probably an error */
-    console.error('Unexpected file-case response:', d);
-    return false;
-  }catch(e){
-    console.error('fileURLForMining exception:', e);
-    return false;
-  }
-}
-
-async function pollCaseWithStateUpdates(id){
-  /* Request notification permission on first file if not already asked */
-  if(!NOTIF.asked&&'Notification' in window&&Notification.permission==='default'){
-    requestNotifPermission();
-  }
-
-  /* Update to processing state on first poll attempt */
-  updateCaseState(id,'processing');
-
-  for(let i=0;i<20;i++){
-    await new Promise(r=>setTimeout(r,3000));
-    try{
-      const d=await api('search-cases',{id});
-      const c=(d.results||[])[0];
-      if(c&&c.status==='live'){
-        CACHE.set(c.id,c);
-        updateCaseState(id,'done',{
-          title:c.title,
-          quote:c.article_quote,
-          summary:c.summary,
-          canonical:c.canonical
-        });
-        /* Send browser notification */
-        sendBrowserNotification(
-          'Case Ready',
-          c.title?.slice(0,80)||'Your filed case is ready to view',
-          ()=>location.hash='case='+id
-        );
-        playNotifSound();
-        return;
-      }
-    }catch(e){}
-  }
-  updateCaseState(id,'failed',{error:'Extraction timed out'});
-}
-
-function showMineAllButton(){
-  const btn=document.getElementById('mineAllBtn');
-  if(!btn)return;
-  const unfiledCount=lastWeb.filter(w=>w.url&&w.url!=='#'&&!w.filed).length;
-  if(unfiledCount>0&&!MINING_IN_PROGRESS){
-    btn.style.display='flex';
-    btn.querySelector('.mine-count').textContent='('+unfiledCount+')';
-  }else{
-    btn.style.display='none';
-  }
-}
-
-async function fileCaseFromSearch(url){
-  const btn=document.getElementById('qclear');
-  btn.textContent='⏳';btn.disabled=true;
-  const ok=await fileURL(url);
-  btn.disabled=false;
-  if(ok){
-    document.getElementById('q').value='';
-    updateClearBtn();renderResults('');
-  }else{
-    btn.textContent='❌';setTimeout(()=>updateClearBtn(),1500);
-  }
-}
 document.getElementById('q').addEventListener('input',()=>{
-  const q=currentQuery();lastParsed=null;webFresh=false;
-  updateClearBtn();
-  /* INSTANT: show cached web results that match this query */
-  lastWeb=q.length>=3?recallWeb(q):[];
+  const q=currentQuery();lastWeb=[];lastParsed=null;
+  EXCLUDE=new Set();NO_FUZZY=false;renderExpansion(null);renderFuzzy(null);
   renderResults(q);
   renderParse(q&&!isURL(q)?clientParse(q):null);
   clearTimeout(topupTimer);clearTimeout(webTimer);
-  if(isURL(q)){showLoadScreen(false);return;}
-  /* Show loading screen while fetching (only if we have quotes to show) */
-  if(q.length>=3&&CACHE.size>5)showLoadScreen(true,q);
-  else showLoadScreen(false);
+  if(isURL(q))return;
   topupTimer=setTimeout(()=>topUp(q),160);
   if(q.length>=4)webTimer=setTimeout(()=>webStream(q),240);
 });
@@ -1566,18 +578,20 @@ function rankLocal(q){
 async function topUp(q){
   if(DEMO||!q)return;
   try{const t0=performance.now();
-    const data=await api('search-cases',{q,category:CATEGORY});
+    const data=await api('search-cases',{q,category:CATEGORY,
+      exclude:[...EXCLUDE],no_fuzzy:NO_FUZZY});
     (data.results||[]).forEach(c=>CACHE.set(c.id,c));
     if(currentQuery()===q){
-      showLoadScreen(false);/* results arrived, hide loading */
       lastParsed=data.parsed||null;
-      if(lastParsed)renderParse(lastParsed);
+      if(lastParsed){renderParse(lastParsed);
+        renderExpansion(lastParsed.expanded||null);
+        renderFuzzy(lastParsed.fuzzy||null);}
       renderResults(q);
       setText('latency',Math.round(performance.now()-t0)+'ms \u00B7 '
         +(data.results||[]).length+' graph hits'
         +(data.parsed&&data.parsed.who?' \u00B7 parsed as triple':''));
     }
-  }catch(e){showLoadScreen(false);}
+  }catch(e){}
 }
 async function webStream(q){
   const token=++webToken;
@@ -1586,12 +600,11 @@ async function webStream(q){
     if(DEMO){await new Promise(r=>setTimeout(r,300));
       web=[{title:'(Demo) Web prospects for "'+q+'" stream here when deployed',
         url:'#',domain:'gdelt + google news, server cached'}];}
-    else{const data=await api('search-cases',{q,web_only:true});
+    else{const data=await api('search-cases',{q,web:true,category:CATEGORY,
+      exclude:[...EXCLUDE],no_fuzzy:NO_FUZZY});
       (data.results||[]).forEach(c=>CACHE.set(c.id,c));
       web=data.web_results||[];}
-    /* Index fresh web results for future instant recall */
-    if(web.length)indexWeb(q,web);
-    if(token===webToken&&currentQuery()===q){lastWeb=web;webFresh=true;renderResults(q);}
+    if(token===webToken&&currentQuery()===q){lastWeb=web;renderResults(q);}
   }catch(e){}
 }
 async function boot(){
@@ -1599,9 +612,7 @@ async function boot(){
     try{const data=await api('search-cases',{browse:true});
       (data.results||[]).forEach(c=>CACHE.set(c.id,c));}catch(e){}
   }
-  renderCategories();renderResults('');renderMyCases();updateTitleBadge();
-  /* Resume polling for any pending/processing cases */
-  MY_CASES.filter(c=>c.state==='pending'||c.state==='processing').forEach(c=>pollCaseWithStateUpdates(c.id));
+  renderCategories();renderResults('');
 }
 /* categories from the live cache */
 function renderCategories(){
@@ -1636,38 +647,13 @@ function renderResults(q){
   }
   if(lastWeb.length){
     const d=document.createElement('div');d.className='divider';
-    d.textContent=webFresh?'FROM THE WEB':'FROM THE WEB • cached';
-    host.appendChild(d);
-
-    /* Add MINE ALL button */
-    const unfiledCount=lastWeb.filter(w=>w.url&&w.url!=='#'&&!w.filed).length;
-    if(unfiledCount>0){
-      const mineBtn=document.createElement('button');
-      mineBtn.id='mineAllBtn';
-      mineBtn.className='mine-all-btn'+(MINING_IN_PROGRESS?' mining':'');
-      mineBtn.onclick=mineAllWebResults;
-      mineBtn.innerHTML=`<span class="mine-icon">⛏️</span><span class="mine-text">${MINING_IN_PROGRESS?'MINING':'MINE ALL'}</span><span class="mine-count">(${unfiledCount})</span>`;
-      mineBtn.style.display='flex';
-      mineBtn.style.gridColumn='1 / -1';
-      host.appendChild(mineBtn);
-    }
-
+    d.textContent='FROM THE WEB (not yet in the record)';host.appendChild(d);
     for(const w of lastWeb){
-      const el=document.createElement('div');el.className='webhit'+(w.filed?' filed':'');
-      el.innerHTML='<a href="'+esc(w.url)+'" target="_blank" rel="noopener">'+esc(w.title)+'</a>'
-        +(w.snippet?'<div class="snippet">'+esc(w.snippet)+'</div>':'')
-        +'<div class="meta">'+esc(w.domain||domainOf(w.url))+'</div>';
-      if(w.url&&w.url!=='#'&&!w.filed){
-        const b=document.createElement('button');
-        b.textContent='+File';
-        b.onclick=async()=>{
-          b.textContent='Filing...';b.disabled=true;
-          const ok=await fileURL(w.url);
-          if(ok){w.filed=true;renderResults(currentQuery());}
-          else{b.textContent='+File';b.disabled=false;}
-        };
-        el.appendChild(b);
-      }
+      const el=document.createElement('div');el.className='webhit';
+      el.innerHTML='<div>'+esc(w.title)+'</div><div class="meta">'+esc(w.domain||'')+'</div>';
+      if(w.url!=='#'){const b=document.createElement('button');
+        b.textContent='File this into the queue';b.onclick=()=>fileURL(w.url);
+        el.appendChild(b);}
       host.appendChild(el);
     }
   }
@@ -1708,8 +694,15 @@ function hitCard(c){
       +(c.source_tier===1?' \u00B7 FIRST-PARTY':'')+'</div>'
     +'<div class="votebar"><i style="width:'+pct+'%"></i></div>'
     +'<div class="modrow" data-mods></div>'
-    +'<div class="detail"><div class="dlabel">Full summary</div>'
+    +'<div class="detail">'
+      +(c.canonical&&c.canonical.who
+        ?'<div class="dlabel">Canonical triple</div><div class="trip" style="font-size:14px">'+esc(tripleLine(c))+'</div>'
+        :'')
+      +'<div class="dlabel">Full summary</div>'
       +'<div style="font-size:13.5px">'+esc(c.summary||'')+'</div>'
+      +'<div class="dlabel">Community modifiers</div>'
+      +'<div data-modgroups><span style="font-size:12px;color:var(--muted)">'
+      +(c._modifiers?'':'Loading\u2026')+'</span></div>'
       +'<a class="srcbtn" href="'+esc(c.source_url||'#')+'" target="_blank" rel="noopener">Read the source \u2192</a>'
     +'</div>';
   // votes
@@ -1726,24 +719,38 @@ function hitCard(c){
       window.scrollTo(0,0);};
     mrow.appendChild(b);
   }
+  const mg=el.querySelector('[data-modgroups]');
+  if(mg&&c._modifiers){
+    mg.innerHTML='';
+    const order=['who','action','whom','case'];
+    let any=false;
+    for(const slot of order){
+      const list=c._modifiers.filter(m=>m.slot===slot);
+      if(!list.length)continue;any=true;
+      const g=document.createElement('div');g.className='grp';
+      g.innerHTML='<b>'+slot.toUpperCase()+'</b>';
+      for(const m of list){
+        const b=document.createElement('button');b.className='mod';
+        b.textContent='#'+m.term+(m.support>1?' \u00D7'+m.support:'');
+        b.title=m.kind.replace('_',' ');
+        b.onclick=e=>{e.stopPropagation();
+          document.getElementById('q').value=m.term;
+          document.getElementById('q').dispatchEvent(new Event('input'));
+          window.scrollTo(0,0);};
+        g.appendChild(b);
+      }
+      mg.appendChild(g);
+    }
+    if(!any)mg.innerHTML='<span style="font-size:12px;color:var(--muted)">None yet. Be the first: every modifier becomes search vocabulary.</span>';
+  }
   const add=document.createElement('button');add.className='mod add';
   add.textContent='+ modifier';
   add.onclick=e=>{e.stopPropagation();openSheet(c);};
   mrow.appendChild(add);
-  /* Save to My Cases button */
-  const isSaved=MY_CASES.some(mc=>mc.id===c.id);
-  const save=document.createElement('button');
-  save.className='mod'+(isSaved?' saved':'');
-  save.textContent=isSaved?'✓ saved':'+ save';
-  save.style.marginLeft='auto';
-  save.onclick=e=>{e.stopPropagation();
-    if(isSaved){removeFromMyCases(c.id);toast('Removed from My Cases');}
-    else{addToMyCases(c);toast('Saved to My Cases');}
-    renderResults(currentQuery());};
-  mrow.appendChild(save);
   // expand toggle + permalink
   const toggle=()=>{OPEN_ID=(OPEN_ID===c.id)?null:c.id;
     history.replaceState(null,'',OPEN_ID?'#case='+c.id:' ');
+    if(OPEN_ID===c.id){sendSignal(c.id,'open');hydrateCase(c.id);}
     renderResults(currentQuery());};
   el.querySelector('h3').onclick=toggle;
   el.querySelector('.trip').onclick=toggle;
@@ -1759,6 +766,7 @@ async function castVote(c,dir){
   if(next===1)c.heaven_votes=(c.heaven_votes||0)+1;
   if(next===-1)c.hell_votes=(c.hell_votes||0)+1;
   MY_VOTES[c.id]=next;saveVotes();renderResults(currentQuery());
+  if(next!==0)sendSignal(c.id,'vote');
   if(DEMO)return;
   try{
     const d=await api('vote',{case_id:c.id,
@@ -1767,6 +775,35 @@ async function castVote(c,dir){
       MY_VOTES[c.id]=d.your_vote;saveVotes();renderResults(currentQuery());}
   }catch(e){toast('Vote did not reach the registry.');}
 }
+async function hydrateCase(id){
+  const c=CACHE.get(id);if(!c)return;
+  if(DEMO){
+    if(!c._modifiers)c._modifiers=(c.modifier_terms||[]).map(t=>
+      ({slot:'case',kind:'compound',term:t,support:1}));
+    renderResults(currentQuery());return;
+  }
+  const jobs=[];
+  if(!c._full)jobs.push(api('search-cases',{id}).then(d=>{
+    const full=(d.results||[])[0];
+    if(full)Object.assign(c,full,{_full:true});
+  }).catch(()=>{}));
+  if(!c._modifiers)jobs.push(
+    fetch(CONFIG.FN('modifiers')+'?case_id='+encodeURIComponent(id))
+      .then(r=>r.json()).then(d=>{c._modifiers=d.modifiers||[];})
+      .catch(()=>{c._modifiers=[];}));
+  if(jobs.length){await Promise.all(jobs);renderResults(currentQuery());}
+}
+function signalTerms(){
+  if(!lastParsed)return [];
+  return [...(lastParsed.entities||[]),
+    ...(lastParsed.action?[lastParsed.action]:[]),
+    ...(lastParsed.modifiers||[]),...(lastParsed.free||[])].slice(0,8);
+}
+function sendSignal(caseId,event){
+  const terms=signalTerms();
+  if(!terms.length||DEMO)return;
+  api('search-cases',{signal:{terms,case_id:caseId,event}}).catch(()=>{});
+}
 function renderFilePrompt(url,host){
   const el=document.createElement('div');el.className='webhit';
   el.innerHTML='<div>File a new case from this source?</div><div class="meta">'+esc(url)+'</div>';
@@ -1774,201 +811,58 @@ function renderFilePrompt(url,host){
   b.onclick=()=>fileURL(url);el.appendChild(b);host.appendChild(el);
 }
 async function fileURL(url){
-  if(DEMO){toast('DEMO: deploys to the staged queue when configured.');return false;}
+  if(DEMO){toast('DEMO: deploys to the staged queue when configured.');return;}
   try{const d=await api('file-case',{url});
-    if(d.ok){
-      /* v2: instant extraction means case is already live! */
-      if(d.instant&&d.case_id){
-        /* Fetch and cache it immediately */
-        try{
-          const cd=await api('search-cases',{id:d.case_id});
-          const c=(cd.results||[])[0];
-          if(c)CACHE.set(c.id,c);
-        }catch(e){}
-        toast('✓ Case filed and live!',{action:()=>{
-          clearSearch();
-          location.hash='case='+d.case_id;
-        }});
-        return true;
-      }
-      /* Fallback for old backend: poll for completion */
-      toast('Filed! Extracting case details…');
-      if(d.case_id)addPending(url,d.case_id);
-      if(d.case_id)pollCaseStatus(d.case_id);
-      return true;
-    }
-    if(d.dedupe&&d.case_id){
-      toast('Already in the registry!',{action:()=>{
-        clearSearch();
-        location.hash='case='+d.case_id;
-      }});
-      return true;
-    }
-    toast(d.error||'Could not file.');return false;
-  }catch(e){toast('Could not reach the registry.');return false;}
-}
-async function pollCaseStatus(id){
-  /* Request notification permission on first file if not already asked */
-  if(!NOTIF.asked&&'Notification' in window&&Notification.permission==='default'){
-    requestNotifPermission();
-  }
-  /* Update to processing state */
-  updateCaseState(id,'processing');
-  for(let i=0;i<20;i++){/* poll up to ~60s */
-    await new Promise(r=>setTimeout(r,3000));
-    try{
-      const d=await api('search-cases',{id});
-      const c=(d.results||[])[0];
-      if(c&&c.status==='live'){
-        updateCaseState(id,'done',{
-          title:c.title,
-          quote:c.article_quote,
-          summary:c.summary,
-          canonical:c.canonical
-        });
-        CACHE.set(c.id,c);
-        /* Send browser notification */
-        sendBrowserNotification(
-          'Case Ready',
-          c.title?.slice(0,80)||'Your filed case is ready to view',
-          ()=>location.hash='case='+id
-        );
-        /* Play sound if enabled */
-        playNotifSound();
-        toast('Case ready: '+c.title?.slice(0,50),{sticky:true,action:()=>location.hash='case='+id});
-        return;
-      }
-    }catch(e){}
-  }
-  updateCaseState(id,'failed',{error:'Extraction timed out'});
+    toast(d.ok?'Filed. The steward will prefill it for review.':(d.error||'Could not file.'));
+  }catch(e){toast('Could not reach the registry.');}
 }
 
 /* ============ MODIFIER SHEET ============ */
 let SHEET_CASE=null;
-const CATEGORIES=['Surveillance','Healthcare','Education','Law Enforcement',
-  'Employment','Financial','Government','Transportation','Defense','Social Media'];
-let SHEET_SELECTIONS={who:[],action:[],whom:[],category:null,custom:[]};
-
+function segInit(id){
+  const seg=document.getElementById(id);
+  seg.querySelectorAll('.seg').forEach(b=>b.onclick=()=>{
+    seg.querySelectorAll('.seg').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');});
+}
+segInit('slotSeg');segInit('kindSeg');
+function segVal(id){return document.querySelector('#'+id+' .seg.on').dataset.v;}
 function openSheet(c){
   SHEET_CASE=c;
-  SHEET_SELECTIONS={who:[],action:[],whom:[],category:null,custom:[]};
-  setText('sheetTitle','Refine: '+(c.title||'').slice(0,40));
-
-  const ex=c.extraction||{};
-  const existing=c.modifier_terms||[];
-
-  /* Populate WHO chips */
-  const whoOpts=[...new Set([...(ex.who_choices||[]),...existing.filter(t=>t.match(/^[A-Z]/))].filter(Boolean))].slice(0,6);
-  renderChips('whoChips',whoOpts,'who');
-
-  /* Populate ACTION chips */
-  const actionOpts=[...new Set([...(ex.action_choices||[]),'deploys','monitors','uses','denies','tracks'].filter(Boolean))].slice(0,6);
-  renderChips('actionChips',actionOpts,'action');
-
-  /* Populate WHOM chips */
-  const whomOpts=[...new Set([...(ex.whom_choices||[]),'customers','students','patients','citizens','employees','users'].filter(Boolean))].slice(0,6);
-  renderChips('whomChips',whomOpts,'whom');
-
-  /* Populate CATEGORY chips */
-  renderChips('categoryChips',CATEGORIES,'category',true);
-
-  /* Pre-select existing modifier_terms */
-  for(const term of existing){
-    const chip=document.querySelector(`.sheet-chip[data-term="${term.toLowerCase()}"]`);
-    if(chip&&!chip.classList.contains('on')){chip.classList.add('on');
-      const slot=chip.closest('.sheet-chips').id.replace('Chips','');
-      if(slot!=='category')SHEET_SELECTIONS[slot].push(term.toLowerCase());
-    }
-  }
-
+  setText('sheetTitle','Add a modifier \u00B7 '+(c.title||'').slice(0,44));
   document.getElementById('modterm').value='';
   document.getElementById('sheet').classList.add('on');
   document.getElementById('sheetveil').classList.add('on');
+  setTimeout(()=>document.getElementById('modterm').focus(),240);
 }
-
-function renderChips(containerId,options,slot,singleSelect=false){
-  const container=document.getElementById(containerId);
-  container.innerHTML=options.map(opt=>
-    `<button class="sheet-chip" data-term="${esc(opt.toLowerCase())}" data-slot="${slot}"
-      onclick="toggleChip(this,${singleSelect})">${esc(opt)}</button>`
-  ).join('');
-}
-
-function toggleChip(chip,singleSelect){
-  const slot=chip.dataset.slot;
-  const term=chip.dataset.term;
-  if(singleSelect){
-    /* Single select: clear others in same container */
-    chip.parentElement.querySelectorAll('.sheet-chip').forEach(c=>c.classList.remove('on'));
-    chip.classList.add('on');
-    SHEET_SELECTIONS[slot]=term;
-  }else{
-    /* Multi select */
-    chip.classList.toggle('on');
-    if(chip.classList.contains('on')){
-      if(!SHEET_SELECTIONS[slot].includes(term))SHEET_SELECTIONS[slot].push(term);
-    }else{
-      SHEET_SELECTIONS[slot]=SHEET_SELECTIONS[slot].filter(t=>t!==term);
-    }
-  }
-}
-
-function addCustomTag(){
-  const input=document.getElementById('modterm');
-  const term=input.value.trim().toLowerCase();
-  if(!term||term.length<2||term.length>40)return toast('2-40 characters');
-  if(!SHEET_SELECTIONS.custom.includes(term)){
-    SHEET_SELECTIONS.custom.push(term);
-    /* Add as a chip to the whom row (generic) */
-    const container=document.getElementById('whomChips');
-    const chip=document.createElement('button');
-    chip.className='sheet-chip on';
-    chip.dataset.term=term;
-    chip.dataset.slot='custom';
-    chip.textContent=term;
-    chip.onclick=()=>{chip.remove();SHEET_SELECTIONS.custom=SHEET_SELECTIONS.custom.filter(t=>t!==term);};
-    container.appendChild(chip);
-  }
-  input.value='';
-  toast('Added: '+term);
-}
-
 function closeSheet(){
   document.getElementById('sheet').classList.remove('on');
   document.getElementById('sheetveil').classList.remove('on');
 }
-
-async function submitRefinement(){
+async function submitModifier(){
+  const term=document.getElementById('modterm').value.trim();
+  const words=term.split(/\s+/).filter(Boolean);
+  if(term.length<2||term.length>40||words.length<1||words.length>3)
+    return toast('1-3 words, 2-40 characters.');
   const c=SHEET_CASE;if(!c)return;
-  const allTerms=[...SHEET_SELECTIONS.who,...SHEET_SELECTIONS.action,
-    ...SHEET_SELECTIONS.whom,...SHEET_SELECTIONS.custom];
-  if(SHEET_SELECTIONS.category)allTerms.push(SHEET_SELECTIONS.category);
-
-  if(!allTerms.length){toast('Select at least one term');return;}
-
-  /* Update local cache */
-  c.modifier_terms=c.modifier_terms||[];
-  for(const t of allTerms){
-    if(!c.modifier_terms.includes(t))c.modifier_terms.push(t);
-  }
-  if(SHEET_SELECTIONS.category)c.category=SHEET_SELECTIONS.category;
-
+  const slot=segVal('slotSeg'),kind=segVal('kindSeg');
+  const norm=term.toLowerCase();
   if(DEMO){
+    c.modifier_terms=c.modifier_terms||[];
+    if(!c.modifier_terms.includes(norm))c.modifier_terms.push(norm);
     closeSheet();renderResults(currentQuery());
-    toast('Refinements saved (demo)');return;
+    toast('Modifier filed (demo). It is now searchable.');return;
   }
-
-  /* Submit each term to modifiers endpoint */
   try{
-    for(const term of allTerms){
-      const slot=SHEET_SELECTIONS.who.includes(term)?'who':
-        SHEET_SELECTIONS.action.includes(term)?'action':
-        SHEET_SELECTIONS.whom.includes(term)?'whom':'case';
-      await api('modifiers',{case_id:c.id,slot,kind:'compound',term});
-    }
+    const d=await api('modifiers',{case_id:c.id,slot,kind,term:norm});
+    if(d.error)return toast(d.error);
+    c.modifier_terms=c.modifier_terms||[];
+    if(!c.modifier_terms.includes(norm))c.modifier_terms.push(norm);
+    c._modifiers=null;hydrateCase(c.id);
     closeSheet();renderResults(currentQuery());
-    toast('Saved '+allTerms.length+' tags');
-  }catch(e){toast('Could not save refinements');}
+    toast(d.strengthened?'Term strengthened. The graph agrees with you.'
+      :'Modifier filed. It is now search vocabulary.');
+  }catch(e){toast('Could not reach the registry.');}
 }
 
 /* ================= ADMIN (#admin) ================= */
@@ -1980,7 +874,8 @@ async function adminLoad(){
   if(DEMO){document.getElementById('epform').style.display='block';
     document.getElementById('eplist').style.display='block';
     renderAdminList([{id:'demo',title:'(demo) EP 1: The Chips Incident',
-      description:'Demo entry',featured:true,published:true}]);return;}
+      description:'Demo entry',featured:true,published:true}]);
+    crawlStatus();return;}
   try{const r=await fetch(CONFIG.FN('episodes'),{method:'POST',
       headers:{'Content-Type':'application/json','x-admin-key':key},
       body:JSON.stringify({action:'list_all'})});
@@ -1989,7 +884,51 @@ async function adminLoad(){
     document.getElementById('epform').style.display='block';
     document.getElementById('eplist').style.display='block';
     renderAdminList(d.episodes||[]);
+    crawlStatus();
   }catch(e){toast('Could not reach the registry.');}
+}
+async function crawlAPI(action,body){
+  const r=await fetch(CONFIG.FN('crawler')+'?action='+action,{method:'POST',
+    headers:{'Content-Type':'application/json','x-admin-key':adminKey()},
+    body:JSON.stringify(body||{})});
+  return r.json();
+}
+async function crawlStatus(){
+  if(DEMO){document.getElementById('crawlbox').style.display='block';
+    setText('crawlcounts','DEMO: crawler runs cloud-side when deployed.');return;}
+  try{const d=await crawlAPI('status');
+    document.getElementById('crawlbox').style.display='block';
+    const c=d.counts||{};
+    setText('crawlcounts','frontier '+(c.found||0)+' · fetched '+(c.fetched||0)
+      +' · awaiting review '+(c.scored||0)+' · promoted '+(c.promoted||0)
+      +' · dead '+(c.dead||0));
+    const host=document.getElementById('crawlpending');host.innerHTML='';
+    for(const p of (d.pending||[])){
+      const row=document.createElement('div');row.className='eprow';
+      row.innerHTML='<div><div class="t">'+esc(p.title||p.url)+'</div>'
+        +'<div class="meta">score '+Math.round(p.score||0)
+        +(p.signals&&p.signals.category_guess?' · '+esc(p.signals.category_guess):'')
+        +' · '+esc(p.domain||'')+' · via '+esc(p.discovered_via||'')+'</div></div>';
+      const btns=document.createElement('div');
+      const go=document.createElement('button');go.textContent='PROMOTE';
+      go.onclick=async()=>{await crawlAPI('promote_one',{id:p.id});
+        toast('Staged for the steward.');crawlStatus();};
+      const no=document.createElement('button');no.textContent='REJECT';
+      no.onclick=async()=>{await crawlAPI('reject_one',{id:p.id});crawlStatus();};
+      btns.appendChild(go);btns.appendChild(no);row.appendChild(btns);
+      host.appendChild(row);
+    }
+  }catch(e){/* crawler not deployed yet */}
+}
+async function crawlRun(){
+  toast('Crawl pass started…');
+  try{const d=await crawlAPI('run');
+    const s=d.stats||{};
+    toast('Crawl: +'+((s.discover||{}).found||0)+' found, '
+      +((s.fetch||{}).fetched||0)+' fetched, '
+      +((s.promote||{}).promoted||0)+' staged.');
+    crawlStatus();
+  }catch(e){toast('Crawl failed to start.');}
 }
 function renderAdminList(list){
   const host=document.getElementById('eplist');
