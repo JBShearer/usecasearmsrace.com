@@ -36,6 +36,11 @@ h1{margin:0;font-size:16px;letter-spacing:2.5px;text-transform:uppercase;
 .hbtns{display:flex;gap:8px;align-items:center}
 #themeToggle{background:none;border:2px solid var(--fg);border-radius:50%;
   width:40px;height:40px;font-size:18px;cursor:pointer}
+.cbbtn{background:none;border:2px solid var(--fg);border-radius:20px;
+  padding:8px 13px;font-size:12px;letter-spacing:1px;cursor:pointer;
+  text-transform:uppercase;font-weight:800}
+.cbbtn i{font-style:normal;color:var(--accent)}
+#casebook .hit{cursor:pointer}
 small.demo{color:var(--accent)}
 main{max-width:1080px;margin:0 auto;padding:16px 14px 80px}
 .screen{display:none}.screen.on{display:block;animation:snap .1s steps(2)}
@@ -220,7 +225,7 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
 <header><div class="hwrap">
   <div><h1 onclick="goHome()">Use Case Arms Race</h1>
   <div class="tagline">The AI use case registry. Search the graph. Vote the record. <small class="demo" id="demoflag"></small></div></div>
-  <div class="hbtns"><button id="themeToggle" title="Dossier / Brain Lab"></button></div>
+  <div class="hbtns"><button class="cbbtn" id="cbBtn" onclick="location.hash='#casebook'">Casebook <i id="cbCount"></i></button><button id="themeToggle" title="Dossier / Brain Lab"></button></div>
 </div></header>
 <main>
 
@@ -243,6 +248,15 @@ footer{color:var(--muted);font-size:11px;text-align:center;padding:18px;
   <div id="latency"></div>
   <div class="catrow" id="catrow"></div>
   <div id="results"></div>
+</section>
+
+<!-- ============ CASEBOOK (#casebook) ============ -->
+<section id="casebook" class="screen">
+  <h2 class="prompt">Your casebook</h2>
+  <div class="divider">FILED BY YOU</div>
+  <div id="cb-filed"></div>
+  <div class="divider">YOUR VERDICTS</div>
+  <div id="cb-voted"></div>
 </section>
 
 <!-- ============ ADMIN (#admin) ============ -->
@@ -414,7 +428,12 @@ const DEMO_CASES=[{
 
 /* ================= STATE ================= */
 const CACHE=new Map();DEMO_CASES.forEach(c=>CACHE.set(c.id,c));
-let CATEGORY=null,MY_VOTES={},OPEN_ID=null,lastWeb=[],lastParsed=null;
+let CATEGORY=null,MY_VOTES={},OPEN_ID=null,lastWeb=[],lastParsed=null,MY_FILED=[];
+try{MY_FILED=JSON.parse(localStorage.getItem('ucar_filed')||'[]');}catch(e){}
+function saveFiled(){try{localStorage.setItem('ucar_filed',JSON.stringify(MY_FILED.slice(0,100)));}catch(e){}}
+function cbCount(){const s=new Set(MY_FILED);
+  for(const [id,v] of Object.entries(MY_VOTES))if(v)s.add(id);
+  const el=document.getElementById('cbCount');if(el)el.textContent=s.size||'';}
 let EXCLUDE=new Set(),NO_FUZZY=false;
 try{MY_VOTES=JSON.parse(localStorage.getItem('ucar_votes')||'{}');}catch(e){}
 function saveVotes(){try{localStorage.setItem('ucar_votes',JSON.stringify(MY_VOTES));}catch(e){}}
@@ -683,6 +702,8 @@ function hitCard(c){
     +'<span class="badge">'+'\u2605'.repeat(c.impact||1)+'</span>'
     +(c.category?'<span class="badge">'+esc(c.category)+'</span>':'')
     +(isNew?'<span class="badge new">NEW</span>':'')
+    +((c.status&&c.status!=='live')
+      ?'<span class="badge new">'+(c.status==='staged'?'STEWARD READING':'AWAITING OWNER')+'</span>':'')
     +((c._matched&&c._matched.length)?'<span class="badge match">'+esc(c._matched[0])+'</span>':'')
     +'</div>'
     +'<h3>'+esc(c.title||c.raw_title||'')+'</h3>'
@@ -813,7 +834,9 @@ function renderFilePrompt(url,host){
 async function fileURL(url){
   if(DEMO){toast('DEMO: deploys to the staged queue when configured.');return;}
   try{const d=await api('file-case',{url});
-    toast(d.ok?'Filed. The steward will prefill it for review.':(d.error||'Could not file.'));
+    if(d.ok&&d.case_id&&!MY_FILED.includes(d.case_id)){
+      MY_FILED.unshift(d.case_id);saveFiled();cbCount();}
+    toast(d.ok?'Filed to your casebook. The steward will prefill it.':(d.error||'Could not file.'));
   }catch(e){toast('Could not reach the registry.');}
 }
 
@@ -863,6 +886,29 @@ async function submitModifier(){
     toast(d.strengthened?'Term strengthened. The graph agrees with you.'
       :'Modifier filed. It is now search vocabulary.');
   }catch(e){toast('Could not reach the registry.');}
+}
+
+/* ================= CASEBOOK (#casebook) ================= */
+async function renderCasebook(){
+  cbCount();
+  const filedHost=document.getElementById('cb-filed');
+  const votedHost=document.getElementById('cb-voted');
+  filedHost.innerHTML='';votedHost.innerHTML='';
+  const votedIds=Object.entries(MY_VOTES).filter(([,v])=>v).map(([id])=>id);
+  const want=[...new Set([...MY_FILED,...votedIds])]
+    .filter(id=>!CACHE.get(id)||!CACHE.get(id).status);
+  if(want.length&&!DEMO){
+    try{const d=await api('search-cases',{ids:want.slice(0,50)});
+      (d.results||[]).forEach(c=>CACHE.set(c.id,c));}catch(e){}
+  }
+  let n=0;
+  for(const id of MY_FILED){const c=CACHE.get(id);
+    if(c){filedHost.appendChild(hitCard(c));n++;}}
+  if(!n)filedHost.innerHTML='<div style="font-size:13px;color:var(--muted)">Nothing filed yet. Paste any article URL into search and file it; it lands here with its pipeline status.</div>';
+  let m=0;
+  for(const id of votedIds){if(MY_FILED.includes(id))continue;
+    const c=CACHE.get(id);if(c){votedHost.appendChild(hitCard(c));m++;}}
+  if(!m)votedHost.innerHTML='<div style="font-size:13px;color:var(--muted)">No verdicts yet. Halo or horns on any case files it here.</div>';
 }
 
 /* ================= ADMIN (#admin) ================= */
@@ -982,6 +1028,7 @@ function adminClear(){
 function route(){
   const h=location.hash;
   if(h==='#admin'){show('admin');setVal('ak',adminKey());return;}
+  if(h==='#casebook'){show('casebook');renderCasebook();return;}
   show('home');
   const m=h.match(/^#case=(.+)$/);
   if(m){OPEN_ID=m[1];
@@ -1002,7 +1049,7 @@ function setText(id,t){const el=document.getElementById(id);if(el)el.textContent
 function val(id){return document.getElementById(id).value;}
 function setVal(id,v){document.getElementById(id).value=v;}
 function esc(t){const d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML;}
-loadEpisodes();boot();route();
+loadEpisodes();boot();route();cbCount();
 
 </script>
 </body>
