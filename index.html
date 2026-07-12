@@ -650,8 +650,9 @@ async function serverSearch(q){
     document.getElementById('latency').textContent=
       (d.ms!=null?d.ms+'ms \u00b7 ':'')+(d.results||[]).length+' graph hits';
     renderParse(d.parsed);renderExpansion(d.parsed);
+    console.log('web_results:', d.web_results);
     renderWeb(d.web_results||[]);
-  }catch(e){}
+  }catch(e){console.error('search error:',e);}
 }
 function renderParse(p){
   const host=document.getElementById('parserow');host.innerHTML='';
