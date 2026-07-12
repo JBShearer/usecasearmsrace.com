@@ -639,11 +639,14 @@ function localRank(q){
 }
 const EXCLUDED=new Set();
 async function serverSearch(q){
+  console.log('serverSearch called:', q);
   const seq=++searchSeq;
-  if(DEMO){localRank(q);return;}
+  if(DEMO){console.log('DEMO mode, skipping');localRank(q);return;}
   try{
+    console.log('calling API...');
     const d=await api('search-cases',{q,web:true,exclude:[...EXCLUDED]});
-    if(seq!==searchSeq)return;
+    console.log('API response:', d);
+    if(seq!==searchSeq){console.log('stale seq');return;}
     (d.results||[]).forEach(c=>CACHE.set(c.id,c));
     lastParsed=d.parsed||null;
     renderList(d.results||[],'THE DOCKET \u00b7 MATCHES');
