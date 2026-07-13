@@ -925,34 +925,18 @@ async function flagFake(f,el,c){
 }
 function renderCase(host,c){
   host.innerHTML='';
-  const f0=(c.filings&&c.filings[0])||c.filing;
   const head=document.createElement('div');head.className='casehead';
-  const idt=c.identity||{};
   head.innerHTML='<div class="cnum">CASE #'+esc(c.case_number)
     +' \u00b7 '+stars(c.impact||1)+'</div>'
     +'<h2>'+esc(c.title_render)+'</h2>'
-    +'<div class="idrow">'
-    +(idt.verb?'<span class="idtag">ACTION: '+esc(idt.verb)+'</span>':'')
-    +(idt.object_class?'<span class="idtag">CLASS: '+esc(idt.object_class)+'</span>':'')
-    +(idt.instrument?'<span class="idtag">WITH: '+esc(idt.instrument)+'</span>':'')
-    +'</div>'
     +(c.parent?'<div class="linkrow">Split from <a href="#case='+esc(c.parent.case_number)
       +'">Case #'+esc(c.parent.case_number)+'</a></div>':'')
     +((c.children||[]).length?'<div class="linkrow">Not the same as: '
       +c.children.map(k=>'<a href="#case='+esc(k.case_number)+'">#'+esc(k.case_number)+'</a>').join(' \u00b7 ')
       +'</div>':'');
   host.appendChild(head);
-  if(f0){
-    const art=document.createElement('div');art.className='article';
-    art.innerHTML='<div class="alabel">NEWEST FILING'
-      +(f0.kind==='testimony'?' \u00b7 TESTIMONY':'')+'</div>'
-      +'<h3>'+esc(f0.headline||'')+'</h3>'
-      +(f0.summary?'<p>'+esc(f0.summary)+'</p>':'')
-      +(f0.article_quote?'<div class="quote">\u201C'+esc(f0.article_quote)+'\u201D</div>':'')
-      +(f0.source_url?'<a class="srcbtn" href="'+esc(f0.source_url)
-        +'" target="_blank" rel="noopener">Read the source \u2192</a>':'');
-    host.appendChild(art);
-  }
+  const bv=document.createElement('div');bv.className='bigvotes';
+  bv.appendChild(votePair(c,true));host.appendChild(bv);
   const acts=document.createElement('div');acts.className='actionrow';
   const saved=!!SAVES[c.id];
   acts.innerHTML='<button class="abtn" id="saveBtn">'+(saved?'\u2713 In casebook':'+ Save to casebook')+'</button>'
@@ -962,14 +946,13 @@ function renderCase(host,c){
   acts.querySelector('#saveBtn').onclick=()=>toggleSave(c,acts.querySelector('#saveBtn'));
   acts.querySelector('#shareBtn').onclick=()=>shareCase(c);
   acts.querySelector('#ntsBtn').onclick=()=>openNotTheSame(c);
+  const filings=(c.filings&&c.filings.length?c.filings:(c.filing?[c.filing]:[]));
   const bd=document.createElement('div');bd.className='divider';
-  bd.innerHTML='<span>ALL FILINGS \u00b7 '+esc((c.filings||[]).length||c.live_filings||0)+'</span>';
+  bd.innerHTML='<span>FILINGS \u00b7 '+esc(filings.length)+'</span>';
   host.appendChild(bd);
-  for(const f of (c.filings&&c.filings.length?c.filings:(c.filing?[c.filing]:[]))){
+  for(const f of filings){
     host.appendChild(filingRow(f,c));
   }
-  const bv=document.createElement('div');bv.className='bigvotes';
-  bv.appendChild(votePair(c,true));host.appendChild(bv);
   const md=document.createElement('div');md.className='divider';
   md.innerHTML='<span>COMMUNITY VOCABULARY</span>';host.appendChild(md);
   const mods=document.createElement('div');mods.className='mods';
