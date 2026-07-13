@@ -132,9 +132,18 @@ header{display:flex;justify-content:space-between;align-items:center;
 .casehead{border-bottom:3px solid var(--line);padding:14px 0 10px;margin-bottom:10px}
 .casehead .cnum{font-size:13px;letter-spacing:2px;color:var(--accent);font-weight:900}
 .casehead h2{font-size:clamp(18px,5vw,26px);letter-spacing:1px;margin:4px 0}
+.casehead .casedesc{font-size:14px;color:var(--muted);margin:8px 0;line-height:1.5}
 .idrow{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
 .idtag{font-size:11px;letter-spacing:1px;border:2px solid var(--fg);
   padding:3px 8px;font-weight:800}
+.comments{margin:10px 0}
+.comment{border-left:3px solid var(--line);padding:8px 12px;margin:8px 0;background:var(--card)}
+.comment .cmeta{font-size:11px;color:var(--muted);font-weight:800;margin-bottom:4px}
+.comment p{font-size:13px;line-height:1.5}
+.comment-form{margin-top:12px}
+.comment-form textarea{width:100%;padding:10px;font-family:inherit;font-size:13px;
+  background:var(--card);color:var(--fg);border:2px solid var(--line);resize:vertical}
+.comment-form button{margin-top:8px}
 .article{border:3px solid var(--line);background:var(--card);padding:14px;margin:12px 0}
 .article .alabel{font-size:11px;letter-spacing:2px;color:var(--accent);
   font-weight:800;margin-bottom:6px}
@@ -929,9 +938,10 @@ function renderCase(host,c){
   head.innerHTML='<div class="cnum">CASE #'+esc(c.case_number)
     +' \u00b7 '+stars(c.impact||1)+'</div>'
     +'<h2>'+esc(c.title_render)+'</h2>'
+    +(c.description?'<p class="casedesc">'+esc(c.description)+'</p>':'')
     +(c.parent?'<div class="linkrow">Split from <a href="#case='+esc(c.parent.case_number)
       +'">Case #'+esc(c.parent.case_number)+'</a></div>':'')
-    +((c.children||[]).length?'<div class="linkrow">Not the same as: '
+    +((c.children||[]).length?'<div class="linkrow">Related: '
       +c.children.map(k=>'<a href="#case='+esc(k.case_number)+'">#'+esc(k.case_number)+'</a>').join(' \u00b7 ')
       +'</div>':'');
   host.appendChild(head);
@@ -940,12 +950,10 @@ function renderCase(host,c){
   const acts=document.createElement('div');acts.className='actionrow';
   const saved=!!SAVES[c.id];
   acts.innerHTML='<button class="abtn" id="saveBtn">'+(saved?'\u2713 In casebook':'+ Save to casebook')+'</button>'
-    +'<button class="abtn" id="shareBtn">Share Case #'+esc(c.case_number)+'</button>'
-    +'<button class="abtn accent" id="ntsBtn">Not the same</button>';
+    +'<button class="abtn" id="shareBtn">Share</button>';
   host.appendChild(acts);
   acts.querySelector('#saveBtn').onclick=()=>toggleSave(c,acts.querySelector('#saveBtn'));
   acts.querySelector('#shareBtn').onclick=()=>shareCase(c);
-  acts.querySelector('#ntsBtn').onclick=()=>openNotTheSame(c);
   const filings=(c.filings&&c.filings.length?c.filings:(c.filing?[c.filing]:[]));
   const bd=document.createElement('div');bd.className='divider';
   bd.innerHTML='<span>FILINGS \u00b7 '+esc(filings.length)+'</span>';
@@ -953,22 +961,72 @@ function renderCase(host,c){
   for(const f of filings){
     host.appendChild(filingRow(f,c));
   }
-  const md=document.createElement('div');md.className='divider';
-  md.innerHTML='<span>COMMUNITY VOCABULARY</span>';host.appendChild(md);
-  const mods=document.createElement('div');mods.className='mods';
-  for(const t of (c.modifier_terms||[])){
-    const b=document.createElement('button');b.className='mod';b.textContent='#'+t;
-    b.onclick=()=>{location.hash='';setTimeout(()=>{const q=document.getElementById('q');
-      q.value=t;q.dispatchEvent(new Event('input'));},50);};
-    mods.appendChild(b);
+  // Comments section
+  const cd=document.createElement('div');cd.className='divider';
+  cd.innerHTML='<span>DISCUSSION</span>';host.appendChild(cd);
+  const comments=document.createElement('div');comments.className='comments';comments.id='comments';
+  comments.innerHTML='<div class="empty">No comments yet.</div>'
+    +'<div class="comment-form">'
+    +'<textarea id="commentInput" placeholder="Add to the discussion..." rows="2"></textarea>'
+    +'<button class="abtn" id="postComment">Post</button>'
+    +'</div>';
+  host.appendChild(comments);
+  comments.querySelector('#postComment').onclick=()=>postComment(c);
+  loadComments(c);
+  // Tags
+  if((c.modifier_terms||[]).length){
+    const md=document.createElement('div');md.className='divider';
+    md.innerHTML='<span>TAGS</span>';host.appendChild(md);
+    const mods=document.createElement('div');mods.className='mods';
+    for(const t of (c.modifier_terms||[])){
+      const b=document.createElement('button');b.className='mod';b.textContent='#'+t;
+      b.onclick=()=>{location.hash='';setTimeout(()=>{const q=document.getElementById('q');
+        q.value=t;q.dispatchEvent(new Event('input'));},50);};
+      mods.appendChild(b);
+    }
+    host.appendChild(mods);
   }
-  const add=document.createElement('button');add.className='mod add';add.textContent='+ add term';
-  add.onclick=()=>openModifier(c);mods.appendChild(add);
-  host.appendChild(mods);
-  const pd=document.createElement('div');pd.className='divider';
-  pd.innerHTML='<span>OPEN PROPOSALS</span>';host.appendChild(pd);
-  const pl=document.createElement('div');pl.className='proplist';pl.id='proplist';
-  pl.innerHTML='<div class="empty">None yet.</div>';host.appendChild(pl);
+}
+async function loadComments(c){
+  if(DEMO)return;
+  try{
+    const d=await api('comments',{case_id:c.id});
+    const host=document.getElementById('comments');
+    if(!host)return;
+    const list=(d.comments||[]);
+    if(list.length){
+      host.innerHTML='';
+      for(const cm of list){
+        const div=document.createElement('div');div.className='comment';
+        div.innerHTML='<div class="cmeta">'+esc(cm.author||'Anon')+' \u00b7 '+relTime(cm.created_at)+'</div>'
+          +'<p>'+esc(cm.text)+'</p>';
+        host.appendChild(div);
+      }
+      host.insertAdjacentHTML('beforeend',
+        '<div class="comment-form">'
+        +'<textarea id="commentInput" placeholder="Add to the discussion..." rows="2"></textarea>'
+        +'<button class="abtn" id="postComment">Post</button>'
+        +'</div>');
+      host.querySelector('#postComment').onclick=()=>postComment(c);
+    }
+  }catch(e){}
+}
+async function postComment(c){
+  const input=document.getElementById('commentInput');
+  const text=(input?.value||'').trim();
+  if(!text){toast('Write something first.');return;}
+  if(text.length>1000){toast('Comment too long.');return;}
+  if(DEMO){toast('Demo mode.');return;}
+  try{
+    const d=await api('comments',{case_id:c.id,text});
+    if(d.ok){
+      input.value='';
+      loadComments(c);
+      toast('Comment posted.');
+    }else{
+      toast(d.error||'Could not post.');
+    }
+  }catch(e){toast('Could not reach server.');}
 }
 async function toggleSave(c,btn){
   if(SAVES[c.id]){delete SAVES[c.id];btn.textContent='+ Save to casebook';}
