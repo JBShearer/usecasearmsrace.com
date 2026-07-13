@@ -89,6 +89,11 @@ header{display:flex;justify-content:space-between;align-items:center;
   font-family:inherit;font-size:11px;font-weight:800;letter-spacing:1px;
   padding:6px 11px;cursor:pointer;border-radius:16px}
 .tchip.on{background:var(--fg);color:var(--bg)}
+.modeseg{display:flex;border:2px solid var(--accent);margin-right:12px}
+.modeseg button{background:none;border:none;color:var(--accent);font-family:inherit;
+  font-size:10.5px;font-weight:800;letter-spacing:1px;padding:7px 10px;
+  cursor:pointer;text-transform:uppercase}
+.modeseg button.on{background:var(--accent);color:var(--bg)}
 .sortseg{display:flex;border:2px solid var(--fg);margin-left:auto}
 .sortseg button{background:none;border:none;color:var(--fg);font-family:inherit;
   font-size:10.5px;font-weight:800;letter-spacing:1px;padding:7px 10px;
@@ -109,6 +114,12 @@ header{display:flex;justify-content:space-between;align-items:center;
 .hit .quote{font-size:12px;border-left:3px solid var(--accent);padding-left:8px;
   font-style:italic;margin:6px 0;color:var(--fg)}
 .hit .meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.hit.filing .domain{font-size:10.5px;letter-spacing:1.5px;color:var(--muted);font-weight:800;text-transform:uppercase}
+.hit.filing .timeago{font-size:10.5px;letter-spacing:1px;color:var(--muted);font-weight:800}
+.hit.filing .filing-headline{cursor:pointer}
+.hit.filing .filing-headline:hover{color:var(--accent)}
+.hit.filing .caselink{font-size:10.5px;letter-spacing:1.5px;color:var(--accent);font-weight:800;cursor:pointer}
+.hit.filing .caselink:hover{text-decoration:underline}
 .fcount{font-size:10.5px;letter-spacing:1px;color:var(--muted);font-weight:800}
 .votes{display:flex;gap:8px;margin-left:auto}
 .vbtn{display:flex;align-items:center;gap:4px;background:none;
@@ -442,6 +453,7 @@ const DEMO_TOPICS=[{id:'t1',name:'Surveillance',term_set:['surveil','cameras']},
 const CACHE = new Map();
 let TOPICS=[], SORT='newest', ACTIVE_TOPIC=null, lastWeb=[], lastParsed=null;
 let CURRENT_CASE=null, CB_OPEN=false;
+let VIEW_MODE='feed'; // 'feed' = filings (news), 'cases' = patterns
 if(DEMO){ DEMO_CASES.forEach(c=>CACHE.set(c.id,c)); TOPICS=DEMO_TOPICS; }
 
 /* ---------------- boot ---------------- */
@@ -456,7 +468,7 @@ async function boot(){
       video_url:'', case_number:102});
     return;
   }
-  loadEpisode(); loadMetrics(); browse(); loadTopics(); refreshBookData();
+  loadEpisode(); loadMetrics(); loadView(); loadTopics(); refreshBookData();
 }
 async function browse(){
   try{
@@ -470,6 +482,16 @@ async function browse(){
           best:'THE DOCKET \u00b7 BEST'})[SORT]);
     document.getElementById('latency').textContent =
       (d.ms!=null? d.ms+'ms \u00b7 ':'')+(d.results||[]).length+' cases';
+  }catch(e){ toast('Could not reach the registry.'); }
+}
+async function feed(){
+  try{
+    const d = await api('search-cases',{feed:true, sort:SORT});
+    renderFilingList(d.filings||[],
+      ({newest:'THE FEED \u00b7 NEWEST',worst:'THE FEED \u00b7 WORST',
+        best:'THE FEED \u00b7 BEST'})[SORT]);
+    document.getElementById('latency').textContent =
+      (d.ms!=null? d.ms+'ms \u00b7 ':'')+(d.filings||[]).length+' filings';
   }catch(e){ toast('Could not reach the registry.'); }
 }
 async function loadMetrics(){
@@ -512,11 +534,22 @@ function renderEpisode(ep){
 /* ---------------- topics + sort ---------------- */
 function renderTopics(){
   const host=document.getElementById('toprow');host.innerHTML='';
+  // Mode toggle: FEED vs CASES
+  const modeDiv=document.createElement('div');modeDiv.className='modeseg';
+  for(const m of ['feed','cases']){
+    const b=document.createElement('button');
+    b.textContent=m.toUpperCase();
+    if(VIEW_MODE===m)b.className='on';
+    b.onclick=()=>{VIEW_MODE=m;renderTopics();DEMO?demoSort():loadView();};
+    modeDiv.appendChild(b);
+  }
+  host.appendChild(modeDiv);
+  // Topic chips
   for(const t of TOPICS){
     const b=document.createElement('button');b.className='tchip'+(ACTIVE_TOPIC===t.id?' on':'');
     b.textContent=t.name;
     b.onclick=()=>{ACTIVE_TOPIC=(ACTIVE_TOPIC===t.id?null:t.id);renderTopics();
-      DEMO?demoTopic():browse();};
+      DEMO?demoTopic():loadView();};
     host.appendChild(b);
   }
   const add=document.createElement('button');add.className='tchip';add.textContent='+ topic';
@@ -525,10 +558,13 @@ function renderTopics(){
   for(const s of ['newest','worst','best']){
     const b=document.createElement('button');b.textContent=s;
     if(SORT===s)b.className='on';
-    b.onclick=()=>{SORT=s;renderTopics();DEMO?demoSort():browse();};
+    b.onclick=()=>{SORT=s;renderTopics();DEMO?demoSort():loadView();};
     seg.appendChild(b);
   }
   host.appendChild(seg);
+}
+function loadView(){
+  if(VIEW_MODE==='feed')feed();else browse();
 }
 function demoSort(){
   const arr=[...DEMO_CASES];
@@ -607,6 +643,53 @@ function renderList(cases,label){
   if(!cases.length){host.insertAdjacentHTML('beforeend',
     '<div class="empty">Nothing on the docket for that. File the first case.</div>');return;}
   for(const c of cases)host.appendChild(caseRow(c));
+}
+function feedFilingRow(f){
+  const el=document.createElement('div');el.className='hit filing';
+  const c=f.case||{};
+  const timeAgo=f.published_at?relTime(f.published_at):(f.created_at?relTime(f.created_at):'');
+  el.innerHTML=
+    '<div class="toprule">'
+      +'<span class="domain">'+esc(f.domain||'')+'</span>'
+      +(timeAgo?'<span class="timeago">'+timeAgo+'</span>':'')
+    +'</div>'
+    +'<h3 class="filing-headline">'+esc(f.headline||f.summary||'')+'</h3>'
+    +(f.summary&&f.headline?'<p>'+esc(f.summary)+'</p>':'')
+    +(f.article_quote?'<div class="quote">"'+esc(f.article_quote)+'"</div>':'')
+    +'<div class="meta">'
+      +(c.case_number?'<span class="caselink">CASE #'+esc(c.case_number)+' · '+esc(c.title_render||'')+'</span>':'')
+    +'</div>';
+  // Click headline to go to source article
+  const headline=el.querySelector('.filing-headline');
+  if(headline&&f.source_url){
+    headline.style.cursor='pointer';
+    headline.onclick=e=>{e.stopPropagation();window.open(f.source_url,'_blank');};
+  }
+  // Click case link to go to case detail
+  const clink=el.querySelector('.caselink');
+  if(clink&&c.case_number){
+    clink.onclick=e=>{e.stopPropagation();location.hash='#case='+c.case_number;};
+  }
+  return el;
+}
+function relTime(isoStr){
+  const ms=Date.now()-new Date(isoStr).getTime();
+  if(ms<0)return'';
+  const mins=Math.floor(ms/60000);
+  if(mins<60)return mins+'m';
+  const hrs=Math.floor(mins/60);
+  if(hrs<24)return hrs+'h';
+  const days=Math.floor(hrs/24);
+  if(days<7)return days+'d';
+  return Math.floor(days/7)+'w';
+}
+function renderFilingList(filings,label){
+  const host=document.getElementById('results');host.innerHTML='';
+  const div=document.createElement('div');div.className='divider';
+  div.innerHTML='<span>'+esc(label)+'</span>';host.appendChild(div);
+  if(!filings.length){host.insertAdjacentHTML('beforeend',
+    '<div class="empty">No filings yet. File the first case.</div>');return;}
+  for(const f of filings)host.appendChild(feedFilingRow(f));
 }
 
 /* ---------------- search ---------------- */
