@@ -36,30 +36,23 @@ header{display:flex;justify-content:space-between;align-items:center;
   text-transform:uppercase;padding:10px 2px;display:flex;gap:14px;flex-wrap:wrap}
 .metrics b{color:var(--fg)}
 /* episode */
-.episode{border:3px solid var(--line);background:var(--card);margin:14px 0;
-  padding:14px}
-.episode .elabel{font-size:10px;letter-spacing:2px;color:var(--accent);
-  font-weight:800;margin-bottom:6px}
+.episode{border:3px solid var(--line);background:var(--card);margin:14px 0;padding:14px}
+.episode .elabel{font-size:10px;letter-spacing:2px;color:var(--accent);font-weight:800;margin-bottom:6px}
 .episode h3{font-size:16px;margin-bottom:6px}
 .episode p{font-size:12.5px;color:var(--muted);margin-bottom:8px}
-.episode iframe,.episode video{width:100%;aspect-ratio:16/9;border:2px solid var(--line);
-  background:#000}
+.episode iframe,.episode video{width:100%;aspect-ratio:16/9;border:2px solid var(--line);background:#000}
 .episode a.caselink{color:var(--accent);font-weight:800;font-size:12px}
 /* casebook strip */
 .cbstrip{border:3px solid var(--line);background:var(--card);margin:12px 0}
 .cbbar{display:flex;justify-content:space-between;align-items:center;
-  padding:10px 12px;cursor:pointer;font-weight:800;letter-spacing:1.5px;
-  font-size:12px;text-transform:uppercase}
+  padding:10px 12px;cursor:pointer;font-weight:800;letter-spacing:1.5px;font-size:12px;text-transform:uppercase}
 .cbbar .dot{display:inline-block;min-width:18px;padding:1px 6px;border-radius:9px;
-  background:var(--accent);color:var(--bg);font-size:10.5px;text-align:center;
-  margin-left:6px}
+  background:var(--accent);color:var(--bg);font-size:10.5px;text-align:center;margin-left:6px}
 .cbbody{display:none;border-top:2px solid var(--line);padding:10px 12px}
 .cbstrip.open .cbbody{display:block}
-.cbsec{font-size:10px;letter-spacing:2px;color:var(--muted);margin:8px 0 4px;
-  font-weight:800}
+.cbsec{font-size:10px;letter-spacing:2px;color:var(--muted);margin:8px 0 4px;font-weight:800}
 .cbrow{display:flex;justify-content:space-between;gap:8px;align-items:center;
-  padding:7px 4px;border-bottom:1px dashed var(--muted);cursor:pointer;
-  font-size:12.5px}
+  padding:7px 4px;border-bottom:1px dashed var(--muted);cursor:pointer;font-size:12.5px}
 .cbrow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .badge{font-size:9px;letter-spacing:1px;padding:2px 6px;border:1.5px solid var(--accent);
   color:var(--accent);font-weight:800;border-radius:3px;white-space:nowrap}
@@ -72,16 +65,8 @@ header{display:flex;justify-content:space-between;align-items:center;
 /* search */
 .searchbox{margin:12px 0 6px;position:relative}
 .searchbox input{width:100%;padding:14px 12px;font-size:16px;
-  font-family:inherit;background:var(--card);color:var(--fg);
-  border:3px solid var(--line);outline:none}
+  font-family:inherit;background:var(--card);color:var(--fg);border:3px solid var(--line);outline:none}
 .latency{font-size:10.5px;color:var(--muted);letter-spacing:1px;margin:5px 2px}
-.parserow,.exprow{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
-.ptag{font-size:10px;letter-spacing:1px;border:1.5px solid var(--muted);
-  color:var(--muted);padding:2px 7px;border-radius:3px;font-weight:800}
-.ptag.hit{border-color:var(--accent);color:var(--accent)}
-.extag{font-size:10px;letter-spacing:1px;background:var(--chip);color:var(--fg);
-  padding:3px 8px;border-radius:3px;font-weight:700;cursor:pointer}
-.extag i{font-style:normal;opacity:.6;margin-left:4px}
 .filebar{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap}
 /* topics + sort */
 .toprow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:10px 0}
@@ -91,28 +76,23 @@ header{display:flex;justify-content:space-between;align-items:center;
 .tchip.on{background:var(--fg);color:var(--bg)}
 .modeseg{display:flex;border:2px solid var(--accent);margin-right:12px}
 .modeseg button{background:none;border:none;color:var(--accent);font-family:inherit;
-  font-size:10.5px;font-weight:800;letter-spacing:1px;padding:7px 10px;
-  cursor:pointer;text-transform:uppercase}
+  font-size:10.5px;font-weight:800;letter-spacing:1px;padding:7px 10px;cursor:pointer;text-transform:uppercase}
 .modeseg button.on{background:var(--accent);color:var(--bg)}
 .sortseg{display:flex;border:2px solid var(--fg);margin-left:auto}
 .sortseg button{background:none;border:none;color:var(--fg);font-family:inherit;
-  font-size:10.5px;font-weight:800;letter-spacing:1px;padding:7px 10px;
-  cursor:pointer;text-transform:uppercase}
+  font-size:10.5px;font-weight:800;letter-spacing:1px;padding:7px 10px;cursor:pointer;text-transform:uppercase}
 .sortseg button.on{background:var(--fg);color:var(--bg)}
 /* case rows */
 .divider{font-size:11px;letter-spacing:2px;color:var(--muted);
-  border-bottom:2px solid var(--line);padding:12px 2px 4px;margin-bottom:8px;
-  font-weight:800;display:flex;justify-content:space-between}
-.hit{border:3px solid var(--line);background:var(--card);margin:10px 0;
-  padding:12px;cursor:pointer}
+  border-bottom:2px solid var(--line);padding:12px 2px 4px;margin-bottom:8px;font-weight:800;display:flex;justify-content:space-between}
+.hit{border:3px solid var(--line);background:var(--card);margin:10px 0;padding:12px;cursor:pointer}
 .hit .toprule{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
 .hit .cnum{font-size:12px;letter-spacing:1.5px;color:var(--accent);font-weight:900}
 .hit .stars{font-size:12px;letter-spacing:2px;color:var(--halo)}
 .hit h3{font-size:16px;letter-spacing:.5px;margin:4px 0 2px;line-height:1.3}
 .hit .subj{font-size:12px;color:var(--muted);letter-spacing:1px;font-weight:800}
 .hit p{font-size:13px;color:var(--muted);margin:6px 0;line-height:1.5}
-.hit .quote{font-size:13px;border-left:3px solid var(--accent);padding-left:8px;
-  font-style:italic;margin:6px 0;color:var(--fg)}
+.hit .quote{font-size:13px;border-left:3px solid var(--accent);padding-left:8px;font-style:italic;margin:6px 0;color:var(--fg)}
 .hit .meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
 .hit.filing .domain{font-size:11px;letter-spacing:1.5px;color:var(--muted);font-weight:800;text-transform:uppercase}
 .hit.filing .timeago{font-size:11px;letter-spacing:1px;color:var(--muted);font-weight:800}
@@ -133,62 +113,22 @@ header{display:flex;justify-content:space-between;align-items:center;
 .casehead .cnum{font-size:13px;letter-spacing:2px;color:var(--accent);font-weight:900}
 .casehead h2{font-size:clamp(18px,5vw,26px);letter-spacing:1px;margin:4px 0}
 .casehead .casedesc{font-size:14px;color:var(--muted);margin:8px 0;line-height:1.5}
-.idrow{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
-.idtag{font-size:11px;letter-spacing:1px;border:2px solid var(--fg);
-  padding:3px 8px;font-weight:800}
-.comments{margin:10px 0}
-.comment{border-left:3px solid var(--line);padding:8px 12px;margin:8px 0;background:var(--card)}
-.comment .cmeta{font-size:11px;color:var(--muted);font-weight:800;margin-bottom:4px}
-.comment p{font-size:13px;line-height:1.5}
-.comment-form{margin-top:12px}
-.comment-form textarea{width:100%;padding:10px;font-family:inherit;font-size:13px;
-  background:var(--card);color:var(--fg);border:2px solid var(--line);resize:vertical}
-.comment-form button{margin-top:8px}
-.article{border:3px solid var(--line);background:var(--card);padding:14px;margin:12px 0}
-.article .alabel{font-size:11px;letter-spacing:2px;color:var(--accent);
-  font-weight:800;margin-bottom:6px}
-.article h3{font-size:16.5px;margin-bottom:6px;line-height:1.35}
-.article p{font-size:13px;line-height:1.5;color:var(--fg)}
-.article .quote{border-left:3px solid var(--accent);padding-left:10px;
-  font-style:italic;margin:10px 0;font-size:13px}
-.srcbtn{display:inline-block;margin-top:8px;font-size:12px;font-weight:800;
-  letter-spacing:1px;color:var(--accent);text-decoration:none;
-  border:2px solid var(--accent);padding:6px 10px}
 .frow{border:2px solid var(--line);background:var(--card);padding:10px;margin:8px 0}
 .frow .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
 .frow .subj{font-weight:900;font-size:13px;letter-spacing:.5px}
 .frow .date{font-size:11px;color:var(--muted)}
 .frow p{font-size:13px;color:var(--muted);margin:5px 0;line-height:1.45}
 .frow .chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
-.dchip{font-size:11px;background:var(--chip);padding:2px 7px;border-radius:3px;
-  font-weight:700}
-.frow.q{opacity:.45}
-.fakebtn{background:none;border:1.5px solid var(--muted);color:var(--muted);
-  font-family:inherit;font-size:11px;font-weight:800;letter-spacing:1px;
-  padding:3px 7px;cursor:pointer;border-radius:3px}
-.fakebtn.on{border-color:var(--horn);color:var(--horn)}
+.dchip{font-size:11px;background:var(--chip);padding:2px 7px;border-radius:3px;font-weight:700}
+.srcbtn{display:inline-block;margin-top:8px;font-size:12px;font-weight:800;
+  letter-spacing:1px;color:var(--accent);text-decoration:none;border:2px solid var(--accent);padding:6px 10px}
 .bigvotes{display:flex;gap:12px;justify-content:center;margin:16px 0}
 .bigvotes .vbtn{font-size:14px;padding:10px 18px}
-.mods{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
-.mod{background:var(--chip);border:none;color:var(--fg);font-family:inherit;
-  font-size:12px;font-weight:700;padding:5px 10px;border-radius:3px;cursor:pointer}
-.mod.add{border:2px dashed var(--muted);background:none;color:var(--muted)}
 .actionrow{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
 .abtn{background:none;border:2px solid var(--fg);color:var(--fg);
   font-family:inherit;font-size:12px;font-weight:800;letter-spacing:1px;
   padding:9px 13px;cursor:pointer;text-transform:uppercase}
 .abtn.accent{border-color:var(--accent);color:var(--accent)}
-.proplist{margin:8px 0}
-.prop{border:2px dashed var(--muted);padding:8px 10px;margin:6px 0;font-size:12px;
-  display:flex;justify-content:space-between;gap:8px;align-items:center}
-.linkrow{font-size:12px;margin:4px 0;color:var(--muted)}
-.linkrow a{color:var(--accent);font-weight:800;cursor:pointer}
-/* web results */
-.webhit{border:2px dashed var(--muted);background:transparent;margin:8px 0;
-  padding:10px 12px}
-.webhit h4{font-size:13px;margin-bottom:3px}
-.webhit .dom{font-size:10px;letter-spacing:1px;color:var(--muted);font-weight:800}
-.webhit p{font-size:11.5px;color:var(--muted);margin:4px 0}
 /* sheet + toast + admin */
 .sheetback{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40}
 .sheetback.open{display:block}
@@ -197,15 +137,12 @@ header{display:flex;justify-content:space-between;align-items:center;
   z-index:41;transform:translateY(105%);transition:transform .22s;max-width:860px;margin:0 auto}
 .sheet.open{transform:translateY(0)}
 .sheet h4{font-size:13px;letter-spacing:1.5px;margin-bottom:10px;text-transform:uppercase}
-.sheet label{font-size:10.5px;letter-spacing:1px;color:var(--muted);display:block;
-  margin:8px 0 3px;font-weight:800;text-transform:uppercase}
+.sheet label{font-size:10.5px;letter-spacing:1px;color:var(--muted);display:block;margin:8px 0 3px;font-weight:800;text-transform:uppercase}
 .sheet input,.sheet textarea,.sheet select{width:100%;padding:10px;font-size:15px;
-  font-family:inherit;background:var(--bg);color:var(--fg);
-  border:2px solid var(--line);outline:none}
+  font-family:inherit;background:var(--bg);color:var(--fg);border:2px solid var(--line);outline:none}
 .sheet textarea{min-height:110px;resize:vertical}
 .sheet .row{display:flex;gap:8px;margin-top:12px}
-.sheet .row button{flex:1;padding:12px;font-family:inherit;font-weight:800;
-  letter-spacing:1px;font-size:12px;cursor:pointer}
+.sheet .row button{flex:1;padding:12px;font-family:inherit;font-weight:800;letter-spacing:1px;font-size:12px;cursor:pointer}
 .sheet .go{background:var(--accent);color:var(--bg);border:none}
 .sheet .no{background:none;border:2px solid var(--fg);color:var(--fg)}
 #toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;
@@ -256,21 +193,16 @@ footer{margin-top:34px;border-top:3px solid var(--line);padding:14px 2px;
   <div class="metrics" id="metrics"></div>
 
   <div class="searchbox">
-    <input id="q" type="search" placeholder="Search the docket, or paste a URL to file..."
-      autocomplete="off" autocapitalize="none">
+    <input id="q" type="search" placeholder="Search the docket, or paste a URL to file..." autocomplete="off" autocapitalize="none">
   </div>
   <div class="latency" id="latency"></div>
-  <div class="parserow" id="parserow"></div>
-  <div class="exprow" id="exprow"></div>
   <div class="filebar">
     <button class="mini" id="fileBtn" style="display:none" onclick="fileURL()">File this URL as a case</button>
     <button class="mini" onclick="openTestimony()">File testimony (no link)</button>
   </div>
 
   <div class="toprow" id="toprow"></div>
-
   <div id="results"></div>
-  <div id="webhost"></div>
 </section>
 
 <!-- ============ CASE (#case=N) ============ -->
@@ -283,37 +215,27 @@ footer{margin-top:34px;border-top:3px solid var(--line);padding:14px 2px;
 <section id="admin" class="screen">
   <button class="backbtn" onclick="location.hash=''">&larr; Exit admin</button>
   <div class="aform">
-    <h4>STEWARD KEY</h4>
+    <h4>ADMIN KEY</h4>
     <input id="ak" type="password" placeholder="ADMIN_KEY">
   </div>
   <div class="aform">
-    <h4>CASE OF THE DAY / EPISODES</h4>
+    <h4>DAILY SHOW / EPISODE</h4>
     <input id="ep-title" placeholder="Title">
     <textarea id="ep-desc" placeholder="Description"></textarea>
     <input id="ep-video" placeholder="Video URL (YouTube embed or mp4)">
-    <input id="ep-case" placeholder="Case number (optional)">
     <button class="mini" onclick="saveEpisode()">Publish episode</button>
-    <div id="ep-list" style="margin-top:10px"></div>
   </div>
   <div class="aform">
-    <h4>PROPOSALS QUEUE</h4>
-    <button class="mini" onclick="loadProposals()">Load open proposals</button>
-    <div id="prop-admin"></div>
+    <h4>VOCABULARY REVIEW</h4>
+    <button class="mini" onclick="loadVocabPending()">Load pending terms</button>
+    <div id="vocab-pending"></div>
   </div>
   <div class="aform">
     <h4>CRAWLER</h4>
     <div id="crawl-status" class="empty">Load status to begin.</div>
     <button class="mini" onclick="crawlerStatus()">Status</button>
     <button class="mini" onclick="crawlerRun()">Run now</button>
-    <button class="mini" onclick="crawlerReview()">Review scored</button>
-    <div id="crawl-review"></div>
-  </div>
-  <div class="aform">
-    <h4>PURGE / QUARANTINE</h4>
-    <input id="purge-id" placeholder="case or filing uuid">
-    <button class="mini" onclick="purge('purge_case')">Purge case</button>
-    <button class="mini" onclick="purge('purge_filing')">Purge filing</button>
-    <button class="mini" onclick="purge('quarantine')">Quarantine filing</button>
+    <button class="mini" onclick="extractRun()">Extract now</button>
   </div>
 </section>
 
@@ -323,1045 +245,672 @@ footer{margin-top:34px;border-top:3px solid var(--line);padding:14px 2px;
 <div class="sheetback" id="sheetback" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet"></div>
 <div id="toast"></div>
-<script>
-/* UCAR 5.0 frontend: the case docket. */
-const CONFIG = {
-  SUPABASE_URL: "https://aslcrwmbdtvimjrexxzw.supabase.co",
-  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.371d4kCpZ9rKJwBYJGmbFB2OPRq45C3KiXXeyy-q7jI",
-  API_BASE: "",                // own-domain front once live
-  SHARE_BASE: "https://usecasearmsrace.com/c/",
-  FN: n => (CONFIG.API_BASE || CONFIG.SUPABASE_URL) + "/functions/v1/" + n,
-};
-const DEMO = !CONFIG.SUPABASE_URL;
 
-/* ---------------- identity + storage ---------------- */
-function anonId(){
-  let id = localStorage.getItem('ucar_anon');
-  if(!id){
-    id = (crypto.randomUUID ? crypto.randomUUID() :
-      'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16);
-      }));
-    localStorage.setItem('ucar_anon', id);
-  }
-  return id;
-}
-let MY_VOTES = {}, MY_FILED = [], MY_FAKES = {}, SAVES = {};
-try{ MY_VOTES = JSON.parse(localStorage.getItem('ucar_votes')||'{}'); }catch(e){}
-try{ MY_FILED = JSON.parse(localStorage.getItem('ucar_filed')||'[]'); }catch(e){}
-try{ MY_FAKES = JSON.parse(localStorage.getItem('ucar_fakes')||'{}'); }catch(e){}
-try{ SAVES = JSON.parse(localStorage.getItem('ucar_saves')||'{}'); }catch(e){}
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+// ── CONFIG: filled by deploy.sh ────────────────────────────────────────────
+const SUPABASE_URL = 'https://znhsnishdqrmumxbgobq.supabase.co';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuaHNuaXNoZHFybXVteGJnb2JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzEwNjMsImV4cCI6MjA5OTY0NzA2M30.k22R9kcbLCp9OyTVBb7DaUbk_Gdghnu-YGKUYc834Rs';
+const SHARE_BASE = location.origin + location.pathname;
+// ───────────────────────────────────────────────────────────────────────────
+
+const sb = createClient(SUPABASE_URL, ANON_KEY);
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+/* ─────────────────── Identity & Storage ─────────────────── */
+let USER = null;
+let MY_VOTES = {}, SAVES = {};
+try { MY_VOTES = JSON.parse(localStorage.getItem('ucar_votes') || '{}'); } catch {}
+try { SAVES = JSON.parse(localStorage.getItem('ucar_saves') || '{}'); } catch {}
 const persist = () => {
-  try{
+  try {
     localStorage.setItem('ucar_votes', JSON.stringify(MY_VOTES));
-    localStorage.setItem('ucar_filed', JSON.stringify(MY_FILED.slice(0,100)));
-    localStorage.setItem('ucar_fakes', JSON.stringify(MY_FAKES));
     localStorage.setItem('ucar_saves', JSON.stringify(SAVES));
-  }catch(e){}
+  } catch {}
 };
 
-/* ---------------- api ---------------- */
-async function api(fn, body){
-  const r = await fetch(CONFIG.FN(fn), {
-    method:'POST',
-    headers:{'Content-Type':'application/json',
-      'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,
-      'x-anon-id':anonId()},
-    body: JSON.stringify(body||{})
-  });
-  return r.json();
+/* ─────────────────── Utilities ─────────────────── */
+const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; };
+const toast = msg => { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2600); };
+const relTime = iso => {
+  const ms = Date.now() - new Date(iso).getTime();
+  if (ms < 0) return '';
+  const mins = Math.floor(ms / 60000);
+  if (mins < 60) return mins + 'm';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h';
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return days + 'd';
+  return Math.floor(days / 7) + 'w';
+};
+const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+const isNew = c => c.last_filed_at && (Date.now() - new Date(c.last_filed_at)) < 48 * 3600000;
+
+/* ─────────────────── Theme ─────────────────── */
+function setTheme(t) {
+  document.body.dataset.theme = t;
+  $('#themeToggle').textContent = t === 'good' ? 'GOOD ☀' : 'EVIL 🧠';
+  try { localStorage.setItem('ucar_theme', t); } catch {}
 }
-function esc(s){const d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;
-  t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600);}
+$('#themeToggle').onclick = () => setTheme(document.body.dataset.theme === 'good' ? 'evil' : 'good');
+setTheme(localStorage.getItem('ucar_theme') || 'good');
 
-/* ---------------- theme: GOOD / EVIL ---------------- */
-function setTheme(t){
-  document.body.dataset.theme=t;
-  document.getElementById('themeToggle').textContent =
-    t==='good' ? 'GOOD \u2600' : 'EVIL \uD83E\uDDE0';
-  try{localStorage.setItem('ucar_theme',t);}catch(e){}
-}
-document.getElementById('themeToggle').onclick = () =>
-  setTheme(document.body.dataset.theme==='good'?'evil':'good');
-setTheme(localStorage.getItem('ucar_theme')||'good');
+/* ─────────────────── Icons ─────────────────── */
+const ICON_HALO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><ellipse cx="12" cy="5" rx="7" ry="2.6"/><path d="M5 13a7 7 0 0 0 14 0"/></svg>';
+const ICON_HORN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 3c0 4-2 6-2 9a7 7 0 0 0 14 0c0-3-2-5-2-9"/><path d="M9 21h6"/></svg>';
 
-/* ---------------- icons ---------------- */
-const ICON_HALO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><ellipse cx="12" cy="5" rx="7" ry="2.6"/><path d="M5 13a7 7 0 0 0 14 0"/></svg>';
-const ICON_HORN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 3c0 4-2 6-2 9a7 7 0 0 0 14 0c0-3-2-5-2-9"/><path d="M9 21h6"/></svg>';
-
-/* ---------------- demo dataset ---------------- */
-const DEMO_CASES = [
- {id:'d1', case_number:101, title_render:'SURVEIL STUDENTS \u00b7 WITH CAMERAS',
-  impact:4, heaven_votes:12, hell_votes:87, live_filings:3,
-  modifier_terms:['always-on','k-12','no opt out'], status:'live',
-  last_filing_at:new Date(Date.now()-4*36e5).toISOString(),
-  identity:{verb:'surveil',instrument:'cameras',object_class:'students'},
-  filing:{id:'f1',kind:'article',headline:'District expands camera analytics to every hallway',
-   summary:'Dee Elementary activated 214 AI cameras that track students between classes. Parents learned of the system from a vendor press release.',
-   article_quote:'The system flags loitering, running, and unusual movement patterns for review.',
-   subject_name:'Dee Elementary', domain:'example-tribune.com', source_url:'#',
-   fake_flags:0, quarantined:false, status:'live',
-   object_details:{ages:'5-11'}, instrument_details:{count:'214 cameras'},
-   published_at:new Date(Date.now()-4*36e5).toISOString()},
-  filings:[
-   {id:'f1',kind:'article',headline:'District expands camera analytics to every hallway',
-    summary:'Dee Elementary activated 214 AI cameras that track students between classes. Parents learned of the system from a vendor press release.',
-    article_quote:'The system flags loitering, running, and unusual movement patterns for review.',
-    subject_name:'Dee Elementary',domain:'example-tribune.com',source_url:'#',
-    fake_flags:0,quarantined:false,status:'live',
-    object_details:{ages:'5-11'},instrument_details:{count:'214 cameras'},
-    published_at:new Date(Date.now()-4*36e5).toISOString()},
-   {id:'f2',kind:'article',headline:'Rutgers pilots dorm entry recognition',
-    summary:'Rutgers began scanning students at two residence halls. The university said the pilot covers 3,000 residents.',
-    article_quote:'Participation is automatic for residents of the two pilot halls.',
-    subject_name:'Rutgers University',domain:'campus-wire.example',source_url:'#',
-    fake_flags:0,quarantined:false,status:'live',
-    object_details:{population:'3,000 residents'},instrument_details:{type:'entry scanners'},
-    published_at:new Date(Date.now()-30*36e5).toISOString()},
-   {id:'f3',kind:'testimony',headline:'My kid says the cameras follow them to the bus',
-    summary:'A parent reports camera pole coverage extending to the bus loading zone without notice to families.',
-    article_quote:null,subject_name:'Georgia Tech area schools',domain:null,source_url:null,
-    fake_flags:1,quarantined:false,status:'live',source_tier:3,
-    object_details:{},instrument_details:{},
-    published_at:new Date(Date.now()-50*36e5).toISOString()}
-  ],
-  children:[], parent:null},
- {id:'d2', case_number:102, title_render:'FLAG AS ARMED \u00b7 WITH VISION MODELS',
-  impact:5, heaven_votes:9, hell_votes:64, live_filings:1,
-  modifier_terms:['false positive','chips bag'], status:'live',
-  last_filing_at:new Date(Date.now()-26*36e5).toISOString(),
-  identity:{verb:'flag as armed',instrument:'vision models',object_class:'students'},
-  filing:{id:'f4',kind:'article',headline:'Student handcuffed after AI flags snack bag as weapon',
-   summary:'Officers detained a teenager after a gun-detection system misread a bag of chips. The vendor called the alert a success.',
-   article_quote:'The process worked as designed, the company said in a statement.',
-   subject_name:'Kenwood High School',domain:'example-times.com',source_url:'#',
-   fake_flags:0,quarantined:false,status:'live',
-   object_details:{age:'16'},instrument_details:{vendor:'gun detection'},
-   published_at:new Date(Date.now()-26*36e5).toISOString()},
-  filings:[], children:[], parent:null},
- {id:'d3', case_number:103, title_render:'FLAG SEPSIS \u00b7 WITH PREDICTIVE MODELS',
-  impact:4, heaven_votes:96, hell_votes:6, live_filings:1,
-  modifier_terms:['six hours earlier','icu'], status:'live',
-  last_filing_at:new Date(Date.now()-70*36e5).toISOString(),
-  identity:{verb:'flag sepsis',instrument:'predictive models',object_class:'patients'},
-  filing:{id:'f5',kind:'article',headline:'Hospital says early-warning model cut sepsis deaths',
-   summary:'A county hospital reported the model surfaces sepsis risk about six hours before symptoms. Mortality fell 18 percent in the first year.',
-   article_quote:'Nurses now get a ranked watchlist at shift change.',
-   subject_name:'County General',domain:'example-health.org',source_url:'#',
-   fake_flags:0,quarantined:false,status:'live',
-   object_details:{},instrument_details:{lead:'6 hours'},
-   published_at:new Date(Date.now()-70*36e5).toISOString()},
-  filings:[], children:[], parent:null}
-];
-const DEMO_TOPICS=[{id:'t1',name:'Surveillance',term_set:['surveil','cameras']},
- {id:'t2',name:'Schools',term_set:['students','school']},
- {id:'t3',name:'Health',term_set:['patients','hospital']}];
-
-/* ---------------- state ---------------- */
+/* ─────────────────── State ─────────────────── */
 const CACHE = new Map();
-let TOPICS=[], SORT='newest', ACTIVE_TOPIC=null, lastWeb=[], lastParsed=null;
-let CURRENT_CASE=null, CB_OPEN=false;
-let VIEW_MODE='feed'; // 'feed' = filings (news), 'cases' = patterns
-if(DEMO){ DEMO_CASES.forEach(c=>CACHE.set(c.id,c)); TOPICS=DEMO_TOPICS; }
+let SORT = 'newest', VIEW_MODE = 'feed', CB_OPEN = false, CURRENT_CASE = null;
 
-/* ---------------- boot ---------------- */
-async function boot(){
-  renderTopics(); renderBook();
-  if(DEMO){
-    renderList(DEMO_CASES,'THE DOCKET (demo data: fill CONFIG to go live)');
-    document.getElementById('metrics').innerHTML =
-      '<span><b>3</b> cases</span><span><b>1</b> new today</span><span><b>27</b> activity 24h</span>';
-    renderEpisode({title:'CASE OF THE DAY: The Chips Bag Incident',
-      description:'A gun detection model, a snack, and a set of handcuffs. Case #102 on the docket.',
-      video_url:'', case_number:102});
-    return;
+/* ─────────────────── Boot ─────────────────── */
+async function boot() {
+  // Anonymous auth
+  let { data: { session } } = await sb.auth.getSession();
+  if (!session) { ({ data: { session } } = await sb.auth.signInAnonymously()); }
+  USER = session?.user ?? null;
+
+  // Load user's votes and tracks from DB
+  if (USER) {
+    const { data: votes } = await sb.from('votes').select('case_id, kind');
+    (votes || []).forEach(v => MY_VOTES[v.case_id] = v.kind === 'good' ? 1 : v.kind === 'evil' ? -1 : 0);
+    const { data: tracks } = await sb.from('tracks').select('case_id');
+    (tracks || []).forEach(t => { if (!SAVES[t.case_id]) SAVES[t.case_id] = { last_seen: 0 }; });
+    persist();
   }
-  loadEpisode(); loadMetrics(); loadView(); loadTopics(); refreshBookData();
-}
-async function browse(){
-  try{
-    const d = ACTIVE_TOPIC
-      ? await api('search-cases',{topic_id:ACTIVE_TOPIC, sort:SORT})
-      : await api('search-cases',{browse:true, sort:SORT});
-    (d.results||[]).forEach(c=>CACHE.set(c.id,c));
-    renderList(d.results||[], ACTIVE_TOPIC
-      ? topicName(ACTIVE_TOPIC).toUpperCase()
-      : ({newest:'THE DOCKET \u00b7 NEWEST',worst:'THE DOCKET \u00b7 WORST',
-          best:'THE DOCKET \u00b7 BEST'})[SORT]);
-    document.getElementById('latency').textContent =
-      (d.ms!=null? d.ms+'ms \u00b7 ':'')+(d.results||[]).length+' cases';
-  }catch(e){ toast('Could not reach the registry.'); }
-}
-async function feed(){
-  try{
-    const d = await api('search-cases',{feed:true, sort:SORT});
-    renderFilingList(d.filings||[],
-      ({newest:'THE FEED \u00b7 NEWEST',worst:'THE FEED \u00b7 WORST',
-        best:'THE FEED \u00b7 BEST'})[SORT]);
-    document.getElementById('latency').textContent =
-      (d.ms!=null? d.ms+'ms \u00b7 ':'')+(d.filings||[]).length+' filings';
-  }catch(e){ toast('Could not reach the registry.'); }
-}
-async function loadMetrics(){
-  try{
-    const m = await api('search-cases',{metrics:true});
-    document.getElementById('metrics').innerHTML =
-      '<span><b>'+(m.cases||0)+'</b> cases</span>'+
-      '<span><b>'+(m.new_today||0)+'</b> new today</span>'+
-      '<span><b>'+(m.activity||0)+'</b> activity 24h</span>';
-  }catch(e){}
-}
-async function loadTopics(){
-  try{const d=await api('search-cases',{list_topics:true});
-    TOPICS=d.topics||[];renderTopics();}catch(e){}
-}
-function topicName(id){const t=TOPICS.find(x=>x.id===id);return t?t.name:'Topic';}
-async function loadEpisode(){
-  try{
-    const r=await fetch(CONFIG.FN('episodes'),{headers:{'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY}});
-    const d=await r.json();
-    const ep=(d.episodes||[]).find(e=>e.featured)||(d.episodes||[])[0];
-    if(ep)renderEpisode(ep);
-  }catch(e){}
-}
-function renderEpisode(ep){
-  const host=document.getElementById('episodeHost');
-  let media='';
-  if(ep.video_url){
-    media=/youtube|youtu\.be/.test(ep.video_url)
-      ?'<iframe src="'+esc(ep.video_url)+'" allowfullscreen frameborder="0"></iframe>'
-      :'<video src="'+esc(ep.video_url)+'" controls playsinline></video>';
-  }
-  host.innerHTML='<div class="episode"><div class="elabel">CASE OF THE DAY</div>'
-    +'<h3>'+esc(ep.title)+'</h3><p>'+esc(ep.description||'')+'</p>'+media
-    +(ep.case_number?'<div style="margin-top:8px"><a class="caselink" href="#case='
-      +esc(ep.case_number)+'">Open Case #'+esc(ep.case_number)+' \u2192</a></div>':'')
-    +'</div>';
+
+  renderTopics();
+  renderBook();
+  loadMetrics();
+  loadEpisode();
+  loadView();
+  route();
 }
 
-/* ---------------- topics + sort ---------------- */
-function renderTopics(){
-  const host=document.getElementById('toprow');host.innerHTML='';
+/* ─────────────────── Data Loading ─────────────────── */
+async function loadMetrics() {
+  const { count: cases } = await sb.from('cases').select('*', { count: 'exact', head: true }).eq('status', 'live');
+  const yesterday = new Date(Date.now() - 86400000).toISOString();
+  const { count: newToday } = await sb.from('filings').select('*', { count: 'exact', head: true }).gt('created_at', yesterday);
+  $('#metrics').innerHTML = `<span><b>${cases || 0}</b> cases</span><span><b>${newToday || 0}</b> new 24h</span>`;
+}
+
+async function loadEpisode() {
+  const { data } = await sb.from('daily_show').select('*').order('show_date', { ascending: false }).limit(1);
+  const ep = data?.[0];
+  if (ep) renderEpisode(ep);
+}
+
+function renderEpisode(ep) {
+  const host = $('#episodeHost');
+  let media = '';
+  if (ep.video_url) {
+    const yt = ep.video_url.match(/(?:youtu\.be\/|v=)([\w-]{11})/);
+    media = yt
+      ? `<iframe src="https://www.youtube-nocookie.com/embed/${yt[1]}" allowfullscreen frameborder="0"></iframe>`
+      : `<video src="${esc(ep.video_url)}" controls playsinline></video>`;
+  }
+  host.innerHTML = `<div class="episode"><div class="elabel">CASE OF THE DAY</div>
+    <h3>${esc(ep.title)}</h3><p>${esc(ep.blurb || '')}</p>${media}</div>`;
+}
+
+/* ─────────────────── Topics & Sort ─────────────────── */
+function renderTopics() {
+  const host = $('#toprow');
+  host.innerHTML = '';
+
   // Mode toggle: FEED vs CASES
-  const modeDiv=document.createElement('div');modeDiv.className='modeseg';
-  for(const m of ['feed','cases']){
-    const b=document.createElement('button');
-    b.textContent=m.toUpperCase();
-    if(VIEW_MODE===m)b.className='on';
-    b.onclick=()=>{VIEW_MODE=m;renderTopics();DEMO?demoSort():loadView();};
+  const modeDiv = document.createElement('div');
+  modeDiv.className = 'modeseg';
+  for (const m of ['feed', 'cases']) {
+    const b = document.createElement('button');
+    b.textContent = m.toUpperCase();
+    if (VIEW_MODE === m) b.className = 'on';
+    b.onclick = () => { VIEW_MODE = m; renderTopics(); loadView(); };
     modeDiv.appendChild(b);
   }
   host.appendChild(modeDiv);
-  // Topic chips
-  for(const t of TOPICS){
-    const b=document.createElement('button');b.className='tchip'+(ACTIVE_TOPIC===t.id?' on':'');
-    b.textContent=t.name;
-    b.onclick=()=>{ACTIVE_TOPIC=(ACTIVE_TOPIC===t.id?null:t.id);renderTopics();
-      DEMO?demoTopic():loadView();};
-    host.appendChild(b);
-  }
-  const add=document.createElement('button');add.className='tchip';add.textContent='+ topic';
-  add.onclick=openTopicSheet;host.appendChild(add);
-  const seg=document.createElement('div');seg.className='sortseg';
-  for(const s of ['newest','worst','best']){
-    const b=document.createElement('button');b.textContent=s;
-    if(SORT===s)b.className='on';
-    b.onclick=()=>{SORT=s;renderTopics();DEMO?demoSort():loadView();};
+
+  // Sort buttons
+  const seg = document.createElement('div');
+  seg.className = 'sortseg';
+  for (const s of ['newest', 'evil', 'good']) {
+    const b = document.createElement('button');
+    b.textContent = s;
+    if (SORT === s) b.className = 'on';
+    b.onclick = () => { SORT = s; renderTopics(); loadView(); };
     seg.appendChild(b);
   }
   host.appendChild(seg);
 }
-function loadView(){
-  if(VIEW_MODE==='feed')feed();else browse();
-}
-function demoSort(){
-  const arr=[...DEMO_CASES];
-  const share=c=>(c.heaven_votes+c.hell_votes)?c.hell_votes/(c.heaven_votes+c.hell_votes):.5;
-  if(SORT==='worst')arr.sort((a,b)=>share(b)-share(a));
-  else if(SORT==='best')arr.sort((a,b)=>share(a)-share(b));
-  renderList(arr,'THE DOCKET \u00b7 '+SORT.toUpperCase());
-}
-function demoTopic(){
-  if(!ACTIVE_TOPIC){demoSort();return;}
-  const t=TOPICS.find(x=>x.id===ACTIVE_TOPIC);
-  const hit=DEMO_CASES.filter(c=>t.term_set.some(term=>
-    (c.title_render+' '+c.modifier_terms.join(' ')).toLowerCase().includes(term)));
-  renderList(hit,t.name.toUpperCase());
+
+function loadView() {
+  if (VIEW_MODE === 'feed') loadFeed();
+  else loadCases();
 }
 
-/* ---------------- list ---------------- */
-function stars(n){return '\u2605'.repeat(n)+'\u2606'.repeat(5-n);}
-function isNew(c){return c.last_filing_at&&(Date.now()-new Date(c.last_filing_at))<48*36e5;}
-function caseRow(c){
-  const el=document.createElement('div');el.className='hit';
-  const f=c.filing||{};
-  el.innerHTML=
-    '<div class="toprule"><span class="cnum">CASE #'+esc(c.case_number)+'</span>'
-    +'<span class="stars">'+stars(c.impact||1)+'</span></div>'
-    +'<h3>'+esc(c.title_render)+'</h3>'
-    +(f.subject_name?'<div class="subj">'+esc(f.subject_name)
-      +(f.kind==='testimony'?' \u00b7 TESTIMONY':'')+'</div>':'')
-    +(f.summary?'<p>'+esc(f.summary)+'</p>':'')
-    +(f.article_quote?'<div class="quote">\u201C'+esc(f.article_quote)+'\u201D</div>':'')
-    +'<div class="meta">'
-      +'<span class="fcount">'+esc(c.live_filings||0)+' FILING'+((c.live_filings||0)===1?'':'S')+'</span>'
-      +(isNew(c)?'<span class="badge solid">NEW</span>':'')
-      +'<span class="votes"></span>'
-    +'</div>';
-  el.querySelector('.votes').appendChild(votePair(c,false));
-  el.onclick=()=>{location.hash='#case='+c.case_number;};
-  return el;
-}
-function votePair(c,big){
-  const wrap=document.createElement('span');wrap.style.display='flex';wrap.style.gap='8px';
-  const mk=(cls,icon,count,val)=>{
-    const b=document.createElement('button');
-    b.className='vbtn '+cls+(MY_VOTES[c.id]===val?' on':'');
-    b.innerHTML=icon+'<span>'+count+'</span>';
-    b.onclick=e=>{e.stopPropagation();castVote(c,val,wrap,big);};
-    return b;
-  };
-  wrap.appendChild(mk('halo',ICON_HALO,c.heaven_votes||0,1));
-  wrap.appendChild(mk('horn',ICON_HORN,c.hell_votes||0,-1));
-  return wrap;
-}
-async function castVote(c,val,wrap,big){
-  const next=(MY_VOTES[c.id]===val)?0:val;
-  const prev=MY_VOTES[c.id]||0;
-  if(prev===1)c.heaven_votes--; if(prev===-1)c.hell_votes--;
-  if(next===1)c.heaven_votes++; if(next===-1)c.hell_votes++;
-  MY_VOTES[c.id]=next;persist();
-  const fresh=votePair(c,big);wrap.replaceWith(fresh);
-  if(DEMO)return;
-  try{
-    const d=await api('vote',{case_id:c.id,vote:next});
-    if(d&&d.heaven!=null){c.heaven_votes=d.heaven;c.hell_votes=d.hell;}
-    api('search-cases',{signal:{case_id:c.id,event:'vote',
-      terms:currentTerms()}}).catch(()=>{});
-  }catch(e){}
-}
-function currentTerms(){
-  const q=document.getElementById('q').value.trim().toLowerCase();
-  return q?q.split(/\s+/).slice(0,6):[];
-}
-function renderList(cases,label){
-  const host=document.getElementById('results');host.innerHTML='';
-  const div=document.createElement('div');div.className='divider';
-  div.innerHTML='<span>'+esc(label)+'</span>';host.appendChild(div);
-  if(!cases.length){host.insertAdjacentHTML('beforeend',
-    '<div class="empty">Nothing on the docket for that. File the first case.</div>');return;}
-  for(const c of cases)host.appendChild(caseRow(c));
-}
-function feedFilingRow(f){
-  const el=document.createElement('div');el.className='hit filing';
-  const c=f.case||{};
-  const timeAgo=f.published_at?relTime(f.published_at):(f.created_at?relTime(f.created_at):'');
-  el.innerHTML=
-    '<div class="toprule">'
-      +'<span class="domain">'+esc(f.domain||'')+'</span>'
-      +(timeAgo?'<span class="timeago">'+timeAgo+'</span>':'')
-    +'</div>'
-    +'<h3 class="filing-headline">'+esc(f.headline||f.summary||'')+'</h3>'
-    +(f.summary&&f.headline?'<p>'+esc(f.summary)+'</p>':'')
-    +(f.article_quote?'<div class="quote">"'+esc(f.article_quote)+'"</div>':'')
-    +'<div class="meta">'
-      +(c.case_number?'<span class="caselink">CASE #'+esc(c.case_number)+' · '+esc(c.title_render||'')+'</span>':'')
-    +'</div>';
-  // Click headline to go to source article
-  const headline=el.querySelector('.filing-headline');
-  if(headline&&f.source_url){
-    headline.style.cursor='pointer';
-    headline.onclick=e=>{e.stopPropagation();window.open(f.source_url,'_blank');};
+async function loadFeed() {
+  const q = $('#q').value.trim();
+  let filings;
+
+  if (q) {
+    // Search via API
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/api?action=search`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${ANON_KEY}`, apikey: ANON_KEY },
+      body: JSON.stringify({ q, limit: 40 })
+    }).then(r => r.json()).catch(() => ({ results: [] }));
+    filings = res.results || [];
+  } else {
+    // Browse filings
+    let query = sb.from('filings')
+      .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes, filing_count)')
+      .eq('status', 'live')
+      .limit(40);
+
+    if (SORT === 'newest') query = query.order('created_at', { ascending: false });
+    else if (SORT === 'evil') query = query.order('impact', { ascending: false });
+
+    const { data } = await query;
+    filings = (data || []).map(f => ({ ...f, cases: f.cases }));
   }
-  // Click case link to go to case detail
-  const clink=el.querySelector('.caselink');
-  if(clink&&c.case_number){
-    clink.onclick=e=>{e.stopPropagation();location.hash='#case='+c.case_number;};
-  }
-  return el;
-}
-function relTime(isoStr){
-  const ms=Date.now()-new Date(isoStr).getTime();
-  if(ms<0)return'';
-  const mins=Math.floor(ms/60000);
-  if(mins<60)return mins+'m';
-  const hrs=Math.floor(mins/60);
-  if(hrs<24)return hrs+'h';
-  const days=Math.floor(hrs/24);
-  if(days<7)return days+'d';
-  return Math.floor(days/7)+'w';
-}
-function renderFilingList(filings,label){
-  const host=document.getElementById('results');host.innerHTML='';
-  const div=document.createElement('div');div.className='divider';
-  div.innerHTML='<span>'+esc(label)+'</span>';host.appendChild(div);
-  if(!filings.length){host.insertAdjacentHTML('beforeend',
-    '<div class="empty">No filings yet. File the first case.</div>');return;}
-  for(const f of filings)host.appendChild(feedFilingRow(f));
+
+  renderFilingList(filings, q ? `SEARCH · ${esc(q)}` : `THE FEED · ${SORT.toUpperCase()}`);
+  $('#latency').textContent = `${filings.length} filings`;
 }
 
-/* ---------------- search ---------------- */
-let searchTimer=null,searchSeq=0;
-document.getElementById('q').addEventListener('input',e=>{
-  const q=e.target.value.trim();
-  const isUrl=/^https?:\/\/\S+$/i.test(q);
-  document.getElementById('fileBtn').style.display=isUrl?'':'none';
-  clearTimeout(searchTimer);
-  if(!q||isUrl){
-    document.getElementById('parserow').innerHTML='';
-    document.getElementById('exprow').innerHTML='';
-    document.getElementById('webhost').innerHTML='';
-    if(!q){DEMO?demoSort():browse();}
+async function loadCases() {
+  let query = sb.from('cases')
+    .select('*')
+    .eq('status', 'live')
+    .limit(60);
+
+  if (SORT === 'newest') query = query.order('last_filed_at', { ascending: false, nullsFirst: false });
+  else if (SORT === 'evil') query = query.order('evil_votes', { ascending: false });
+  else if (SORT === 'good') query = query.order('good_votes', { ascending: false });
+
+  const { data: cases } = await query;
+  (cases || []).forEach(c => CACHE.set(c.id, c));
+  renderCaseList(cases || [], `THE DOCKET · ${SORT.toUpperCase()}`);
+  $('#latency').textContent = `${(cases || []).length} cases`;
+}
+
+/* ─────────────────── Rendering Lists ─────────────────── */
+function renderCaseList(cases, label) {
+  const host = $('#results');
+  host.innerHTML = '';
+  const div = document.createElement('div');
+  div.className = 'divider';
+  div.innerHTML = `<span>${esc(label)}</span>`;
+  host.appendChild(div);
+
+  if (!cases.length) {
+    host.insertAdjacentHTML('beforeend', '<div class="empty">Nothing on the docket yet.</div>');
     return;
   }
-  localRank(q);
-  searchTimer=setTimeout(()=>serverSearch(q),200);
-});
-function localRank(q){
-  const terms=q.toLowerCase().split(/\s+/).filter(Boolean);
-  const scored=[...CACHE.values()].map(c=>{
-    const hay=(c.title_render+' '+((c.filing||{}).summary||'')+' '
-      +((c.filing||{}).subject_name||'')+' '+(c.modifier_terms||[]).join(' ')).toLowerCase();
-    let s=0;for(const t of terms)if(hay.includes(t))s+=10;
-    return {c,s};
-  }).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,20).map(x=>x.c);
-  renderList(scored,'INSTANT \u00b7 LOCAL');
-  document.getElementById('latency').textContent='local index';
-}
-const EXCLUDED=new Set();
-async function serverSearch(q){
-  console.log('serverSearch called:', q);
-  const seq=++searchSeq;
-  if(DEMO){console.log('DEMO mode, skipping');localRank(q);return;}
-  try{
-    console.log('calling API...');
-    const d=await api('search-cases',{q,web:true,exclude:[...EXCLUDED]});
-    console.log('API response:', d);
-    if(seq!==searchSeq){console.log('stale seq');return;}
-    (d.results||[]).forEach(c=>CACHE.set(c.id,c));
-    lastParsed=d.parsed||null;
-    renderList(d.results||[],'THE DOCKET \u00b7 MATCHES');
-    document.getElementById('latency').textContent=
-      (d.ms!=null?d.ms+'ms \u00b7 ':'')+(d.results||[]).length+' graph hits';
-    renderParse(d.parsed);renderExpansion(d.parsed);
-    console.log('web_results:', d.web_results);
-    renderWeb(d.web_results||[]);
-  }catch(e){console.error('search error:',e);}
-}
-function renderParse(p){
-  const host=document.getElementById('parserow');host.innerHTML='';
-  if(!p)return;
-  const tag=(label,val)=>{const s=document.createElement('span');
-    s.className='ptag'+(val?' hit':'');s.textContent=label+': '+(val||'\u2014');
-    host.appendChild(s);};
-  if(p.action)tag('ACTION',p.action);
-  for(const e of (p.entities||[]))tag('NOUN',e);
-  for(const m of (p.modifiers||[]))tag('#',m);
-  if((p.free||[]).length)tag('FREE',(p.free||[]).join(' '));
-}
-function renderExpansion(p){
-  const host=document.getElementById('exprow');host.innerHTML='';
-  if(!p||!p.expanded)return;
-  const seen=new Set();
-  for(const [term,alts] of Object.entries(p.expanded)){
-    for(const a of alts){
-      if(seen.has(a.alt)||EXCLUDED.has(a.alt))continue;seen.add(a.alt);
-      const b=document.createElement('button');b.className='extag';
-      b.innerHTML='SEARCHED AS: '+esc(a.alt)+'<i>\u00d7</i>';
-      b.title='via '+esc(term)+' \u00b7 tap to exclude';
-      b.onclick=()=>{EXCLUDED.add(a.alt);b.remove();
-        serverSearch(document.getElementById('q').value.trim());};
-      host.appendChild(b);
-    }
-  }
-}
-function renderWeb(list){
-  lastWeb=list;
-  const host=document.getElementById('webhost');host.innerHTML='';
-  if(!list.length)return;
-  const div=document.createElement('div');div.className='divider';
-  div.innerHTML='<span>FROM THE WEB \u00b7 UNFILED</span>';host.appendChild(div);
-  for(const w of list){
-    const el=document.createElement('div');el.className='webhit';
-    el.innerHTML='<div class="dom">'+esc(w.domain||'')+'</div>'
-      +'<h4>'+esc(w.title||w.url)+'</h4><p>'+esc(w.snippet||'')+'</p>'
-      +'<button class="mini">File this as a case</button>';
-    const btn=el.querySelector('button');
-    btn.onclick=async()=>{
-      btn.disabled=true;
-      btn.textContent='Filing...';
-      el.style.opacity='0.5';
-      await fileURL(w.url);
-      btn.textContent='Filed \u2713';
-    };
-    host.appendChild(el);
-  }
+  for (const c of cases) host.appendChild(caseRow(c));
 }
 
-/* ---------------- filing ---------------- */
-async function fileURL(explicit){
-  const url=explicit||document.getElementById('q').value.trim();
-  if(!/^https?:\/\//i.test(url)){toast('That is not a URL.');return;}
-  if(DEMO){toast('Demo mode: fill CONFIG to file real cases.');return;}
-  try{
-    const d=await api('file-case',{url});
-    if(d.error){toast(d.error);return;}
-    if(d.ok&&d.filing_id&&!MY_FILED.includes(d.filing_id)){
-      MY_FILED.unshift(d.filing_id);persist();renderBook();
-      // Trigger extraction and poll for completion
-      triggerAndPollExtraction(d.filing_id);
-    }
-    if(d.dedupe&&d.case_number){
-      toast('Already on the docket: Case #'+d.case_number);
-      location.hash='#case='+d.case_number;
-    }else{
-      toast(d.ok?'Filed! Extracting...':(d.error||'Could not file.'));
-    }
-  }catch(e){toast('Could not reach the registry.');}
-}
-
-async function triggerAndPollExtraction(filingId){
-  // Trigger extraction via admin endpoint (requires admin key in localStorage for now)
-  // For now just poll - extraction will happen via cron or manual trigger
-  let attempts=0;
-  const maxAttempts=20; // 20 * 3s = 60 seconds max
-  const poll=async()=>{
-    if(attempts>=maxAttempts){
-      toast('Extraction taking longer than expected. Check casebook later.');
-      return;
-    }
-    attempts++;
-    try{
-      const d=await api('search-cases',{filing_ids:[filingId]});
-      const f=(d.filings||[])[0];
-      if(f&&f.status!=='staged'){
-        if(f.case&&f.case.case_number){
-          toast('Case #'+f.case.case_number+' ready!');
-          refreshBookData();
-        }else{
-          toast('Extraction complete. Awaiting review.');
-          refreshBookData();
-        }
-        return;
-      }
-      setTimeout(poll,3000);
-    }catch(e){setTimeout(poll,3000);}
-  };
-  setTimeout(poll,5000); // Start polling after 5 seconds
-}
-function openTestimony(){
-  openSheet('<h4>FILE TESTIMONY</h4>'
-   +'<div class="empty">No link? Tell the docket what you saw. Testimony is marked UNSOURCED until corroborated by filings.</div>'
-   +'<label>What happened</label><textarea id="tst-body" placeholder="Who deployed what, on whom, where..."></textarea>'
-   +'<div class="row"><button class="no" onclick="closeSheet()">Cancel</button>'
-   +'<button class="go" onclick="submitTestimony()">File it</button></div>');
-}
-async function submitTestimony(){
-  const text=(document.getElementById('tst-body').value||'').trim();
-  if(text.length<60){toast('Give the docket at least 60 characters.');return;}
-  if(DEMO){toast('Demo mode: fill CONFIG to file.');closeSheet();return;}
-  try{
-    const d=await api('file-case',{text});
-    if(d.ok&&d.filing_id){MY_FILED.unshift(d.filing_id);persist();renderBook();refreshBookData();}
-    toast(d.ok?'Testimony filed. Marked UNSOURCED until corroborated.':(d.error||'Could not file.'));
-    closeSheet();
-  }catch(e){toast('Could not reach the registry.');}
-}
-
-/* ---------------- case page ---------------- */
-async function openCase(num){
-  show('casepg');
-  const host=document.getElementById('casehost');
-  host.innerHTML='<div class="empty">Pulling the docket...</div>';
-  let c=null;
-  if(DEMO){c=DEMO_CASES.find(x=>String(x.case_number)===String(num));}
-  else{
-    try{const d=await api('search-cases',{case_number:Number(num)});
-      c=(d.results||[])[0];if(c)CACHE.set(c.id,c);}catch(e){}
-  }
-  if(!c){host.innerHTML='<div class="empty">No such case on the docket.</div>';return;}
-  CURRENT_CASE=c;
-  renderCase(host,c);
-  if(!DEMO)api('search-cases',{signal:{case_id:c.id,event:'open',
-    terms:currentTerms()}}).catch(()=>{});
-  loadCaseProposals(c);
-}
-function detailChips(f){
-  const chips=[];
-  for(const src of [f.object_details,f.instrument_details]){
-    if(src&&typeof src==='object'){
-      for(const [k,v] of Object.entries(src).slice(0,4)){
-        chips.push('<span class="dchip">'+esc(k)+': '+esc(v)+'</span>');
-      }
-    }
-  }
-  return chips.join('');
-}
-function filingRow(f,c){
-  const el=document.createElement('div');
-  el.className='frow'+(f.quarantined?' q':'');
-  el.innerHTML='<div class="top"><span class="subj">'+esc(f.subject_name||f.domain||'Unnamed filer')
-    +(f.kind==='testimony'?' <span class="badge">TESTIMONY \u00b7 UNSOURCED</span>':'')
-    +(f.status==='under_review'?' <span class="badge">AWAITING OWNER</span>':'')
-    +'</span><span class="date">'+(f.published_at?new Date(f.published_at).toLocaleDateString():'')+'</span></div>'
-    +(f.headline?'<p style="color:var(--fg);font-weight:700">'+esc(f.headline)+'</p>':'')
-    +(f.summary?'<p>'+esc(f.summary)+'</p>':'')
-    +'<div class="chips">'+detailChips(f)+'</div>'
-    +'<div style="display:flex;gap:8px;margin-top:7px;align-items:center">'
-    +(f.source_url?'<a class="srcbtn" style="margin:0;font-size:9.5px;padding:4px 8px" href="'
-      +esc(f.source_url)+'" target="_blank" rel="noopener">Source</a>':'')
-    +'<button class="fakebtn'+(MY_FAKES[f.id]?' on':'')+'">FAKE'
-    +(f.fake_flags?' \u00d7'+f.fake_flags:'')+'</button>'
-    +(f.quarantined?'<span class="badge">QUARANTINED</span>':'')
-    +'</div>';
-  el.querySelector('.fakebtn').onclick=e=>{e.stopPropagation();flagFake(f,el,c);};
+function caseRow(c) {
+  const el = document.createElement('div');
+  el.className = 'hit';
+  el.innerHTML = `
+    <div class="toprule">
+      <span class="cnum">CASE #${esc(c.case_number)}</span>
+      <span class="stars">${stars(c.impact || 3)}</span>
+    </div>
+    <h3>${esc(c.title_render)}</h3>
+    <div class="meta">
+      <span class="fcount">${c.filing_count || 0} FILING${(c.filing_count || 0) === 1 ? '' : 'S'}</span>
+      ${isNew(c) ? '<span class="badge solid">NEW</span>' : ''}
+      <span class="votes"></span>
+    </div>`;
+  el.querySelector('.votes').appendChild(votePair(c, false));
+  el.onclick = () => { location.hash = '#case=' + c.case_number; };
   return el;
 }
-async function flagFake(f,el,c){
-  if(MY_FAKES[f.id]){toast('You already flagged this filing.');return;}
-  MY_FAKES[f.id]=1;persist();
-  f.fake_flags=(f.fake_flags||0)+1;
-  if(DEMO){el.replaceWith(filingRow(f,c));toast('Flag recorded (demo).');return;}
-  try{
-    const d=await api('flag',{action:'fake',filing_id:f.id});
-    if(d.fake_flags!=null)f.fake_flags=d.fake_flags;
-    if(d.quarantined){f.quarantined=true;
-      toast('Filing quarantined pending steward review. The case survives.');}
-    else toast('Fake flag filed on this source.');
-    el.replaceWith(filingRow(f,c));
-  }catch(e){toast('Could not reach the registry.');}
-}
-function renderCase(host,c){
-  host.innerHTML='';
-  const head=document.createElement('div');head.className='casehead';
-  head.innerHTML='<div class="cnum">CASE #'+esc(c.case_number)
-    +' \u00b7 '+stars(c.impact||1)+'</div>'
-    +'<h2>'+esc(c.title_render)+'</h2>'
-    +(c.description?'<p class="casedesc">'+esc(c.description)+'</p>':'')
-    +(c.parent?'<div class="linkrow">Split from <a href="#case='+esc(c.parent.case_number)
-      +'">Case #'+esc(c.parent.case_number)+'</a></div>':'')
-    +((c.children||[]).length?'<div class="linkrow">Related: '
-      +c.children.map(k=>'<a href="#case='+esc(k.case_number)+'">#'+esc(k.case_number)+'</a>').join(' \u00b7 ')
-      +'</div>':'');
-  host.appendChild(head);
-  const bv=document.createElement('div');bv.className='bigvotes';
-  bv.appendChild(votePair(c,true));host.appendChild(bv);
-  const acts=document.createElement('div');acts.className='actionrow';
-  const saved=!!SAVES[c.id];
-  acts.innerHTML='<button class="abtn" id="saveBtn">'+(saved?'\u2713 In casebook':'+ Save to casebook')+'</button>'
-    +'<button class="abtn" id="shareBtn">Share</button>';
-  host.appendChild(acts);
-  acts.querySelector('#saveBtn').onclick=()=>toggleSave(c,acts.querySelector('#saveBtn'));
-  acts.querySelector('#shareBtn').onclick=()=>shareCase(c);
-  const filings=(c.filings&&c.filings.length?c.filings:(c.filing?[c.filing]:[]));
-  const bd=document.createElement('div');bd.className='divider';
-  bd.innerHTML='<span>FILINGS \u00b7 '+esc(filings.length)+'</span>';
-  host.appendChild(bd);
-  for(const f of filings){
-    host.appendChild(filingRow(f,c));
+
+function renderFilingList(filings, label) {
+  const host = $('#results');
+  host.innerHTML = '';
+  const div = document.createElement('div');
+  div.className = 'divider';
+  div.innerHTML = `<span>${esc(label)}</span>`;
+  host.appendChild(div);
+
+  if (!filings.length) {
+    host.insertAdjacentHTML('beforeend', '<div class="empty">No filings yet. File the first case.</div>');
+    return;
   }
-  // Comments section
-  const cd=document.createElement('div');cd.className='divider';
-  cd.innerHTML='<span>DISCUSSION</span>';host.appendChild(cd);
-  const comments=document.createElement('div');comments.className='comments';comments.id='comments';
-  comments.innerHTML='<div class="empty">No comments yet.</div>'
-    +'<div class="comment-form">'
-    +'<textarea id="commentInput" placeholder="Add to the discussion..." rows="2"></textarea>'
-    +'<button class="abtn" id="postComment">Post</button>'
-    +'</div>';
-  host.appendChild(comments);
-  comments.querySelector('#postComment').onclick=()=>postComment(c);
-  loadComments(c);
-  // Tags
-  if((c.modifier_terms||[]).length){
-    const md=document.createElement('div');md.className='divider';
-    md.innerHTML='<span>TAGS</span>';host.appendChild(md);
-    const mods=document.createElement('div');mods.className='mods';
-    for(const t of (c.modifier_terms||[])){
-      const b=document.createElement('button');b.className='mod';b.textContent='#'+t;
-      b.onclick=()=>{location.hash='';setTimeout(()=>{const q=document.getElementById('q');
-        q.value=t;q.dispatchEvent(new Event('input'));},50);};
-      mods.appendChild(b);
-    }
-    host.appendChild(mods);
-  }
-}
-async function loadComments(c){
-  if(DEMO)return;
-  try{
-    const d=await api('comments',{case_id:c.id});
-    const host=document.getElementById('comments');
-    if(!host)return;
-    const list=(d.comments||[]);
-    if(list.length){
-      host.innerHTML='';
-      for(const cm of list){
-        const div=document.createElement('div');div.className='comment';
-        div.innerHTML='<div class="cmeta">'+esc(cm.author||'Anon')+' \u00b7 '+relTime(cm.created_at)+'</div>'
-          +'<p>'+esc(cm.text)+'</p>';
-        host.appendChild(div);
-      }
-      host.insertAdjacentHTML('beforeend',
-        '<div class="comment-form">'
-        +'<textarea id="commentInput" placeholder="Add to the discussion..." rows="2"></textarea>'
-        +'<button class="abtn" id="postComment">Post</button>'
-        +'</div>');
-      host.querySelector('#postComment').onclick=()=>postComment(c);
-    }
-  }catch(e){}
-}
-async function postComment(c){
-  const input=document.getElementById('commentInput');
-  const text=(input?.value||'').trim();
-  if(!text){toast('Write something first.');return;}
-  if(text.length>1000){toast('Comment too long.');return;}
-  if(DEMO){toast('Demo mode.');return;}
-  try{
-    const d=await api('comments',{case_id:c.id,text});
-    if(d.ok){
-      input.value='';
-      loadComments(c);
-      toast('Comment posted.');
-    }else{
-      toast(d.error||'Could not post.');
-    }
-  }catch(e){toast('Could not reach server.');}
-}
-async function toggleSave(c,btn){
-  if(SAVES[c.id]){delete SAVES[c.id];btn.textContent='+ Save to casebook';}
-  else{SAVES[c.id]={last_seen:c.live_filings||0};btn.textContent='\u2713 In casebook';}
-  persist();renderBook();
-  if(DEMO)return;
-  try{
-    await api('saves',SAVES[c.id]
-      ?{action:'save',case_id:c.id,last_seen:c.live_filings||0}
-      :{action:'unsave',case_id:c.id});
-  }catch(e){}
-}
-async function shareCase(c){
-  const url=CONFIG.SHARE_BASE+c.case_number;
-  const text='CASE #'+c.case_number+': '+c.title_render+' \u00b7 Report AI before it reports you.';
-  if(navigator.share){
-    try{await navigator.share({title:'Case #'+c.case_number,text,url});return;}catch(e){}
-  }
-  try{await navigator.clipboard.writeText(url);toast('Case link copied: '+url);}
-  catch(e){toast(url);}
-}
-function openNotTheSame(c){
-  openSheet('<h4>NOT THE SAME</h4>'
-   +'<div class="empty">Propose a split when this docket mixes two different practices. Name the class that makes it different (students vs workers). The steward confirms; a new immortal case number is minted.</div>'
-   +'<label>Different object class</label><input id="nts-class" placeholder="e.g. employees">'
-   +'<label>Why (optional)</label><input id="nts-note" placeholder="Watching kids is not watching staff">'
-   +'<div class="row"><button class="no" onclick="closeSheet()">Cancel</button>'
-   +'<button class="go" onclick="submitNTS()">Propose the split</button></div>');
-}
-async function submitNTS(){
-  const cls=(document.getElementById('nts-class').value||'').trim().toLowerCase();
-  const note=(document.getElementById('nts-note').value||'').trim();
-  if(!cls){toast('Name the class that splits it.');return;}
-  if(DEMO){toast('Split proposed (demo).');closeSheet();return;}
-  try{
-    const d=await api('proposals',{action:'create',kind:'not_the_same',
-      case_id:CURRENT_CASE.id,payload:{object_class:cls,note,filing_ids:[]}});
-    toast(d.ok?'Split proposed. Others can support it; the steward decides.':(d.error||'Could not propose.'));
-    closeSheet();loadCaseProposals(CURRENT_CASE);
-  }catch(e){toast('Could not reach the registry.');}
-}
-async function loadCaseProposals(c){
-  if(DEMO)return;
-  try{
-    const r=await fetch(CONFIG.FN('proposals')+'?case_id='+encodeURIComponent(c.id),
-      {headers:{'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY}});
-    const d=await r.json();
-    const host=document.getElementById('proplist');if(!host)return;
-    const list=d.proposals||[];
-    if(!list.length){host.innerHTML='<div class="empty">None yet.</div>';return;}
-    host.innerHTML='';
-    for(const p of list){
-      const el=document.createElement('div');el.className='prop';
-      el.innerHTML='<span><b>'+esc(p.kind.replace(/_/g,' ').toUpperCase())+'</b> '
-        +esc(p.payload&&p.payload.object_class?('\u2192 '+p.payload.object_class):'')
-        +' \u00b7 '+esc(p.support)+' support</span>'
-        +'<button class="mini">Support</button>';
-      el.querySelector('button').onclick=async()=>{
-        try{const r2=await api('proposals',{action:'support',id:p.id});
-          toast('Supported ('+(r2.support||'?')+').');}catch(e){}
-      };
-      host.appendChild(el);
-    }
-  }catch(e){}
-}
-function openModifier(c){
-  openSheet('<h4>ADD TO THE VOCABULARY</h4>'
-   +'<label>Term</label><input id="mod-term" placeholder="always-on, opt out, k-12...">'
-   +'<div class="row"><button class="no" onclick="closeSheet()">Cancel</button>'
-   +'<button class="go" onclick="submitModifier()">File it</button></div>');
-}
-async function submitModifier(){
-  const term=(document.getElementById('mod-term').value||'').trim().toLowerCase();
-  if(!term||term.length>40){toast('One short term.');return;}
-  const c=CURRENT_CASE;
-  if(DEMO){c.modifier_terms.push(term);renderCase(document.getElementById('casehost'),c);
-    closeSheet();toast('Filed (demo).');return;}
-  try{
-    const d=await api('modifiers',{case_id:c.id,slot:'case',kind:'compound',term});
-    if(d.ok){c.modifier_terms=c.modifier_terms||[];
-      if(!c.modifier_terms.includes(term))c.modifier_terms.push(term);
-      renderCase(document.getElementById('casehost'),c);
-      toast(d.strengthened?'Term strengthened.':'Filed. It is now search vocabulary.');}
-    else toast(d.error||'Could not file.');
-    closeSheet();
-  }catch(e){toast('Could not reach the registry.');}
-}
-function openTopicSheet(){
-  openSheet('<h4>PROPOSE A TOPIC BUTTON</h4>'
-   +'<div class="empty">Topics are semantic: cases match by meaning through the graph, no literal tag needed. Steward approves.</div>'
-   +'<label>Name</label><input id="tp-name" placeholder="Housing">'
-   +'<label>Terms (comma separated, 2+)</label><input id="tp-terms" placeholder="tenants, eviction, screening">'
-   +'<div class="row"><button class="no" onclick="closeSheet()">Cancel</button>'
-   +'<button class="go" onclick="submitTopic()">Propose it</button></div>');
-}
-async function submitTopic(){
-  const name=(document.getElementById('tp-name').value||'').trim();
-  const terms=(document.getElementById('tp-terms').value||'').split(',')
-    .map(t=>t.trim().toLowerCase()).filter(Boolean);
-  if(!name||terms.length<2){toast('Name plus at least two terms.');return;}
-  if(DEMO){toast('Topic proposed (demo).');closeSheet();return;}
-  try{
-    const d=await api('proposals',{action:'create',kind:'topic',
-      payload:{name,terms}});
-    toast(d.ok?'Topic proposed to the steward.':(d.error||'Could not propose.'));
-    closeSheet();
-  }catch(e){toast('Could not reach the registry.');}
+  for (const f of filings) host.appendChild(feedFilingRow(f));
 }
 
-/* ---------------- casebook (3-state accordion) ---------------- */
-let FILED_CACHE=[];
-function toggleBook(){
-  CB_OPEN=!CB_OPEN;
-  document.getElementById('cbstrip').classList.toggle('open',CB_OPEN);
-  document.getElementById('cbDetail').style.display='none';
-  if(CB_OPEN)renderBook();
-}
-function bookCount(){
-  return new Set([...MY_FILED,...Object.keys(SAVES)]).size;
-}
-async function refreshBookData(){
-  if(DEMO)return;
-  try{
-    if(MY_FILED.length){
-      const d=await api('search-cases',{filing_ids:MY_FILED.slice(0,50)});
-      FILED_CACHE=d.filings||[];
-    }
-    const ids=Object.keys(SAVES);
-    if(ids.length){
-      const d2=await api('search-cases',{ids:ids.slice(0,50)});
-      (d2.results||[]).forEach(c=>CACHE.set(c.id,c));
-    }
-    renderBook();
-  }catch(e){}
-}
-function renderBook(){
-  document.getElementById('cbCount').textContent=bookCount();
-  let hasNew=false;
-  for(const [id,s] of Object.entries(SAVES)){
-    const c=CACHE.get(id);
-    if(c&&(c.live_filings||0)>(s.last_seen||0)){hasNew=true;break;}
+function feedFilingRow(f) {
+  const el = document.createElement('div');
+  el.className = 'hit filing';
+  const c = f.cases || {};
+  const timeAgo = f.created_at ? relTime(f.created_at) : '';
+  el.innerHTML = `
+    <div class="toprule">
+      <span class="domain">${esc(f.source_domain || '')}</span>
+      ${timeAgo ? `<span class="timeago">${timeAgo}</span>` : ''}
+    </div>
+    <h3 class="filing-headline">${esc(f.headline || f.summary || '')}</h3>
+    ${f.summary && f.headline ? `<p>${esc(f.summary)}</p>` : ''}
+    ${f.article_quote ? `<div class="quote">"${esc(f.article_quote)}"</div>` : ''}
+    <div class="meta">
+      ${c.case_number ? `<span class="caselink">CASE #${esc(c.case_number)} · ${esc(c.title_render || '')}</span>` : ''}
+    </div>`;
+
+  const headline = el.querySelector('.filing-headline');
+  if (headline && f.source_url) {
+    headline.style.cursor = 'pointer';
+    headline.onclick = e => { e.stopPropagation(); window.open(f.source_url, '_blank'); };
   }
-  document.getElementById('cbNewDot').innerHTML=
-    hasNew?'<span class="badge solid">NEW FILINGS</span>':'';
-  if(!CB_OPEN)return;
-  const host=document.getElementById('cbList');host.innerHTML='';
-  host.insertAdjacentHTML('beforeend','<div class="cbsec">FILED BY YOU</div>');
-  if(DEMO&&!FILED_CACHE.length){
-    host.insertAdjacentHTML('beforeend',
-      '<div class="cbrow"><span class="nm">My kid says the cameras follow them...</span>'
-      +'<span class="badge">AWAITING OWNER</span></div>');
-  }else if(!FILED_CACHE.length){
-    host.insertAdjacentHTML('beforeend',
-      '<div class="empty">Paste any article URL into search, or file testimony. It lands here with its pipeline status.</div>');
-  }else{
-    for(const f of FILED_CACHE){
-      const el=document.createElement('div');el.className='cbrow';
-      const chip=f.status==='staged'?'STEWARD READING'
-        :f.status==='under_review'?'AWAITING OWNER'
-        :f.status==='live'?'LIVE':'';
-      el.innerHTML='<span class="nm">'+esc(f.headline||f.source_url||'Testimony')+'</span>'
-        +(chip?'<span class="badge'+(f.status==='live'?' solid':'')+'">'+chip+'</span>':'');
-      if(f.case&&f.case.case_number){
-        el.onclick=()=>bookOpenCase(null,f.case.case_number);
-      }
+  const clink = el.querySelector('.caselink');
+  if (clink && c.case_number) {
+    clink.onclick = e => { e.stopPropagation(); location.hash = '#case=' + c.case_number; };
+  }
+  return el;
+}
+
+/* ─────────────────── Voting ─────────────────── */
+function votePair(c, big) {
+  const wrap = document.createElement('span');
+  wrap.style.display = 'flex';
+  wrap.style.gap = '8px';
+  const mk = (cls, icon, count, val) => {
+    const b = document.createElement('button');
+    b.className = 'vbtn ' + cls + (MY_VOTES[c.id] === val ? ' on' : '');
+    b.innerHTML = icon + '<span>' + count + '</span>';
+    b.onclick = e => { e.stopPropagation(); castVote(c, val, wrap, big); };
+    return b;
+  };
+  wrap.appendChild(mk('halo', ICON_HALO, c.good_votes || 0, 1));
+  wrap.appendChild(mk('horn', ICON_HORN, c.evil_votes || 0, -1));
+  return wrap;
+}
+
+async function castVote(c, val, wrap, big) {
+  const next = MY_VOTES[c.id] === val ? 0 : val;
+  const prev = MY_VOTES[c.id] || 0;
+
+  // Optimistic update
+  if (prev === 1) c.good_votes--;
+  if (prev === -1) c.evil_votes--;
+  if (next === 1) c.good_votes++;
+  if (next === -1) c.evil_votes++;
+  MY_VOTES[c.id] = next;
+  persist();
+
+  const fresh = votePair(c, big);
+  wrap.replaceWith(fresh);
+
+  // Persist to DB
+  if (USER) {
+    const kind = next === 1 ? 'good' : next === -1 ? 'evil' : null;
+    if (kind) {
+      await sb.from('votes').upsert({ user_id: USER.id, case_id: c.id, kind });
+    } else {
+      await sb.from('votes').delete().eq('user_id', USER.id).eq('case_id', c.id);
+    }
+  }
+}
+
+/* ─────────────────── Case Page ─────────────────── */
+async function openCase(num) {
+  show('casepg');
+  const host = $('#casehost');
+  host.innerHTML = '<div class="empty">Pulling the docket...</div>';
+
+  const { data } = await sb.from('cases').select('*').eq('case_number', num).single();
+  if (!data) { host.innerHTML = '<div class="empty">No such case on the docket.</div>'; return; }
+
+  CACHE.set(data.id, data);
+  CURRENT_CASE = data;
+
+  const { data: filings } = await sb.from('filings')
+    .select('*')
+    .eq('case_id', data.id)
+    .eq('status', 'live')
+    .order('created_at', { ascending: false })
+    .limit(30);
+
+  renderCasePage(host, data, filings || []);
+}
+
+function renderCasePage(host, c, filings) {
+  host.innerHTML = '';
+
+  // Header
+  const head = document.createElement('div');
+  head.className = 'casehead';
+  head.innerHTML = `
+    <div class="cnum">CASE #${esc(c.case_number)} · ${stars(c.impact || 3)}</div>
+    <h2>${esc(c.title_render)}</h2>`;
+  host.appendChild(head);
+
+  // Big votes
+  const bv = document.createElement('div');
+  bv.className = 'bigvotes';
+  bv.appendChild(votePair(c, true));
+  host.appendChild(bv);
+
+  // Action buttons
+  const saved = !!SAVES[c.id];
+  const acts = document.createElement('div');
+  acts.className = 'actionrow';
+  acts.innerHTML = `
+    <button class="abtn" id="saveBtn">${saved ? '✓ In casebook' : '+ Save to casebook'}</button>
+    <button class="abtn" id="shareBtn">Share</button>`;
+  host.appendChild(acts);
+  acts.querySelector('#saveBtn').onclick = () => toggleSave(c, acts.querySelector('#saveBtn'));
+  acts.querySelector('#shareBtn').onclick = () => shareCase(c);
+
+  // Filings
+  const bd = document.createElement('div');
+  bd.className = 'divider';
+  bd.innerHTML = `<span>FILINGS · ${filings.length}</span>`;
+  host.appendChild(bd);
+
+  for (const f of filings) {
+    host.appendChild(filingRow(f));
+  }
+}
+
+function filingRow(f) {
+  const el = document.createElement('div');
+  el.className = 'frow';
+  el.innerHTML = `
+    <div class="top">
+      <span class="subj">${esc(f.subject || f.source_domain || 'Unknown')}</span>
+      <span class="date">${f.created_at ? new Date(f.created_at).toLocaleDateString() : ''}</span>
+    </div>
+    ${f.headline ? `<p style="color:var(--fg);font-weight:700">${esc(f.headline)}</p>` : ''}
+    ${f.summary ? `<p>${esc(f.summary)}</p>` : ''}
+    ${f.article_quote ? `<div class="quote" style="border-left:3px solid var(--accent);padding-left:10px;font-style:italic;margin:10px 0">"${esc(f.article_quote)}"</div>` : ''}
+    ${f.source_url ? `<a class="srcbtn" style="margin:0;font-size:9.5px;padding:4px 8px" href="${esc(f.source_url)}" target="_blank" rel="noopener">Source</a>` : ''}`;
+  return el;
+}
+
+/* ─────────────────── Save / Share ─────────────────── */
+async function toggleSave(c, btn) {
+  if (SAVES[c.id]) {
+    delete SAVES[c.id];
+    btn.textContent = '+ Save to casebook';
+    if (USER) await sb.from('tracks').delete().eq('user_id', USER.id).eq('case_id', c.id);
+  } else {
+    SAVES[c.id] = { last_seen: c.filing_count || 0 };
+    btn.textContent = '✓ In casebook';
+    if (USER) await sb.from('tracks').upsert({ user_id: USER.id, case_id: c.id });
+  }
+  persist();
+  renderBook();
+}
+
+async function shareCase(c) {
+  const url = SHARE_BASE + '?c=' + c.case_number;
+  const text = 'CASE #' + c.case_number + ': ' + c.title_render + ' · Report AI before it reports you.';
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Case #' + c.case_number, text, url }); return; } catch {}
+  }
+  try { await navigator.clipboard.writeText(url); toast('Case link copied: ' + url); }
+  catch { toast(url); }
+}
+
+/* ─────────────────── Casebook ─────────────────── */
+function toggleBook() {
+  CB_OPEN = !CB_OPEN;
+  $('#cbstrip').classList.toggle('open', CB_OPEN);
+  $('#cbDetail').style.display = 'none';
+  if (CB_OPEN) renderBook();
+}
+
+function bookCount() {
+  return Object.keys(SAVES).length;
+}
+
+function renderBook() {
+  $('#cbCount').textContent = bookCount();
+
+  // Check for new filings
+  let hasNew = false;
+  for (const [id, s] of Object.entries(SAVES)) {
+    const c = CACHE.get(id);
+    if (c && (c.filing_count || 0) > (s.last_seen || 0)) { hasNew = true; break; }
+  }
+  $('#cbNewDot').innerHTML = hasNew ? '<span class="badge solid">NEW FILINGS</span>' : '';
+
+  if (!CB_OPEN) return;
+
+  const host = $('#cbList');
+  host.innerHTML = '<div class="cbsec">SAVED CASES</div>';
+
+  const savedIds = Object.keys(SAVES);
+  if (!savedIds.length) {
+    host.insertAdjacentHTML('beforeend', '<div class="empty">Save any case and it lives here. New filings light it up.</div>');
+  } else {
+    for (const id of savedIds) {
+      const c = CACHE.get(id);
+      if (!c) continue;
+      const fresh = (c.filing_count || 0) > ((SAVES[id] || {}).last_seen || 0);
+      const el = document.createElement('div');
+      el.className = 'cbrow';
+      el.innerHTML = `<span class="nm">#${esc(c.case_number)} ${esc(c.title_render)}</span>
+        ${fresh ? '<span class="badge solid">NEW</span>' : ''}`;
+      el.onclick = () => { location.hash = '#case=' + c.case_number; };
       host.appendChild(el);
     }
   }
-  host.insertAdjacentHTML('beforeend','<div class="cbsec">SAVED CASES</div>');
-  const savedIds=Object.keys(SAVES);
-  if(!savedIds.length){
-    host.insertAdjacentHTML('beforeend',
-      '<div class="empty">Save any case and it lives here. New filings light it up.</div>');
-  }else{
-    for(const id of savedIds){
-      const c=CACHE.get(id);if(!c)continue;
-      const fresh=(c.live_filings||0)>((SAVES[id]||{}).last_seen||0);
-      const el=document.createElement('div');el.className='cbrow';
-      el.innerHTML='<span class="nm">#'+esc(c.case_number)+' '+esc(c.title_render)+'</span>'
-        +(fresh?'<span class="badge solid">NEW</span>':'');
-      el.onclick=()=>bookOpenCase(c,c.case_number);
-      host.appendChild(el);
-    }
-  }
 }
-async function bookOpenCase(c,num){
-  const det=document.getElementById('cbDetail');
-  det.style.display='block';
-  det.innerHTML='<div class="empty">Opening case...</div>';
-  let kase=c;
-  if(!kase||!kase.filings){
-    if(DEMO){kase=DEMO_CASES.find(x=>String(x.case_number)===String(num));}
-    else{
-      try{const d=await api('search-cases',{case_number:Number(num)});
-        kase=(d.results||[])[0];if(kase)CACHE.set(kase.id,kase);}catch(e){}
-    }
+
+function exportCSV() {
+  const rows = [['case_number', 'title', 'my_vote', 'good', 'evil', 'filings', 'saved']];
+  for (const id of Object.keys(SAVES)) {
+    const c = CACHE.get(id);
+    if (!c) continue;
+    rows.push([
+      c.case_number, c.title_render,
+      MY_VOTES[c.id] === 1 ? 'good' : MY_VOTES[c.id] === -1 ? 'evil' : '',
+      c.good_votes || 0, c.evil_votes || 0, c.filing_count || 0,
+      SAVES[id] ? new Date().toISOString().slice(0, 10) : ''
+    ]);
   }
-  if(!kase){det.innerHTML='<div class="empty">Could not open it.</div>';return;}
-  CURRENT_CASE=kase;
-  renderCase(det,kase);
-  det.insertAdjacentHTML('beforeend',
-    '<button class="mini" style="margin-top:8px" onclick="document.getElementById(\'cbDetail\').style.display=\'none\'">Close</button>');
-  if(SAVES[kase.id]){
-    SAVES[kase.id].last_seen=kase.live_filings||0;persist();renderBook();
-    det.style.display='block';
-    if(!DEMO)api('saves',{action:'seen',case_id:kase.id,
-      last_seen:kase.live_filings||0}).catch(()=>{});
-  }
-}
-function exportCSV(){
-  const rows=[['case_number','title','my_vote','heaven','hell','filings','newest_source','saved']];
-  const ids=new Set([...Object.keys(SAVES)]);
-  for(const f of FILED_CACHE){if(f.case_id)ids.add(f.case_id);}
-  for(const id of ids){
-    const c=CACHE.get(id);if(!c)continue;
-    rows.push([c.case_number,c.title_render,
-      MY_VOTES[c.id]===1?'good':MY_VOTES[c.id]===-1?'evil':'',
-      c.heaven_votes||0,c.hell_votes||0,c.live_filings||0,
-      (c.filing&&c.filing.source_url)||'',
-      SAVES[id]?new Date(SAVES[id].saved_at||Date.now()).toISOString().slice(0,10):'']);
-  }
-  const csv=rows.map(r=>r.map(x=>'"'+String(x==null?'':x).replace(/"/g,'""')+'"').join(',')).join('\n');
-  const a=document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-  a.download='casebook.csv';a.click();
+  const csv = rows.map(r => r.map(x => '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'casebook.csv';
+  a.click();
   toast('Casebook exported.');
 }
 
-/* ---------------- sheet plumbing ---------------- */
-function openSheet(html){
-  document.getElementById('sheet').innerHTML=html;
-  document.getElementById('sheet').classList.add('open');
-  document.getElementById('sheetback').classList.add('open');
-}
-function closeSheet(){
-  document.getElementById('sheet').classList.remove('open');
-  document.getElementById('sheetback').classList.remove('open');
-}
+/* ─────────────────── Filing ─────────────────── */
+async function fileURL(explicit) {
+  const url = explicit || $('#q').value.trim();
+  if (!/^https?:\/\//i.test(url)) { toast('That is not a URL.'); return; }
 
-/* ---------------- admin ---------------- */
-const adminKey=()=>document.getElementById('ak').value.trim();
-async function adminApi(fn,params,body){
-  const r=await fetch(CONFIG.FN(fn)+(params||''),{method:'POST',
-    headers:{'Content-Type':'application/json',
-      'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY,
-      'x-admin-key':adminKey()},
-    body:JSON.stringify(body||{})});
-  return r.json();
+  toast('Filing... this may take a moment.');
+
+  // Add to prospects via crawler
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=seed_urls`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-admin-key': localStorage.getItem('ucar_admin_key') || '' },
+      body: JSON.stringify({ urls: [url] })
+    }).then(r => r.json());
+
+    if (res.added) {
+      toast('URL queued for extraction. Check back in a few minutes.');
+    } else {
+      toast('Could not queue URL. May already exist.');
+    }
+  } catch (e) {
+    toast('Could not reach the registry.');
+  }
 }
-async function saveEpisode(){
-  const body={title:val('ep-title'),description:val('ep-desc'),
-    video_url:val('ep-video'),case_number:val('ep-case'),featured:true};
-  if(!body.title){toast('Title required.');return;}
-  try{
-    const d=await adminApi('episodes','',{action:'upsert',episode:body});
-    toast(d.ok?'Episode published.':(d.error||'Failed.'));
+window.fileURL = fileURL;
+
+function openTestimony() {
+  openSheet(`<h4>FILE TESTIMONY</h4>
+    <div class="empty">No link? Tell the docket what you saw. Testimony is marked UNSOURCED until corroborated.</div>
+    <label>What happened</label>
+    <textarea id="tst-body" placeholder="Who deployed what, on whom, where..."></textarea>
+    <div class="row">
+      <button class="no" onclick="closeSheet()">Cancel</button>
+      <button class="go" onclick="submitTestimony()">File it</button>
+    </div>`);
+}
+window.openTestimony = openTestimony;
+
+async function submitTestimony() {
+  const text = ($('#tst-body')?.value || '').trim();
+  if (text.length < 60) { toast('Give the docket at least 60 characters.'); return; }
+  toast('Testimony feature coming soon. For now, paste a source URL.');
+  closeSheet();
+}
+window.submitTestimony = submitTestimony;
+
+/* ─────────────────── Search ─────────────────── */
+let searchTimer = null;
+$('#q').addEventListener('input', e => {
+  const q = e.target.value.trim();
+  const isUrl = /^https?:\/\/\S+$/i.test(q);
+  $('#fileBtn').style.display = isUrl ? '' : 'none';
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => loadView(), 300);
+});
+
+/* ─────────────────── Sheet ─────────────────── */
+function openSheet(html) {
+  $('#sheet').innerHTML = html;
+  $('#sheet').classList.add('open');
+  $('#sheetback').classList.add('open');
+}
+window.openSheet = openSheet;
+
+function closeSheet() {
+  $('#sheet').classList.remove('open');
+  $('#sheetback').classList.remove('open');
+}
+window.closeSheet = closeSheet;
+
+/* ─────────────────── Admin ─────────────────── */
+const adminKey = () => $('#ak')?.value?.trim() || localStorage.getItem('ucar_admin_key') || '';
+
+async function saveEpisode() {
+  const title = $('#ep-title')?.value?.trim();
+  const blurb = $('#ep-desc')?.value?.trim();
+  const video_url = $('#ep-video')?.value?.trim();
+  if (!title) { toast('Title required.'); return; }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/api?action=set_show`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-admin-key': adminKey() },
+      body: JSON.stringify({ title, blurb, video_url })
+    }).then(r => r.json());
+    toast(res.ok ? 'Episode published.' : (res.error || 'Failed.'));
     loadEpisode();
-  }catch(e){toast('Failed.');}
+  } catch { toast('Failed.'); }
 }
-function val(id){return (document.getElementById(id).value||'').trim();}
-async function loadProposals(){
-  try{
-    const r=await fetch(CONFIG.FN('proposals'),{headers:{
-      'Authorization':'Bearer '+CONFIG.SUPABASE_ANON_KEY}});
-    const d=await r.json();
-    const host=document.getElementById('prop-admin');host.innerHTML='';
-    for(const p of (d.proposals||[])){
-      const el=document.createElement('div');el.className='prop';
-      el.innerHTML='<span><b>'+esc(p.kind)+'</b> '+esc(JSON.stringify(p.payload).slice(0,80))
-        +' \u00b7 '+esc(p.support)+' support</span><span></span>';
-      const ok=document.createElement('button');ok.className='mini';ok.textContent='Approve';
-      ok.onclick=async()=>{const r2=await adminApi('proposals','',{action:'decide',
-        id:p.id,decision:'approve'});
-        toast(r2.ok?('Approved.'+(r2.new_case_number?' Minted Case #'+r2.new_case_number:'')):(r2.error||'Failed.'));
-        loadProposals();};
-      const no=document.createElement('button');no.className='mini';no.textContent='Reject';
-      no.onclick=async()=>{await adminApi('proposals','',{action:'decide',
-        id:p.id,decision:'reject'});loadProposals();};
-      el.lastElementChild.append(ok,no);
+window.saveEpisode = saveEpisode;
+
+async function loadVocabPending() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/api?action=vocab_pending`, {
+      method: 'POST',
+      headers: { 'x-admin-key': adminKey() }
+    }).then(r => r.json());
+
+    const host = $('#vocab-pending');
+    host.innerHTML = '';
+    for (const t of (res.pending || [])) {
+      const el = document.createElement('div');
+      el.className = 'frow';
+      el.innerHTML = `<span><b>${esc(t.kind)}</b>: ${esc(t.term)}</span>
+        <button class="mini" data-id="${t.id}" data-action="approve">Approve</button>`;
+      el.querySelector('button').onclick = async () => {
+        await fetch(`${SUPABASE_URL}/functions/v1/api?action=vocab_approve`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-admin-key': adminKey() },
+          body: JSON.stringify({ term_id: t.id })
+        });
+        toast('Approved.');
+        loadVocabPending();
+      };
       host.appendChild(el);
     }
-    if(!(d.proposals||[]).length)host.innerHTML='<div class="empty">Queue is clear.</div>';
-  }catch(e){toast('Failed.');}
+    if (!(res.pending || []).length) host.innerHTML = '<div class="empty">No pending terms.</div>';
+  } catch { toast('Failed.'); }
 }
-async function crawlerStatus(){
-  try{const d=await adminApi('crawler','?action=status');
-    document.getElementById('crawl-status').textContent=JSON.stringify(d.counts||d);}
-  catch(e){toast('Failed.');}
+window.loadVocabPending = loadVocabPending;
+
+async function crawlerStatus() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=status`, {
+      method: 'POST',
+      headers: { 'x-admin-key': adminKey() }
+    }).then(r => r.json());
+    $('#crawl-status').textContent = JSON.stringify(res, null, 2);
+  } catch { toast('Failed.'); }
 }
-async function crawlerRun(){
+window.crawlerStatus = crawlerStatus;
+
+async function crawlerRun() {
   toast('Crawler running...');
-  try{const d=await adminApi('crawler','?action=run');
-    document.getElementById('crawl-status').textContent=JSON.stringify(d.stats||d);}
-  catch(e){toast('Failed.');}
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=run`, {
+      method: 'POST',
+      headers: { 'x-admin-key': adminKey() }
+    }).then(r => r.json());
+    $('#crawl-status').textContent = JSON.stringify(res, null, 2);
+    toast('Crawler complete.');
+  } catch { toast('Failed.'); }
 }
-async function crawlerReview(){
-  try{
-    const d=await adminApi('crawler','?action=review');
-    const host=document.getElementById('crawl-review');host.innerHTML='';
-    for(const p of (d.prospects||[])){
-      const el=document.createElement('div');el.className='prop';
-      el.innerHTML='<span>['+esc(Math.round(p.score||0))+'] '+esc(p.title||p.url)+'</span><span></span>';
-      const ok=document.createElement('button');ok.className='mini';ok.textContent='Promote';
-      ok.onclick=async()=>{await adminApi('crawler','?action=promote_one',{id:p.id});
-        toast('Promoted to a filing.');crawlerReview();};
-      const no=document.createElement('button');no.className='mini';no.textContent='Reject';
-      no.onclick=async()=>{await adminApi('crawler','?action=reject_one',{id:p.id});crawlerReview();};
-      el.lastElementChild.append(ok,no);host.appendChild(el);
-    }
-    if(!(d.prospects||[]).length)host.innerHTML='<div class="empty">Nothing scored yet.</div>';
-  }catch(e){toast('Failed.');}
+window.crawlerRun = crawlerRun;
+
+async function extractRun() {
+  toast('Extracting...');
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/extract?action=run`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-admin-key': adminKey() },
+      body: JSON.stringify({ max: 5 })
+    }).then(r => r.json());
+    $('#crawl-status').textContent = JSON.stringify(res, null, 2);
+    toast('Extraction complete.');
+  } catch { toast('Failed.'); }
 }
-async function purge(action){
-  const id=val('purge-id');if(!id){toast('Paste a uuid.');return;}
-  try{const d=await adminApi('crawler','?action='+action,{id,on:true});
-    toast(JSON.stringify(d.stats||d));}
-  catch(e){toast('Failed.');}
+window.extractRun = extractRun;
+
+/* ─────────────────── Routing ─────────────────── */
+function show(id) {
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  $(`#${id}`).classList.add('active');
+  window.scrollTo(0, 0);
 }
 
-/* ---------------- routing ---------------- */
-function show(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
-}
-function route(){
-  const h=location.hash;
-  const m=h.match(/^#case=(\d+)/);
-  if(m){openCase(m[1]);return;}
-  if(h==='#admin'){show('admin');return;}
+function route() {
+  const h = location.hash;
+  const m = h.match(/^#case=(\d+)/);
+  if (m) { openCase(m[1]); return; }
+  if (h === '#admin') { show('admin'); return; }
+
+  // Check for ?c= query param (share links)
+  const params = new URLSearchParams(location.search);
+  if (params.has('c')) { openCase(params.get('c')); return; }
+
   show('home');
 }
-window.addEventListener('hashchange',route);
-boot();route();
 
+window.addEventListener('hashchange', route);
+window.toggleBook = toggleBook;
+window.exportCSV = exportCSV;
+
+// Boot
+boot();
 </script>
 </body>
 </html>
