@@ -244,7 +244,8 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 
 <!-- About modal -->
 <div id="aboutModal" class="modal">
-  <div class="submit-box" style="max-width:500px">
+  <div class="submit-box" style="max-width:500px;position:relative">
+    <button class="close-btn" id="closeAboutX" style="position:absolute;top:10px;right:14px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--ink)">×</button>
     <h3>ABOUT USE CASE ARMS RACE</h3>
     <p style="font-size:14px;line-height:1.6;margin-bottom:12px">
       <strong>The AI Arms Race is here.</strong> Every week, new AI systems are deployed to surveil, score, manipulate, and decide.
@@ -400,6 +401,8 @@ if(importParam){
 // About modal
 $('#aboutBtn').onclick = () => $('#aboutModal').classList.add('open');
 $('#closeAbout').onclick = () => $('#aboutModal').classList.remove('open');
+$('#closeAboutX').onclick = () => $('#aboutModal').classList.remove('open');
+$('#aboutModal').onclick = e => { if(e.target.id === 'aboutModal') $('#aboutModal').classList.remove('open'); };
 
 // Admin
 let ADMIN_KEY = localStorage.getItem('ucar-admin-key') || '';
