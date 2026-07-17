@@ -225,12 +225,16 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
       <button class="admin-action" data-action="extract">⚙ Run Extraction</button>
       <button class="admin-action" data-action="embed">📐 Embed Vocab</button>
       <button class="admin-action" data-action="status">📊 Pipeline Status</button>
+      <button class="admin-action" data-action="alignment">🔍 Review Alignment</button>
     </div>
 
     <div id="adminStatus" style="font-family:'IBM Plex Mono',monospace;font-size:13px;padding:12px;background:var(--card);border:1px solid var(--line);margin-bottom:24px;min-height:60px"></div>
 
     <h3 style="font-family:'Oswald',sans-serif;font-size:16px;margin-bottom:12px;border-bottom:2px solid var(--ink);padding-bottom:6px">PENDING VOCABULARY</h3>
     <div id="pendingVocab" style="font-family:'IBM Plex Mono',monospace;font-size:13px"></div>
+
+    <h3 style="font-family:'Oswald',sans-serif;font-size:16px;margin:24px 0 12px;border-bottom:2px solid var(--ink);padding-bottom:6px">MISALIGNED FILINGS</h3>
+    <div id="misalignedFilings" style="font-family:'IBM Plex Mono',monospace;font-size:12px"></div>
   </div>
 </div>
 
@@ -247,6 +251,13 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 .pending-term button:hover{background:var(--ink);color:var(--paper)}
 .pending-term button.approve{border-color:var(--good);color:var(--good)}
 .pending-term button.approve:hover{background:var(--good);color:#fff}
+.misaligned-item{border:1px solid var(--line);padding:12px;margin-bottom:12px;background:var(--card)}
+.misaligned-item .headline{font-weight:600;margin-bottom:8px}
+.misaligned-item .comparison{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px}
+.misaligned-item .col{padding:8px;background:var(--paper)}
+.misaligned-item .col-title{font-size:10px;color:var(--olive);text-transform:uppercase;margin-bottom:4px}
+.misaligned-item .mismatch{color:var(--stamp);font-weight:600}
+.misaligned-item .match{color:var(--good)}
 </style>
 
 <script type="module">
@@ -749,11 +760,57 @@ document.querySelectorAll('.admin-action').forEach(btn => {
         }).then(r => r.json());
         status.innerHTML = `<b>Pipeline status:</b><br>${Object.entries(r.queue||{}).map(([k,v])=>`• ${k}: ${v}`).join('<br>')}`;
       }
+      else if(action === 'alignment'){
+        status.textContent = 'Loading misaligned filings...';
+        loadMisalignedFilings();
+      }
     } catch(e) {
       status.textContent = 'Error: ' + e.message;
     }
   });
 });
+
+async function loadMisalignedFilings(){
+  const container = $('#misalignedFilings');
+  const status = $('#adminStatus');
+  if(!ADMIN_KEY){ container.innerHTML = '<div class="empty">Enter admin key</div>'; return; }
+
+  try {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/api?action=review_alignment`, {
+      method: 'POST',
+      headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
+      body: '{}'
+    }).then(r => r.json());
+
+    if(r.error){ container.innerHTML = `<div class="empty">Error: ${r.error}</div>`; return; }
+    status.innerHTML = `<b>Found ${r.total} misaligned filings</b>`;
+
+    if(!r.misaligned?.length){ container.innerHTML = '<div class="empty">All filings aligned ✓</div>'; return; }
+
+    container.innerHTML = r.misaligned.slice(0, 30).map(m => `
+      <div class="misaligned-item" data-filing="${m.filing_id}" data-case="${m.case_id}">
+        <div class="headline">${esc(m.headline)}</div>
+        <div class="comparison">
+          <div class="col">
+            <div class="col-title">Raw (from LLM)</div>
+            <div class="${m.mismatch.verb ? 'mismatch' : 'match'}">verb: ${esc(m.raw.verb || '—')}</div>
+            <div class="${m.mismatch.object ? 'mismatch' : 'match'}">object: ${esc(m.raw.object || '—')}</div>
+            <div class="${m.mismatch.instrument ? 'mismatch' : 'match'}">instrument: ${esc(m.raw.instrument || '—')}</div>
+          </div>
+          <div class="col">
+            <div class="col-title">Canonical (case #${m.case_number})</div>
+            <div class="${m.mismatch.verb ? 'mismatch' : 'match'}">verb: ${esc(m.canonical.verb || '—')}</div>
+            <div class="${m.mismatch.object ? 'mismatch' : 'match'}">object: ${esc(m.canonical.object || '—')}</div>
+            <div class="${m.mismatch.instrument ? 'mismatch' : 'match'}">instrument: ${esc(m.canonical.instrument || '—')}</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--olive)">Case: ${esc(m.case_title)}</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    container.innerHTML = `<div class="empty">Error: ${e.message}</div>`;
+  }
+}
 
 async function loadPendingVocab(){
   const container = $('#pendingVocab');
