@@ -207,6 +207,40 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
   <div id="dpanel"></div>
 </div>
 
+<!-- Suggestion Modal -->
+<div id="suggestModal" style="display:none;position:fixed;inset:0;background:rgba(20,18,16,.8);z-index:25;display:flex;align-items:center;justify-content:center">
+  <div style="max-width:500px;width:90%;background:var(--paper);border:3px solid var(--ink);padding:24px">
+    <h3 style="font-family:'Oswald',sans-serif;font-size:18px;margin-bottom:16px">SUGGEST A BETTER TERM</h3>
+    <p style="font-size:13px;color:var(--olive);margin-bottom:16px">Help improve the case title by suggesting a better verb, object, or instrument.</p>
+
+    <div style="margin-bottom:12px">
+      <label style="font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.1em">TYPE</label>
+      <select id="suggestKind" style="width:100%;padding:10px;margin-top:4px;border:2px solid var(--ink);background:var(--card);font-family:'IBM Plex Mono',monospace">
+        <option value="verb">Verb (the action)</option>
+        <option value="object_class">Object (who/what is affected)</option>
+        <option value="instrument">Instrument (the AI technology)</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label style="font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.1em">SUGGESTED TERM</label>
+      <input id="suggestTerm" type="text" style="width:100%;padding:10px;margin-top:4px;border:2px solid var(--ink);background:var(--card);font-family:'IBM Plex Mono',monospace" placeholder="e.g., surveil, workers, facial recognition">
+    </div>
+
+    <div style="margin-bottom:16px">
+      <label style="font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.1em">REASON (optional)</label>
+      <textarea id="suggestReason" style="width:100%;padding:10px;margin-top:4px;border:2px solid var(--ink);background:var(--card);font-family:'IBM Plex Mono',monospace;height:60px" placeholder="Why is this term better?"></textarea>
+    </div>
+
+    <div style="display:flex;gap:12px">
+      <button id="submitSuggest" style="flex:1;padding:12px;background:var(--ink);color:var(--paper);border:none;font-family:'Oswald',sans-serif;font-size:14px;cursor:pointer">SUBMIT</button>
+      <button id="cancelSuggest" style="padding:12px 20px;background:none;border:2px solid var(--ink);font-family:'Oswald',sans-serif;font-size:14px;cursor:pointer">CANCEL</button>
+    </div>
+
+    <div id="suggestStatus" style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:12px"></div>
+  </div>
+</div>
+
 <!-- Admin Panel -->
 <div id="adminPanel" style="display:none;position:fixed;inset:0;background:rgba(20,18,16,.8);z-index:20;overflow-y:auto">
   <div style="max-width:800px;margin:40px auto;background:var(--paper);border:3px solid var(--ink);padding:24px">
@@ -235,6 +269,9 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 
     <h3 style="font-family:'Oswald',sans-serif;font-size:16px;margin:24px 0 12px;border-bottom:2px solid var(--ink);padding-bottom:6px">MISALIGNED FILINGS</h3>
     <div id="misalignedFilings" style="font-family:'IBM Plex Mono',monospace;font-size:12px"></div>
+
+    <h3 style="font-family:'Oswald',sans-serif;font-size:16px;margin:24px 0 12px;border-bottom:2px solid var(--ink);padding-bottom:6px">USER SUGGESTIONS</h3>
+    <div id="userSuggestions" style="font-family:'IBM Plex Mono',monospace;font-size:12px"></div>
   </div>
 </div>
 
@@ -562,6 +599,7 @@ async function openFiling(filingId){
       ${chits(c)}
       <button class="trackbtn ${tracked?'on':''}" id="trk">${tracked ? '★ Tracking — untrack' : '☆ Track this case'}</button>
       <button class="sharebtn" id="share">⛓ Share link</button>
+      <button class="sharebtn" id="suggest" style="margin-left:4px">💡 Suggest fix</button>
 
       ${otherFilings?.length ? `
         <div class="sect">Other Filings in This Case</div>
@@ -612,6 +650,11 @@ async function openFiling(filingId){
         btn.classList.add('copied');
         setTimeout(() => { btn.textContent = '⛓ Share link'; btn.classList.remove('copied'); }, 2000);
       } catch { alert(shareUrl); }
+    });
+
+    // Suggest button
+    panel.querySelector('#suggest').addEventListener('click', () => {
+      openSuggestModal(c.id, c.title_render);
     });
   }
 }
@@ -704,12 +747,6 @@ let ADMIN_KEY = localStorage.getItem('ucar-admin-key') || '';
 if(ADMIN_KEY || location.search.includes('admin')){
   $('#adminBtn').style.display = 'block';
 }
-
-$('#adminBtn').addEventListener('click', () => {
-  $('#adminPanel').style.display = 'block';
-  $('#adminKey').value = ADMIN_KEY;
-  if(ADMIN_KEY) loadPendingVocab();
-});
 
 $('#closeAdmin').addEventListener('click', () => {
   $('#adminPanel').style.display = 'none';
@@ -812,6 +849,78 @@ async function loadMisalignedFilings(){
   }
 }
 
+// ── SUGGESTION MODAL ───────────────────────────────────────────────────────
+let SUGGEST_CASE_ID = null;
+
+function openSuggestModal(caseId, caseTitle) {
+  SUGGEST_CASE_ID = caseId;
+  $('#suggestModal').style.display = 'flex';
+  $('#suggestTerm').value = '';
+  $('#suggestReason').value = '';
+  $('#suggestStatus').textContent = '';
+  $('#suggestKind').focus();
+}
+
+$('#cancelSuggest').addEventListener('click', () => {
+  $('#suggestModal').style.display = 'none';
+});
+
+$('#suggestModal').addEventListener('click', (e) => {
+  if (e.target.id === 'suggestModal') $('#suggestModal').style.display = 'none';
+});
+
+$('#submitSuggest').addEventListener('click', async () => {
+  const kind = $('#suggestKind').value;
+  const term = $('#suggestTerm').value.trim();
+  const reason = $('#suggestReason').value.trim();
+  const status = $('#suggestStatus');
+
+  if (!term) {
+    status.textContent = 'Please enter a term';
+    status.style.color = 'var(--stamp)';
+    return;
+  }
+
+  if (!USER) {
+    status.textContent = 'You must be signed in to suggest';
+    status.style.color = 'var(--stamp)';
+    return;
+  }
+
+  status.textContent = 'Submitting...';
+  status.style.color = 'var(--olive)';
+
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/api?action=suggest_vocab`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'authorization': `Bearer ${session.access_token}`,
+        'apikey': ANON_KEY
+      },
+      body: JSON.stringify({
+        case_id: SUGGEST_CASE_ID,
+        kind,
+        suggested_term: term,
+        reason: reason || null
+      })
+    }).then(r => r.json());
+
+    if (r.ok) {
+      status.textContent = '✓ Suggestion submitted! Thanks for helping improve UCAR.';
+      status.style.color = 'var(--good)';
+      setTimeout(() => { $('#suggestModal').style.display = 'none'; }, 2000);
+    } else {
+      status.textContent = 'Error: ' + (r.error || 'Unknown error');
+      status.style.color = 'var(--stamp)';
+    }
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message;
+    status.style.color = 'var(--stamp)';
+  }
+});
+
 async function loadPendingVocab(){
   const container = $('#pendingVocab');
   if(!ADMIN_KEY){ container.innerHTML = '<div class="empty">Enter admin key to see pending vocab</div>'; return; }
@@ -866,6 +975,72 @@ async function loadPendingVocab(){
     container.innerHTML = `<div class="empty">Error loading: ${e.message}</div>`;
   }
 }
+
+async function loadUserSuggestions() {
+  const container = $('#userSuggestions');
+  if(!ADMIN_KEY){ container.innerHTML = '<div class="empty">Enter admin key</div>'; return; }
+
+  try {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/api?action=list_suggestions`, {
+      method: 'POST',
+      headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
+      body: '{}'
+    }).then(r => r.json());
+
+    if(r.error){ container.innerHTML = `<div class="empty">Error: ${r.error}</div>`; return; }
+    if(!r.suggestions?.length){ container.innerHTML = '<div class="empty">No pending suggestions ✓</div>'; return; }
+
+    container.innerHTML = r.suggestions.map(s => `
+      <div class="pending-term" data-id="${s.id}">
+        <div class="info">
+          <div class="kind">${esc(s.kind)}</div>
+          <div class="term">${esc(s.suggested_term)}</div>
+          ${s.reason ? `<div style="font-size:11px;color:var(--olive);margin-top:4px">"${esc(s.reason)}"</div>` : ''}
+          ${s.cases ? `<div style="font-size:10px;color:var(--muted);margin-top:2px">Case #${s.cases.case_number}: ${esc(s.cases.title_render)}</div>` : ''}
+        </div>
+        <div class="actions">
+          <button class="approve" data-action="approve">✓ Approve</button>
+          <button data-action="reject">✕ Reject</button>
+        </div>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('.pending-term button').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const suggestionId = btn.closest('.pending-term').dataset.id;
+        const action = btn.dataset.action;
+
+        if(action === 'approve'){
+          await fetch(`${SUPABASE_URL}/functions/v1/api?action=approve_suggestion`, {
+            method: 'POST',
+            headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
+            body: JSON.stringify({ suggestion_id: suggestionId })
+          });
+        } else {
+          await fetch(`${SUPABASE_URL}/functions/v1/api?action=reject_suggestion`, {
+            method: 'POST',
+            headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
+            body: JSON.stringify({ suggestion_id: suggestionId })
+          });
+        }
+        btn.closest('.pending-term').remove();
+        loadUserSuggestions();
+      });
+    });
+  } catch(e) {
+    container.innerHTML = `<div class="empty">Error: ${e.message}</div>`;
+  }
+}
+
+// Load suggestions when admin panel opens
+$('#adminBtn').addEventListener('click', () => {
+  $('#adminPanel').style.display = 'block';
+  $('#adminKey').value = ADMIN_KEY;
+  if(ADMIN_KEY) {
+    loadPendingVocab();
+    loadUserSuggestions();
+  }
+});
 
 boot();
 </script>
