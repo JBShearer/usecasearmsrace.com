@@ -15,17 +15,34 @@
   --olive:#565442;      /* filing cabinet */
   --line:#C9C2AE;       /* rule lines */
   --good:#2E6B3F;
+  --card:#fff;
+}
+[data-theme="dark"]{
+  --paper:#141210;
+  --ink:#E8E4DC;
+  --stamp:#E85A4F;
+  --olive:#A8A090;
+  --line:#3A3632;
+  --good:#4CAF50;
+  --card:#1E1C18;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--paper);color:var(--ink);font-family:'Archivo',sans-serif;font-size:16px;line-height:1.5}
+body{background:var(--paper);color:var(--ink);font-family:'Archivo',sans-serif;font-size:16px;line-height:1.5;
+  transition:background .3s,color .3s}
 a{color:inherit}
 .mono{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.02em}
 .disp{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em}
 
-header{border-bottom:3px solid var(--ink);padding:14px 20px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+header{border-bottom:3px solid var(--ink);padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  justify-content:space-between}
+.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
 header h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:26px;letter-spacing:.04em}
 header h1 span{color:var(--stamp)}
 header .tag{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive)}
+#themeToggle{background:none;border:2px solid var(--ink);color:var(--ink);padding:6px 14px;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  transition:background .2s,color .2s}
+#themeToggle:hover{background:var(--ink);color:var(--paper)}
 main{max-width:920px;margin:0 auto;padding:20px}
 
 /* what's new banner */
@@ -34,7 +51,7 @@ main{max-width:920px;margin:0 auto;padding:20px}
 #newsbar b{color:#F2C744}
 
 /* daily show */
-#show{border:2px solid var(--ink);margin-bottom:14px;background:#fff;position:relative}
+#show{border:2px solid var(--ink);margin-bottom:14px;background:var(--card);position:relative}
 #show .stamp{position:absolute;top:-11px;left:14px;background:var(--stamp);color:var(--paper);
   font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.12em;padding:2px 10px;text-transform:uppercase}
 #show .inner{padding:20px 16px 16px}
@@ -45,68 +62,85 @@ main{max-width:920px;margin:0 auto;padding:20px}
 #trackbox{border:2px dashed var(--olive);padding:14px 16px;margin-bottom:24px;background:transparent}
 #trackbox h3{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--olive);margin-bottom:8px}
 #trackbox .t-item{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line);cursor:pointer}
-#trackbox .t-item:hover{background:#EFE9D8}
+#trackbox .t-item:hover{background:var(--line)}
 #trackbox .fresh{color:var(--stamp);font-weight:600}
 
 /* controls */
 #controls{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
-#q{flex:1;min-width:220px;border:2px solid var(--ink);background:#fff;padding:10px 12px;
+#q{flex:1;min-width:220px;border:2px solid var(--ink);background:var(--card);color:var(--ink);padding:10px 12px;
   font-family:'IBM Plex Mono',monospace;font-size:14px}
 #q:focus{outline:3px solid var(--stamp);outline-offset:1px}
-.tab{border:2px solid var(--ink);background:transparent;padding:9px 16px;cursor:pointer;
+.tab{border:2px solid var(--ink);background:transparent;color:var(--ink);padding:9px 16px;cursor:pointer;
   font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
 .tab.on{background:var(--ink);color:var(--paper)}
 
 /* filing rows: the docket */
 .filing{border-bottom:1px solid var(--line);padding:16px 0;display:grid;
-  grid-template-columns:86px 1fr;gap:14px}
+  grid-template-columns:86px 1fr;gap:14px;cursor:pointer}
+.filing:hover{background:var(--line)}
 .casenum{font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;color:var(--stamp);
   border:2px solid var(--stamp);align-self:start;text-align:center;padding:6px 4px;
-  transform:rotate(-2.5deg);cursor:pointer;line-height:1.2;background:#fff}
+  transform:rotate(-2.5deg);cursor:pointer;line-height:1.2;background:var(--card)}
 .casenum small{display:block;font-size:9px;letter-spacing:.14em;color:var(--ink)}
 .filing h3{font-size:17px;font-weight:600;margin-bottom:4px}
 .filing .ctitle{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.05em;color:var(--olive);
   text-transform:uppercase;cursor:pointer;margin-bottom:6px}
 .filing .ctitle:hover{color:var(--stamp)}
-.filing p{font-size:14.5px;color:#3A362E;margin-bottom:8px}
+.filing p{font-size:14.5px;color:var(--olive);margin-bottom:8px}
 .meta{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive);display:flex;gap:14px;flex-wrap:wrap}
 .impact{color:var(--stamp);font-weight:600}
 
 /* case rows */
 .caserow{border-bottom:1px solid var(--line);padding:14px 0;display:flex;gap:14px;align-items:baseline;cursor:pointer}
-.caserow:hover{background:#EFE9D8}
+.caserow:hover{background:var(--line)}
 .caserow .num{font-family:'Oswald',sans-serif;color:var(--stamp);font-weight:700;min-width:64px}
 .caserow .t{font-family:'Oswald',sans-serif;font-size:16px;flex:1}
 .caserow .c{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive)}
 
 /* vote chits */
 .chits{display:flex;gap:8px;margin-top:4px}
-.chit{border:1.5px solid var(--ink);background:#fff;padding:4px 10px;cursor:pointer;
+.chit{border:1.5px solid var(--ink);background:var(--card);color:var(--ink);padding:4px 10px;cursor:pointer;
   font-family:'IBM Plex Mono',monospace;font-size:12px}
 .chit.good.on{background:var(--good);color:#fff;border-color:var(--good)}
 .chit.evil.on{background:var(--stamp);color:#fff;border-color:var(--stamp)}
 .chit.fake.on{background:var(--olive);color:#fff;border-color:var(--olive)}
 
 /* case drawer */
-#drawer{position:fixed;inset:0;background:rgba(20,18,16,.45);display:none;z-index:10}
+#drawer{position:fixed;inset:0;background:rgba(20,18,16,.65);display:none;z-index:10}
 #drawer.open{display:block}
-#dpanel{position:absolute;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--paper);
+#dpanel{position:absolute;top:0;right:0;bottom:0;width:min(620px,100%);background:var(--paper);
   border-left:3px solid var(--ink);overflow-y:auto;padding:22px}
 #dpanel .close{float:right;font-family:'IBM Plex Mono',monospace;border:2px solid var(--ink);
-  background:transparent;padding:4px 10px;cursor:pointer}
+  background:transparent;color:var(--ink);padding:4px 10px;cursor:pointer}
+#dpanel .close:hover{background:var(--ink);color:var(--paper)}
 #dpanel h2{font-family:'Oswald',sans-serif;font-size:22px;margin:10px 0 4px;text-transform:uppercase}
 #dpanel .sect{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--olive);margin:20px 0 6px;border-bottom:2px solid var(--ink);padding-bottom:4px}
-.dfiling{padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
-.sim{padding:7px 0;border-bottom:1px dotted var(--line);cursor:pointer;font-size:14px}
-.sim:hover{color:var(--stamp)}
-.trackbtn{margin-top:10px;border:2px solid var(--ink);background:transparent;padding:8px 16px;cursor:pointer;
+.dfiling{padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
+.dfiling b{font-size:15px}
+.dfiling .summary{margin:6px 0;color:var(--olive)}
+.dfiling .quote{border-left:3px solid var(--stamp);padding-left:10px;margin:8px 0;font-style:italic;color:var(--ink)}
+
+/* nearby cases - enhanced */
+.sim{padding:12px 0;border-bottom:1px dotted var(--line);cursor:pointer}
+.sim:hover{background:var(--line)}
+.sim .sim-title{font-family:'Oswald',sans-serif;font-size:14px;color:var(--stamp);margin-bottom:4px}
+.sim .sim-desc{font-size:13px;color:var(--olive);margin-bottom:4px}
+.sim .sim-meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive)}
+
+.trackbtn{margin-top:10px;border:2px solid var(--ink);background:transparent;color:var(--ink);padding:8px 16px;cursor:pointer;
   font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
 .trackbtn.on{background:var(--ink);color:var(--paper)}
 .sharebtn{margin-left:8px;border:2px solid var(--olive);background:transparent;padding:8px 16px;cursor:pointer;
   font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--olive)}
 .sharebtn:hover{background:var(--olive);color:var(--paper)}
 .copied{background:var(--good)!important;color:#fff!important;border-color:var(--good)!important}
+
+/* filing popup - article first, then case */
+.filing-detail{background:var(--card);border:2px solid var(--ink);padding:16px;margin-bottom:16px}
+.filing-detail h3{font-size:18px;margin-bottom:8px}
+.filing-detail .quote{border-left:3px solid var(--stamp);padding-left:12px;margin:12px 0;font-style:italic}
+.case-section{border-top:3px solid var(--ink);padding-top:16px;margin-top:8px}
 
 .empty{padding:40px 0;text-align:center;font-family:'IBM Plex Mono',monospace;color:var(--olive);font-size:14px}
 footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid var(--ink);
@@ -117,8 +151,11 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 </head>
 <body>
 <header>
-  <h1>UCAR<span>.</span></h1>
-  <div class="tag">USE CASE ARMS RACE · a public docket of AI deployments</div>
+  <div class="brand">
+    <h1>UCAR<span>.</span></h1>
+    <div class="tag">USE CASE ARMS RACE · a public docket of AI deployments</div>
+  </div>
+  <button id="themeToggle">☀ Light</button>
 </header>
 
 <main>
@@ -128,7 +165,7 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
     <div class="stamp">Today's Show</div>
     <div class="inner">
       <h2 id="show-title"></h2>
-      <p id="show-blurb" style="font-size:14px;color:#3A362E"></p>
+      <p id="show-blurb" style="font-size:14px;color:var(--olive)"></p>
       <div id="show-video"></div>
     </div>
   </section>
@@ -159,7 +196,7 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-// ── CONFIG: filled by deploy.sh ────────────────────────────────────────────
+// ── CONFIG ─────────────────────────────────────────────────────────────────
 const SUPABASE_URL = 'https://znhsnishdqrmumxbgobq.supabase.co';
 const ANON_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuaHNuaXNoZHFybXVteGJnb2JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzEwNjMsImV4cCI6MjA5OTY0NzA2M30.k22R9kcbLCp9OyTVBb7DaUbk_Gdghnu-YGKUYc834Rs';
 // ───────────────────────────────────────────────────────────────────────────
@@ -167,18 +204,32 @@ const ANON_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const sb = createClient(SUPABASE_URL, ANON_KEY);
 const $ = (s) => document.querySelector(s);
 let USER = null, MODE = 'filings', MY_VOTES = new Map(), MY_TRACKS = new Set(), LAST_SEEN = null;
+let FILINGS_CACHE = []; // cache filings for click-to-open
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ago = (d) => { const s=(Date.now()-new Date(d))/1e3;
   if(s<3600) return `${Math.max(1,s/60|0)}m ago`; if(s<86400) return `${s/3600|0}h ago`; return `${s/86400|0}d ago`; };
 
+// Theme toggle
+function setTheme(t){
+  document.body.dataset.theme = t;
+  localStorage.setItem('ucar-theme', t);
+  $('#themeToggle').textContent = t === 'dark' ? '☾ Dark' : '☀ Light';
+}
+$('#themeToggle').addEventListener('click', () => {
+  setTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark');
+});
+// Load saved theme
+const saved = localStorage.getItem('ucar-theme') || 'light';
+setTheme(saved);
+
 // URL routing for /c/{case_number}
 function checkRoute(){
   const m = location.pathname.match(/\/c\/(\d+)$/);
-  if(m) return m[1];
-  // Handle GitHub Pages 404 redirect via query param
+  if(m) return { type: 'case', num: m[1] };
   const sp = new URLSearchParams(location.search);
-  if(sp.has('c')) return sp.get('c');
+  if(sp.has('c')) return { type: 'case', num: sp.get('c') };
+  if(sp.has('f')) return { type: 'filing', id: sp.get('f') };
   return null;
 }
 
@@ -203,9 +254,10 @@ async function boot(){
   }
   await Promise.all([loadShow(), loadNewsBar(), loadTrackBox(), loadFeed()]);
 
-  // Check for deep link to case
-  const routedCase = checkRoute();
-  if(routedCase) openCaseByNumber(routedCase);
+  // Check for deep link
+  const route = checkRoute();
+  if(route?.type === 'case') openCaseByNumber(route.num);
+  if(route?.type === 'filing') openFilingById(route.id);
 }
 
 async function loadShow(){
@@ -256,7 +308,7 @@ async function loadTrackBox(){
 }
 
 function filingRow(f, c){
-  return `<article class="filing">
+  return `<article class="filing" data-filing="${f.id}">
     <div class="casenum" data-case="${c?.id}"><small>CASE No.</small>${c?.case_number ?? '—'}</div>
     <div>
       <div class="ctitle" data-case="${c?.id}">${esc(c?.title_render ?? '')}</div>
@@ -267,7 +319,6 @@ function filingRow(f, c){
         <span>${esc(f.source_domain ?? '')}</span>
         <span>${ago(f.created_at)}</span>
         ${f.impact ? `<span class="impact">impact ${'▮'.repeat(f.impact)}${'▯'.repeat(5-f.impact)}</span>` : ''}
-        <a href="${esc(f.source_url)}" target="_blank" rel="noopener">source ↗</a>
       </div>
       ${c ? chits(c) : ''}
     </div>
@@ -284,8 +335,18 @@ function chits(c){
 }
 
 function wireRows(root){
+  // Click on filing row (not case number or vote buttons) opens filing detail
+  root.querySelectorAll('.filing').forEach(el => {
+    el.addEventListener('click', (e) => {
+      // Don't trigger if clicking case number, ctitle, or vote buttons
+      if(e.target.closest('.casenum') || e.target.closest('.ctitle') || e.target.closest('.chits')) return;
+      const filingId = el.dataset.filing;
+      if(filingId) openFiling(filingId);
+    });
+  });
+
   root.querySelectorAll('.casenum,.ctitle').forEach(el =>
-    el.addEventListener('click', () => el.dataset.case && openCase(el.dataset.case)));
+    el.addEventListener('click', (e) => { e.stopPropagation(); el.dataset.case && openCase(el.dataset.case); }));
   root.querySelectorAll('.chits .chit').forEach(btn =>
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
@@ -312,6 +373,7 @@ async function loadFeed(){
       headers:{ 'content-type':'application/json', 'authorization':`Bearer ${ANON_KEY}`, 'apikey': ANON_KEY },
       body: JSON.stringify({ q })
     }).then(r=>r.json()).catch(()=>({results:[]}));
+    FILINGS_CACHE = r.results || [];
     feed.innerHTML = (r.results?.length)
       ? r.results.map(f => filingRow(f, f.cases)).join('')
       : `<div class="empty">Nothing on the docket for "${esc(q)}". Try broader terms.</div>`;
@@ -322,6 +384,7 @@ async function loadFeed(){
     const { data } = await sb.from('filings')
       .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes)')
       .eq('status','live').order('created_at',{ascending:false}).limit(40);
+    FILINGS_CACHE = data || [];
     feed.innerHTML = (data?.length)
       ? data.map(f => filingRow(f, f.cases)).join('')
       : `<div class="empty">The docket is empty. The crawler files the first cases within the hour.</div>`;
@@ -343,6 +406,125 @@ async function loadFeed(){
   wireRows(feed);
 }
 
+// Open a filing: show article details first, then the full case below
+async function openFiling(filingId){
+  const panel = $('#dpanel');
+  panel.innerHTML = `<div class="empty">Loading filing…</div>`;
+  $('#drawer').classList.add('open');
+
+  // Try cache first
+  let f = FILINGS_CACHE.find(x => x.id === filingId);
+  if(!f){
+    const { data } = await sb.from('filings')
+      .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes, filing_count, first_filed_at)')
+      .eq('id', filingId).single();
+    f = data;
+  }
+  if(!f){ panel.innerHTML = `<div class="empty">Filing not found.</div>`; return; }
+
+  const c = f.cases;
+
+  // Fetch similar cases for the case section
+  const sim = await fetch(`${SUPABASE_URL}/functions/v1/api?action=similar`, {
+    method:'POST',
+    headers:{ 'content-type':'application/json', 'authorization':`Bearer ${ANON_KEY}`, 'apikey': ANON_KEY },
+    body: JSON.stringify({ case_id: c?.id })
+  }).then(r=>r.json()).catch(()=>({results:[]}));
+
+  // Fetch other filings for this case
+  const { data: otherFilings } = c ? await sb.from('filings')
+    .select('id, headline, summary, source_url, source_domain, created_at')
+    .eq('case_id', c.id).eq('status','live').neq('id', filingId)
+    .order('created_at',{ascending:false}).limit(10) : { data: [] };
+
+  const tracked = c ? MY_TRACKS.has(c.id) : false;
+  const shareUrl = c ? `${location.origin}?c=${c.case_number}` : location.href;
+
+  panel.innerHTML = `
+    <button class="close" aria-label="Close">CLOSE ✕</button>
+
+    <!-- FILING DETAIL (the news article) -->
+    <div class="filing-detail">
+      <div class="mono" style="color:var(--stamp);margin-bottom:8px">FILING</div>
+      <h3>${esc(f.headline)}</h3>
+      <p style="margin:10px 0;color:var(--olive)">${esc(f.summary)}</p>
+      ${f.article_quote ? `<div class="quote">"${esc(f.article_quote)}"</div>` : ''}
+      <div class="meta" style="margin-top:12px">
+        ${f.subject ? `<span>filed against: <b>${esc(f.subject)}</b></span>` : ''}
+        <span>${esc(f.source_domain ?? '')}</span>
+        <span>${ago(f.created_at)}</span>
+        ${f.impact ? `<span class="impact">impact ${'▮'.repeat(f.impact)}${'▯'.repeat(5-f.impact)}</span>` : ''}
+        <a href="${esc(f.source_url)}" target="_blank" rel="noopener">read full article ↗</a>
+      </div>
+    </div>
+
+    <!-- CASE SECTION (the fuller case below) -->
+    ${c ? `
+    <div class="case-section">
+      <div class="mono" style="color:var(--stamp)">CASE No. ${c.case_number}</div>
+      <h2>${esc(c.title_render)}</h2>
+      <div class="mono">${c.filing_count} filing${c.filing_count===1?'':'s'} · opened ${c.first_filed_at ? ago(c.first_filed_at) : '—'}</div>
+      ${chits(c)}
+      <button class="trackbtn ${tracked?'on':''}" id="trk">${tracked ? '★ Tracking — untrack' : '☆ Track this case'}</button>
+      <button class="sharebtn" id="share">⛓ Share link</button>
+
+      ${otherFilings?.length ? `
+        <div class="sect">Other Filings in This Case</div>
+        ${otherFilings.map(of => `<div class="dfiling" data-filing="${of.id}" style="cursor:pointer">
+          <b>${esc(of.headline)}</b>
+          <div class="summary">${esc(of.summary)}</div>
+          <div class="meta"><span>${esc(of.source_domain)}</span><span>${ago(of.created_at)}</span></div>
+        </div>`).join('')}
+      ` : ''}
+
+      <div class="sect">Nearby Cases</div>
+      ${(sim.results??[]).map(s => `<div class="sim" data-case="${s.id}">
+        <div class="sim-title">No. ${s.case_number} — ${esc(s.title_render)}</div>
+        <div class="sim-desc">${esc(s.latest_headline || '')}</div>
+        <div class="sim-meta">${s.filing_count} filings · ${Math.round(s.sim*100)}% similar</div>
+      </div>`).join('') || '<div class="empty">No neighbors yet.</div>'}
+    </div>
+    ` : ''}
+  `;
+
+  panel.querySelector('.close').addEventListener('click', () => $('#drawer').classList.remove('open'));
+
+  // Wire other filings
+  panel.querySelectorAll('.dfiling[data-filing]').forEach(el =>
+    el.addEventListener('click', () => openFiling(el.dataset.filing)));
+
+  // Wire similar cases
+  panel.querySelectorAll('.sim').forEach(el => el.addEventListener('click', () => openCase(el.dataset.case)));
+  wireRows(panel);
+
+  if(c){
+    panel.querySelector('#trk').addEventListener('click', async () => {
+      if(!USER) return;
+      if(MY_TRACKS.has(c.id)){
+        await sb.from('tracks').delete().eq('user_id',USER.id).eq('case_id',c.id);
+        MY_TRACKS.delete(c.id);
+      } else {
+        await sb.from('tracks').upsert({ user_id: USER.id, case_id: c.id });
+        MY_TRACKS.add(c.id);
+      }
+      openFiling(filingId); loadTrackBox();
+    });
+    panel.querySelector('#share').addEventListener('click', async (e) => {
+      const btn = e.target;
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        btn.textContent = '✓ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = '⛓ Share link'; btn.classList.remove('copied'); }, 2000);
+      } catch { alert(shareUrl); }
+    });
+  }
+}
+
+async function openFilingById(id){
+  openFiling(id);
+}
+
 async function openCase(caseId){
   if(!caseId) return;
   const panel = $('#dpanel');
@@ -351,7 +533,7 @@ async function openCase(caseId){
 
   const [{ data: c }, { data: filings }, sim] = await Promise.all([
     sb.from('cases').select('*').eq('id', caseId).single(),
-    sb.from('filings').select('headline, summary, subject, source_url, source_domain, created_at, impact')
+    sb.from('filings').select('id, headline, summary, subject, source_url, source_domain, created_at, impact, article_quote')
       .eq('case_id', caseId).eq('status','live').order('created_at',{ascending:false}).limit(30),
     fetch(`${SUPABASE_URL}/functions/v1/api?action=similar`, {
       method:'POST',
@@ -362,7 +544,7 @@ async function openCase(caseId){
   if(!c){ panel.innerHTML = `<div class="empty">Case not found.</div>`; return; }
 
   const tracked = MY_TRACKS.has(caseId);
-  const shareUrl = `${location.origin}${location.pathname.replace(/\/$/,'')}?c=${c.case_number}`;
+  const shareUrl = `${location.origin}?c=${c.case_number}`;
   panel.innerHTML = `
     <button class="close" aria-label="Close">CLOSE ✕</button>
     <div class="mono" style="color:var(--stamp)">CASE No. ${c.case_number}</div>
@@ -372,16 +554,24 @@ async function openCase(caseId){
     <button class="trackbtn ${tracked?'on':''}" id="trk">${tracked ? '★ Tracking — untrack' : '☆ Track this case'}</button>
     <button class="sharebtn" id="share">⛓ Share link</button>
     <div class="sect">Filings</div>
-    ${(filings??[]).map(f => `<div class="dfiling">
-        <b>${esc(f.headline)}</b><br>${esc(f.summary)}
+    ${(filings??[]).map(f => `<div class="dfiling" data-filing="${f.id}" style="cursor:pointer">
+        <b>${esc(f.headline)}</b>
+        <div class="summary">${esc(f.summary)}</div>
+        ${f.article_quote ? `<div class="quote">"${esc(f.article_quote)}"</div>` : ''}
         <div class="meta" style="margin-top:4px">
-          ${f.subject?`<span>${esc(f.subject)}</span>`:''}<span>${ago(f.created_at)}</span>
-          <a href="${esc(f.source_url)}" target="_blank" rel="noopener">source ↗</a>
+          ${f.subject?`<span>${esc(f.subject)}</span>`:''}<span>${esc(f.source_domain)}</span><span>${ago(f.created_at)}</span>
+          <a href="${esc(f.source_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">source ↗</a>
         </div></div>`).join('') || '<div class="empty">No live filings.</div>'}
-    <div class="sect">Nearby cases</div>
-    ${(sim.results??[]).map(s => `<div class="sim" data-case="${s.id}">No. ${s.case_number} — ${esc(s.title_render)} <span class="mono">(${Math.round(s.sim*100)}% similar)</span></div>`).join('') || '<div class="empty">No neighbors yet.</div>'}
+    <div class="sect">Nearby Cases</div>
+    ${(sim.results??[]).map(s => `<div class="sim" data-case="${s.id}">
+      <div class="sim-title">No. ${s.case_number} — ${esc(s.title_render)}</div>
+      <div class="sim-desc">${esc(s.latest_headline || '')}</div>
+      <div class="sim-meta">${s.filing_count} filings · ${Math.round(s.sim*100)}% similar</div>
+    </div>`).join('') || '<div class="empty">No neighbors yet.</div>'}
   `;
   panel.querySelector('.close').addEventListener('click', () => $('#drawer').classList.remove('open'));
+  panel.querySelectorAll('.dfiling[data-filing]').forEach(el =>
+    el.addEventListener('click', () => openFiling(el.dataset.filing)));
   panel.querySelectorAll('.sim').forEach(el => el.addEventListener('click', () => openCase(el.dataset.case)));
   wireRows(panel);
   panel.querySelector('#trk').addEventListener('click', async () => {
