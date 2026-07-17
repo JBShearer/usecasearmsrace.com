@@ -77,8 +77,15 @@ main{max-width:920px;margin:0 auto;padding:16px}
 #panelOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:999;display:none}
 #panelOverlay.open{display:block}
 
-/* Tags bar */
-#tagsBar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+/* Filter/Sort bar */
+#filterBar{margin-bottom:12px}
+#tagsBar{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center}
+#sortBar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sort-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive)}
+.sort-btn{background:none;border:1.5px solid var(--line);padding:4px 10px;font-family:'IBM Plex Mono',monospace;
+  font-size:11px;cursor:pointer;color:var(--olive)}
+.sort-btn:hover{border-color:var(--ink);color:var(--ink)}
+.sort-btn.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .tag-chip{background:var(--card);border:1.5px solid var(--line);padding:4px 10px;font-family:'IBM Plex Mono',monospace;
   font-size:11px;cursor:pointer;white-space:nowrap}
 .tag-chip:hover,.tag-chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
@@ -268,7 +275,16 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 </div>
 
 <main>
-  <div id="tagsBar"></div>
+  <div id="filterBar">
+    <div id="tagsBar"></div>
+    <div id="sortBar">
+      <span class="sort-label">Sort:</span>
+      <button class="sort-btn on" data-sort="newest">Newest</button>
+      <button class="sort-btn" data-sort="votes">Most Votes</button>
+      <button class="sort-btn" data-sort="activity">Activity</button>
+      <button class="sort-btn" data-sort="trending">Trending</button>
+    </div>
+  </div>
 
   <div id="controls">
     <input id="q" type="search" placeholder="search cases…" aria-label="Search">
@@ -333,7 +349,7 @@ const sb = createClient(SUPABASE_URL, ANON_KEY);
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 let USER = null, MODE = 'articles', MY_VOTES = new Map(), MY_TRACKS = new Set();
-let ALL_CASES = [], TOP_SUBJECTS = [], ACTIVE_TAG = null;
+let ALL_CASES = [], TOP_SUBJECTS = [], ACTIVE_TAG = null, SORT_BY = 'newest';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ago = d => { const s=(Date.now()-new Date(d))/1e3;
@@ -588,18 +604,41 @@ async function loadFeed(){
 
   if(MODE === 'articles'){
     let query = sb.from('filings')
-      .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes)')
-      .eq('status','live').order('created_at',{ascending:false}).limit(200);
+      .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes, filing_count, last_filed_at)')
+      .eq('status','live').limit(200);
+
+    // Apply tag filter
     if(ACTIVE_TAG) query = query.ilike('subject', `%${ACTIVE_TAG}%`);
-    const { data } = await query;
+
+    // Apply sort
+    if(SORT_BY === 'newest') query = query.order('created_at', {ascending: false});
+    else if(SORT_BY === 'votes') query = query.order('cases(good_votes)', {ascending: false, nullsFirst: false});
+    else if(SORT_BY === 'activity') query = query.order('cases(filing_count)', {ascending: false, nullsFirst: false});
+    else if(SORT_BY === 'trending') query = query.order('cases(last_filed_at)', {ascending: false, nullsFirst: false});
+
+    let { data } = await query;
+
+    // Client-side sort fallback for nested fields
+    if(data && SORT_BY === 'votes') data.sort((a,b) => ((b.cases?.good_votes||0)+(b.cases?.evil_votes||0)) - ((a.cases?.good_votes||0)+(a.cases?.evil_votes||0)));
+    if(data && SORT_BY === 'activity') data.sort((a,b) => (b.cases?.filing_count||0) - (a.cases?.filing_count||0));
+    if(data && SORT_BY === 'trending') data.sort((a,b) => new Date(b.cases?.last_filed_at||0) - new Date(a.cases?.last_filed_at||0));
+
     feed.innerHTML = (data?.length)
       ? data.map(a => articleCard(a, a.cases)).join('')
       : `<div class="empty">${ACTIVE_TAG ? `No articles for "${esc(ACTIVE_TAG)}"` : 'No articles yet.'}</div>`;
     wireArticles(feed);
   } else {
-    const { data } = await sb.from('cases')
-      .select('id, case_number, title_render, filing_count, good_votes, evil_votes, fake_votes')
-      .eq('status','live').order('case_number',{ascending:false}).limit(200);
+    let query = sb.from('cases')
+      .select('id, case_number, title_render, filing_count, good_votes, evil_votes, fake_votes, last_filed_at')
+      .eq('status','live').limit(200);
+
+    // Apply sort for cases view
+    if(SORT_BY === 'newest') query = query.order('case_number', {ascending: false});
+    else if(SORT_BY === 'votes') query = query.order('good_votes', {ascending: false});
+    else if(SORT_BY === 'activity') query = query.order('filing_count', {ascending: false});
+    else if(SORT_BY === 'trending') query = query.order('last_filed_at', {ascending: false, nullsFirst: false});
+
+    const { data } = await query;
     feed.innerHTML = (data?.length)
       ? data.map(c => caseCard(c)).join('')
       : `<div class="empty">No cases yet.</div>`;
@@ -1064,10 +1103,20 @@ function checkRoute(){
 }
 
 $('#drawer').onclick = e => { if(e.target.id === 'drawer') $('#drawer').classList.remove('open'); };
-document.onkeydown = e => { if(e.key === 'Escape'){ $('#drawer').classList.remove('open'); $('#submitModal').classList.remove('open'); }};
+document.onkeydown = e => { if(e.key === 'Escape'){ $('#drawer').classList.remove('open'); $('#submitModal').classList.remove('open'); $('#aboutModal').classList.remove('open'); }};
 
 $('#tab-articles').onclick = () => { MODE='articles'; $('#tab-articles').classList.add('on'); $('#tab-cases').classList.remove('on'); loadFeed(); };
 $('#tab-cases').onclick = () => { MODE='cases'; $('#tab-cases').classList.add('on'); $('#tab-articles').classList.remove('on'); loadFeed(); };
+
+// Sort buttons
+$$('.sort-btn').forEach(btn => {
+  btn.onclick = () => {
+    SORT_BY = btn.dataset.sort;
+    $$('.sort-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    loadFeed();
+  };
+});
 
 let qt; $('#q').oninput = () => { clearTimeout(qt); qt=setTimeout(loadFeed, 350); };
 
