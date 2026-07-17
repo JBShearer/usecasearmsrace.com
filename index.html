@@ -81,40 +81,34 @@ main{max-width:920px;margin:0 auto;padding:16px}
 #panelOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:999;display:none}
 #panelOverlay.open{display:block}
 
-/* Stats bar */
-#statsBar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap}
-#topCompanies{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.company-chip{background:var(--card);border:2px solid var(--ink);padding:6px 12px;font-family:'Oswald',sans-serif;
-  font-size:12px;letter-spacing:.05em;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
-.company-chip:hover{background:var(--ink);color:var(--paper)}
-.company-chip.more{background:var(--stamp);color:#fff;border-color:var(--stamp);box-shadow:2px 2px 0 var(--stamp)}
-.company-chip.more:hover{background:#a01a16}
-#statCounts{display:flex;gap:10px}
+/* Filter Section - WHO / TO WHOM */
+#filterSection{margin-bottom:16px}
+.filter-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.filter-label{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--olive);min-width:70px}
+#companyChips,#objectChips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:1}
+.chip{padding:5px 12px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.04em;cursor:pointer;
+  border:2px solid;box-shadow:2px 2px 0}
+.chip:hover{opacity:.85}
+.chip.on{opacity:1}
+/* WHO chips - red */
+.chip.who{background:var(--card);border-color:var(--stamp);color:var(--stamp);box-shadow-color:var(--stamp)}
+.chip.who:hover,.chip.who.on{background:var(--stamp);color:#fff}
+.chip.who.more{background:var(--stamp);color:#fff}
+/* TO WHOM chips - olive */
+.chip.whom{background:var(--card);border-color:var(--olive);color:var(--olive);box-shadow-color:var(--olive)}
+.chip.whom:hover,.chip.whom.on{background:var(--olive);color:#fff}
+.chip.whom.more{background:var(--olive);color:#fff}
+#statCounts{display:flex;gap:8px;margin-left:auto}
 #statCounts.hidden{display:none}
-.stat-box{background:var(--card);border:2px solid var(--ink);padding:8px 14px;text-align:center;box-shadow:2px 2px 0 var(--ink)}
-.stat-num{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;display:block}
-.stat-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--olive);text-transform:uppercase}
-
-/* Filter/Sort bar */
-#filterBar{margin-bottom:12px}
-#tagsBar{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center}
+.stat-box{background:var(--card);border:2px solid var(--ink);padding:6px 12px;text-align:center;box-shadow:2px 2px 0 var(--ink)}
+.stat-num{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;display:block}
+.stat-label{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--olive);text-transform:uppercase}
 #sortBar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .sort-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive)}
 .sort-btn{background:none;border:1.5px solid var(--line);padding:4px 10px;font-family:'IBM Plex Mono',monospace;
   font-size:11px;cursor:pointer;color:var(--olive)}
 .sort-btn:hover{border-color:var(--ink);color:var(--ink)}
 .sort-btn.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.tag-chip{background:var(--card);border:1.5px solid var(--line);padding:4px 10px;font-family:'IBM Plex Mono',monospace;
-  font-size:11px;cursor:pointer;white-space:nowrap}
-.tag-chip:hover,.tag-chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.tag-chip.subject{border-color:var(--stamp);color:var(--stamp)}
-.tag-chip.subject:hover,.tag-chip.subject.on{background:var(--stamp);color:#fff}
-.tag-chip.verb{border-color:var(--good);color:var(--good)}
-.tag-chip.verb:hover,.tag-chip.verb.on{background:var(--good);color:#fff}
-.tag-chip.object{border-color:var(--olive);color:var(--olive)}
-.tag-chip.object:hover,.tag-chip.object.on{background:var(--olive);color:#fff}
-#moreTags{background:none;border:1.5px dashed var(--line);padding:4px 8px;font-size:11px;cursor:pointer;color:var(--olive);
-  font-family:'IBM Plex Mono',monospace}
 #moreTags:hover{border-color:var(--ink);color:var(--ink)}
 
 /* controls */
@@ -319,16 +313,19 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 </div>
 
 <main>
-  <div id="statsBar">
-    <div id="topCompanies"></div>
-    <div id="statCounts">
-      <div class="stat-box" id="statToday"><span class="stat-num">0</span><span class="stat-label">Today</span></div>
-      <div class="stat-box" id="statWeek"><span class="stat-num">0</span><span class="stat-label">This Week</span></div>
+  <div id="filterSection">
+    <div id="whoDidIt" class="filter-row">
+      <span class="filter-label">WHO:</span>
+      <div id="companyChips"></div>
+      <div id="statCounts">
+        <div class="stat-box" id="statToday"><span class="stat-num">0</span><span class="stat-label">Today</span></div>
+        <div class="stat-box" id="statWeek"><span class="stat-num">0</span><span class="stat-label">This Week</span></div>
+      </div>
     </div>
-  </div>
-
-  <div id="filterBar">
-    <div id="tagsBar"></div>
+    <div id="toWhom" class="filter-row">
+      <span class="filter-label">TO WHOM:</span>
+      <div id="objectChips"></div>
+    </div>
     <div id="sortBar">
       <span class="sort-label">Sort:</span>
       <button class="sort-btn on" data-sort="newest">Newest</button>
@@ -502,89 +499,6 @@ $('#aboutModal').onclick = e => { if(e.target.id === 'aboutModal') $('#aboutModa
 let ADMIN_KEY = localStorage.getItem('ucar-admin-key') || '';
 if(ADMIN_KEY || location.search.includes('admin')) $('#adminBtn').style.display = 'block';
 
-// Tags bar - subjects (filed against), verbs, objects
-let TOP_VERBS = [], TOP_OBJECTS = [];
-
-async function loadTags(){
-  // Get subjects (filed against)
-  const { data: filings } = await sb.from('filings').select('subject').eq('status','live').not('subject','is',null);
-  const subjectCounts = {};
-  (filings||[]).forEach(f => { if(f.subject) subjectCounts[f.subject] = (subjectCounts[f.subject]||0)+1; });
-  TOP_SUBJECTS = Object.entries(subjectCounts).sort((a,b)=>b[1]-a[1]).slice(0,8).map(e=>e[0]);
-
-  // Get top verbs and objects from cases
-  const { data: terms } = await sb.from('vocab_terms').select('term, kind').eq('status','active');
-  const verbSet = new Set(), objSet = new Set();
-  (terms||[]).forEach(t => {
-    if(t.kind === 'verb') verbSet.add(t.term);
-    if(t.kind === 'object_class') objSet.add(t.term);
-  });
-
-  // Get case counts per verb/object
-  const { data: cases } = await sb.from('cases')
-    .select('verb_id, object_class_id, vocab_terms!cases_verb_id_fkey(term), vocab_terms!cases_object_class_id_fkey(term)')
-    .eq('status','live');
-  const verbCounts = {}, objCounts = {};
-  (cases||[]).forEach(c => {
-    const v = c['vocab_terms!cases_verb_id_fkey']?.term;
-    const o = c['vocab_terms!cases_object_class_id_fkey']?.term;
-    if(v) verbCounts[v] = (verbCounts[v]||0)+1;
-    if(o) objCounts[o] = (objCounts[o]||0)+1;
-  });
-  TOP_VERBS = Object.entries(verbCounts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(e=>e[0]);
-  TOP_OBJECTS = Object.entries(objCounts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(e=>e[0]);
-
-  renderTags();
-}
-
-function renderTags(){
-  const bar = $('#tagsBar');
-  const isMobile = window.innerWidth < 600;
-
-  // On mobile: show top 2 subjects + 1 verb + 1 object
-  // On desktop: show more of each
-  const subjects = isMobile ? TOP_SUBJECTS.slice(0,2) : TOP_SUBJECTS.slice(0,4);
-  const verbs = isMobile ? TOP_VERBS.slice(0,1) : TOP_VERBS.slice(0,3);
-  const objects = isMobile ? TOP_OBJECTS.slice(0,1) : TOP_OBJECTS.slice(0,3);
-
-  const hiddenCount = (TOP_SUBJECTS.length - subjects.length) + (TOP_VERBS.length - verbs.length) + (TOP_OBJECTS.length - objects.length);
-
-  let html = '';
-  // Subjects (filed against) - red accent
-  html += subjects.map(s => `<button class="tag-chip subject ${ACTIVE_TAG===s?'on':''}" data-tag="${esc(s)}" data-type="subject">${esc(s)}</button>`).join('');
-  // Verbs - default style
-  html += verbs.map(v => `<button class="tag-chip verb ${ACTIVE_TAG===v?'on':''}" data-tag="${esc(v)}" data-type="verb">${esc(v)}</button>`).join('');
-  // Objects - default style
-  html += objects.map(o => `<button class="tag-chip object ${ACTIVE_TAG===o?'on':''}" data-tag="${esc(o)}" data-type="object">${esc(o)}</button>`).join('');
-
-  if(hiddenCount > 0) html += `<button id="moreTags">+${hiddenCount}</button>`;
-
-  bar.innerHTML = html;
-
-  bar.querySelectorAll('.tag-chip').forEach(el => el.onclick = () => {
-    ACTIVE_TAG = ACTIVE_TAG === el.dataset.tag ? null : el.dataset.tag;
-    renderTags();
-    loadFeed();
-  });
-  if($('#moreTags')) $('#moreTags').onclick = () => {
-    // Expand to show all
-    TOP_SUBJECTS = TOP_SUBJECTS; // keep all
-    TOP_VERBS = TOP_VERBS;
-    TOP_OBJECTS = TOP_OBJECTS;
-    const bar = $('#tagsBar');
-    let html = '';
-    html += TOP_SUBJECTS.map(s => `<button class="tag-chip subject ${ACTIVE_TAG===s?'on':''}" data-tag="${esc(s)}" data-type="subject">${esc(s)}</button>`).join('');
-    html += TOP_VERBS.map(v => `<button class="tag-chip verb ${ACTIVE_TAG===v?'on':''}" data-tag="${esc(v)}" data-type="verb">${esc(v)}</button>`).join('');
-    html += TOP_OBJECTS.map(o => `<button class="tag-chip object ${ACTIVE_TAG===o?'on':''}" data-tag="${esc(o)}" data-type="object">${esc(o)}</button>`).join('');
-    bar.innerHTML = html;
-    bar.querySelectorAll('.tag-chip').forEach(el => el.onclick = () => {
-      ACTIVE_TAG = ACTIVE_TAG === el.dataset.tag ? null : el.dataset.tag;
-      renderTags();
-      loadFeed();
-    });
-  };
-}
-
 async function boot(){
   let { data:{ session } } = await sb.auth.getSession();
   if(!session) ({ data:{ session } } = await sb.auth.signInAnonymously());
@@ -608,71 +522,93 @@ async function boot(){
     } catch(e){}
   }
 
-  loadStats();
-  loadTags();
+  loadFilters();
   loadFeed();
 }
 
-// Stats bar - top companies + today/week counts
-let STATS_EXPANDED = false;
-async function loadStats(){
-  // Get filing counts
+// Combined filter bar - WHO (companies) + TO WHOM (objects) + counts
+let WHO_EXPANDED = false, WHOM_EXPANDED = false;
+let ALL_COMPANIES = [], ALL_OBJECTS = [], TODAY_COUNT = 0, WEEK_COUNT = 0;
+
+async function loadFilters(){
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
   const weekStart = new Date(now - 7*24*60*60*1000).toISOString();
 
-  const [todayRes, weekRes, subjectsRes] = await Promise.all([
+  const [todayRes, weekRes, filingsRes, casesRes] = await Promise.all([
     sb.from('filings').select('id', {count:'exact', head:true}).eq('status','live').gte('created_at', todayStart),
     sb.from('filings').select('id', {count:'exact', head:true}).eq('status','live').gte('created_at', weekStart),
-    sb.from('filings').select('subject').eq('status','live').not('subject','is',null)
+    sb.from('filings').select('subject').eq('status','live').not('subject','is',null),
+    sb.from('cases').select('object_class_id, vocab_terms!cases_object_class_id_fkey(term)').eq('status','live')
   ]);
 
-  const todayCount = todayRes.count || 0;
-  const weekCount = weekRes.count || 0;
+  TODAY_COUNT = todayRes.count || 0;
+  WEEK_COUNT = weekRes.count || 0;
 
-  // Count subjects (companies)
+  // WHO - companies/subjects
   const subjectCounts = {};
-  (subjectsRes.data||[]).forEach(f => { if(f.subject) subjectCounts[f.subject] = (subjectCounts[f.subject]||0)+1; });
-  const topCompanies = Object.entries(subjectCounts).sort((a,b)=>b[1]-a[1]);
+  (filingsRes.data||[]).forEach(f => { if(f.subject) subjectCounts[f.subject] = (subjectCounts[f.subject]||0)+1; });
+  ALL_COMPANIES = Object.entries(subjectCounts).sort((a,b)=>b[1]-a[1]);
 
-  renderStats(topCompanies, todayCount, weekCount);
+  // TO WHOM - objects
+  const objectCounts = {};
+  (casesRes.data||[]).forEach(c => {
+    const obj = c['vocab_terms!cases_object_class_id_fkey']?.term;
+    if(obj) objectCounts[obj] = (objectCounts[obj]||0)+1;
+  });
+  ALL_OBJECTS = Object.entries(objectCounts).sort((a,b)=>b[1]-a[1]);
+
+  renderFilters();
 }
 
-function renderStats(topCompanies, todayCount, weekCount){
-  const container = $('#topCompanies');
-  const counts = $('#statCounts');
+function renderFilters(){
+  // WHO row
+  const whoContainer = $('#companyChips');
+  const shownWho = WHO_EXPANDED ? ALL_COMPANIES : ALL_COMPANIES.slice(0,3);
+  const hiddenWho = ALL_COMPANIES.length - 3;
 
-  if(STATS_EXPANDED){
-    // Show all companies, hide counts
-    counts.classList.add('hidden');
-    container.innerHTML = topCompanies.map(([name]) =>
-      `<button class="company-chip" data-company="${esc(name)}">${esc(name)}</button>`
-    ).join('') + `<button class="company-chip more" id="collapseCompanies">− Less</button>`;
+  whoContainer.innerHTML = shownWho.map(([name]) =>
+    `<button class="chip who ${ACTIVE_TAG===name?'on':''}" data-filter="${esc(name)}">${esc(name)}</button>`
+  ).join('');
+  if(!WHO_EXPANDED && hiddenWho > 0) {
+    whoContainer.innerHTML += `<button class="chip who more" id="expandWho">+${hiddenWho}</button>`;
+  } else if(WHO_EXPANDED) {
+    whoContainer.innerHTML += `<button class="chip who more" id="collapseWho">−</button>`;
+  }
 
-    container.querySelectorAll('.company-chip[data-company]').forEach(el => {
-      el.onclick = () => { ACTIVE_TAG = el.dataset.company; renderTags(); loadFeed(); };
-    });
-    $('#collapseCompanies').onclick = () => { STATS_EXPANDED = false; renderStats(topCompanies, todayCount, weekCount); };
-  } else {
-    // Show top 2 + more button, show counts
-    counts.classList.remove('hidden');
-    const shown = topCompanies.slice(0,2);
-    const hiddenCount = topCompanies.length - 2;
+  // TO WHOM row
+  const whomContainer = $('#objectChips');
+  const shownWhom = WHOM_EXPANDED ? ALL_OBJECTS : ALL_OBJECTS.slice(0,4);
+  const hiddenWhom = ALL_OBJECTS.length - 4;
 
-    container.innerHTML = shown.map(([name]) =>
-      `<button class="company-chip" data-company="${esc(name)}">${esc(name)}</button>`
-    ).join('');
-    if(hiddenCount > 0) container.innerHTML += `<button class="company-chip more" id="expandCompanies">+${hiddenCount}</button>`;
-
-    container.querySelectorAll('.company-chip[data-company]').forEach(el => {
-      el.onclick = () => { ACTIVE_TAG = el.dataset.company; renderTags(); loadFeed(); };
-    });
-    if($('#expandCompanies')) $('#expandCompanies').onclick = () => { STATS_EXPANDED = true; renderStats(topCompanies, todayCount, weekCount); };
+  whomContainer.innerHTML = shownWhom.map(([name]) =>
+    `<button class="chip whom ${ACTIVE_TAG===name?'on':''}" data-filter="${esc(name)}">${esc(name)}</button>`
+  ).join('');
+  if(!WHOM_EXPANDED && hiddenWhom > 0) {
+    whomContainer.innerHTML += `<button class="chip whom more" id="expandWhom">+${hiddenWhom}</button>`;
+  } else if(WHOM_EXPANDED) {
+    whomContainer.innerHTML += `<button class="chip whom more" id="collapseWhom">−</button>`;
   }
 
   // Update counts
-  $('#statToday .stat-num').textContent = todayCount;
-  $('#statWeek .stat-num').textContent = weekCount;
+  $('#statToday .stat-num').textContent = TODAY_COUNT;
+  $('#statWeek .stat-num').textContent = WEEK_COUNT;
+
+  // Show/hide counts based on expansion
+  $('#statCounts').classList.toggle('hidden', WHO_EXPANDED);
+
+  // Wire clicks
+  $$('.chip[data-filter]').forEach(el => {
+    el.onclick = () => {
+      ACTIVE_TAG = ACTIVE_TAG === el.dataset.filter ? null : el.dataset.filter;
+      renderFilters();
+      loadFeed();
+    };
+  });
+  if($('#expandWho')) $('#expandWho').onclick = () => { WHO_EXPANDED = true; renderFilters(); };
+  if($('#collapseWho')) $('#collapseWho').onclick = () => { WHO_EXPANDED = false; renderFilters(); };
+  if($('#expandWhom')) $('#expandWhom').onclick = () => { WHOM_EXPANDED = true; renderFilters(); };
+  if($('#collapseWhom')) $('#collapseWhom').onclick = () => { WHOM_EXPANDED = false; renderFilters(); };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
