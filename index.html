@@ -4,18 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UCAR · Use Case Arms Race</title>
-<meta name="description" content="A public docket of AI deployments. Every use case is a case. Every news event is a filing.">
+<meta name="description" content="A public docket of AI deployments. Every use case is a case. Every news article is evidence.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Archivo:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#F5F1E6;      /* index card */
-  --ink:#141210;        /* docket black */
-  --stamp:#C0221C;      /* crayon red */
-  --olive:#565442;      /* filing cabinet */
-  --line:#C9C2AE;       /* rule lines */
+  --paper:#F5F1E6;
+  --ink:#141210;
+  --stamp:#C0221C;
+  --olive:#565442;
+  --line:#C9C2AE;
   --good:#2E6B3F;
+  --evil:#8B0000;
   --card:#fff;
+  --case-bg:#FFFEF8;
+  --case-tab:#D4A84C;
+  --article-bg:#fff;
 }
 [data-theme="dark"]{
   --paper:#141210;
@@ -24,7 +28,11 @@
   --olive:#A8A090;
   --line:#3A3632;
   --good:#4CAF50;
+  --evil:#FF6B6B;
   --card:#1E1C18;
+  --case-bg:#1A1815;
+  --case-tab:#B8860B;
+  --article-bg:#1E1C18;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--paper);color:var(--ink);font-family:'Archivo',sans-serif;font-size:16px;line-height:1.5;
@@ -39,36 +47,12 @@ header{border-bottom:3px solid var(--ink);padding:14px 20px;display:flex;align-i
 header h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:26px;letter-spacing:.04em}
 header h1 span{color:var(--stamp)}
 header .tag{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive)}
-#themeToggle{background:none;border:2px solid var(--ink);color:var(--ink);padding:6px 14px;cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
-  transition:background .2s,color .2s}
-#themeToggle:hover{background:var(--ink);color:var(--paper)}
+.hdr-btns{display:flex;gap:8px}
+.hdr-btn{background:none;border:2px solid var(--ink);color:var(--ink);padding:6px 14px;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.hdr-btn:hover{background:var(--ink);color:var(--paper)}
+.hdr-btn.admin{border-color:var(--stamp);color:var(--stamp)}
 main{max-width:920px;margin:0 auto;padding:20px}
-
-/* what's new banner */
-#newsbar{display:none;background:var(--ink);color:var(--paper);padding:10px 14px;margin-bottom:18px;
-  font-family:'IBM Plex Mono',monospace;font-size:13px}
-#newsbar b{color:#F2C744}
-
-/* daily show */
-#show{border:2px solid var(--ink);margin-bottom:14px;background:var(--card);position:relative}
-#show .stamp{position:absolute;top:-11px;left:14px;background:var(--stamp);color:var(--paper);
-  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.12em;padding:2px 10px;text-transform:uppercase}
-#show .inner{padding:20px 16px 16px}
-#show h2{font-family:'Oswald',sans-serif;font-size:20px;margin-bottom:6px}
-#show iframe,#show video{width:100%;aspect-ratio:16/9;border:0;margin-top:10px;background:#000}
-
-/* case file box */
-#trackbox{border:2px dashed var(--olive);padding:14px 16px;margin-bottom:24px;background:transparent}
-#trackbox .tb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-#trackbox h3{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--olive);margin:0}
-#trackbox .tb-tools{display:flex;gap:8px}
-.mini-btn{background:none;border:1.5px solid var(--olive);color:var(--olive);padding:4px 10px;cursor:pointer;
-  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em}
-.mini-btn:hover{background:var(--olive);color:var(--paper)}
-#trackbox .t-item{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line);cursor:pointer}
-#trackbox .t-item:hover{background:var(--line)}
-#trackbox .fresh{color:var(--stamp);font-weight:600}
 
 /* controls */
 #controls{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
@@ -79,119 +63,135 @@ main{max-width:920px;margin:0 auto;padding:20px}
   font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
 .tab.on{background:var(--ink);color:var(--paper)}
 
-/* filing rows: the docket */
-.filing{border-bottom:1px solid var(--line);padding:16px 0;display:grid;
-  grid-template-columns:86px 1fr;gap:14px;cursor:pointer}
-.filing:hover{background:var(--line)}
-.casenum{font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;color:var(--stamp);
-  border:2px solid var(--stamp);align-self:start;text-align:center;padding:6px 4px;
-  transform:rotate(-2.5deg);cursor:pointer;line-height:1.2;background:var(--card)}
-.casenum small{display:block;font-size:9px;letter-spacing:.14em;color:var(--ink)}
-.filing h3{font-size:17px;font-weight:600;margin-bottom:4px}
-.filing .ctitle{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.05em;color:var(--olive);
-  text-transform:uppercase;cursor:pointer;margin-bottom:6px}
-.filing .ctitle:hover{color:var(--stamp)}
-.filing p{font-size:14.5px;color:var(--olive);margin-bottom:8px}
-.meta{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive);display:flex;gap:14px;flex-wrap:wrap}
-.impact{color:var(--stamp);font-weight:600}
+/* ═══════════════════════════════════════════════════════════════════════════
+   ARTICLE CARDS - Evidence filed into cases
+   ═══════════════════════════════════════════════════════════════════════════ */
+.article{background:var(--article-bg);border:1px solid var(--line);margin:12px 0;position:relative;
+  box-shadow:2px 2px 0 var(--line);cursor:pointer}
+.article:hover{box-shadow:3px 3px 0 var(--stamp)}
+.article-inner{padding:16px 16px 12px;display:grid;grid-template-columns:80px 1fr;gap:14px}
 
-/* case rows */
-.caserow{border-bottom:1px solid var(--line);padding:14px 0;display:flex;gap:14px;align-items:baseline;cursor:pointer}
-.caserow:hover{background:var(--line)}
-.caserow .num{font-family:'Oswald',sans-serif;color:var(--stamp);font-weight:700;min-width:64px}
-.caserow .t{font-family:'Oswald',sans-serif;font-size:16px;flex:1}
-.caserow .c{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive)}
+/* Red filing stamp */
+.article-stamp{background:var(--stamp);color:#fff;padding:8px 6px;text-align:center;
+  font-family:'Oswald',sans-serif;transform:rotate(-3deg);align-self:start;line-height:1.1}
+.article-stamp .label{font-size:8px;letter-spacing:.15em;opacity:.9}
+.article-stamp .date{font-size:14px;font-weight:700;margin-top:2px}
+.article-stamp .src{font-size:9px;margin-top:4px;opacity:.85;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-/* vote chits */
-.chits{display:flex;gap:8px;margin-top:4px}
-.chit{border:1.5px solid var(--ink);background:var(--card);color:var(--ink);padding:4px 10px;cursor:pointer;
-  font-family:'IBM Plex Mono',monospace;font-size:12px}
-.chit.good.on{background:var(--good);color:#fff;border-color:var(--good)}
-.chit.evil.on{background:var(--stamp);color:#fff;border-color:var(--stamp)}
-.chit.fake.on{background:var(--olive);color:#fff;border-color:var(--olive)}
+.article-body h3{font-size:16px;font-weight:600;margin-bottom:4px;line-height:1.3}
+.article-body .case-link{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.05em;color:var(--olive);
+  text-transform:uppercase;margin-bottom:6px;display:inline-block}
+.article-body .case-link:hover{color:var(--stamp)}
+.article-body p{font-size:14px;color:var(--olive);margin-bottom:8px;line-height:1.5}
+.article-body .source-link{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--stamp);
+  text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.article-body .source-link:hover{text-decoration:underline}
 
-/* case drawer */
+/* Action bar for articles */
+.article-actions{display:flex;gap:6px;padding:10px 16px;border-top:1px dashed var(--line);background:rgba(0,0,0,.02)}
+.act-btn{background:none;border:1.5px solid var(--ink);color:var(--ink);padding:5px 10px;cursor:pointer;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;display:flex;align-items:center;gap:4px}
+.act-btn:hover{background:var(--ink);color:var(--paper)}
+.act-btn.good{border-color:var(--good);color:var(--good)}
+.act-btn.good:hover,.act-btn.good.on{background:var(--good);color:#fff}
+.act-btn.evil{border-color:var(--evil);color:var(--evil)}
+.act-btn.evil:hover,.act-btn.evil.on{background:var(--evil);color:#fff}
+.act-btn.fake{border-color:var(--olive);color:var(--olive)}
+.act-btn.fake:hover,.act-btn.fake.on{background:var(--olive);color:#fff}
+.act-btn.track.on{background:var(--ink);color:var(--paper)}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CASE CARDS - The docket folders
+   ═══════════════════════════════════════════════════════════════════════════ */
+.case-card{background:var(--case-bg);border:2px solid var(--ink);margin:14px 0;position:relative;
+  box-shadow:4px 4px 0 var(--ink)}
+.case-card::before{content:'';position:absolute;top:-12px;left:20px;right:60%;height:12px;
+  background:var(--case-tab);border:2px solid var(--ink);border-bottom:none;border-radius:4px 4px 0 0}
+.case-card-inner{padding:20px}
+.case-card .case-num{font-family:'Oswald',sans-serif;font-size:13px;color:var(--stamp);letter-spacing:.1em}
+.case-card h2{font-family:'Oswald',sans-serif;font-size:20px;text-transform:uppercase;margin:4px 0 8px;line-height:1.2}
+.case-card .case-meta{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive);margin-bottom:12px}
+.case-card-actions{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px;border-top:2px solid var(--ink);background:rgba(0,0,0,.03)}
+
+/* Case rows in list view */
+.caserow{border:2px solid var(--ink);background:var(--case-bg);margin:10px 0;padding:14px 16px;
+  cursor:pointer;position:relative;box-shadow:3px 3px 0 var(--ink)}
+.caserow::before{content:'';position:absolute;top:-8px;left:16px;width:50px;height:8px;
+  background:var(--case-tab);border:2px solid var(--ink);border-bottom:none;border-radius:3px 3px 0 0}
+.caserow:hover{box-shadow:4px 4px 0 var(--stamp)}
+.caserow .num{font-family:'Oswald',sans-serif;color:var(--stamp);font-weight:700;font-size:12px;letter-spacing:.1em}
+.caserow .t{font-family:'Oswald',sans-serif;font-size:15px;text-transform:uppercase;margin:4px 0}
+.caserow .c{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive)}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DRAWER PANEL
+   ═══════════════════════════════════════════════════════════════════════════ */
 #drawer{position:fixed;inset:0;background:rgba(20,18,16,.65);display:none;z-index:10}
 #drawer.open{display:block}
-#dpanel{position:absolute;top:0;right:0;bottom:0;width:min(620px,100%);background:var(--paper);
-  border-left:3px solid var(--ink);overflow-y:auto;padding:22px}
-#dpanel .close{float:right;font-family:'IBM Plex Mono',monospace;border:2px solid var(--ink);
+#dpanel{position:absolute;top:0;right:0;bottom:0;width:min(640px,100%);background:var(--paper);
+  border-left:3px solid var(--ink);overflow-y:auto;padding:0}
+.drawer-header{padding:16px 20px;border-bottom:2px solid var(--ink);display:flex;justify-content:space-between;align-items:center}
+.drawer-header .close{font-family:'IBM Plex Mono',monospace;border:2px solid var(--ink);
   background:transparent;color:var(--ink);padding:4px 10px;cursor:pointer}
-#dpanel .close:hover{background:var(--ink);color:var(--paper)}
-#dpanel h2{font-family:'Oswald',sans-serif;font-size:22px;margin:10px 0 4px;text-transform:uppercase}
-#dpanel .sect{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--olive);margin:20px 0 6px;border-bottom:2px solid var(--ink);padding-bottom:4px}
-.dfiling{padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
-.dfiling b{font-size:15px}
-.dfiling .summary{margin:6px 0;color:var(--olive)}
-.dfiling .quote{border-left:3px solid var(--stamp);padding-left:10px;margin:8px 0;font-style:italic;color:var(--ink)}
+.drawer-header .close:hover{background:var(--ink);color:var(--paper)}
+.drawer-body{padding:20px}
 
-/* nearby cases - enhanced */
-.sim{padding:12px 0;border-bottom:1px dotted var(--line);cursor:pointer}
-.sim:hover{background:var(--line)}
-.sim .sim-title{font-family:'Oswald',sans-serif;font-size:14px;color:var(--stamp);margin-bottom:4px}
-.sim .sim-desc{font-size:13px;color:var(--olive);margin-bottom:4px}
-.sim .sim-meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive)}
+/* Article detail in drawer */
+.article-detail{background:var(--article-bg);border:2px solid var(--ink);padding:20px;margin-bottom:20px}
+.article-detail .stamp-row{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.article-detail .stamp-badge{background:var(--stamp);color:#fff;padding:6px 12px;font-family:'Oswald',sans-serif;
+  font-size:11px;letter-spacing:.1em}
+.article-detail h3{font-size:20px;margin-bottom:10px;line-height:1.3}
+.article-detail .summary{font-size:15px;color:var(--olive);margin-bottom:12px;line-height:1.6}
+.article-detail .quote{border-left:4px solid var(--stamp);padding-left:14px;font-style:italic;
+  margin:16px 0;color:var(--ink);font-size:14px}
+.article-detail .read-link{display:inline-block;margin-top:8px;padding:8px 16px;background:var(--ink);
+  color:var(--paper);text-decoration:none;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em}
+.article-detail .read-link:hover{background:var(--stamp)}
 
-.trackbtn{margin-top:10px;border:2px solid var(--ink);background:transparent;color:var(--ink);padding:8px 16px;cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
-.trackbtn.on{background:var(--ink);color:var(--paper)}
-.sharebtn{margin-left:8px;border:2px solid var(--olive);background:transparent;padding:8px 16px;cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--olive)}
-.sharebtn:hover{background:var(--olive);color:var(--paper)}
-.copied{background:var(--good)!important;color:#fff!important;border-color:var(--good)!important}
+/* Sections */
+.sect{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--olive);margin:24px 0 10px;border-bottom:2px solid var(--ink);padding-bottom:6px}
 
-/* filing popup - article first, then case */
-.filing-detail{background:var(--card);border:2px solid var(--ink);padding:16px;margin-bottom:16px}
-.filing-detail h3{font-size:18px;margin-bottom:8px}
-.filing-detail .quote{border-left:3px solid var(--stamp);padding-left:12px;margin:12px 0;font-style:italic}
-.case-section{border-top:3px solid var(--ink);padding-top:16px;margin-top:8px}
+/* Submit correction modal */
+#submitModal{display:none;position:fixed;inset:0;background:rgba(20,18,16,.8);z-index:25;align-items:center;justify-content:center}
+#submitModal.open{display:flex}
+.submit-box{max-width:520px;width:90%;background:var(--paper);border:3px solid var(--ink);padding:24px;max-height:90vh;overflow-y:auto}
+.submit-box h3{font-family:'Oswald',sans-serif;font-size:20px;margin-bottom:16px}
+.submit-box label{display:block;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.1em;margin:12px 0 4px}
+.submit-box input,.submit-box select,.submit-box textarea{width:100%;padding:10px;border:2px solid var(--ink);
+  background:var(--card);font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink)}
+.submit-box .action-type{display:flex;gap:8px;margin:16px 0}
+.submit-box .action-type button{flex:1;padding:12px;border:2px solid var(--ink);background:none;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.08em}
+.submit-box .action-type button:hover,.submit-box .action-type button.on{background:var(--ink);color:var(--paper)}
+.submit-box .btn-row{display:flex;gap:12px;margin-top:20px}
+.submit-box .btn-row button{padding:12px 20px;font-family:'Oswald',sans-serif;font-size:14px;cursor:pointer}
+.submit-box .primary{background:var(--ink);color:var(--paper);border:none}
+.submit-box .secondary{background:none;border:2px solid var(--ink)}
+#submitStatus{margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:12px}
 
 .empty{padding:40px 0;text-align:center;font-family:'IBM Plex Mono',monospace;color:var(--olive);font-size:14px}
 footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid var(--ink);
   font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive)}
-@media (prefers-reduced-motion: reduce){*{transition:none!important}}
-@media (max-width:600px){.filing{grid-template-columns:70px 1fr}}
 </style>
 </head>
 <body>
 <header>
   <div class="brand">
     <h1>UCAR<span>.</span></h1>
-    <div class="tag">USE CASE ARMS RACE · a public docket of AI deployments</div>
+    <div class="tag">USE CASE ARMS RACE · articles filed as evidence against AI</div>
   </div>
-  <div style="display:flex;gap:8px;align-items:center">
-    <button id="themeToggle">☀ Light</button>
-    <button id="adminBtn" style="display:none;background:none;border:2px solid var(--stamp);color:var(--stamp);padding:6px 14px;cursor:pointer;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.08em">ADMIN</button>
+  <div class="hdr-btns">
+    <button class="hdr-btn" id="themeToggle">☀ Light</button>
+    <button class="hdr-btn admin" id="adminBtn" style="display:none">ADMIN</button>
   </div>
 </header>
 
 <main>
-  <div id="newsbar"></div>
-
-  <section id="show" hidden>
-    <div class="stamp">Today's Show</div>
-    <div class="inner">
-      <h2 id="show-title"></h2>
-      <p id="show-blurb" style="font-size:14px;color:var(--olive)"></p>
-      <div id="show-video"></div>
-    </div>
-  </section>
-
-  <section id="trackbox" hidden>
-    <div class="tb-header">
-      <h3>Case File Box · cases you track</h3>
-      <div class="tb-tools">
-        <button class="mini-btn" id="exportCsv">↓ CSV</button>
-        <button class="mini-btn" id="clearAll">✕ Clear</button>
-      </div>
-    </div>
-    <div id="track-items"></div>
-  </section>
-
   <div id="controls">
-    <input id="q" type="search" placeholder="search the docket: face recognition, students, OpenAI…" aria-label="Search filings">
-    <button class="tab on" id="tab-filings">New Filings</button>
+    <input id="q" type="search" placeholder="search: facial recognition, students, OpenAI…" aria-label="Search">
+    <button class="tab on" id="tab-articles">New Articles</button>
     <button class="tab" id="tab-cases">Cases</button>
   </div>
 
@@ -199,302 +199,147 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 </main>
 
 <footer>
-  Cases are semantic triples: VERB + OBJECT + INSTRUMENT. Filings are the news events filed against them.
-  Vote good, vote evil, or call it fake. An Evil Brain Labs production.
+  Cases = VERB + OBJECT + INSTRUMENT. Articles are news events filed as evidence.
+  Vote good, evil, or fake. Submit corrections to improve the docket.
 </footer>
 
 <div id="drawer" role="dialog" aria-modal="true">
   <div id="dpanel"></div>
 </div>
 
-<!-- Suggestion Modal -->
-<div id="suggestModal" style="display:none;position:fixed;inset:0;background:rgba(20,18,16,.8);z-index:25;display:flex;align-items:center;justify-content:center">
-  <div style="max-width:500px;width:90%;background:var(--paper);border:3px solid var(--ink);padding:24px">
-    <h3 style="font-family:'Oswald',sans-serif;font-size:18px;margin-bottom:16px">SUGGEST A BETTER TERM</h3>
-    <p style="font-size:13px;color:var(--olive);margin-bottom:16px">Help improve the case title by suggesting a better verb, object, or instrument.</p>
+<!-- Submit Correction Modal -->
+<div id="submitModal">
+  <div class="submit-box">
+    <h3>SUBMIT CORRECTION</h3>
+    <p style="font-size:13px;color:var(--olive);margin-bottom:16px">Suggest a better case title for this article.</p>
 
-    <div style="margin-bottom:12px">
-      <label style="font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.1em">TYPE</label>
-      <select id="suggestKind" style="width:100%;padding:10px;margin-top:4px;border:2px solid var(--ink);background:var(--card);font-family:'IBM Plex Mono',monospace">
-        <option value="verb">Verb (the action)</option>
-        <option value="object_class">Object (who/what is affected)</option>
-        <option value="instrument">Instrument (the AI technology)</option>
-      </select>
+    <label>VERB (what the AI does)</label>
+    <input id="subVerb" type="text" placeholder="e.g., surveil, generate, moderate">
+
+    <label>OBJECT (who/what is affected)</label>
+    <input id="subObject" type="text" placeholder="e.g., workers, images, applicants">
+
+    <label>INSTRUMENT (the AI technology)</label>
+    <input id="subInstrument" type="text" placeholder="e.g., facial recognition, large language models">
+
+    <label>ACTION</label>
+    <div class="action-type">
+      <button data-action="correct" class="on">Correct this case</button>
+      <button data-action="new">Create new case</button>
+      <button data-action="copy">Copy to existing</button>
     </div>
 
-    <div style="margin-bottom:12px">
-      <label style="font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.1em">SUGGESTED TERM</label>
-      <input id="suggestTerm" type="text" style="width:100%;padding:10px;margin-top:4px;border:2px solid var(--ink);background:var(--card);font-family:'IBM Plex Mono',monospace" placeholder="e.g., surveil, workers, facial recognition">
+    <div id="copyTarget" style="display:none">
+      <label>TARGET CASE NUMBER</label>
+      <input id="subTargetCase" type="number" placeholder="e.g., 142">
     </div>
 
-    <div style="margin-bottom:16px">
-      <label style="font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.1em">REASON (optional)</label>
-      <textarea id="suggestReason" style="width:100%;padding:10px;margin-top:4px;border:2px solid var(--ink);background:var(--card);font-family:'IBM Plex Mono',monospace;height:60px" placeholder="Why is this term better?"></textarea>
-    </div>
+    <label>REASON (optional)</label>
+    <textarea id="subReason" rows="2" placeholder="Why is this better?"></textarea>
 
-    <div style="display:flex;gap:12px">
-      <button id="submitSuggest" style="flex:1;padding:12px;background:var(--ink);color:var(--paper);border:none;font-family:'Oswald',sans-serif;font-size:14px;cursor:pointer">SUBMIT</button>
-      <button id="cancelSuggest" style="padding:12px 20px;background:none;border:2px solid var(--ink);font-family:'Oswald',sans-serif;font-size:14px;cursor:pointer">CANCEL</button>
+    <div class="btn-row">
+      <button class="primary" id="submitCorrection">SUBMIT</button>
+      <button class="secondary" id="cancelSubmit">CANCEL</button>
     </div>
-
-    <div id="suggestStatus" style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:12px"></div>
+    <div id="submitStatus"></div>
   </div>
 </div>
-
-<!-- Admin Panel -->
-<div id="adminPanel" style="display:none;position:fixed;inset:0;background:rgba(20,18,16,.8);z-index:20;overflow-y:auto">
-  <div style="max-width:800px;margin:40px auto;background:var(--paper);border:3px solid var(--ink);padding:24px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <h2 style="font-family:'Oswald',sans-serif;font-size:22px">ADMIN PANEL</h2>
-      <button id="closeAdmin" style="background:none;border:2px solid var(--ink);padding:6px 12px;cursor:pointer;font-family:'IBM Plex Mono',monospace">CLOSE ✕</button>
-    </div>
-
-    <div style="margin-bottom:24px">
-      <label style="font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.1em">ADMIN KEY</label>
-      <input id="adminKey" type="password" style="width:100%;padding:10px;margin-top:6px;border:2px solid var(--ink);background:var(--card);font-family:'IBM Plex Mono',monospace" placeholder="Enter admin key...">
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
-      <button class="admin-action" data-action="crawl">🕷 Run Crawler</button>
-      <button class="admin-action" data-action="extract">⚙ Run Extraction</button>
-      <button class="admin-action" data-action="embed">📐 Embed Vocab</button>
-      <button class="admin-action" data-action="status">📊 Pipeline Status</button>
-      <button class="admin-action" data-action="alignment">🔍 Review Alignment</button>
-    </div>
-
-    <div id="adminStatus" style="font-family:'IBM Plex Mono',monospace;font-size:13px;padding:12px;background:var(--card);border:1px solid var(--line);margin-bottom:24px;min-height:60px"></div>
-
-    <h3 style="font-family:'Oswald',sans-serif;font-size:16px;margin-bottom:12px;border-bottom:2px solid var(--ink);padding-bottom:6px">PENDING VOCABULARY</h3>
-    <div id="pendingVocab" style="font-family:'IBM Plex Mono',monospace;font-size:13px"></div>
-
-    <h3 style="font-family:'Oswald',sans-serif;font-size:16px;margin:24px 0 12px;border-bottom:2px solid var(--ink);padding-bottom:6px">MISALIGNED FILINGS</h3>
-    <div id="misalignedFilings" style="font-family:'IBM Plex Mono',monospace;font-size:12px"></div>
-
-    <h3 style="font-family:'Oswald',sans-serif;font-size:16px;margin:24px 0 12px;border-bottom:2px solid var(--ink);padding-bottom:6px">USER SUGGESTIONS</h3>
-    <div id="userSuggestions" style="font-family:'IBM Plex Mono',monospace;font-size:12px"></div>
-  </div>
-</div>
-
-<style>
-.admin-action{background:none;border:2px solid var(--ink);color:var(--ink);padding:12px 16px;cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
-.admin-action:hover{background:var(--ink);color:var(--paper)}
-.pending-term{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
-.pending-term .info{flex:1}
-.pending-term .kind{font-size:10px;color:var(--stamp);text-transform:uppercase;letter-spacing:.1em}
-.pending-term .term{font-size:14px;margin-top:2px}
-.pending-term .actions{display:flex;gap:6px}
-.pending-term button{background:none;border:1.5px solid var(--ink);padding:4px 10px;cursor:pointer;font-size:11px}
-.pending-term button:hover{background:var(--ink);color:var(--paper)}
-.pending-term button.approve{border-color:var(--good);color:var(--good)}
-.pending-term button.approve:hover{background:var(--good);color:#fff}
-.misaligned-item{border:1px solid var(--line);padding:12px;margin-bottom:12px;background:var(--card)}
-.misaligned-item .headline{font-weight:600;margin-bottom:8px}
-.misaligned-item .comparison{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px}
-.misaligned-item .col{padding:8px;background:var(--paper)}
-.misaligned-item .col-title{font-size:10px;color:var(--olive);text-transform:uppercase;margin-bottom:4px}
-.misaligned-item .mismatch{color:var(--stamp);font-weight:600}
-.misaligned-item .match{color:var(--good)}
-</style>
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-// ── CONFIG ─────────────────────────────────────────────────────────────────
 const SUPABASE_URL = 'https://znhsnishdqrmumxbgobq.supabase.co';
-const ANON_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuaHNuaXNoZHFybXVteGJnb2JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzEwNjMsImV4cCI6MjA5OTY0NzA2M30.k22R9kcbLCp9OyTVBb7DaUbk_Gdghnu-YGKUYc834Rs';
-// ───────────────────────────────────────────────────────────────────────────
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuaHNuaXNoZHFybXVteGJnb2JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzEwNjMsImV4cCI6MjA5OTY0NzA2M30.k22R9kcbLCp9OyTVBb7DaUbk_Gdghnu-YGKUYc834Rs';
 
 const sb = createClient(SUPABASE_URL, ANON_KEY);
-const $ = (s) => document.querySelector(s);
-let USER = null, MODE = 'filings', MY_VOTES = new Map(), MY_TRACKS = new Set(), LAST_SEEN = null;
-let FILINGS_CACHE = []; // cache filings for click-to-open
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+let USER = null, MODE = 'articles', MY_VOTES = new Map(), MY_TRACKS = new Set();
 
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const ago = (d) => { const s=(Date.now()-new Date(d))/1e3;
-  if(s<3600) return `${Math.max(1,s/60|0)}m ago`; if(s<86400) return `${s/3600|0}h ago`; return `${s/86400|0}d ago`; };
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ago = d => { const s=(Date.now()-new Date(d))/1e3;
+  if(s<3600) return `${Math.max(1,s/60|0)}m`; if(s<86400) return `${s/3600|0}h`; return `${s/86400|0}d`; };
+const fmtDate = d => new Date(d).toLocaleDateString('en-US', {month:'short', day:'numeric'});
 
-// Theme toggle
+// Theme
 function setTheme(t){
   document.body.dataset.theme = t;
   localStorage.setItem('ucar-theme', t);
   $('#themeToggle').textContent = t === 'dark' ? '☾ Dark' : '☀ Light';
 }
-$('#themeToggle').addEventListener('click', () => {
-  setTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark');
-});
-// Load saved theme
-const saved = localStorage.getItem('ucar-theme') || 'light';
-setTheme(saved);
+$('#themeToggle').onclick = () => setTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark');
+setTheme(localStorage.getItem('ucar-theme') || 'light');
 
-// URL routing for /c/{case_number}
-function checkRoute(){
-  const m = location.pathname.match(/\/c\/(\d+)$/);
-  if(m) return { type: 'case', num: m[1] };
-  const sp = new URLSearchParams(location.search);
-  if(sp.has('c')) return { type: 'case', num: sp.get('c') };
-  if(sp.has('f')) return { type: 'filing', id: sp.get('f') };
-  return null;
-}
-
-async function openCaseByNumber(caseNum){
-  const { data } = await sb.from('cases').select('id').eq('case_number', caseNum).maybeSingle();
-  if(data?.id) openCase(data.id);
-}
+// Admin
+let ADMIN_KEY = localStorage.getItem('ucar-admin-key') || '';
+if(ADMIN_KEY || location.search.includes('admin')) $('#adminBtn').style.display = 'block';
 
 async function boot(){
   let { data:{ session } } = await sb.auth.getSession();
-  if(!session){ ({ data:{ session } } = await sb.auth.signInAnonymously()); }
+  if(!session) ({ data:{ session } } = await sb.auth.signInAnonymously());
   USER = session?.user ?? null;
 
   if(USER){
-    const { data: prof } = await sb.from('profiles').select('last_seen_at').eq('user_id', USER.id).maybeSingle();
-    LAST_SEEN = prof?.last_seen_at ?? null;
-    await sb.from('profiles').upsert({ user_id: USER.id, last_seen_at: new Date().toISOString() });
     const { data: v } = await sb.from('votes').select('case_id, kind');
     (v??[]).forEach(r => MY_VOTES.set(r.case_id, r.kind));
     const { data: t } = await sb.from('tracks').select('case_id');
     (t??[]).forEach(r => MY_TRACKS.add(r.case_id));
   }
-  await Promise.all([loadShow(), loadNewsBar(), loadTrackBox(), loadFeed()]);
-
-  // Check for deep link
-  const route = checkRoute();
-  if(route?.type === 'case') openCaseByNumber(route.num);
-  if(route?.type === 'filing') openFilingById(route.id);
+  loadFeed();
 }
 
-async function loadShow(){
-  const { data } = await sb.from('daily_show').select('*').order('show_date',{ascending:false}).limit(1);
-  const s = data?.[0]; if(!s) return;
-  $('#show').hidden = false;
-  $('#show-title').textContent = s.title;
-  $('#show-blurb').textContent = s.blurb ?? '';
-  if(s.video_url){
-    const yt = s.video_url.match(/(?:youtu\.be\/|v=)([\w-]{11})/);
-    $('#show-video').innerHTML = yt
-      ? `<iframe src="https://www.youtube-nocookie.com/embed/${yt[1]}" allowfullscreen title="${esc(s.title)}"></iframe>`
-      : `<p class="mono"><a href="${esc(s.video_url)}" target="_blank" rel="noopener">▶ watch today's episode</a></p>`;
-  }
-}
+// ═══════════════════════════════════════════════════════════════════════════
+// ARTICLE CARD (for feed)
+// ═══════════════════════════════════════════════════════════════════════════
+function articleCard(a, c){
+  const vote = c ? MY_VOTES.get(c.id) : null;
+  const tracked = c ? MY_TRACKS.has(c.id) : false;
+  const domain = a.source_domain || 'source';
 
-async function loadNewsBar(){
-  if(!LAST_SEEN) return;
-  const { count } = await sb.from('filings').select('*',{count:'exact',head:true})
-    .eq('status','live').gt('created_at', LAST_SEEN);
-  if(!count) return;
-  let tracked = 0;
-  if(MY_TRACKS.size){
-    const { count: tc } = await sb.from('filings').select('*',{count:'exact',head:true})
-      .eq('status','live').gt('created_at', LAST_SEEN).in('case_id',[...MY_TRACKS]);
-    tracked = tc ?? 0;
-  }
-  $('#newsbar').style.display='block';
-  $('#newsbar').innerHTML = `SINCE YOUR LAST VISIT: <b>${count}</b> new filing${count===1?'':'s'} entered the docket`
-    + (tracked ? ` · <b>${tracked}</b> in cases you track` : '');
-}
-
-async function loadTrackBox(){
-  if(!MY_TRACKS.size){ $('#trackbox').hidden = true; return; }
-  const { data } = await sb.from('cases')
-    .select('id, case_number, title_render, filing_count, last_filed_at')
-    .in('id',[...MY_TRACKS]).order('last_filed_at',{ascending:false});
-  if(!data?.length){ $('#trackbox').hidden = true; return; }
-  $('#trackbox').hidden = false;
-  $('#track-items').innerHTML = data.map(c => {
-    const fresh = LAST_SEEN && c.last_filed_at && c.last_filed_at > LAST_SEEN;
-    return `<div class="t-item" data-case="${c.id}">
-      <span class="disp">No. ${c.case_number} — ${esc(c.title_render)}</span>
-      <span class="mono ${fresh?'fresh':''}">${fresh?'NEW FILINGS':''} ${c.filing_count} filed</span></div>`;
-  }).join('');
-  $('#track-items').querySelectorAll('[data-case]').forEach(el =>
-    el.addEventListener('click', () => openCase(el.dataset.case)));
-
-  // Wire up export CSV button
-  $('#exportCsv').onclick = async () => {
-    const { data: cases } = await sb.from('cases')
-      .select('case_number, title_render, filing_count, good_votes, evil_votes, fake_votes, first_filed_at, last_filed_at')
-      .in('id',[...MY_TRACKS]);
-    if(!cases?.length) return;
-    const header = 'Case Number,Title,Filings,Good,Evil,Fake,First Filed,Last Filed';
-    const rows = cases.map(c =>
-      `${c.case_number},"${(c.title_render||'').replace(/"/g,'""')}",${c.filing_count},${c.good_votes},${c.evil_votes},${c.fake_votes},${c.first_filed_at||''},${c.last_filed_at||''}`
-    );
-    const csv = [header, ...rows].join('\n');
-    const blob = new Blob([csv], {type:'text/csv'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `ucar-casefile-${new Date().toISOString().slice(0,10)}.csv`;
-    a.click(); URL.revokeObjectURL(url);
-  };
-
-  // Wire up clear all button
-  $('#clearAll').onclick = async () => {
-    if(!confirm('Clear all tracked cases from your case file?')) return;
-    for(const caseId of MY_TRACKS){
-      await sb.from('tracks').delete().eq('user_id',USER.id).eq('case_id',caseId);
-    }
-    MY_TRACKS.clear();
-    loadTrackBox();
-  };
-}
-
-function filingRow(f, c){
-  return `<article class="filing" data-filing="${f.id}">
-    <div class="casenum" data-case="${c?.id}"><small>CASE No.</small>${c?.case_number ?? '—'}</div>
-    <div>
-      <div class="ctitle" data-case="${c?.id}">${esc(c?.title_render ?? '')}</div>
-      <h3>${esc(f.headline)}</h3>
-      <p>${esc(f.summary)}</p>
-      <div class="meta">
-        ${f.subject ? `<span>filed against: <b>${esc(f.subject)}</b></span>` : ''}
-        <span>${esc(f.source_domain ?? '')}</span>
-        <span>${ago(f.created_at)}</span>
-        ${f.impact ? `<span class="impact">impact ${'▮'.repeat(f.impact)}${'▯'.repeat(5-f.impact)}</span>` : ''}
+  return `<div class="article" data-article="${a.id}" data-case="${c?.id || ''}">
+    <div class="article-inner">
+      <div class="article-stamp">
+        <div class="label">FILED</div>
+        <div class="date">${fmtDate(a.created_at)}</div>
+        <div class="src">${esc(domain)}</div>
       </div>
-      ${c ? chits(c) : ''}
+      <div class="article-body">
+        <a href="${esc(a.source_url)}" target="_blank" rel="noopener" class="source-link" onclick="event.stopPropagation()">
+          ${esc(domain)} ↗
+        </a>
+        <h3>${esc(a.headline)}</h3>
+        ${c ? `<a class="case-link" data-case="${c.id}">Case #${c.case_number}: ${esc(c.title_render)}</a>` : ''}
+        <p>${esc(a.summary)}</p>
+      </div>
     </div>
-  </article>`;
-}
-
-function chits(c){
-  const mine = MY_VOTES.get(c.id);
-  return `<div class="chits" data-case="${c.id}">
-    <button class="chit good ${mine==='good'?'on':''}" data-k="good">GOOD ${c.good_votes??0}</button>
-    <button class="chit evil ${mine==='evil'?'on':''}" data-k="evil">EVIL ${c.evil_votes??0}</button>
-    <button class="chit fake ${mine==='fake'?'on':''}" data-k="fake">FAKE ${c.fake_votes??0}</button>
+    <div class="article-actions">
+      <button class="act-btn good ${vote==='good'?'on':''}" data-vote="good">👍 Good ${c?.good_votes||0}</button>
+      <button class="act-btn evil ${vote==='evil'?'on':''}" data-vote="evil">👎 Evil ${c?.evil_votes||0}</button>
+      <button class="act-btn fake ${vote==='fake'?'on':''}" data-vote="fake">🚫 Fake ${c?.fake_votes||0}</button>
+      <button class="act-btn track ${tracked?'on':''}" data-action="track">☆ Track</button>
+      <button class="act-btn" data-action="share">⛓ Share</button>
+      <button class="act-btn" data-action="submit" style="margin-left:auto">✎ Submit</button>
+    </div>
   </div>`;
 }
 
-function wireRows(root){
-  // Click on filing row (not case number or vote buttons) opens filing detail
-  root.querySelectorAll('.filing').forEach(el => {
-    el.addEventListener('click', (e) => {
-      // Don't trigger if clicking case number, ctitle, or vote buttons
-      if(e.target.closest('.casenum') || e.target.closest('.ctitle') || e.target.closest('.chits')) return;
-      const filingId = el.dataset.filing;
-      if(filingId) openFiling(filingId);
-    });
-  });
+// ═══════════════════════════════════════════════════════════════════════════
+// CASE CARD (for cases list)
+// ═══════════════════════════════════════════════════════════════════════════
+function caseCard(c){
+  const vote = MY_VOTES.get(c.id);
+  const tracked = MY_TRACKS.has(c.id);
 
-  root.querySelectorAll('.casenum,.ctitle').forEach(el =>
-    el.addEventListener('click', (e) => { e.stopPropagation(); el.dataset.case && openCase(el.dataset.case); }));
-  root.querySelectorAll('.chits .chit').forEach(btn =>
-    btn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const caseId = btn.closest('.chits').dataset.case, kind = btn.dataset.k;
-      if(!USER) return;
-      if(MY_VOTES.get(caseId) === kind){
-        await sb.from('votes').delete().eq('user_id',USER.id).eq('case_id',caseId);
-        MY_VOTES.delete(caseId);
-      } else {
-        await sb.from('votes').upsert({ user_id: USER.id, case_id: caseId, kind });
-        MY_VOTES.set(caseId, kind);
-      }
-      loadFeed();
-    }));
+  return `<div class="caserow" data-case="${c.id}">
+    <div class="num">CASE #${c.case_number}</div>
+    <div class="t">${esc(c.title_render)}</div>
+    <div class="c">${c.filing_count} article${c.filing_count===1?'':'s'} · ${c.good_votes} good / ${c.evil_votes} evil</div>
+  </div>`;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// FEED
+// ═══════════════════════════════════════════════════════════════════════════
 async function loadFeed(){
   const feed = $('#feed');
   const q = $('#q').value.trim();
@@ -505,173 +350,263 @@ async function loadFeed(){
       headers:{ 'content-type':'application/json', 'authorization':`Bearer ${ANON_KEY}`, 'apikey': ANON_KEY },
       body: JSON.stringify({ q })
     }).then(r=>r.json()).catch(()=>({results:[]}));
-    FILINGS_CACHE = r.results || [];
     feed.innerHTML = (r.results?.length)
-      ? r.results.map(f => filingRow(f, f.cases)).join('')
-      : `<div class="empty">Nothing on the docket for "${esc(q)}". Try broader terms.</div>`;
-    wireRows(feed); return;
+      ? r.results.map(a => articleCard(a, a.cases)).join('')
+      : `<div class="empty">No results for "${esc(q)}"</div>`;
+    wireArticles(feed);
+    return;
   }
 
-  if(MODE === 'filings'){
+  if(MODE === 'articles'){
     const { data } = await sb.from('filings')
       .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes)')
       .eq('status','live').order('created_at',{ascending:false}).limit(40);
-    FILINGS_CACHE = data || [];
     feed.innerHTML = (data?.length)
-      ? data.map(f => filingRow(f, f.cases)).join('')
-      : `<div class="empty">The docket is empty. The crawler files the first cases within the hour.</div>`;
+      ? data.map(a => articleCard(a, a.cases)).join('')
+      : `<div class="empty">No articles yet.</div>`;
+    wireArticles(feed);
   } else {
     const { data } = await sb.from('cases')
-      .select('id, case_number, title_render, filing_count, good_votes, evil_votes, fake_votes, last_filed_at')
+      .select('id, case_number, title_render, filing_count, good_votes, evil_votes, fake_votes')
       .eq('status','live').order('last_filed_at',{ascending:false, nullsFirst:false}).limit(60);
     feed.innerHTML = (data?.length)
-      ? data.map(c => `<div class="caserow" data-case="${c.id}">
-          <span class="num">No. ${c.case_number}</span>
-          <span class="t">${esc(c.title_render)}</span>
-          <span class="c">${c.filing_count} filed · ${c.evil_votes} evil / ${c.good_votes} good</span>
-        </div>`).join('')
+      ? data.map(c => caseCard(c)).join('')
       : `<div class="empty">No cases yet.</div>`;
     feed.querySelectorAll('.caserow').forEach(el =>
       el.addEventListener('click', () => openCase(el.dataset.case)));
-    return;
   }
-  wireRows(feed);
 }
 
-// Open a filing: show article details first, then the full case below
-async function openFiling(filingId){
+function wireArticles(root){
+  root.querySelectorAll('.article').forEach(el => {
+    el.addEventListener('click', e => {
+      if(e.target.closest('.article-actions') || e.target.closest('.case-link') || e.target.closest('.source-link')) return;
+      openArticle(el.dataset.article);
+    });
+  });
+
+  root.querySelectorAll('.case-link').forEach(el => {
+    el.addEventListener('click', e => { e.stopPropagation(); openCase(el.dataset.case); });
+  });
+
+  root.querySelectorAll('[data-vote]').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.stopPropagation();
+      const caseId = btn.closest('.article').dataset.case;
+      const kind = btn.dataset.vote;
+      if(!USER || !caseId) return;
+
+      if(MY_VOTES.get(caseId) === kind){
+        await sb.from('votes').delete().eq('user_id',USER.id).eq('case_id',caseId);
+        MY_VOTES.delete(caseId);
+      } else {
+        await sb.from('votes').upsert({ user_id: USER.id, case_id: caseId, kind });
+        MY_VOTES.set(caseId, kind);
+      }
+      loadFeed();
+    });
+  });
+
+  root.querySelectorAll('[data-action="track"]').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.stopPropagation();
+      const caseId = btn.closest('.article').dataset.case;
+      if(!USER || !caseId) return;
+
+      if(MY_TRACKS.has(caseId)){
+        await sb.from('tracks').delete().eq('user_id',USER.id).eq('case_id',caseId);
+        MY_TRACKS.delete(caseId);
+      } else {
+        await sb.from('tracks').upsert({ user_id: USER.id, case_id: caseId });
+        MY_TRACKS.add(caseId);
+      }
+      loadFeed();
+    });
+  });
+
+  root.querySelectorAll('[data-action="share"]').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.stopPropagation();
+      const articleId = btn.closest('.article').dataset.article;
+      const url = `${location.origin}?a=${articleId}`;
+      try {
+        await navigator.clipboard.writeText(url);
+        btn.textContent = '✓ Copied';
+        setTimeout(() => btn.textContent = '⛓ Share', 2000);
+      } catch { alert(url); }
+    });
+  });
+
+  root.querySelectorAll('[data-action="submit"]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const el = btn.closest('.article');
+      openSubmitModal(el.dataset.article, el.dataset.case);
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ARTICLE DETAIL (drawer)
+// ═══════════════════════════════════════════════════════════════════════════
+async function openArticle(articleId){
   const panel = $('#dpanel');
-  panel.innerHTML = `<div class="empty">Loading filing…</div>`;
+  panel.innerHTML = `<div class="drawer-header"><span class="mono">Loading...</span><button class="close">✕</button></div>`;
   $('#drawer').classList.add('open');
+  panel.querySelector('.close').onclick = () => $('#drawer').classList.remove('open');
 
-  // Try cache first
-  let f = FILINGS_CACHE.find(x => x.id === filingId);
-  if(!f){
-    const { data } = await sb.from('filings')
-      .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes, filing_count, first_filed_at)')
-      .eq('id', filingId).single();
-    f = data;
-  }
-  if(!f){ panel.innerHTML = `<div class="empty">Filing not found.</div>`; return; }
+  const { data: a } = await sb.from('filings')
+    .select('*, cases(id, case_number, title_render, filing_count, first_filed_at, good_votes, evil_votes, fake_votes)')
+    .eq('id', articleId).single();
+  if(!a){ panel.innerHTML = `<div class="empty">Article not found.</div>`; return; }
 
-  const c = f.cases;
+  const c = a.cases;
+  const vote = c ? MY_VOTES.get(c.id) : null;
+  const tracked = c ? MY_TRACKS.has(c.id) : false;
 
-  // Fetch similar cases for the case section
-  const sim = await fetch(`${SUPABASE_URL}/functions/v1/api?action=similar`, {
+  // Get other articles in same case
+  const { data: others } = c ? await sb.from('filings')
+    .select('id, headline, source_domain, created_at')
+    .eq('case_id', c.id).neq('id', articleId).eq('status','live')
+    .order('created_at',{ascending:false}).limit(10) : {data:[]};
+
+  // Get similar cases
+  const sim = c ? await fetch(`${SUPABASE_URL}/functions/v1/api?action=similar`, {
     method:'POST',
     headers:{ 'content-type':'application/json', 'authorization':`Bearer ${ANON_KEY}`, 'apikey': ANON_KEY },
-    body: JSON.stringify({ case_id: c?.id })
-  }).then(r=>r.json()).catch(()=>({results:[]}));
-
-  // Fetch other filings for this case
-  const { data: otherFilings } = c ? await sb.from('filings')
-    .select('id, headline, summary, source_url, source_domain, created_at')
-    .eq('case_id', c.id).eq('status','live').neq('id', filingId)
-    .order('created_at',{ascending:false}).limit(10) : { data: [] };
-
-  const tracked = c ? MY_TRACKS.has(c.id) : false;
-  const shareUrl = c ? `${location.origin}?c=${c.case_number}` : location.href;
+    body: JSON.stringify({ case_id: c.id })
+  }).then(r=>r.json()).catch(()=>({results:[]})) : {results:[]};
 
   panel.innerHTML = `
-    <button class="close" aria-label="Close">CLOSE ✕</button>
-
-    <!-- FILING DETAIL (the news article) -->
-    <div class="filing-detail">
-      <div class="mono" style="color:var(--stamp);margin-bottom:8px">FILING</div>
-      <h3>${esc(f.headline)}</h3>
-      <p style="margin:10px 0;color:var(--olive)">${esc(f.summary)}</p>
-      ${f.article_quote ? `<div class="quote">"${esc(f.article_quote)}"</div>` : ''}
-      <div class="meta" style="margin-top:12px">
-        ${f.subject ? `<span>filed against: <b>${esc(f.subject)}</b></span>` : ''}
-        <span>${esc(f.source_domain ?? '')}</span>
-        <span>${ago(f.created_at)}</span>
-        ${f.impact ? `<span class="impact">impact ${'▮'.repeat(f.impact)}${'▯'.repeat(5-f.impact)}</span>` : ''}
-        <a href="${esc(f.source_url)}" target="_blank" rel="noopener">read full article ↗</a>
-      </div>
+    <div class="drawer-header">
+      <span class="mono">ARTICLE</span>
+      <button class="close">✕ CLOSE</button>
     </div>
+    <div class="drawer-body">
+      <div class="article-detail">
+        <div class="stamp-row">
+          <div class="stamp-badge">FILED ${fmtDate(a.created_at)}</div>
+          <span class="mono">${esc(a.source_domain)}</span>
+        </div>
+        <h3>${esc(a.headline)}</h3>
+        <p class="summary">${esc(a.summary)}</p>
+        ${a.article_quote ? `<div class="quote">"${esc(a.article_quote)}"</div>` : ''}
+        <a href="${esc(a.source_url)}" target="_blank" rel="noopener" class="read-link">READ FULL ARTICLE ↗</a>
+      </div>
 
-    <!-- CASE SECTION (the fuller case below) -->
-    ${c ? `
-    <div class="case-section">
-      <div class="mono" style="color:var(--stamp)">CASE No. ${c.case_number}</div>
-      <h2>${esc(c.title_render)}</h2>
-      <div class="mono">${c.filing_count} filing${c.filing_count===1?'':'s'} · opened ${c.first_filed_at ? ago(c.first_filed_at) : '—'}</div>
-      ${chits(c)}
-      <button class="trackbtn ${tracked?'on':''}" id="trk">${tracked ? '★ Tracking — untrack' : '☆ Track this case'}</button>
-      <button class="sharebtn" id="share">⛓ Share link</button>
-      <button class="sharebtn" id="suggest" style="margin-left:4px">💡 Suggest fix</button>
+      ${c ? `
+      <div class="case-card">
+        <div class="case-card-inner">
+          <div class="case-num">CASE #${c.case_number}</div>
+          <h2>${esc(c.title_render)}</h2>
+          <div class="case-meta">${c.filing_count} article${c.filing_count===1?'':'s'} filed · opened ${ago(c.first_filed_at)} ago</div>
+        </div>
+        <div class="case-card-actions">
+          <button class="act-btn good ${vote==='good'?'on':''}" data-vote="good" data-case="${c.id}">👍 Good ${c.good_votes}</button>
+          <button class="act-btn evil ${vote==='evil'?'on':''}" data-vote="evil" data-case="${c.id}">👎 Evil ${c.evil_votes}</button>
+          <button class="act-btn fake ${vote==='fake'?'on':''}" data-vote="fake" data-case="${c.id}">🚫 Fake ${c.fake_votes}</button>
+          <button class="act-btn track ${tracked?'on':''}" data-action="track" data-case="${c.id}">${tracked?'★ Tracked':'☆ Track'}</button>
+          <button class="act-btn" data-action="share-case" data-case="${c.id}">⛓ Share</button>
+          <button class="act-btn" data-action="submit" data-article="${a.id}" data-case="${c.id}">✎ Submit</button>
+        </div>
+      </div>
 
-      ${otherFilings?.length ? `
-        <div class="sect">Other Filings in This Case</div>
-        ${otherFilings.map(of => `<div class="dfiling" data-filing="${of.id}" style="cursor:pointer">
-          <b>${esc(of.headline)}</b>
-          <div class="summary">${esc(of.summary)}</div>
-          <div class="meta"><span>${esc(of.source_domain)}</span><span>${ago(of.created_at)}</span></div>
+      ${others?.length ? `
+        <div class="sect">OTHER ARTICLES IN THIS CASE</div>
+        ${others.map(o => `<div class="article" data-article="${o.id}" style="cursor:pointer;margin:8px 0">
+          <div class="article-inner" style="grid-template-columns:1fr">
+            <div class="article-body">
+              <span class="mono">${fmtDate(o.created_at)} · ${esc(o.source_domain)}</span>
+              <h3 style="font-size:14px;margin-top:4px">${esc(o.headline)}</h3>
+            </div>
+          </div>
         </div>`).join('')}
       ` : ''}
 
-      <div class="sect">Nearby Cases</div>
-      ${(sim.results??[]).map(s => `<div class="sim" data-case="${s.id}">
-        <div class="sim-title">No. ${s.case_number} — ${esc(s.title_render)}</div>
-        <div class="sim-desc">${esc(s.latest_headline || '')}</div>
-        <div class="sim-meta">${s.filing_count} filings · ${Math.round(s.sim*100)}% similar</div>
-      </div>`).join('') || '<div class="empty">No neighbors yet.</div>'}
+      <div class="sect">SIMILAR CASES</div>
+      ${(sim.results??[]).length ? sim.results.map(s => `
+        <div class="caserow" data-case="${s.id}" style="margin:8px 0">
+          <div class="num">CASE #${s.case_number}</div>
+          <div class="t" style="font-size:13px">${esc(s.title_render)}</div>
+          <div class="c">${s.filing_count} articles · ${Math.round(s.sim*100)}% similar</div>
+        </div>
+      `).join('') : '<div class="empty">No similar cases yet.</div>'}
+      ` : ''}
     </div>
-    ` : ''}
   `;
 
-  panel.querySelector('.close').addEventListener('click', () => $('#drawer').classList.remove('open'));
+  // Wire up panel interactions
+  panel.querySelector('.close').onclick = () => $('#drawer').classList.remove('open');
 
-  // Wire other filings
-  panel.querySelectorAll('.dfiling[data-filing]').forEach(el =>
-    el.addEventListener('click', () => openFiling(el.dataset.filing)));
+  panel.querySelectorAll('.article[data-article]').forEach(el => {
+    el.onclick = () => openArticle(el.dataset.article);
+  });
 
-  // Wire similar cases
-  panel.querySelectorAll('.sim').forEach(el => el.addEventListener('click', () => openCase(el.dataset.case)));
-  wireRows(panel);
+  panel.querySelectorAll('.caserow[data-case]').forEach(el => {
+    el.onclick = () => openCase(el.dataset.case);
+  });
 
-  if(c){
-    panel.querySelector('#trk').addEventListener('click', async () => {
+  panel.querySelectorAll('[data-vote]').forEach(btn => {
+    btn.onclick = async () => {
+      const caseId = btn.dataset.case;
+      const kind = btn.dataset.vote;
       if(!USER) return;
-      if(MY_TRACKS.has(c.id)){
-        await sb.from('tracks').delete().eq('user_id',USER.id).eq('case_id',c.id);
-        MY_TRACKS.delete(c.id);
+      if(MY_VOTES.get(caseId) === kind){
+        await sb.from('votes').delete().eq('user_id',USER.id).eq('case_id',caseId);
+        MY_VOTES.delete(caseId);
       } else {
-        await sb.from('tracks').upsert({ user_id: USER.id, case_id: c.id });
-        MY_TRACKS.add(c.id);
+        await sb.from('votes').upsert({ user_id: USER.id, case_id: caseId, kind });
+        MY_VOTES.set(caseId, kind);
       }
-      openFiling(filingId); loadTrackBox();
-    });
-    panel.querySelector('#share').addEventListener('click', async (e) => {
-      const btn = e.target;
+      openArticle(articleId);
+    };
+  });
+
+  panel.querySelectorAll('[data-action="track"]').forEach(btn => {
+    btn.onclick = async () => {
+      const caseId = btn.dataset.case;
+      if(!USER) return;
+      if(MY_TRACKS.has(caseId)){
+        await sb.from('tracks').delete().eq('user_id',USER.id).eq('case_id',caseId);
+        MY_TRACKS.delete(caseId);
+      } else {
+        await sb.from('tracks').upsert({ user_id: USER.id, case_id: caseId });
+        MY_TRACKS.add(caseId);
+      }
+      openArticle(articleId);
+    };
+  });
+
+  panel.querySelectorAll('[data-action="share-case"]').forEach(btn => {
+    btn.onclick = async () => {
+      const caseId = btn.dataset.case;
+      const { data: cData } = await sb.from('cases').select('case_number').eq('id', caseId).single();
+      const url = `${location.origin}?c=${cData?.case_number}`;
       try {
-        await navigator.clipboard.writeText(shareUrl);
-        btn.textContent = '✓ Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = '⛓ Share link'; btn.classList.remove('copied'); }, 2000);
-      } catch { alert(shareUrl); }
-    });
+        await navigator.clipboard.writeText(url);
+        btn.textContent = '✓ Copied';
+        setTimeout(() => btn.textContent = '⛓ Share', 2000);
+      } catch { alert(url); }
+    };
+  });
 
-    // Suggest button
-    panel.querySelector('#suggest').addEventListener('click', () => {
-      openSuggestModal(c.id, c.title_render);
-    });
-  }
+  panel.querySelectorAll('[data-action="submit"]').forEach(btn => {
+    btn.onclick = () => openSubmitModal(btn.dataset.article, btn.dataset.case);
+  });
 }
 
-async function openFilingById(id){
-  openFiling(id);
-}
-
+// ═══════════════════════════════════════════════════════════════════════════
+// CASE DETAIL (drawer)
+// ═══════════════════════════════════════════════════════════════════════════
 async function openCase(caseId){
-  if(!caseId) return;
   const panel = $('#dpanel');
-  panel.innerHTML = `<div class="empty">Pulling the case file…</div>`;
+  panel.innerHTML = `<div class="drawer-header"><span class="mono">Loading...</span><button class="close">✕</button></div>`;
   $('#drawer').classList.add('open');
+  panel.querySelector('.close').onclick = () => $('#drawer').classList.remove('open');
 
-  const [{ data: c }, { data: filings }, sim] = await Promise.all([
+  const [{ data: c }, { data: articles }, sim] = await Promise.all([
     sb.from('cases').select('*').eq('id', caseId).single(),
-    sb.from('filings').select('id, headline, summary, subject, source_url, source_domain, created_at, impact, article_quote')
+    sb.from('filings').select('id, headline, summary, source_url, source_domain, created_at')
       .eq('case_id', caseId).eq('status','live').order('created_at',{ascending:false}).limit(30),
     fetch(`${SUPABASE_URL}/functions/v1/api?action=similar`, {
       method:'POST',
@@ -681,38 +616,86 @@ async function openCase(caseId){
   ]);
   if(!c){ panel.innerHTML = `<div class="empty">Case not found.</div>`; return; }
 
+  const vote = MY_VOTES.get(caseId);
   const tracked = MY_TRACKS.has(caseId);
-  const shareUrl = `${location.origin}?c=${c.case_number}`;
+
   panel.innerHTML = `
-    <button class="close" aria-label="Close">CLOSE ✕</button>
-    <div class="mono" style="color:var(--stamp)">CASE No. ${c.case_number}</div>
-    <h2>${esc(c.title_render)}</h2>
-    <div class="mono">${c.filing_count} filing${c.filing_count===1?'':'s'} · opened ${c.first_filed_at ? ago(c.first_filed_at) : '—'}</div>
-    ${chits(c)}
-    <button class="trackbtn ${tracked?'on':''}" id="trk">${tracked ? '★ Tracking — untrack' : '☆ Track this case'}</button>
-    <button class="sharebtn" id="share">⛓ Share link</button>
-    <div class="sect">Filings</div>
-    ${(filings??[]).map(f => `<div class="dfiling" data-filing="${f.id}" style="cursor:pointer">
-        <b>${esc(f.headline)}</b>
-        <div class="summary">${esc(f.summary)}</div>
-        ${f.article_quote ? `<div class="quote">"${esc(f.article_quote)}"</div>` : ''}
-        <div class="meta" style="margin-top:4px">
-          ${f.subject?`<span>${esc(f.subject)}</span>`:''}<span>${esc(f.source_domain)}</span><span>${ago(f.created_at)}</span>
-          <a href="${esc(f.source_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">source ↗</a>
-        </div></div>`).join('') || '<div class="empty">No live filings.</div>'}
-    <div class="sect">Nearby Cases</div>
-    ${(sim.results??[]).map(s => `<div class="sim" data-case="${s.id}">
-      <div class="sim-title">No. ${s.case_number} — ${esc(s.title_render)}</div>
-      <div class="sim-desc">${esc(s.latest_headline || '')}</div>
-      <div class="sim-meta">${s.filing_count} filings · ${Math.round(s.sim*100)}% similar</div>
-    </div>`).join('') || '<div class="empty">No neighbors yet.</div>'}
+    <div class="drawer-header">
+      <span class="mono">CASE FILE</span>
+      <button class="close">✕ CLOSE</button>
+    </div>
+    <div class="drawer-body">
+      <div class="case-card">
+        <div class="case-card-inner">
+          <div class="case-num">CASE #${c.case_number}</div>
+          <h2>${esc(c.title_render)}</h2>
+          <div class="case-meta">${c.filing_count} article${c.filing_count===1?'':'s'} filed · opened ${ago(c.first_filed_at)} ago</div>
+        </div>
+        <div class="case-card-actions">
+          <button class="act-btn good ${vote==='good'?'on':''}" data-vote="good">👍 Good ${c.good_votes}</button>
+          <button class="act-btn evil ${vote==='evil'?'on':''}" data-vote="evil">👎 Evil ${c.evil_votes}</button>
+          <button class="act-btn fake ${vote==='fake'?'on':''}" data-vote="fake">🚫 Fake ${c.fake_votes}</button>
+          <button class="act-btn track ${tracked?'on':''}" data-action="track">${tracked?'★ Tracked':'☆ Track'}</button>
+          <button class="act-btn" data-action="share">⛓ Share</button>
+          <button class="act-btn" data-action="submit-case">✎ Submit</button>
+        </div>
+      </div>
+
+      <div class="sect">ARTICLES FILED AS EVIDENCE</div>
+      ${(articles??[]).map(a => `<div class="article" data-article="${a.id}" style="cursor:pointer;margin:10px 0">
+        <div class="article-inner">
+          <div class="article-stamp">
+            <div class="label">FILED</div>
+            <div class="date">${fmtDate(a.created_at)}</div>
+          </div>
+          <div class="article-body">
+            <a href="${esc(a.source_url)}" target="_blank" class="source-link" onclick="event.stopPropagation()">${esc(a.source_domain)} ↗</a>
+            <h3 style="font-size:15px">${esc(a.headline)}</h3>
+            <p style="font-size:13px">${esc(a.summary)}</p>
+          </div>
+        </div>
+      </div>`).join('') || '<div class="empty">No articles filed yet.</div>'}
+
+      <div class="sect">SIMILAR CASES</div>
+      ${(sim.results??[]).length ? sim.results.map(s => `
+        <div class="caserow" data-case="${s.id}" style="margin:8px 0">
+          <div class="num">CASE #${s.case_number}</div>
+          <div class="t" style="font-size:13px">${esc(s.title_render)}</div>
+          <div class="c">${s.filing_count} articles · ${Math.round(s.sim*100)}% similar</div>
+        </div>
+      `).join('') : '<div class="empty">No similar cases yet.</div>'}
+    </div>
   `;
-  panel.querySelector('.close').addEventListener('click', () => $('#drawer').classList.remove('open'));
-  panel.querySelectorAll('.dfiling[data-filing]').forEach(el =>
-    el.addEventListener('click', () => openFiling(el.dataset.filing)));
-  panel.querySelectorAll('.sim').forEach(el => el.addEventListener('click', () => openCase(el.dataset.case)));
-  wireRows(panel);
-  panel.querySelector('#trk').addEventListener('click', async () => {
+
+  panel.querySelector('.close').onclick = () => $('#drawer').classList.remove('open');
+
+  panel.querySelectorAll('.article[data-article]').forEach(el => {
+    el.onclick = e => {
+      if(e.target.closest('.source-link')) return;
+      openArticle(el.dataset.article);
+    };
+  });
+
+  panel.querySelectorAll('.caserow[data-case]').forEach(el => {
+    el.onclick = () => openCase(el.dataset.case);
+  });
+
+  panel.querySelectorAll('[data-vote]').forEach(btn => {
+    btn.onclick = async () => {
+      const kind = btn.dataset.vote;
+      if(!USER) return;
+      if(MY_VOTES.get(caseId) === kind){
+        await sb.from('votes').delete().eq('user_id',USER.id).eq('case_id',caseId);
+        MY_VOTES.delete(caseId);
+      } else {
+        await sb.from('votes').upsert({ user_id: USER.id, case_id: caseId, kind });
+        MY_VOTES.set(caseId, kind);
+      }
+      openCase(caseId);
+    };
+  });
+
+  panel.querySelector('[data-action="track"]').onclick = async () => {
     if(!USER) return;
     if(MY_TRACKS.has(caseId)){
       await sb.from('tracks').delete().eq('user_id',USER.id).eq('case_id',caseId);
@@ -721,169 +704,78 @@ async function openCase(caseId){
       await sb.from('tracks').upsert({ user_id: USER.id, case_id: caseId });
       MY_TRACKS.add(caseId);
     }
-    openCase(caseId); loadTrackBox();
-  });
-  panel.querySelector('#share').addEventListener('click', async (e) => {
-    const btn = e.target;
+    openCase(caseId);
+  };
+
+  panel.querySelector('[data-action="share"]').onclick = async () => {
+    const url = `${location.origin}?c=${c.case_number}`;
     try {
-      await navigator.clipboard.writeText(shareUrl);
-      btn.textContent = '✓ Copied!';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = '⛓ Share link'; btn.classList.remove('copied'); }, 2000);
-    } catch { alert(shareUrl); }
-  });
+      await navigator.clipboard.writeText(url);
+      panel.querySelector('[data-action="share"]').textContent = '✓ Copied';
+    } catch { alert(url); }
+  };
+
+  panel.querySelector('[data-action="submit-case"]').onclick = () => {
+    // For case-level submit, use first article or null
+    const firstArticle = articles?.[0]?.id;
+    openSubmitModal(firstArticle, caseId);
+  };
 }
 
-$('#drawer').addEventListener('click', (e) => { if(e.target.id==='drawer') $('#drawer').classList.remove('open'); });
-document.addEventListener('keydown', (e) => { if(e.key==='Escape'){ $('#drawer').classList.remove('open'); $('#adminPanel').style.display='none'; }});
-$('#tab-filings').addEventListener('click', () => { MODE='filings'; $('#tab-filings').classList.add('on'); $('#tab-cases').classList.remove('on'); loadFeed(); });
-$('#tab-cases').addEventListener('click', () => { MODE='cases'; $('#tab-cases').classList.add('on'); $('#tab-filings').classList.remove('on'); loadFeed(); });
-let qt; $('#q').addEventListener('input', () => { clearTimeout(qt); qt=setTimeout(loadFeed, 350); });
+// ═══════════════════════════════════════════════════════════════════════════
+// SUBMIT CORRECTION MODAL
+// ═══════════════════════════════════════════════════════════════════════════
+let SUBMIT_ARTICLE_ID = null;
+let SUBMIT_CASE_ID = null;
+let SUBMIT_ACTION = 'correct';
 
-// ── ADMIN PANEL ────────────────────────────────────────────────────────────
-let ADMIN_KEY = localStorage.getItem('ucar-admin-key') || '';
+function openSubmitModal(articleId, caseId){
+  SUBMIT_ARTICLE_ID = articleId;
+  SUBMIT_CASE_ID = caseId;
+  SUBMIT_ACTION = 'correct';
 
-// Show admin button if key is stored or on ?admin
-if(ADMIN_KEY || location.search.includes('admin')){
-  $('#adminBtn').style.display = 'block';
+  $('#subVerb').value = '';
+  $('#subObject').value = '';
+  $('#subInstrument').value = '';
+  $('#subReason').value = '';
+  $('#subTargetCase').value = '';
+  $('#submitStatus').textContent = '';
+  $('#copyTarget').style.display = 'none';
+
+  $$('.action-type button').forEach(b => b.classList.remove('on'));
+  $('.action-type button[data-action="correct"]').classList.add('on');
+
+  $('#submitModal').classList.add('open');
 }
 
-$('#closeAdmin').addEventListener('click', () => {
-  $('#adminPanel').style.display = 'none';
+$$('.action-type button').forEach(btn => {
+  btn.onclick = () => {
+    $$('.action-type button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    SUBMIT_ACTION = btn.dataset.action;
+    $('#copyTarget').style.display = SUBMIT_ACTION === 'copy' ? 'block' : 'none';
+  };
 });
 
-$('#adminKey').addEventListener('change', (e) => {
-  ADMIN_KEY = e.target.value;
-  localStorage.setItem('ucar-admin-key', ADMIN_KEY);
-  loadPendingVocab();
-});
+$('#cancelSubmit').onclick = () => $('#submitModal').classList.remove('open');
+$('#submitModal').onclick = e => { if(e.target.id === 'submitModal') $('#submitModal').classList.remove('open'); };
 
-document.querySelectorAll('.admin-action').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    const action = btn.dataset.action;
-    const status = $('#adminStatus');
-    status.textContent = 'Running...';
+$('#submitCorrection').onclick = async () => {
+  const verb = $('#subVerb').value.trim();
+  const obj = $('#subObject').value.trim();
+  const instrument = $('#subInstrument').value.trim();
+  const reason = $('#subReason').value.trim();
+  const targetCase = $('#subTargetCase').value.trim();
+  const status = $('#submitStatus');
 
-    try {
-      if(action === 'crawl'){
-        const r = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=run`, {
-          method: 'POST',
-          headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
-          body: '{}'
-        }).then(r => r.json());
-        status.innerHTML = `<b>Crawler:</b> ${r.discovered ?? 0} discovered, ${r.fetched ?? 0} fetched, ${r.promoted ?? 0} promoted`;
-      }
-      else if(action === 'extract'){
-        const r = await fetch(`${SUPABASE_URL}/functions/v1/extract?action=run`, {
-          method: 'POST',
-          headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
-          body: '{"max":5}'
-        }).then(r => r.json());
-        status.innerHTML = `<b>Extraction:</b> ${r.processed ?? 0} processed<br>${(r.results||[]).map(x => `• ${x.result}: ${x.case_title || x.reason || x.url}`).join('<br>')}`;
-      }
-      else if(action === 'embed'){
-        const r = await fetch(`${SUPABASE_URL}/functions/v1/extract?action=embed_vocab`, {
-          method: 'POST',
-          headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
-          body: '{}'
-        }).then(r => r.json());
-        status.innerHTML = `<b>Embed vocab:</b> ${r.embedded ?? 0} embedded, ${r.remaining ?? 0} remaining`;
-      }
-      else if(action === 'status'){
-        const r = await fetch(`${SUPABASE_URL}/functions/v1/extract?action=status`, {
-          method: 'POST',
-          headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
-          body: '{}'
-        }).then(r => r.json());
-        status.innerHTML = `<b>Pipeline status:</b><br>${Object.entries(r.queue||{}).map(([k,v])=>`• ${k}: ${v}`).join('<br>')}`;
-      }
-      else if(action === 'alignment'){
-        status.textContent = 'Loading misaligned filings...';
-        loadMisalignedFilings();
-      }
-    } catch(e) {
-      status.textContent = 'Error: ' + e.message;
-    }
-  });
-});
-
-async function loadMisalignedFilings(){
-  const container = $('#misalignedFilings');
-  const status = $('#adminStatus');
-  if(!ADMIN_KEY){ container.innerHTML = '<div class="empty">Enter admin key</div>'; return; }
-
-  try {
-    const r = await fetch(`${SUPABASE_URL}/functions/v1/api?action=review_alignment`, {
-      method: 'POST',
-      headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
-      body: '{}'
-    }).then(r => r.json());
-
-    if(r.error){ container.innerHTML = `<div class="empty">Error: ${r.error}</div>`; return; }
-    status.innerHTML = `<b>Found ${r.total} misaligned filings</b>`;
-
-    if(!r.misaligned?.length){ container.innerHTML = '<div class="empty">All filings aligned ✓</div>'; return; }
-
-    container.innerHTML = r.misaligned.slice(0, 30).map(m => `
-      <div class="misaligned-item" data-filing="${m.filing_id}" data-case="${m.case_id}">
-        <div class="headline">${esc(m.headline)}</div>
-        <div class="comparison">
-          <div class="col">
-            <div class="col-title">Raw (from LLM)</div>
-            <div class="${m.mismatch.verb ? 'mismatch' : 'match'}">verb: ${esc(m.raw.verb || '—')}</div>
-            <div class="${m.mismatch.object ? 'mismatch' : 'match'}">object: ${esc(m.raw.object || '—')}</div>
-            <div class="${m.mismatch.instrument ? 'mismatch' : 'match'}">instrument: ${esc(m.raw.instrument || '—')}</div>
-          </div>
-          <div class="col">
-            <div class="col-title">Canonical (case #${m.case_number})</div>
-            <div class="${m.mismatch.verb ? 'mismatch' : 'match'}">verb: ${esc(m.canonical.verb || '—')}</div>
-            <div class="${m.mismatch.object ? 'mismatch' : 'match'}">object: ${esc(m.canonical.object || '—')}</div>
-            <div class="${m.mismatch.instrument ? 'mismatch' : 'match'}">instrument: ${esc(m.canonical.instrument || '—')}</div>
-          </div>
-        </div>
-        <div style="font-size:11px;color:var(--olive)">Case: ${esc(m.case_title)}</div>
-      </div>
-    `).join('');
-  } catch(e) {
-    container.innerHTML = `<div class="empty">Error: ${e.message}</div>`;
-  }
-}
-
-// ── SUGGESTION MODAL ───────────────────────────────────────────────────────
-let SUGGEST_CASE_ID = null;
-
-function openSuggestModal(caseId, caseTitle) {
-  SUGGEST_CASE_ID = caseId;
-  $('#suggestModal').style.display = 'flex';
-  $('#suggestTerm').value = '';
-  $('#suggestReason').value = '';
-  $('#suggestStatus').textContent = '';
-  $('#suggestKind').focus();
-}
-
-$('#cancelSuggest').addEventListener('click', () => {
-  $('#suggestModal').style.display = 'none';
-});
-
-$('#suggestModal').addEventListener('click', (e) => {
-  if (e.target.id === 'suggestModal') $('#suggestModal').style.display = 'none';
-});
-
-$('#submitSuggest').addEventListener('click', async () => {
-  const kind = $('#suggestKind').value;
-  const term = $('#suggestTerm').value.trim();
-  const reason = $('#suggestReason').value.trim();
-  const status = $('#suggestStatus');
-
-  if (!term) {
-    status.textContent = 'Please enter a term';
+  if(!verb && !obj && !instrument){
+    status.textContent = 'Please enter at least one term';
     status.style.color = 'var(--stamp)';
     return;
   }
 
-  if (!USER) {
-    status.textContent = 'You must be signed in to suggest';
-    status.style.color = 'var(--stamp)';
+  if(!USER){
+    status.textContent = 'Please wait, signing in...';
     return;
   }
 
@@ -892,157 +784,61 @@ $('#submitSuggest').addEventListener('click', async () => {
 
   try {
     const { data: { session } } = await sb.auth.getSession();
-    const r = await fetch(`${SUPABASE_URL}/functions/v1/api?action=suggest_vocab`, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'authorization': `Bearer ${session.access_token}`,
-        'apikey': ANON_KEY
-      },
-      body: JSON.stringify({
-        case_id: SUGGEST_CASE_ID,
-        kind,
-        suggested_term: term,
-        reason: reason || null
-      })
-    }).then(r => r.json());
 
-    if (r.ok) {
-      status.textContent = '✓ Suggestion submitted! Thanks for helping improve UCAR.';
-      status.style.color = 'var(--good)';
-      setTimeout(() => { $('#suggestModal').style.display = 'none'; }, 2000);
-    } else {
-      status.textContent = 'Error: ' + (r.error || 'Unknown error');
-      status.style.color = 'var(--stamp)';
+    // Submit each non-empty term as a suggestion
+    const suggestions = [];
+    if(verb) suggestions.push({ kind: 'verb', suggested_term: verb.toLowerCase() });
+    if(obj) suggestions.push({ kind: 'object_class', suggested_term: obj.toLowerCase() });
+    if(instrument) suggestions.push({ kind: 'instrument', suggested_term: instrument.toLowerCase() });
+
+    for(const sug of suggestions){
+      await fetch(`${SUPABASE_URL}/functions/v1/api?action=suggest_vocab`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'authorization': `Bearer ${session.access_token}`,
+          'apikey': ANON_KEY
+        },
+        body: JSON.stringify({
+          case_id: SUBMIT_CASE_ID,
+          kind: sug.kind,
+          suggested_term: sug.suggested_term,
+          reason: `${SUBMIT_ACTION}: ${reason || 'User correction'}${SUBMIT_ACTION === 'copy' ? ` (target: case ${targetCase})` : ''}`
+        })
+      });
     }
-  } catch (e) {
+
+    status.textContent = '✓ Correction submitted for review. Thank you!';
+    status.style.color = 'var(--good)';
+    setTimeout(() => $('#submitModal').classList.remove('open'), 2000);
+
+  } catch(e) {
     status.textContent = 'Error: ' + e.message;
     status.style.color = 'var(--stamp)';
   }
-});
+};
 
-async function loadPendingVocab(){
-  const container = $('#pendingVocab');
-  if(!ADMIN_KEY){ container.innerHTML = '<div class="empty">Enter admin key to see pending vocab</div>'; return; }
-
-  try {
-    const r = await fetch(`${SUPABASE_URL}/functions/v1/api?action=vocab_pending`, {
-      method: 'POST',
-      headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
-      body: '{}'
-    }).then(r => r.json());
-
-    if(r.error){ container.innerHTML = `<div class="empty">Error: ${r.error}</div>`; return; }
-    if(!r.pending?.length){ container.innerHTML = '<div class="empty">No pending terms ✓</div>'; return; }
-
-    container.innerHTML = r.pending.map(t => `
-      <div class="pending-term" data-id="${t.id}">
-        <div class="info">
-          <div class="kind">${esc(t.kind)}</div>
-          <div class="term">${esc(t.term)}</div>
-        </div>
-        <div class="actions">
-          <button class="approve" data-action="approve">✓ Approve</button>
-          <button data-action="reject">✕ Reject</button>
-        </div>
-      </div>
-    `).join('');
-
-    container.querySelectorAll('.pending-term button').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const termId = btn.closest('.pending-term').dataset.id;
-        const action = btn.dataset.action;
-
-        if(action === 'approve'){
-          await fetch(`${SUPABASE_URL}/functions/v1/api?action=vocab_approve`, {
-            method: 'POST',
-            headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
-            body: JSON.stringify({ term_id: termId })
-          });
-        }
-        // For reject, we'd need a vocab_reject endpoint - for now just remove from UI
-        btn.closest('.pending-term').remove();
-
-        // Release any cases waiting on vocab
-        await fetch(`${SUPABASE_URL}/functions/v1/api?action=vocab_release`, {
-          method: 'POST',
-          headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
-          body: '{}'
-        });
-      });
-    });
-  } catch(e) {
-    container.innerHTML = `<div class="empty">Error loading: ${e.message}</div>`;
+// ═══════════════════════════════════════════════════════════════════════════
+// ROUTING & EVENTS
+// ═══════════════════════════════════════════════════════════════════════════
+function checkRoute(){
+  const sp = new URLSearchParams(location.search);
+  if(sp.has('c')){
+    sb.from('cases').select('id').eq('case_number', sp.get('c')).maybeSingle()
+      .then(({data}) => { if(data?.id) openCase(data.id); });
   }
+  if(sp.has('a')) openArticle(sp.get('a'));
 }
 
-async function loadUserSuggestions() {
-  const container = $('#userSuggestions');
-  if(!ADMIN_KEY){ container.innerHTML = '<div class="empty">Enter admin key</div>'; return; }
+$('#drawer').onclick = e => { if(e.target.id === 'drawer') $('#drawer').classList.remove('open'); };
+document.onkeydown = e => { if(e.key === 'Escape'){ $('#drawer').classList.remove('open'); $('#submitModal').classList.remove('open'); }};
 
-  try {
-    const r = await fetch(`${SUPABASE_URL}/functions/v1/api?action=list_suggestions`, {
-      method: 'POST',
-      headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
-      body: '{}'
-    }).then(r => r.json());
+$('#tab-articles').onclick = () => { MODE='articles'; $('#tab-articles').classList.add('on'); $('#tab-cases').classList.remove('on'); loadFeed(); };
+$('#tab-cases').onclick = () => { MODE='cases'; $('#tab-cases').classList.add('on'); $('#tab-articles').classList.remove('on'); loadFeed(); };
 
-    if(r.error){ container.innerHTML = `<div class="empty">Error: ${r.error}</div>`; return; }
-    if(!r.suggestions?.length){ container.innerHTML = '<div class="empty">No pending suggestions ✓</div>'; return; }
+let qt; $('#q').oninput = () => { clearTimeout(qt); qt=setTimeout(loadFeed, 350); };
 
-    container.innerHTML = r.suggestions.map(s => `
-      <div class="pending-term" data-id="${s.id}">
-        <div class="info">
-          <div class="kind">${esc(s.kind)}</div>
-          <div class="term">${esc(s.suggested_term)}</div>
-          ${s.reason ? `<div style="font-size:11px;color:var(--olive);margin-top:4px">"${esc(s.reason)}"</div>` : ''}
-          ${s.cases ? `<div style="font-size:10px;color:var(--muted);margin-top:2px">Case #${s.cases.case_number}: ${esc(s.cases.title_render)}</div>` : ''}
-        </div>
-        <div class="actions">
-          <button class="approve" data-action="approve">✓ Approve</button>
-          <button data-action="reject">✕ Reject</button>
-        </div>
-      </div>
-    `).join('');
-
-    container.querySelectorAll('.pending-term button').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const suggestionId = btn.closest('.pending-term').dataset.id;
-        const action = btn.dataset.action;
-
-        if(action === 'approve'){
-          await fetch(`${SUPABASE_URL}/functions/v1/api?action=approve_suggestion`, {
-            method: 'POST',
-            headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
-            body: JSON.stringify({ suggestion_id: suggestionId })
-          });
-        } else {
-          await fetch(`${SUPABASE_URL}/functions/v1/api?action=reject_suggestion`, {
-            method: 'POST',
-            headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
-            body: JSON.stringify({ suggestion_id: suggestionId })
-          });
-        }
-        btn.closest('.pending-term').remove();
-        loadUserSuggestions();
-      });
-    });
-  } catch(e) {
-    container.innerHTML = `<div class="empty">Error: ${e.message}</div>`;
-  }
-}
-
-// Load suggestions when admin panel opens
-$('#adminBtn').addEventListener('click', () => {
-  $('#adminPanel').style.display = 'block';
-  $('#adminKey').value = ADMIN_KEY;
-  if(ADMIN_KEY) {
-    loadPendingVocab();
-    loadUserSuggestions();
-  }
-});
-
-boot();
+boot().then(checkRoute);
 </script>
 </body>
 </html>
