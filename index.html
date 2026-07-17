@@ -360,7 +360,7 @@ async function loadFeed(){
   if(MODE === 'articles'){
     const { data } = await sb.from('filings')
       .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes)')
-      .eq('status','live').order('created_at',{ascending:false}).limit(40);
+      .eq('status','live').order('created_at',{ascending:false}).limit(200);
     feed.innerHTML = (data?.length)
       ? data.map(a => articleCard(a, a.cases)).join('')
       : `<div class="empty">No articles yet.</div>`;
@@ -368,7 +368,7 @@ async function loadFeed(){
   } else {
     const { data } = await sb.from('cases')
       .select('id, case_number, title_render, filing_count, good_votes, evil_votes, fake_votes')
-      .eq('status','live').order('last_filed_at',{ascending:false, nullsFirst:false}).limit(60);
+      .eq('status','live').order('case_number',{ascending:false}).limit(200);
     feed.innerHTML = (data?.length)
       ? data.map(c => caseCard(c)).join('')
       : `<div class="empty">No cases yet.</div>`;
