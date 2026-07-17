@@ -60,7 +60,12 @@ main{max-width:920px;margin:0 auto;padding:20px}
 
 /* case file box */
 #trackbox{border:2px dashed var(--olive);padding:14px 16px;margin-bottom:24px;background:transparent}
-#trackbox h3{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--olive);margin-bottom:8px}
+#trackbox .tb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+#trackbox h3{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--olive);margin:0}
+#trackbox .tb-tools{display:flex;gap:8px}
+.mini-btn{background:none;border:1.5px solid var(--olive);color:var(--olive);padding:4px 10px;cursor:pointer;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em}
+.mini-btn:hover{background:var(--olive);color:var(--paper)}
 #trackbox .t-item{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line);cursor:pointer}
 #trackbox .t-item:hover{background:var(--line)}
 #trackbox .fresh{color:var(--stamp);font-weight:600}
@@ -171,7 +176,13 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
   </section>
 
   <section id="trackbox" hidden>
-    <h3>Case File Box · cases you track</h3>
+    <div class="tb-header">
+      <h3>Case File Box · cases you track</h3>
+      <div class="tb-tools">
+        <button class="mini-btn" id="exportCsv">↓ CSV</button>
+        <button class="mini-btn" id="clearAll">✕ Clear</button>
+      </div>
+    </div>
     <div id="track-items"></div>
   </section>
 
@@ -291,11 +302,11 @@ async function loadNewsBar(){
 }
 
 async function loadTrackBox(){
-  if(!MY_TRACKS.size) return;
+  if(!MY_TRACKS.size){ $('#trackbox').hidden = true; return; }
   const { data } = await sb.from('cases')
     .select('id, case_number, title_render, filing_count, last_filed_at')
     .in('id',[...MY_TRACKS]).order('last_filed_at',{ascending:false});
-  if(!data?.length) return;
+  if(!data?.length){ $('#trackbox').hidden = true; return; }
   $('#trackbox').hidden = false;
   $('#track-items').innerHTML = data.map(c => {
     const fresh = LAST_SEEN && c.last_filed_at && c.last_filed_at > LAST_SEEN;
@@ -305,6 +316,34 @@ async function loadTrackBox(){
   }).join('');
   $('#track-items').querySelectorAll('[data-case]').forEach(el =>
     el.addEventListener('click', () => openCase(el.dataset.case)));
+
+  // Wire up export CSV button
+  $('#exportCsv').onclick = async () => {
+    const { data: cases } = await sb.from('cases')
+      .select('case_number, title_render, filing_count, good_votes, evil_votes, fake_votes, first_filed_at, last_filed_at')
+      .in('id',[...MY_TRACKS]);
+    if(!cases?.length) return;
+    const header = 'Case Number,Title,Filings,Good,Evil,Fake,First Filed,Last Filed';
+    const rows = cases.map(c =>
+      `${c.case_number},"${(c.title_render||'').replace(/"/g,'""')}",${c.filing_count},${c.good_votes},${c.evil_votes},${c.fake_votes},${c.first_filed_at||''},${c.last_filed_at||''}`
+    );
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `ucar-casefile-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  };
+
+  // Wire up clear all button
+  $('#clearAll').onclick = async () => {
+    if(!confirm('Clear all tracked cases from your case file?')) return;
+    for(const caseId of MY_TRACKS){
+      await sb.from('tracks').delete().eq('user_id',USER.id).eq('case_id',caseId);
+    }
+    MY_TRACKS.clear();
+    loadTrackBox();
+  };
 }
 
 function filingRow(f, c){
