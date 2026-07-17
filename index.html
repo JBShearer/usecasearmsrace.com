@@ -1,915 +1,417 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>USE CASE ARMS RACE</title>
-<meta name="description" content="Report AI before it reports you. The public docket of AI deployments.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UCAR · Use Case Arms Race</title>
+<meta name="description" content="A public docket of AI deployments. Every use case is a case. Every news event is a filing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Archivo:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F5F0E6;--fg:#1A1817;--muted:#4A4540;--line:#1A1817;
-  --card:#FDFBF5;--accent:#C1121F;--halo:#B8860B;--horn:#C1121F;
-  --chip:#E9E2D2;--good:#2E7D32;
+  --paper:#F5F1E6;      /* index card */
+  --ink:#141210;        /* docket black */
+  --stamp:#C0221C;      /* crayon red */
+  --olive:#565442;      /* filing cabinet */
+  --line:#C9C2AE;       /* rule lines */
+  --good:#2E6B3F;
 }
-[data-theme="evil"]{
-  --bg:#1A0A12;--fg:#E8E0E4;--muted:#C8C0C4;--line:#E8E0E4;
-  --card:#241019;--accent:#D4A84C;--halo:#D4A84C;--horn:#FF4757;
-  --chip:#331A26;--good:#66BB6A;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--fg);
-  font-family:'Courier New',Courier,monospace;
-  transition:background .3s,color .3s;padding-bottom:80px}
-.wrap{max-width:860px;margin:0 auto;padding:0 14px}
-header{display:flex;justify-content:space-between;align-items:center;
-  padding:16px 0 6px;border-bottom:3px solid var(--line)}
-.brand{cursor:pointer}
-.brand h1{font-size:clamp(17px,4.6vw,26px);letter-spacing:2px;font-weight:900}
-.brand .tag{font-size:10.5px;letter-spacing:1.6px;color:var(--accent);
-  font-weight:800;text-transform:uppercase}
-.hbtns{display:flex;gap:8px;align-items:center}
-#themeToggle{background:none;border:2px solid var(--fg);border-radius:20px;
-  padding:8px 12px;font-size:11px;letter-spacing:1px;cursor:pointer;
-  font-weight:800;color:var(--fg);font-family:inherit}
-.screen{display:none}.screen.active{display:block}
-.metrics{font-size:11px;letter-spacing:1px;color:var(--muted);
-  text-transform:uppercase;padding:10px 2px;display:flex;gap:14px;flex-wrap:wrap}
-.metrics b{color:var(--fg)}
-/* episode */
-.episode{border:3px solid var(--line);background:var(--card);margin:14px 0;padding:14px}
-.episode .elabel{font-size:10px;letter-spacing:2px;color:var(--accent);font-weight:800;margin-bottom:6px}
-.episode h3{font-size:16px;margin-bottom:6px}
-.episode p{font-size:12.5px;color:var(--muted);margin-bottom:8px}
-.episode iframe,.episode video{width:100%;aspect-ratio:16/9;border:2px solid var(--line);background:#000}
-.episode a.caselink{color:var(--accent);font-weight:800;font-size:12px}
-/* casebook strip */
-.cbstrip{border:3px solid var(--line);background:var(--card);margin:12px 0}
-.cbbar{display:flex;justify-content:space-between;align-items:center;
-  padding:10px 12px;cursor:pointer;font-weight:800;letter-spacing:1.5px;font-size:12px;text-transform:uppercase}
-.cbbar .dot{display:inline-block;min-width:18px;padding:1px 6px;border-radius:9px;
-  background:var(--accent);color:var(--bg);font-size:10.5px;text-align:center;margin-left:6px}
-.cbbody{display:none;border-top:2px solid var(--line);padding:10px 12px}
-.cbstrip.open .cbbody{display:block}
-.cbsec{font-size:10px;letter-spacing:2px;color:var(--muted);margin:8px 0 4px;font-weight:800}
-.cbrow{display:flex;justify-content:space-between;gap:8px;align-items:center;
-  padding:7px 4px;border-bottom:1px dashed var(--muted);cursor:pointer;font-size:12.5px}
-.cbrow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.badge{font-size:9px;letter-spacing:1px;padding:2px 6px;border:1.5px solid var(--accent);
-  color:var(--accent);font-weight:800;border-radius:3px;white-space:nowrap}
-.badge.solid{background:var(--accent);color:var(--bg)}
-.cbdetail{border-top:2px solid var(--line);margin-top:8px;padding-top:8px}
-.cbtools{display:flex;gap:8px;margin-top:8px}
-.mini{background:none;border:2px solid var(--fg);color:var(--fg);
-  font-family:inherit;font-size:10.5px;font-weight:800;letter-spacing:1px;
-  padding:6px 10px;cursor:pointer;text-transform:uppercase}
-/* search */
-.searchbox{margin:12px 0 6px;position:relative}
-.searchbox input{width:100%;padding:14px 12px;font-size:16px;
-  font-family:inherit;background:var(--card);color:var(--fg);border:3px solid var(--line);outline:none}
-.latency{font-size:10.5px;color:var(--muted);letter-spacing:1px;margin:5px 2px}
-.filebar{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap}
-/* topics + sort */
-.toprow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:10px 0}
-.tchip{background:none;border:2px solid var(--fg);color:var(--fg);
-  font-family:inherit;font-size:11px;font-weight:800;letter-spacing:1px;
-  padding:6px 11px;cursor:pointer;border-radius:16px}
-.tchip.on{background:var(--fg);color:var(--bg)}
-.modeseg{display:flex;border:2px solid var(--accent);margin-right:12px}
-.modeseg button{background:none;border:none;color:var(--accent);font-family:inherit;
-  font-size:10.5px;font-weight:800;letter-spacing:1px;padding:7px 10px;cursor:pointer;text-transform:uppercase}
-.modeseg button.on{background:var(--accent);color:var(--bg)}
-.sortseg{display:flex;border:2px solid var(--fg);margin-left:auto}
-.sortseg button{background:none;border:none;color:var(--fg);font-family:inherit;
-  font-size:10.5px;font-weight:800;letter-spacing:1px;padding:7px 10px;cursor:pointer;text-transform:uppercase}
-.sortseg button.on{background:var(--fg);color:var(--bg)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:'Archivo',sans-serif;font-size:16px;line-height:1.5}
+a{color:inherit}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.02em}
+.disp{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em}
+
+header{border-bottom:3px solid var(--ink);padding:14px 20px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+header h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:26px;letter-spacing:.04em}
+header h1 span{color:var(--stamp)}
+header .tag{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive)}
+main{max-width:920px;margin:0 auto;padding:20px}
+
+/* what's new banner */
+#newsbar{display:none;background:var(--ink);color:var(--paper);padding:10px 14px;margin-bottom:18px;
+  font-family:'IBM Plex Mono',monospace;font-size:13px}
+#newsbar b{color:#F2C744}
+
+/* daily show */
+#show{border:2px solid var(--ink);margin-bottom:14px;background:#fff;position:relative}
+#show .stamp{position:absolute;top:-11px;left:14px;background:var(--stamp);color:var(--paper);
+  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.12em;padding:2px 10px;text-transform:uppercase}
+#show .inner{padding:20px 16px 16px}
+#show h2{font-family:'Oswald',sans-serif;font-size:20px;margin-bottom:6px}
+#show iframe,#show video{width:100%;aspect-ratio:16/9;border:0;margin-top:10px;background:#000}
+
+/* case file box */
+#trackbox{border:2px dashed var(--olive);padding:14px 16px;margin-bottom:24px;background:transparent}
+#trackbox h3{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--olive);margin-bottom:8px}
+#trackbox .t-item{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line);cursor:pointer}
+#trackbox .t-item:hover{background:#EFE9D8}
+#trackbox .fresh{color:var(--stamp);font-weight:600}
+
+/* controls */
+#controls{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+#q{flex:1;min-width:220px;border:2px solid var(--ink);background:#fff;padding:10px 12px;
+  font-family:'IBM Plex Mono',monospace;font-size:14px}
+#q:focus{outline:3px solid var(--stamp);outline-offset:1px}
+.tab{border:2px solid var(--ink);background:transparent;padding:9px 16px;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.tab.on{background:var(--ink);color:var(--paper)}
+
+/* filing rows: the docket */
+.filing{border-bottom:1px solid var(--line);padding:16px 0;display:grid;
+  grid-template-columns:86px 1fr;gap:14px}
+.casenum{font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;color:var(--stamp);
+  border:2px solid var(--stamp);align-self:start;text-align:center;padding:6px 4px;
+  transform:rotate(-2.5deg);cursor:pointer;line-height:1.2;background:#fff}
+.casenum small{display:block;font-size:9px;letter-spacing:.14em;color:var(--ink)}
+.filing h3{font-size:17px;font-weight:600;margin-bottom:4px}
+.filing .ctitle{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.05em;color:var(--olive);
+  text-transform:uppercase;cursor:pointer;margin-bottom:6px}
+.filing .ctitle:hover{color:var(--stamp)}
+.filing p{font-size:14.5px;color:#3A362E;margin-bottom:8px}
+.meta{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive);display:flex;gap:14px;flex-wrap:wrap}
+.impact{color:var(--stamp);font-weight:600}
+
 /* case rows */
-.divider{font-size:11px;letter-spacing:2px;color:var(--muted);
-  border-bottom:2px solid var(--line);padding:12px 2px 4px;margin-bottom:8px;font-weight:800;display:flex;justify-content:space-between}
-.hit{border:3px solid var(--line);background:var(--card);margin:10px 0;padding:12px;cursor:pointer}
-.hit .toprule{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
-.hit .cnum{font-size:12px;letter-spacing:1.5px;color:var(--accent);font-weight:900}
-.hit .stars{font-size:12px;letter-spacing:2px;color:var(--halo)}
-.hit h3{font-size:16px;letter-spacing:.5px;margin:4px 0 2px;line-height:1.3}
-.hit .subj{font-size:12px;color:var(--muted);letter-spacing:1px;font-weight:800}
-.hit p{font-size:13px;color:var(--muted);margin:6px 0;line-height:1.5}
-.hit .quote{font-size:13px;border-left:3px solid var(--accent);padding-left:8px;font-style:italic;margin:6px 0;color:var(--fg)}
-.hit .meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
-.hit.filing .domain{font-size:11px;letter-spacing:1.5px;color:var(--muted);font-weight:800;text-transform:uppercase}
-.hit.filing .timeago{font-size:11px;letter-spacing:1px;color:var(--muted);font-weight:800}
-.hit.filing .filing-headline{cursor:pointer}
-.hit.filing .filing-headline:hover{color:var(--accent)}
-.hit.filing .caselink{font-size:11px;letter-spacing:1px;color:var(--accent);font-weight:800;cursor:pointer}
-.hit.filing .caselink:hover{text-decoration:underline}
-.fcount{font-size:11px;letter-spacing:1px;color:var(--muted);font-weight:800}
-.votes{display:flex;gap:8px;margin-left:auto}
-.vbtn{display:flex;align-items:center;gap:4px;background:none;
-  border:2px solid var(--fg);color:var(--fg);font-family:inherit;
-  font-size:12px;font-weight:800;padding:5px 9px;cursor:pointer;border-radius:4px}
-.vbtn.halo.on{border-color:var(--halo);color:var(--halo)}
-.vbtn.horn.on{border-color:var(--horn);color:var(--horn)}
-.vbtn svg{width:15px;height:15px}
-/* case page */
-.casehead{border-bottom:3px solid var(--line);padding:14px 0 10px;margin-bottom:10px}
-.casehead .cnum{font-size:13px;letter-spacing:2px;color:var(--accent);font-weight:900}
-.casehead h2{font-size:clamp(18px,5vw,26px);letter-spacing:1px;margin:4px 0}
-.casehead .casedesc{font-size:14px;color:var(--muted);margin:8px 0;line-height:1.5}
-.frow{border:2px solid var(--line);background:var(--card);padding:10px;margin:8px 0}
-.frow .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
-.frow .subj{font-weight:900;font-size:13px;letter-spacing:.5px}
-.frow .date{font-size:11px;color:var(--muted)}
-.frow p{font-size:13px;color:var(--muted);margin:5px 0;line-height:1.45}
-.frow .chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
-.dchip{font-size:11px;background:var(--chip);padding:2px 7px;border-radius:3px;font-weight:700}
-.srcbtn{display:inline-block;margin-top:8px;font-size:12px;font-weight:800;
-  letter-spacing:1px;color:var(--accent);text-decoration:none;border:2px solid var(--accent);padding:6px 10px}
-.bigvotes{display:flex;gap:12px;justify-content:center;margin:16px 0}
-.bigvotes .vbtn{font-size:14px;padding:10px 18px}
-.actionrow{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-.abtn{background:none;border:2px solid var(--fg);color:var(--fg);
-  font-family:inherit;font-size:12px;font-weight:800;letter-spacing:1px;
-  padding:9px 13px;cursor:pointer;text-transform:uppercase}
-.abtn.accent{border-color:var(--accent);color:var(--accent)}
-/* sheet + toast + admin */
-.sheetback{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40}
-.sheetback.open{display:block}
-.sheet{position:fixed;left:0;right:0;bottom:0;background:var(--card);
-  border-top:3px solid var(--line);padding:16px 14px calc(16px + env(safe-area-inset-bottom));
-  z-index:41;transform:translateY(105%);transition:transform .22s;max-width:860px;margin:0 auto}
-.sheet.open{transform:translateY(0)}
-.sheet h4{font-size:13px;letter-spacing:1.5px;margin-bottom:10px;text-transform:uppercase}
-.sheet label{font-size:10.5px;letter-spacing:1px;color:var(--muted);display:block;margin:8px 0 3px;font-weight:800;text-transform:uppercase}
-.sheet input,.sheet textarea,.sheet select{width:100%;padding:10px;font-size:15px;
-  font-family:inherit;background:var(--bg);color:var(--fg);border:2px solid var(--line);outline:none}
-.sheet textarea{min-height:110px;resize:vertical}
-.sheet .row{display:flex;gap:8px;margin-top:12px}
-.sheet .row button{flex:1;padding:12px;font-family:inherit;font-weight:800;letter-spacing:1px;font-size:12px;cursor:pointer}
-.sheet .go{background:var(--accent);color:var(--bg);border:none}
-.sheet .no{background:none;border:2px solid var(--fg);color:var(--fg)}
-#toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;
-  transform:translateX(-50%) translateY(80px);background:var(--fg);color:var(--bg);
-  padding:10px 16px;font-size:12px;font-weight:800;letter-spacing:.5px;
-  border-radius:4px;transition:transform .25s;z-index:60;max-width:88vw;text-align:center}
-#toast.show{transform:translateX(-50%) translateY(0)}
-.aform{border:3px solid var(--line);background:var(--card);padding:12px;margin:12px 0}
-.aform h4{font-size:12px;letter-spacing:1.5px;margin-bottom:8px}
-.aform input,.aform textarea{width:100%;padding:9px;margin:4px 0;font-family:inherit;
-  font-size:13px;background:var(--bg);color:var(--fg);border:2px solid var(--line)}
-.aform .mini{margin-top:6px}
-.backbtn{background:none;border:none;color:var(--accent);font-family:inherit;
-  font-size:12px;font-weight:800;letter-spacing:1px;cursor:pointer;padding:10px 0}
-.empty{font-size:12.5px;color:var(--muted);padding:8px 2px}
-footer{margin-top:34px;border-top:3px solid var(--line);padding:14px 2px;
-  font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase}
+.caserow{border-bottom:1px solid var(--line);padding:14px 0;display:flex;gap:14px;align-items:baseline;cursor:pointer}
+.caserow:hover{background:#EFE9D8}
+.caserow .num{font-family:'Oswald',sans-serif;color:var(--stamp);font-weight:700;min-width:64px}
+.caserow .t{font-family:'Oswald',sans-serif;font-size:16px;flex:1}
+.caserow .c{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive)}
+
+/* vote chits */
+.chits{display:flex;gap:8px;margin-top:4px}
+.chit{border:1.5px solid var(--ink);background:#fff;padding:4px 10px;cursor:pointer;
+  font-family:'IBM Plex Mono',monospace;font-size:12px}
+.chit.good.on{background:var(--good);color:#fff;border-color:var(--good)}
+.chit.evil.on{background:var(--stamp);color:#fff;border-color:var(--stamp)}
+.chit.fake.on{background:var(--olive);color:#fff;border-color:var(--olive)}
+
+/* case drawer */
+#drawer{position:fixed;inset:0;background:rgba(20,18,16,.45);display:none;z-index:10}
+#drawer.open{display:block}
+#dpanel{position:absolute;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--paper);
+  border-left:3px solid var(--ink);overflow-y:auto;padding:22px}
+#dpanel .close{float:right;font-family:'IBM Plex Mono',monospace;border:2px solid var(--ink);
+  background:transparent;padding:4px 10px;cursor:pointer}
+#dpanel h2{font-family:'Oswald',sans-serif;font-size:22px;margin:10px 0 4px;text-transform:uppercase}
+#dpanel .sect{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--olive);margin:20px 0 6px;border-bottom:2px solid var(--ink);padding-bottom:4px}
+.dfiling{padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.sim{padding:7px 0;border-bottom:1px dotted var(--line);cursor:pointer;font-size:14px}
+.sim:hover{color:var(--stamp)}
+.trackbtn{margin-top:10px;border:2px solid var(--ink);background:transparent;padding:8px 16px;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.trackbtn.on{background:var(--ink);color:var(--paper)}
+.sharebtn{margin-left:8px;border:2px solid var(--olive);background:transparent;padding:8px 16px;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--olive)}
+.sharebtn:hover{background:var(--olive);color:var(--paper)}
+.copied{background:var(--good)!important;color:#fff!important;border-color:var(--good)!important}
+
+.empty{padding:40px 0;text-align:center;font-family:'IBM Plex Mono',monospace;color:var(--olive);font-size:14px}
+footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid var(--ink);
+  font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media (max-width:600px){.filing{grid-template-columns:70px 1fr}}
 </style>
 </head>
-<body data-theme="good">
-<div class="wrap">
+<body>
 <header>
-  <div class="brand" onclick="location.hash='';window.scrollTo(0,0)">
-    <h1>USE CASE ARMS RACE</h1>
-    <div class="tag">Report AI before it reports you</div>
-  </div>
-  <div class="hbtns"><button id="themeToggle"></button></div>
+  <h1>UCAR<span>.</span></h1>
+  <div class="tag">USE CASE ARMS RACE · a public docket of AI deployments</div>
 </header>
 
-<!-- ============ HOME ============ -->
-<section id="home" class="screen active">
-  <div id="episodeHost"></div>
+<main>
+  <div id="newsbar"></div>
 
-  <div class="cbstrip" id="cbstrip">
-    <div class="cbbar" onclick="toggleBook()">
-      <span>CASEBOOK <span class="dot" id="cbCount">0</span></span>
-      <span id="cbNewDot"></span>
+  <section id="show" hidden>
+    <div class="stamp">Today's Show</div>
+    <div class="inner">
+      <h2 id="show-title"></h2>
+      <p id="show-blurb" style="font-size:14px;color:#3A362E"></p>
+      <div id="show-video"></div>
     </div>
-    <div class="cbbody">
-      <div id="cbList"></div>
-      <div class="cbtools">
-        <button class="mini" onclick="exportCSV()">Export CSV</button>
-      </div>
-      <div class="cbdetail" id="cbDetail" style="display:none"></div>
-    </div>
+  </section>
+
+  <section id="trackbox" hidden>
+    <h3>Case File Box · cases you track</h3>
+    <div id="track-items"></div>
+  </section>
+
+  <div id="controls">
+    <input id="q" type="search" placeholder="search the docket: face recognition, students, OpenAI…" aria-label="Search filings">
+    <button class="tab on" id="tab-filings">New Filings</button>
+    <button class="tab" id="tab-cases">Cases</button>
   </div>
 
-  <div class="metrics" id="metrics"></div>
+  <div id="feed"><div class="empty">Opening the docket…</div></div>
+</main>
 
-  <div class="searchbox">
-    <input id="q" type="search" placeholder="Search the docket, or paste a URL to file..." autocomplete="off" autocapitalize="none">
-  </div>
-  <div class="latency" id="latency"></div>
-  <div class="filebar">
-    <button class="mini" id="fileBtn" style="display:none" onclick="fileURL()">File this URL as a case</button>
-    <button class="mini" onclick="openTestimony()">File testimony (no link)</button>
-  </div>
+<footer>
+  Cases are semantic triples: VERB + OBJECT + INSTRUMENT. Filings are the news events filed against them.
+  Vote good, vote evil, or call it fake. An Evil Brain Labs production.
+</footer>
 
-  <div class="toprow" id="toprow"></div>
-  <div id="results"></div>
-</section>
-
-<!-- ============ CASE (#case=N) ============ -->
-<section id="casepg" class="screen">
-  <button class="backbtn" onclick="location.hash=''">&larr; Back to the docket</button>
-  <div id="casehost"></div>
-</section>
-
-<!-- ============ ADMIN (#admin) ============ -->
-<section id="admin" class="screen">
-  <button class="backbtn" onclick="location.hash=''">&larr; Exit admin</button>
-  <div class="aform">
-    <h4>ADMIN KEY</h4>
-    <input id="ak" type="password" placeholder="ADMIN_KEY">
-  </div>
-  <div class="aform">
-    <h4>DAILY SHOW / EPISODE</h4>
-    <input id="ep-title" placeholder="Title">
-    <textarea id="ep-desc" placeholder="Description"></textarea>
-    <input id="ep-video" placeholder="Video URL (YouTube embed or mp4)">
-    <button class="mini" onclick="saveEpisode()">Publish episode</button>
-  </div>
-  <div class="aform">
-    <h4>VOCABULARY REVIEW</h4>
-    <button class="mini" onclick="loadVocabPending()">Load pending terms</button>
-    <div id="vocab-pending"></div>
-  </div>
-  <div class="aform">
-    <h4>CRAWLER</h4>
-    <div id="crawl-status" class="empty">Load status to begin.</div>
-    <button class="mini" onclick="crawlerStatus()">Status</button>
-    <button class="mini" onclick="crawlerRun()">Run now</button>
-    <button class="mini" onclick="extractRun()">Extract now</button>
-  </div>
-</section>
-
-<footer>USE CASE ARMS RACE &middot; THE PUBLIC DOCKET OF AI DEPLOYMENTS &middot; REPORT AI BEFORE IT REPORTS YOU</footer>
+<div id="drawer" role="dialog" aria-modal="true">
+  <div id="dpanel"></div>
 </div>
-
-<div class="sheetback" id="sheetback" onclick="closeSheet()"></div>
-<div class="sheet" id="sheet"></div>
-<div id="toast"></div>
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // ── CONFIG: filled by deploy.sh ────────────────────────────────────────────
 const SUPABASE_URL = 'https://znhsnishdqrmumxbgobq.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuaHNuaXNoZHFybXVteGJnb2JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzEwNjMsImV4cCI6MjA5OTY0NzA2M30.k22R9kcbLCp9OyTVBb7DaUbk_Gdghnu-YGKUYc834Rs';
-const SHARE_BASE = location.origin + location.pathname;
+const ANON_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuaHNuaXNoZHFybXVteGJnb2JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzEwNjMsImV4cCI6MjA5OTY0NzA2M30.k22R9kcbLCp9OyTVBb7DaUbk_Gdghnu-YGKUYc834Rs';
 // ───────────────────────────────────────────────────────────────────────────
 
 const sb = createClient(SUPABASE_URL, ANON_KEY);
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
+const $ = (s) => document.querySelector(s);
+let USER = null, MODE = 'filings', MY_VOTES = new Map(), MY_TRACKS = new Set(), LAST_SEEN = null;
 
-/* ─────────────────── Identity & Storage ─────────────────── */
-let USER = null;
-let MY_VOTES = {}, SAVES = {};
-try { MY_VOTES = JSON.parse(localStorage.getItem('ucar_votes') || '{}'); } catch {}
-try { SAVES = JSON.parse(localStorage.getItem('ucar_saves') || '{}'); } catch {}
-const persist = () => {
-  try {
-    localStorage.setItem('ucar_votes', JSON.stringify(MY_VOTES));
-    localStorage.setItem('ucar_saves', JSON.stringify(SAVES));
-  } catch {}
-};
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ago = (d) => { const s=(Date.now()-new Date(d))/1e3;
+  if(s<3600) return `${Math.max(1,s/60|0)}m ago`; if(s<86400) return `${s/3600|0}h ago`; return `${s/86400|0}d ago`; };
 
-/* ─────────────────── Utilities ─────────────────── */
-const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; };
-const toast = msg => { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2600); };
-const relTime = iso => {
-  const ms = Date.now() - new Date(iso).getTime();
-  if (ms < 0) return '';
-  const mins = Math.floor(ms / 60000);
-  if (mins < 60) return mins + 'm';
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return hrs + 'h';
-  const days = Math.floor(hrs / 24);
-  if (days < 7) return days + 'd';
-  return Math.floor(days / 7) + 'w';
-};
-const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
-const isNew = c => c.last_filed_at && (Date.now() - new Date(c.last_filed_at)) < 48 * 3600000;
-
-/* ─────────────────── Theme ─────────────────── */
-function setTheme(t) {
-  document.body.dataset.theme = t;
-  $('#themeToggle').textContent = t === 'good' ? 'GOOD ☀' : 'EVIL 🧠';
-  try { localStorage.setItem('ucar_theme', t); } catch {}
+// URL routing for /c/{case_number}
+function checkRoute(){
+  const m = location.pathname.match(/\/c\/(\d+)$/);
+  if(m) return m[1];
+  // Handle GitHub Pages 404 redirect via query param
+  const sp = new URLSearchParams(location.search);
+  if(sp.has('c')) return sp.get('c');
+  return null;
 }
-$('#themeToggle').onclick = () => setTheme(document.body.dataset.theme === 'good' ? 'evil' : 'good');
-setTheme(localStorage.getItem('ucar_theme') || 'good');
 
-/* ─────────────────── Icons ─────────────────── */
-const ICON_HALO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><ellipse cx="12" cy="5" rx="7" ry="2.6"/><path d="M5 13a7 7 0 0 0 14 0"/></svg>';
-const ICON_HORN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 3c0 4-2 6-2 9a7 7 0 0 0 14 0c0-3-2-5-2-9"/><path d="M9 21h6"/></svg>';
+async function openCaseByNumber(caseNum){
+  const { data } = await sb.from('cases').select('id').eq('case_number', caseNum).maybeSingle();
+  if(data?.id) openCase(data.id);
+}
 
-/* ─────────────────── State ─────────────────── */
-const CACHE = new Map();
-let SORT = 'newest', VIEW_MODE = 'feed', CB_OPEN = false, CURRENT_CASE = null;
-
-/* ─────────────────── Boot ─────────────────── */
-async function boot() {
-  // Anonymous auth
-  let { data: { session } } = await sb.auth.getSession();
-  if (!session) { ({ data: { session } } = await sb.auth.signInAnonymously()); }
+async function boot(){
+  let { data:{ session } } = await sb.auth.getSession();
+  if(!session){ ({ data:{ session } } = await sb.auth.signInAnonymously()); }
   USER = session?.user ?? null;
 
-  // Load user's votes and tracks from DB
-  if (USER) {
-    const { data: votes } = await sb.from('votes').select('case_id, kind');
-    (votes || []).forEach(v => MY_VOTES[v.case_id] = v.kind === 'good' ? 1 : v.kind === 'evil' ? -1 : 0);
-    const { data: tracks } = await sb.from('tracks').select('case_id');
-    (tracks || []).forEach(t => { if (!SAVES[t.case_id]) SAVES[t.case_id] = { last_seen: 0 }; });
-    persist();
+  if(USER){
+    const { data: prof } = await sb.from('profiles').select('last_seen_at').eq('user_id', USER.id).maybeSingle();
+    LAST_SEEN = prof?.last_seen_at ?? null;
+    await sb.from('profiles').upsert({ user_id: USER.id, last_seen_at: new Date().toISOString() });
+    const { data: v } = await sb.from('votes').select('case_id, kind');
+    (v??[]).forEach(r => MY_VOTES.set(r.case_id, r.kind));
+    const { data: t } = await sb.from('tracks').select('case_id');
+    (t??[]).forEach(r => MY_TRACKS.add(r.case_id));
   }
+  await Promise.all([loadShow(), loadNewsBar(), loadTrackBox(), loadFeed()]);
 
-  renderTopics();
-  renderBook();
-  loadMetrics();
-  loadEpisode();
-  loadView();
-  route();
+  // Check for deep link to case
+  const routedCase = checkRoute();
+  if(routedCase) openCaseByNumber(routedCase);
 }
 
-/* ─────────────────── Data Loading ─────────────────── */
-async function loadMetrics() {
-  const { count: cases } = await sb.from('cases').select('*', { count: 'exact', head: true }).eq('status', 'live');
-  const yesterday = new Date(Date.now() - 86400000).toISOString();
-  const { count: newToday } = await sb.from('filings').select('*', { count: 'exact', head: true }).gt('created_at', yesterday);
-  $('#metrics').innerHTML = `<span><b>${cases || 0}</b> cases</span><span><b>${newToday || 0}</b> new 24h</span>`;
-}
-
-async function loadEpisode() {
-  const { data } = await sb.from('daily_show').select('*').order('show_date', { ascending: false }).limit(1);
-  const ep = data?.[0];
-  if (ep) renderEpisode(ep);
-}
-
-function renderEpisode(ep) {
-  const host = $('#episodeHost');
-  let media = '';
-  if (ep.video_url) {
-    const yt = ep.video_url.match(/(?:youtu\.be\/|v=)([\w-]{11})/);
-    media = yt
-      ? `<iframe src="https://www.youtube-nocookie.com/embed/${yt[1]}" allowfullscreen frameborder="0"></iframe>`
-      : `<video src="${esc(ep.video_url)}" controls playsinline></video>`;
+async function loadShow(){
+  const { data } = await sb.from('daily_show').select('*').order('show_date',{ascending:false}).limit(1);
+  const s = data?.[0]; if(!s) return;
+  $('#show').hidden = false;
+  $('#show-title').textContent = s.title;
+  $('#show-blurb').textContent = s.blurb ?? '';
+  if(s.video_url){
+    const yt = s.video_url.match(/(?:youtu\.be\/|v=)([\w-]{11})/);
+    $('#show-video').innerHTML = yt
+      ? `<iframe src="https://www.youtube-nocookie.com/embed/${yt[1]}" allowfullscreen title="${esc(s.title)}"></iframe>`
+      : `<p class="mono"><a href="${esc(s.video_url)}" target="_blank" rel="noopener">▶ watch today's episode</a></p>`;
   }
-  host.innerHTML = `<div class="episode"><div class="elabel">CASE OF THE DAY</div>
-    <h3>${esc(ep.title)}</h3><p>${esc(ep.blurb || '')}</p>${media}</div>`;
 }
 
-/* ─────────────────── Topics & Sort ─────────────────── */
-function renderTopics() {
-  const host = $('#toprow');
-  host.innerHTML = '';
-
-  // Mode toggle: FEED vs CASES
-  const modeDiv = document.createElement('div');
-  modeDiv.className = 'modeseg';
-  for (const m of ['feed', 'cases']) {
-    const b = document.createElement('button');
-    b.textContent = m.toUpperCase();
-    if (VIEW_MODE === m) b.className = 'on';
-    b.onclick = () => { VIEW_MODE = m; renderTopics(); loadView(); };
-    modeDiv.appendChild(b);
+async function loadNewsBar(){
+  if(!LAST_SEEN) return;
+  const { count } = await sb.from('filings').select('*',{count:'exact',head:true})
+    .eq('status','live').gt('created_at', LAST_SEEN);
+  if(!count) return;
+  let tracked = 0;
+  if(MY_TRACKS.size){
+    const { count: tc } = await sb.from('filings').select('*',{count:'exact',head:true})
+      .eq('status','live').gt('created_at', LAST_SEEN).in('case_id',[...MY_TRACKS]);
+    tracked = tc ?? 0;
   }
-  host.appendChild(modeDiv);
-
-  // Sort buttons
-  const seg = document.createElement('div');
-  seg.className = 'sortseg';
-  for (const s of ['newest', 'evil', 'good']) {
-    const b = document.createElement('button');
-    b.textContent = s;
-    if (SORT === s) b.className = 'on';
-    b.onclick = () => { SORT = s; renderTopics(); loadView(); };
-    seg.appendChild(b);
-  }
-  host.appendChild(seg);
+  $('#newsbar').style.display='block';
+  $('#newsbar').innerHTML = `SINCE YOUR LAST VISIT: <b>${count}</b> new filing${count===1?'':'s'} entered the docket`
+    + (tracked ? ` · <b>${tracked}</b> in cases you track` : '');
 }
 
-function loadView() {
-  if (VIEW_MODE === 'feed') loadFeed();
-  else loadCases();
+async function loadTrackBox(){
+  if(!MY_TRACKS.size) return;
+  const { data } = await sb.from('cases')
+    .select('id, case_number, title_render, filing_count, last_filed_at')
+    .in('id',[...MY_TRACKS]).order('last_filed_at',{ascending:false});
+  if(!data?.length) return;
+  $('#trackbox').hidden = false;
+  $('#track-items').innerHTML = data.map(c => {
+    const fresh = LAST_SEEN && c.last_filed_at && c.last_filed_at > LAST_SEEN;
+    return `<div class="t-item" data-case="${c.id}">
+      <span class="disp">No. ${c.case_number} — ${esc(c.title_render)}</span>
+      <span class="mono ${fresh?'fresh':''}">${fresh?'NEW FILINGS':''} ${c.filing_count} filed</span></div>`;
+  }).join('');
+  $('#track-items').querySelectorAll('[data-case]').forEach(el =>
+    el.addEventListener('click', () => openCase(el.dataset.case)));
 }
 
-async function loadFeed() {
+function filingRow(f, c){
+  return `<article class="filing">
+    <div class="casenum" data-case="${c?.id}"><small>CASE No.</small>${c?.case_number ?? '—'}</div>
+    <div>
+      <div class="ctitle" data-case="${c?.id}">${esc(c?.title_render ?? '')}</div>
+      <h3>${esc(f.headline)}</h3>
+      <p>${esc(f.summary)}</p>
+      <div class="meta">
+        ${f.subject ? `<span>filed against: <b>${esc(f.subject)}</b></span>` : ''}
+        <span>${esc(f.source_domain ?? '')}</span>
+        <span>${ago(f.created_at)}</span>
+        ${f.impact ? `<span class="impact">impact ${'▮'.repeat(f.impact)}${'▯'.repeat(5-f.impact)}</span>` : ''}
+        <a href="${esc(f.source_url)}" target="_blank" rel="noopener">source ↗</a>
+      </div>
+      ${c ? chits(c) : ''}
+    </div>
+  </article>`;
+}
+
+function chits(c){
+  const mine = MY_VOTES.get(c.id);
+  return `<div class="chits" data-case="${c.id}">
+    <button class="chit good ${mine==='good'?'on':''}" data-k="good">GOOD ${c.good_votes??0}</button>
+    <button class="chit evil ${mine==='evil'?'on':''}" data-k="evil">EVIL ${c.evil_votes??0}</button>
+    <button class="chit fake ${mine==='fake'?'on':''}" data-k="fake">FAKE ${c.fake_votes??0}</button>
+  </div>`;
+}
+
+function wireRows(root){
+  root.querySelectorAll('.casenum,.ctitle').forEach(el =>
+    el.addEventListener('click', () => el.dataset.case && openCase(el.dataset.case)));
+  root.querySelectorAll('.chits .chit').forEach(btn =>
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const caseId = btn.closest('.chits').dataset.case, kind = btn.dataset.k;
+      if(!USER) return;
+      if(MY_VOTES.get(caseId) === kind){
+        await sb.from('votes').delete().eq('user_id',USER.id).eq('case_id',caseId);
+        MY_VOTES.delete(caseId);
+      } else {
+        await sb.from('votes').upsert({ user_id: USER.id, case_id: caseId, kind });
+        MY_VOTES.set(caseId, kind);
+      }
+      loadFeed();
+    }));
+}
+
+async function loadFeed(){
+  const feed = $('#feed');
   const q = $('#q').value.trim();
-  let filings;
 
-  if (q) {
-    // Search via API
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/api?action=search`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', authorization: `Bearer ${ANON_KEY}`, apikey: ANON_KEY },
-      body: JSON.stringify({ q, limit: 40 })
-    }).then(r => r.json()).catch(() => ({ results: [] }));
-    filings = res.results || [];
-  } else {
-    // Browse filings
-    let query = sb.from('filings')
-      .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes, filing_count)')
-      .eq('status', 'live')
-      .limit(40);
-
-    if (SORT === 'newest') query = query.order('created_at', { ascending: false });
-    else if (SORT === 'evil') query = query.order('impact', { ascending: false });
-
-    const { data } = await query;
-    filings = (data || []).map(f => ({ ...f, cases: f.cases }));
+  if(q){
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/api?action=search`, {
+      method:'POST',
+      headers:{ 'content-type':'application/json', 'authorization':`Bearer ${ANON_KEY}`, 'apikey': ANON_KEY },
+      body: JSON.stringify({ q })
+    }).then(r=>r.json()).catch(()=>({results:[]}));
+    feed.innerHTML = (r.results?.length)
+      ? r.results.map(f => filingRow(f, f.cases)).join('')
+      : `<div class="empty">Nothing on the docket for "${esc(q)}". Try broader terms.</div>`;
+    wireRows(feed); return;
   }
 
-  renderFilingList(filings, q ? `SEARCH · ${esc(q)}` : `THE FEED · ${SORT.toUpperCase()}`);
-  $('#latency').textContent = `${filings.length} filings`;
-}
-
-async function loadCases() {
-  let query = sb.from('cases')
-    .select('*')
-    .eq('status', 'live')
-    .limit(60);
-
-  if (SORT === 'newest') query = query.order('last_filed_at', { ascending: false, nullsFirst: false });
-  else if (SORT === 'evil') query = query.order('evil_votes', { ascending: false });
-  else if (SORT === 'good') query = query.order('good_votes', { ascending: false });
-
-  const { data: cases } = await query;
-  (cases || []).forEach(c => CACHE.set(c.id, c));
-  renderCaseList(cases || [], `THE DOCKET · ${SORT.toUpperCase()}`);
-  $('#latency').textContent = `${(cases || []).length} cases`;
-}
-
-/* ─────────────────── Rendering Lists ─────────────────── */
-function renderCaseList(cases, label) {
-  const host = $('#results');
-  host.innerHTML = '';
-  const div = document.createElement('div');
-  div.className = 'divider';
-  div.innerHTML = `<span>${esc(label)}</span>`;
-  host.appendChild(div);
-
-  if (!cases.length) {
-    host.insertAdjacentHTML('beforeend', '<div class="empty">Nothing on the docket yet.</div>');
+  if(MODE === 'filings'){
+    const { data } = await sb.from('filings')
+      .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes)')
+      .eq('status','live').order('created_at',{ascending:false}).limit(40);
+    feed.innerHTML = (data?.length)
+      ? data.map(f => filingRow(f, f.cases)).join('')
+      : `<div class="empty">The docket is empty. The crawler files the first cases within the hour.</div>`;
+  } else {
+    const { data } = await sb.from('cases')
+      .select('id, case_number, title_render, filing_count, good_votes, evil_votes, fake_votes, last_filed_at')
+      .eq('status','live').order('last_filed_at',{ascending:false, nullsFirst:false}).limit(60);
+    feed.innerHTML = (data?.length)
+      ? data.map(c => `<div class="caserow" data-case="${c.id}">
+          <span class="num">No. ${c.case_number}</span>
+          <span class="t">${esc(c.title_render)}</span>
+          <span class="c">${c.filing_count} filed · ${c.evil_votes} evil / ${c.good_votes} good</span>
+        </div>`).join('')
+      : `<div class="empty">No cases yet.</div>`;
+    feed.querySelectorAll('.caserow').forEach(el =>
+      el.addEventListener('click', () => openCase(el.dataset.case)));
     return;
   }
-  for (const c of cases) host.appendChild(caseRow(c));
+  wireRows(feed);
 }
 
-function caseRow(c) {
-  const el = document.createElement('div');
-  el.className = 'hit';
-  el.innerHTML = `
-    <div class="toprule">
-      <span class="cnum">CASE #${esc(c.case_number)}</span>
-      <span class="stars">${stars(c.impact || 3)}</span>
-    </div>
-    <h3>${esc(c.title_render)}</h3>
-    <div class="meta">
-      <span class="fcount">${c.filing_count || 0} FILING${(c.filing_count || 0) === 1 ? '' : 'S'}</span>
-      ${isNew(c) ? '<span class="badge solid">NEW</span>' : ''}
-      <span class="votes"></span>
-    </div>`;
-  el.querySelector('.votes').appendChild(votePair(c, false));
-  el.onclick = () => { location.hash = '#case=' + c.case_number; };
-  return el;
-}
+async function openCase(caseId){
+  if(!caseId) return;
+  const panel = $('#dpanel');
+  panel.innerHTML = `<div class="empty">Pulling the case file…</div>`;
+  $('#drawer').classList.add('open');
 
-function renderFilingList(filings, label) {
-  const host = $('#results');
-  host.innerHTML = '';
-  const div = document.createElement('div');
-  div.className = 'divider';
-  div.innerHTML = `<span>${esc(label)}</span>`;
-  host.appendChild(div);
+  const [{ data: c }, { data: filings }, sim] = await Promise.all([
+    sb.from('cases').select('*').eq('id', caseId).single(),
+    sb.from('filings').select('headline, summary, subject, source_url, source_domain, created_at, impact')
+      .eq('case_id', caseId).eq('status','live').order('created_at',{ascending:false}).limit(30),
+    fetch(`${SUPABASE_URL}/functions/v1/api?action=similar`, {
+      method:'POST',
+      headers:{ 'content-type':'application/json', 'authorization':`Bearer ${ANON_KEY}`, 'apikey': ANON_KEY },
+      body: JSON.stringify({ case_id: caseId })
+    }).then(r=>r.json()).catch(()=>({results:[]})),
+  ]);
+  if(!c){ panel.innerHTML = `<div class="empty">Case not found.</div>`; return; }
 
-  if (!filings.length) {
-    host.insertAdjacentHTML('beforeend', '<div class="empty">No filings yet. File the first case.</div>');
-    return;
-  }
-  for (const f of filings) host.appendChild(feedFilingRow(f));
-}
-
-function feedFilingRow(f) {
-  const el = document.createElement('div');
-  el.className = 'hit filing';
-  const c = f.cases || {};
-  const timeAgo = f.created_at ? relTime(f.created_at) : '';
-  el.innerHTML = `
-    <div class="toprule">
-      <span class="domain">${esc(f.source_domain || '')}</span>
-      ${timeAgo ? `<span class="timeago">${timeAgo}</span>` : ''}
-    </div>
-    <h3 class="filing-headline">${esc(f.headline || f.summary || '')}</h3>
-    ${f.summary && f.headline ? `<p>${esc(f.summary)}</p>` : ''}
-    ${f.article_quote ? `<div class="quote">"${esc(f.article_quote)}"</div>` : ''}
-    <div class="meta">
-      ${c.case_number ? `<span class="caselink">CASE #${esc(c.case_number)} · ${esc(c.title_render || '')}</span>` : ''}
-    </div>`;
-
-  const headline = el.querySelector('.filing-headline');
-  if (headline && f.source_url) {
-    headline.style.cursor = 'pointer';
-    headline.onclick = e => { e.stopPropagation(); window.open(f.source_url, '_blank'); };
-  }
-  const clink = el.querySelector('.caselink');
-  if (clink && c.case_number) {
-    clink.onclick = e => { e.stopPropagation(); location.hash = '#case=' + c.case_number; };
-  }
-  return el;
-}
-
-/* ─────────────────── Voting ─────────────────── */
-function votePair(c, big) {
-  const wrap = document.createElement('span');
-  wrap.style.display = 'flex';
-  wrap.style.gap = '8px';
-  const mk = (cls, icon, count, val) => {
-    const b = document.createElement('button');
-    b.className = 'vbtn ' + cls + (MY_VOTES[c.id] === val ? ' on' : '');
-    b.innerHTML = icon + '<span>' + count + '</span>';
-    b.onclick = e => { e.stopPropagation(); castVote(c, val, wrap, big); };
-    return b;
-  };
-  wrap.appendChild(mk('halo', ICON_HALO, c.good_votes || 0, 1));
-  wrap.appendChild(mk('horn', ICON_HORN, c.evil_votes || 0, -1));
-  return wrap;
-}
-
-async function castVote(c, val, wrap, big) {
-  const next = MY_VOTES[c.id] === val ? 0 : val;
-  const prev = MY_VOTES[c.id] || 0;
-
-  // Optimistic update
-  if (prev === 1) c.good_votes--;
-  if (prev === -1) c.evil_votes--;
-  if (next === 1) c.good_votes++;
-  if (next === -1) c.evil_votes++;
-  MY_VOTES[c.id] = next;
-  persist();
-
-  const fresh = votePair(c, big);
-  wrap.replaceWith(fresh);
-
-  // Persist to DB
-  if (USER) {
-    const kind = next === 1 ? 'good' : next === -1 ? 'evil' : null;
-    if (kind) {
-      await sb.from('votes').upsert({ user_id: USER.id, case_id: c.id, kind });
+  const tracked = MY_TRACKS.has(caseId);
+  const shareUrl = `${location.origin}${location.pathname.replace(/\/$/,'')}?c=${c.case_number}`;
+  panel.innerHTML = `
+    <button class="close" aria-label="Close">CLOSE ✕</button>
+    <div class="mono" style="color:var(--stamp)">CASE No. ${c.case_number}</div>
+    <h2>${esc(c.title_render)}</h2>
+    <div class="mono">${c.filing_count} filing${c.filing_count===1?'':'s'} · opened ${c.first_filed_at ? ago(c.first_filed_at) : '—'}</div>
+    ${chits(c)}
+    <button class="trackbtn ${tracked?'on':''}" id="trk">${tracked ? '★ Tracking — untrack' : '☆ Track this case'}</button>
+    <button class="sharebtn" id="share">⛓ Share link</button>
+    <div class="sect">Filings</div>
+    ${(filings??[]).map(f => `<div class="dfiling">
+        <b>${esc(f.headline)}</b><br>${esc(f.summary)}
+        <div class="meta" style="margin-top:4px">
+          ${f.subject?`<span>${esc(f.subject)}</span>`:''}<span>${ago(f.created_at)}</span>
+          <a href="${esc(f.source_url)}" target="_blank" rel="noopener">source ↗</a>
+        </div></div>`).join('') || '<div class="empty">No live filings.</div>'}
+    <div class="sect">Nearby cases</div>
+    ${(sim.results??[]).map(s => `<div class="sim" data-case="${s.id}">No. ${s.case_number} — ${esc(s.title_render)} <span class="mono">(${Math.round(s.sim*100)}% similar)</span></div>`).join('') || '<div class="empty">No neighbors yet.</div>'}
+  `;
+  panel.querySelector('.close').addEventListener('click', () => $('#drawer').classList.remove('open'));
+  panel.querySelectorAll('.sim').forEach(el => el.addEventListener('click', () => openCase(el.dataset.case)));
+  wireRows(panel);
+  panel.querySelector('#trk').addEventListener('click', async () => {
+    if(!USER) return;
+    if(MY_TRACKS.has(caseId)){
+      await sb.from('tracks').delete().eq('user_id',USER.id).eq('case_id',caseId);
+      MY_TRACKS.delete(caseId);
     } else {
-      await sb.from('votes').delete().eq('user_id', USER.id).eq('case_id', c.id);
+      await sb.from('tracks').upsert({ user_id: USER.id, case_id: caseId });
+      MY_TRACKS.add(caseId);
     }
-  }
+    openCase(caseId); loadTrackBox();
+  });
+  panel.querySelector('#share').addEventListener('click', async (e) => {
+    const btn = e.target;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '⛓ Share link'; btn.classList.remove('copied'); }, 2000);
+    } catch { alert(shareUrl); }
+  });
 }
 
-/* ─────────────────── Case Page ─────────────────── */
-async function openCase(num) {
-  show('casepg');
-  const host = $('#casehost');
-  host.innerHTML = '<div class="empty">Pulling the docket...</div>';
+$('#drawer').addEventListener('click', (e) => { if(e.target.id==='drawer') $('#drawer').classList.remove('open'); });
+document.addEventListener('keydown', (e) => { if(e.key==='Escape') $('#drawer').classList.remove('open'); });
+$('#tab-filings').addEventListener('click', () => { MODE='filings'; $('#tab-filings').classList.add('on'); $('#tab-cases').classList.remove('on'); loadFeed(); });
+$('#tab-cases').addEventListener('click', () => { MODE='cases'; $('#tab-cases').classList.add('on'); $('#tab-filings').classList.remove('on'); loadFeed(); });
+let qt; $('#q').addEventListener('input', () => { clearTimeout(qt); qt=setTimeout(loadFeed, 350); });
 
-  const { data } = await sb.from('cases').select('*').eq('case_number', num).single();
-  if (!data) { host.innerHTML = '<div class="empty">No such case on the docket.</div>'; return; }
-
-  CACHE.set(data.id, data);
-  CURRENT_CASE = data;
-
-  const { data: filings } = await sb.from('filings')
-    .select('*')
-    .eq('case_id', data.id)
-    .eq('status', 'live')
-    .order('created_at', { ascending: false })
-    .limit(30);
-
-  renderCasePage(host, data, filings || []);
-}
-
-function renderCasePage(host, c, filings) {
-  host.innerHTML = '';
-
-  // Header
-  const head = document.createElement('div');
-  head.className = 'casehead';
-  head.innerHTML = `
-    <div class="cnum">CASE #${esc(c.case_number)} · ${stars(c.impact || 3)}</div>
-    <h2>${esc(c.title_render)}</h2>`;
-  host.appendChild(head);
-
-  // Big votes
-  const bv = document.createElement('div');
-  bv.className = 'bigvotes';
-  bv.appendChild(votePair(c, true));
-  host.appendChild(bv);
-
-  // Action buttons
-  const saved = !!SAVES[c.id];
-  const acts = document.createElement('div');
-  acts.className = 'actionrow';
-  acts.innerHTML = `
-    <button class="abtn" id="saveBtn">${saved ? '✓ In casebook' : '+ Save to casebook'}</button>
-    <button class="abtn" id="shareBtn">Share</button>`;
-  host.appendChild(acts);
-  acts.querySelector('#saveBtn').onclick = () => toggleSave(c, acts.querySelector('#saveBtn'));
-  acts.querySelector('#shareBtn').onclick = () => shareCase(c);
-
-  // Filings
-  const bd = document.createElement('div');
-  bd.className = 'divider';
-  bd.innerHTML = `<span>FILINGS · ${filings.length}</span>`;
-  host.appendChild(bd);
-
-  for (const f of filings) {
-    host.appendChild(filingRow(f));
-  }
-}
-
-function filingRow(f) {
-  const el = document.createElement('div');
-  el.className = 'frow';
-  el.innerHTML = `
-    <div class="top">
-      <span class="subj">${esc(f.subject || f.source_domain || 'Unknown')}</span>
-      <span class="date">${f.created_at ? new Date(f.created_at).toLocaleDateString() : ''}</span>
-    </div>
-    ${f.headline ? `<p style="color:var(--fg);font-weight:700">${esc(f.headline)}</p>` : ''}
-    ${f.summary ? `<p>${esc(f.summary)}</p>` : ''}
-    ${f.article_quote ? `<div class="quote" style="border-left:3px solid var(--accent);padding-left:10px;font-style:italic;margin:10px 0">"${esc(f.article_quote)}"</div>` : ''}
-    ${f.source_url ? `<a class="srcbtn" style="margin:0;font-size:9.5px;padding:4px 8px" href="${esc(f.source_url)}" target="_blank" rel="noopener">Source</a>` : ''}`;
-  return el;
-}
-
-/* ─────────────────── Save / Share ─────────────────── */
-async function toggleSave(c, btn) {
-  if (SAVES[c.id]) {
-    delete SAVES[c.id];
-    btn.textContent = '+ Save to casebook';
-    if (USER) await sb.from('tracks').delete().eq('user_id', USER.id).eq('case_id', c.id);
-  } else {
-    SAVES[c.id] = { last_seen: c.filing_count || 0 };
-    btn.textContent = '✓ In casebook';
-    if (USER) await sb.from('tracks').upsert({ user_id: USER.id, case_id: c.id });
-  }
-  persist();
-  renderBook();
-}
-
-async function shareCase(c) {
-  const url = SHARE_BASE + '?c=' + c.case_number;
-  const text = 'CASE #' + c.case_number + ': ' + c.title_render + ' · Report AI before it reports you.';
-  if (navigator.share) {
-    try { await navigator.share({ title: 'Case #' + c.case_number, text, url }); return; } catch {}
-  }
-  try { await navigator.clipboard.writeText(url); toast('Case link copied: ' + url); }
-  catch { toast(url); }
-}
-
-/* ─────────────────── Casebook ─────────────────── */
-function toggleBook() {
-  CB_OPEN = !CB_OPEN;
-  $('#cbstrip').classList.toggle('open', CB_OPEN);
-  $('#cbDetail').style.display = 'none';
-  if (CB_OPEN) renderBook();
-}
-
-function bookCount() {
-  return Object.keys(SAVES).length;
-}
-
-function renderBook() {
-  $('#cbCount').textContent = bookCount();
-
-  // Check for new filings
-  let hasNew = false;
-  for (const [id, s] of Object.entries(SAVES)) {
-    const c = CACHE.get(id);
-    if (c && (c.filing_count || 0) > (s.last_seen || 0)) { hasNew = true; break; }
-  }
-  $('#cbNewDot').innerHTML = hasNew ? '<span class="badge solid">NEW FILINGS</span>' : '';
-
-  if (!CB_OPEN) return;
-
-  const host = $('#cbList');
-  host.innerHTML = '<div class="cbsec">SAVED CASES</div>';
-
-  const savedIds = Object.keys(SAVES);
-  if (!savedIds.length) {
-    host.insertAdjacentHTML('beforeend', '<div class="empty">Save any case and it lives here. New filings light it up.</div>');
-  } else {
-    for (const id of savedIds) {
-      const c = CACHE.get(id);
-      if (!c) continue;
-      const fresh = (c.filing_count || 0) > ((SAVES[id] || {}).last_seen || 0);
-      const el = document.createElement('div');
-      el.className = 'cbrow';
-      el.innerHTML = `<span class="nm">#${esc(c.case_number)} ${esc(c.title_render)}</span>
-        ${fresh ? '<span class="badge solid">NEW</span>' : ''}`;
-      el.onclick = () => { location.hash = '#case=' + c.case_number; };
-      host.appendChild(el);
-    }
-  }
-}
-
-function exportCSV() {
-  const rows = [['case_number', 'title', 'my_vote', 'good', 'evil', 'filings', 'saved']];
-  for (const id of Object.keys(SAVES)) {
-    const c = CACHE.get(id);
-    if (!c) continue;
-    rows.push([
-      c.case_number, c.title_render,
-      MY_VOTES[c.id] === 1 ? 'good' : MY_VOTES[c.id] === -1 ? 'evil' : '',
-      c.good_votes || 0, c.evil_votes || 0, c.filing_count || 0,
-      SAVES[id] ? new Date().toISOString().slice(0, 10) : ''
-    ]);
-  }
-  const csv = rows.map(r => r.map(x => '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"').join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'casebook.csv';
-  a.click();
-  toast('Casebook exported.');
-}
-
-/* ─────────────────── Filing ─────────────────── */
-async function fileURL(explicit) {
-  const url = explicit || $('#q').value.trim();
-  if (!/^https?:\/\//i.test(url)) { toast('That is not a URL.'); return; }
-
-  toast('Filing... this may take a moment.');
-
-  // Add to prospects via crawler
-  try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=seed_urls`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-admin-key': localStorage.getItem('ucar_admin_key') || '' },
-      body: JSON.stringify({ urls: [url] })
-    }).then(r => r.json());
-
-    if (res.added) {
-      toast('URL queued for extraction. Check back in a few minutes.');
-    } else {
-      toast('Could not queue URL. May already exist.');
-    }
-  } catch (e) {
-    toast('Could not reach the registry.');
-  }
-}
-window.fileURL = fileURL;
-
-function openTestimony() {
-  openSheet(`<h4>FILE TESTIMONY</h4>
-    <div class="empty">No link? Tell the docket what you saw. Testimony is marked UNSOURCED until corroborated.</div>
-    <label>What happened</label>
-    <textarea id="tst-body" placeholder="Who deployed what, on whom, where..."></textarea>
-    <div class="row">
-      <button class="no" onclick="closeSheet()">Cancel</button>
-      <button class="go" onclick="submitTestimony()">File it</button>
-    </div>`);
-}
-window.openTestimony = openTestimony;
-
-async function submitTestimony() {
-  const text = ($('#tst-body')?.value || '').trim();
-  if (text.length < 60) { toast('Give the docket at least 60 characters.'); return; }
-  toast('Testimony feature coming soon. For now, paste a source URL.');
-  closeSheet();
-}
-window.submitTestimony = submitTestimony;
-
-/* ─────────────────── Search ─────────────────── */
-let searchTimer = null;
-$('#q').addEventListener('input', e => {
-  const q = e.target.value.trim();
-  const isUrl = /^https?:\/\/\S+$/i.test(q);
-  $('#fileBtn').style.display = isUrl ? '' : 'none';
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => loadView(), 300);
-});
-
-/* ─────────────────── Sheet ─────────────────── */
-function openSheet(html) {
-  $('#sheet').innerHTML = html;
-  $('#sheet').classList.add('open');
-  $('#sheetback').classList.add('open');
-}
-window.openSheet = openSheet;
-
-function closeSheet() {
-  $('#sheet').classList.remove('open');
-  $('#sheetback').classList.remove('open');
-}
-window.closeSheet = closeSheet;
-
-/* ─────────────────── Admin ─────────────────── */
-const adminKey = () => $('#ak')?.value?.trim() || localStorage.getItem('ucar_admin_key') || '';
-
-async function saveEpisode() {
-  const title = $('#ep-title')?.value?.trim();
-  const blurb = $('#ep-desc')?.value?.trim();
-  const video_url = $('#ep-video')?.value?.trim();
-  if (!title) { toast('Title required.'); return; }
-
-  try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/api?action=set_show`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-admin-key': adminKey() },
-      body: JSON.stringify({ title, blurb, video_url })
-    }).then(r => r.json());
-    toast(res.ok ? 'Episode published.' : (res.error || 'Failed.'));
-    loadEpisode();
-  } catch { toast('Failed.'); }
-}
-window.saveEpisode = saveEpisode;
-
-async function loadVocabPending() {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/api?action=vocab_pending`, {
-      method: 'POST',
-      headers: { 'x-admin-key': adminKey() }
-    }).then(r => r.json());
-
-    const host = $('#vocab-pending');
-    host.innerHTML = '';
-    for (const t of (res.pending || [])) {
-      const el = document.createElement('div');
-      el.className = 'frow';
-      el.innerHTML = `<span><b>${esc(t.kind)}</b>: ${esc(t.term)}</span>
-        <button class="mini" data-id="${t.id}" data-action="approve">Approve</button>`;
-      el.querySelector('button').onclick = async () => {
-        await fetch(`${SUPABASE_URL}/functions/v1/api?action=vocab_approve`, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json', 'x-admin-key': adminKey() },
-          body: JSON.stringify({ term_id: t.id })
-        });
-        toast('Approved.');
-        loadVocabPending();
-      };
-      host.appendChild(el);
-    }
-    if (!(res.pending || []).length) host.innerHTML = '<div class="empty">No pending terms.</div>';
-  } catch { toast('Failed.'); }
-}
-window.loadVocabPending = loadVocabPending;
-
-async function crawlerStatus() {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=status`, {
-      method: 'POST',
-      headers: { 'x-admin-key': adminKey() }
-    }).then(r => r.json());
-    $('#crawl-status').textContent = JSON.stringify(res, null, 2);
-  } catch { toast('Failed.'); }
-}
-window.crawlerStatus = crawlerStatus;
-
-async function crawlerRun() {
-  toast('Crawler running...');
-  try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=run`, {
-      method: 'POST',
-      headers: { 'x-admin-key': adminKey() }
-    }).then(r => r.json());
-    $('#crawl-status').textContent = JSON.stringify(res, null, 2);
-    toast('Crawler complete.');
-  } catch { toast('Failed.'); }
-}
-window.crawlerRun = crawlerRun;
-
-async function extractRun() {
-  toast('Extracting...');
-  try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/extract?action=run`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-admin-key': adminKey() },
-      body: JSON.stringify({ max: 5 })
-    }).then(r => r.json());
-    $('#crawl-status').textContent = JSON.stringify(res, null, 2);
-    toast('Extraction complete.');
-  } catch { toast('Failed.'); }
-}
-window.extractRun = extractRun;
-
-/* ─────────────────── Routing ─────────────────── */
-function show(id) {
-  $$('.screen').forEach(s => s.classList.remove('active'));
-  $(`#${id}`).classList.add('active');
-  window.scrollTo(0, 0);
-}
-
-function route() {
-  const h = location.hash;
-  const m = h.match(/^#case=(\d+)/);
-  if (m) { openCase(m[1]); return; }
-  if (h === '#admin') { show('admin'); return; }
-
-  // Check for ?c= query param (share links)
-  const params = new URLSearchParams(location.search);
-  if (params.has('c')) { openCase(params.get('c')); return; }
-
-  show('home');
-}
-
-window.addEventListener('hashchange', route);
-window.toggleBook = toggleBook;
-window.exportCSV = exportCSV;
-
-// Boot
 boot();
 </script>
 </body>
