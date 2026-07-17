@@ -81,6 +81,20 @@ main{max-width:920px;margin:0 auto;padding:16px}
 #panelOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:999;display:none}
 #panelOverlay.open{display:block}
 
+/* Stats bar */
+#statsBar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap}
+#topCompanies{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.company-chip{background:var(--card);border:2px solid var(--ink);padding:6px 12px;font-family:'Oswald',sans-serif;
+  font-size:12px;letter-spacing:.05em;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+.company-chip:hover{background:var(--ink);color:var(--paper)}
+.company-chip.more{background:var(--stamp);color:#fff;border-color:var(--stamp);box-shadow:2px 2px 0 var(--stamp)}
+.company-chip.more:hover{background:#a01a16}
+#statCounts{display:flex;gap:10px}
+#statCounts.hidden{display:none}
+.stat-box{background:var(--card);border:2px solid var(--ink);padding:8px 14px;text-align:center;box-shadow:2px 2px 0 var(--ink)}
+.stat-num{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;display:block}
+.stat-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--olive);text-transform:uppercase}
+
 /* Filter/Sort bar */
 #filterBar{margin-bottom:12px}
 #tagsBar{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center}
@@ -305,6 +319,14 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 </div>
 
 <main>
+  <div id="statsBar">
+    <div id="topCompanies"></div>
+    <div id="statCounts">
+      <div class="stat-box" id="statToday"><span class="stat-num">0</span><span class="stat-label">Today</span></div>
+      <div class="stat-box" id="statWeek"><span class="stat-num">0</span><span class="stat-label">This Week</span></div>
+    </div>
+  </div>
+
   <div id="filterBar">
     <div id="tagsBar"></div>
     <div id="sortBar">
@@ -585,8 +607,72 @@ async function boot(){
       stored.forEach(id => MY_TRACKS.add(id));
     } catch(e){}
   }
+
+  loadStats();
   loadTags();
   loadFeed();
+}
+
+// Stats bar - top companies + today/week counts
+let STATS_EXPANDED = false;
+async function loadStats(){
+  // Get filing counts
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const weekStart = new Date(now - 7*24*60*60*1000).toISOString();
+
+  const [todayRes, weekRes, subjectsRes] = await Promise.all([
+    sb.from('filings').select('id', {count:'exact', head:true}).eq('status','live').gte('created_at', todayStart),
+    sb.from('filings').select('id', {count:'exact', head:true}).eq('status','live').gte('created_at', weekStart),
+    sb.from('filings').select('subject').eq('status','live').not('subject','is',null)
+  ]);
+
+  const todayCount = todayRes.count || 0;
+  const weekCount = weekRes.count || 0;
+
+  // Count subjects (companies)
+  const subjectCounts = {};
+  (subjectsRes.data||[]).forEach(f => { if(f.subject) subjectCounts[f.subject] = (subjectCounts[f.subject]||0)+1; });
+  const topCompanies = Object.entries(subjectCounts).sort((a,b)=>b[1]-a[1]);
+
+  renderStats(topCompanies, todayCount, weekCount);
+}
+
+function renderStats(topCompanies, todayCount, weekCount){
+  const container = $('#topCompanies');
+  const counts = $('#statCounts');
+
+  if(STATS_EXPANDED){
+    // Show all companies, hide counts
+    counts.classList.add('hidden');
+    container.innerHTML = topCompanies.map(([name]) =>
+      `<button class="company-chip" data-company="${esc(name)}">${esc(name)}</button>`
+    ).join('') + `<button class="company-chip more" id="collapseCompanies">− Less</button>`;
+
+    container.querySelectorAll('.company-chip[data-company]').forEach(el => {
+      el.onclick = () => { ACTIVE_TAG = el.dataset.company; renderTags(); loadFeed(); };
+    });
+    $('#collapseCompanies').onclick = () => { STATS_EXPANDED = false; renderStats(topCompanies, todayCount, weekCount); };
+  } else {
+    // Show top 2 + more button, show counts
+    counts.classList.remove('hidden');
+    const shown = topCompanies.slice(0,2);
+    const hiddenCount = topCompanies.length - 2;
+
+    container.innerHTML = shown.map(([name]) =>
+      `<button class="company-chip" data-company="${esc(name)}">${esc(name)}</button>`
+    ).join('');
+    if(hiddenCount > 0) container.innerHTML += `<button class="company-chip more" id="expandCompanies">+${hiddenCount}</button>`;
+
+    container.querySelectorAll('.company-chip[data-company]').forEach(el => {
+      el.onclick = () => { ACTIVE_TAG = el.dataset.company; renderTags(); loadFeed(); };
+    });
+    if($('#expandCompanies')) $('#expandCompanies').onclick = () => { STATS_EXPANDED = true; renderStats(topCompanies, todayCount, weekCount); };
+  }
+
+  // Update counts
+  $('#statToday .stat-num').textContent = todayCount;
+  $('#statWeek .stat-num').textContent = weekCount;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
