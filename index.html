@@ -207,13 +207,20 @@ main{max-width:920px;margin:0 auto;padding:16px}
   font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.08em;white-space:nowrap}
 .comment-submit:hover{background:var(--stamp)}
 .comment-submit:disabled{opacity:.5;cursor:not-allowed}
-.comment{border-bottom:1px solid var(--line);padding:12px 0}
-.comment:last-child{border-bottom:none}
-.comment-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.comment-meta .mono{color:var(--olive)}
-.comment-delete{background:none;border:none;color:var(--stamp);cursor:pointer;font-size:16px;padding:2px 6px}
-.comment-delete:hover{background:var(--stamp);color:#fff}
-.comment-body{font-size:14px;line-height:1.5}
+.comment{border:1px solid var(--line);padding:12px;margin-bottom:10px;background:var(--card)}
+.comment-body{font-size:14px;line-height:1.5;margin-bottom:8px}
+.comment-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.cm-btn{background:none;border:1px solid var(--line);padding:3px 8px;cursor:pointer;
+  font-family:'IBM Plex Mono',monospace;font-size:10px;display:flex;align-items:center;gap:3px}
+.cm-btn:hover{border-color:var(--ink)}
+.cm-btn.good{color:var(--good);border-color:var(--good)}
+.cm-btn.good:hover,.cm-btn.good.on{background:var(--good);color:#fff}
+.cm-btn.evil{color:var(--evil);border-color:var(--evil)}
+.cm-btn.evil:hover,.cm-btn.evil.on{background:var(--evil);color:#fff}
+.cm-btn.fake{color:var(--olive);border-color:var(--olive)}
+.cm-btn.fake:hover,.cm-btn.fake.on{background:var(--olive);color:#fff}
+.cm-btn.delete{color:var(--stamp);border-color:var(--stamp)}
+.cm-btn.delete:hover{background:var(--stamp);color:#fff}
 
 /* Submit correction modal */
 #submitModal, #aboutModal{display:none;position:fixed;inset:0;background:rgba(20,18,16,.8);z-index:25;align-items:center;justify-content:center}
@@ -903,24 +910,56 @@ async function loadComments(caseId, panel){
   const { data: comments } = await sb.from('comments')
     .select('id, body, created_at, user_id')
     .eq('case_id', caseId)
+    .eq('status', 'live')
     .order('created_at', {ascending: false})
     .limit(50);
+
+  // Get user's comment votes
+  let myCommentVotes = new Map();
+  if(USER){
+    const { data: cvotes } = await sb.from('comment_votes').select('comment_id, kind').eq('user_id', USER.id);
+    (cvotes||[]).forEach(v => myCommentVotes.set(v.comment_id, v.kind));
+  }
 
   if(!comments?.length){
     list.innerHTML = '<div class="empty">No comments yet. Be the first!</div>';
   } else {
-    list.innerHTML = comments.map(cm => `
+    list.innerHTML = comments.map(cm => {
+      const cvote = myCommentVotes.get(cm.id);
+      return `
       <div class="comment" data-id="${cm.id}" data-user="${cm.user_id}">
-        <div class="comment-meta">
-          <span class="mono">${ago(cm.created_at)} ago</span>
-          ${cm.user_id === USER?.id ? '<button class="comment-delete">×</button>' : ''}
-        </div>
         <div class="comment-body">${esc(cm.body)}</div>
+        <div class="comment-actions">
+          <button class="cm-btn good ${cvote==='good'?'on':''}" data-cvote="good">👍 ${cm.good_votes||0}</button>
+          <button class="cm-btn evil ${cvote==='evil'?'on':''}" data-cvote="evil">👎 ${cm.evil_votes||0}</button>
+          <button class="cm-btn fake ${cvote==='fake'?'on':''}" data-cvote="fake">🚫 ${cm.fake_votes||0}</button>
+          <span class="mono" style="margin-left:auto">${ago(cm.created_at)} ago</span>
+          ${cm.user_id === USER?.id ? '<button class="cm-btn delete">×</button>' : ''}
+        </div>
       </div>
-    `).join('');
+    `}).join('');
+
+    // Wire comment vote buttons
+    list.querySelectorAll('[data-cvote]').forEach(btn => {
+      btn.onclick = async () => {
+        if(!USER) return;
+        const commentId = btn.closest('.comment').dataset.id;
+        const kind = btn.dataset.cvote;
+        const current = myCommentVotes.get(commentId);
+
+        if(current === kind){
+          await sb.from('comment_votes').delete().eq('user_id', USER.id).eq('comment_id', commentId);
+        } else if(current){
+          await sb.from('comment_votes').update({ kind }).eq('user_id', USER.id).eq('comment_id', commentId);
+        } else {
+          await sb.from('comment_votes').insert({ user_id: USER.id, comment_id: commentId, kind });
+        }
+        loadComments(caseId, panel);
+      };
+    });
 
     // Wire delete buttons
-    list.querySelectorAll('.comment-delete').forEach(btn => {
+    list.querySelectorAll('.cm-btn.delete').forEach(btn => {
       btn.onclick = async () => {
         const commentId = btn.closest('.comment').dataset.id;
         await sb.from('comments').delete().eq('id', commentId);
