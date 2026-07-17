@@ -160,7 +160,10 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
     <h1>UCAR<span>.</span></h1>
     <div class="tag">USE CASE ARMS RACE · a public docket of AI deployments</div>
   </div>
-  <button id="themeToggle">☀ Light</button>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button id="themeToggle">☀ Light</button>
+    <button id="adminBtn" style="display:none;background:none;border:2px solid var(--stamp);color:var(--stamp);padding:6px 14px;cursor:pointer;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.08em">ADMIN</button>
+  </div>
 </header>
 
 <main>
@@ -203,6 +206,48 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 <div id="drawer" role="dialog" aria-modal="true">
   <div id="dpanel"></div>
 </div>
+
+<!-- Admin Panel -->
+<div id="adminPanel" style="display:none;position:fixed;inset:0;background:rgba(20,18,16,.8);z-index:20;overflow-y:auto">
+  <div style="max-width:800px;margin:40px auto;background:var(--paper);border:3px solid var(--ink);padding:24px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="font-family:'Oswald',sans-serif;font-size:22px">ADMIN PANEL</h2>
+      <button id="closeAdmin" style="background:none;border:2px solid var(--ink);padding:6px 12px;cursor:pointer;font-family:'IBM Plex Mono',monospace">CLOSE ✕</button>
+    </div>
+
+    <div style="margin-bottom:24px">
+      <label style="font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.1em">ADMIN KEY</label>
+      <input id="adminKey" type="password" style="width:100%;padding:10px;margin-top:6px;border:2px solid var(--ink);background:var(--card);font-family:'IBM Plex Mono',monospace" placeholder="Enter admin key...">
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+      <button class="admin-action" data-action="crawl">🕷 Run Crawler</button>
+      <button class="admin-action" data-action="extract">⚙ Run Extraction</button>
+      <button class="admin-action" data-action="embed">📐 Embed Vocab</button>
+      <button class="admin-action" data-action="status">📊 Pipeline Status</button>
+    </div>
+
+    <div id="adminStatus" style="font-family:'IBM Plex Mono',monospace;font-size:13px;padding:12px;background:var(--card);border:1px solid var(--line);margin-bottom:24px;min-height:60px"></div>
+
+    <h3 style="font-family:'Oswald',sans-serif;font-size:16px;margin-bottom:12px;border-bottom:2px solid var(--ink);padding-bottom:6px">PENDING VOCABULARY</h3>
+    <div id="pendingVocab" style="font-family:'IBM Plex Mono',monospace;font-size:13px"></div>
+  </div>
+</div>
+
+<style>
+.admin-action{background:none;border:2px solid var(--ink);color:var(--ink);padding:12px 16px;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.admin-action:hover{background:var(--ink);color:var(--paper)}
+.pending-term{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.pending-term .info{flex:1}
+.pending-term .kind{font-size:10px;color:var(--stamp);text-transform:uppercase;letter-spacing:.1em}
+.pending-term .term{font-size:14px;margin-top:2px}
+.pending-term .actions{display:flex;gap:6px}
+.pending-term button{background:none;border:1.5px solid var(--ink);padding:4px 10px;cursor:pointer;font-size:11px}
+.pending-term button:hover{background:var(--ink);color:var(--paper)}
+.pending-term button.approve{border-color:var(--good);color:var(--good)}
+.pending-term button.approve:hover{background:var(--good);color:#fff}
+</style>
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -636,10 +681,134 @@ async function openCase(caseId){
 }
 
 $('#drawer').addEventListener('click', (e) => { if(e.target.id==='drawer') $('#drawer').classList.remove('open'); });
-document.addEventListener('keydown', (e) => { if(e.key==='Escape') $('#drawer').classList.remove('open'); });
+document.addEventListener('keydown', (e) => { if(e.key==='Escape'){ $('#drawer').classList.remove('open'); $('#adminPanel').style.display='none'; }});
 $('#tab-filings').addEventListener('click', () => { MODE='filings'; $('#tab-filings').classList.add('on'); $('#tab-cases').classList.remove('on'); loadFeed(); });
 $('#tab-cases').addEventListener('click', () => { MODE='cases'; $('#tab-cases').classList.add('on'); $('#tab-filings').classList.remove('on'); loadFeed(); });
 let qt; $('#q').addEventListener('input', () => { clearTimeout(qt); qt=setTimeout(loadFeed, 350); });
+
+// ── ADMIN PANEL ────────────────────────────────────────────────────────────
+let ADMIN_KEY = localStorage.getItem('ucar-admin-key') || '';
+
+// Show admin button if key is stored or on ?admin
+if(ADMIN_KEY || location.search.includes('admin')){
+  $('#adminBtn').style.display = 'block';
+}
+
+$('#adminBtn').addEventListener('click', () => {
+  $('#adminPanel').style.display = 'block';
+  $('#adminKey').value = ADMIN_KEY;
+  if(ADMIN_KEY) loadPendingVocab();
+});
+
+$('#closeAdmin').addEventListener('click', () => {
+  $('#adminPanel').style.display = 'none';
+});
+
+$('#adminKey').addEventListener('change', (e) => {
+  ADMIN_KEY = e.target.value;
+  localStorage.setItem('ucar-admin-key', ADMIN_KEY);
+  loadPendingVocab();
+});
+
+document.querySelectorAll('.admin-action').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const action = btn.dataset.action;
+    const status = $('#adminStatus');
+    status.textContent = 'Running...';
+
+    try {
+      if(action === 'crawl'){
+        const r = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=poll`, {
+          method: 'POST',
+          headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
+          body: '{}'
+        }).then(r => r.json());
+        status.innerHTML = `<b>Crawler:</b> ${r.sources_polled ?? 0} sources polled, ${r.new_prospects ?? 0} new prospects`;
+      }
+      else if(action === 'extract'){
+        const r = await fetch(`${SUPABASE_URL}/functions/v1/extract?action=run`, {
+          method: 'POST',
+          headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
+          body: '{"max":5}'
+        }).then(r => r.json());
+        status.innerHTML = `<b>Extraction:</b> ${r.processed ?? 0} processed<br>${(r.results||[]).map(x => `• ${x.result}: ${x.case_title || x.reason || x.url}`).join('<br>')}`;
+      }
+      else if(action === 'embed'){
+        const r = await fetch(`${SUPABASE_URL}/functions/v1/extract?action=embed_vocab`, {
+          method: 'POST',
+          headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
+          body: '{}'
+        }).then(r => r.json());
+        status.innerHTML = `<b>Embed vocab:</b> ${r.embedded ?? 0} embedded, ${r.remaining ?? 0} remaining`;
+      }
+      else if(action === 'status'){
+        const r = await fetch(`${SUPABASE_URL}/functions/v1/extract?action=status`, {
+          method: 'POST',
+          headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
+          body: '{}'
+        }).then(r => r.json());
+        status.innerHTML = `<b>Pipeline status:</b><br>${Object.entries(r.queue||{}).map(([k,v])=>`• ${k}: ${v}`).join('<br>')}`;
+      }
+    } catch(e) {
+      status.textContent = 'Error: ' + e.message;
+    }
+  });
+});
+
+async function loadPendingVocab(){
+  const container = $('#pendingVocab');
+  if(!ADMIN_KEY){ container.innerHTML = '<div class="empty">Enter admin key to see pending vocab</div>'; return; }
+
+  try {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/api?action=vocab_pending`, {
+      method: 'POST',
+      headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
+      body: '{}'
+    }).then(r => r.json());
+
+    if(r.error){ container.innerHTML = `<div class="empty">Error: ${r.error}</div>`; return; }
+    if(!r.pending?.length){ container.innerHTML = '<div class="empty">No pending terms ✓</div>'; return; }
+
+    container.innerHTML = r.pending.map(t => `
+      <div class="pending-term" data-id="${t.id}">
+        <div class="info">
+          <div class="kind">${esc(t.kind)}</div>
+          <div class="term">${esc(t.term)}</div>
+        </div>
+        <div class="actions">
+          <button class="approve" data-action="approve">✓ Approve</button>
+          <button data-action="reject">✕ Reject</button>
+        </div>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('.pending-term button').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const termId = btn.closest('.pending-term').dataset.id;
+        const action = btn.dataset.action;
+
+        if(action === 'approve'){
+          await fetch(`${SUPABASE_URL}/functions/v1/api?action=vocab_approve`, {
+            method: 'POST',
+            headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
+            body: JSON.stringify({ term_id: termId })
+          });
+        }
+        // For reject, we'd need a vocab_reject endpoint - for now just remove from UI
+        btn.closest('.pending-term').remove();
+
+        // Release any cases waiting on vocab
+        await fetch(`${SUPABASE_URL}/functions/v1/api?action=vocab_release`, {
+          method: 'POST',
+          headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
+          body: '{}'
+        });
+      });
+    });
+  } catch(e) {
+    container.innerHTML = `<div class="empty">Error loading: ${e.message}</div>`;
+  }
+}
 
 boot();
 </script>
