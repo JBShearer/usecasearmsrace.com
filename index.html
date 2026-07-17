@@ -41,21 +41,53 @@ a{color:inherit}
 .mono{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.02em}
 .disp{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em}
 
-header{border-bottom:3px solid var(--ink);padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+header{border-bottom:3px solid var(--ink);padding:14px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
   justify-content:space-between}
-.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-header h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:26px;letter-spacing:.04em}
+.brand{display:flex;flex-direction:column;gap:2px}
+header h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;white-space:nowrap}
+@media(min-width:600px){header h1{font-size:26px}}
 header h1 span{color:var(--stamp)}
-header .tag{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive)}
-.hdr-btns{display:flex;gap:8px}
-.hdr-btn{background:none;border:2px solid var(--ink);color:var(--ink);padding:6px 14px;cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+header .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive);line-height:1.3}
+header .tag .line2{display:block}
+@media(min-width:480px){header .tag .line2{display:inline}}
+.hdr-btns{display:flex;gap:6px;flex-shrink:0}
+.hdr-btn{background:none;border:2px solid var(--ink);color:var(--ink);padding:5px 10px;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+@media(min-width:600px){.hdr-btn{padding:6px 14px;font-size:12px}}
 .hdr-btn:hover{background:var(--ink);color:var(--paper)}
 .hdr-btn.admin{border-color:var(--stamp);color:var(--stamp)}
-main{max-width:920px;margin:0 auto;padding:20px}
+main{max-width:920px;margin:0 auto;padding:16px}
+@media(min-width:600px){main{padding:20px}}
+
+/* My Cases panel */
+#myCasesPanel{position:fixed;top:0;right:-320px;width:300px;max-width:85vw;height:100vh;background:var(--card);
+  border-left:3px solid var(--ink);z-index:1000;transition:right .25s ease;overflow-y:auto;padding:16px}
+#myCasesPanel.open{right:0}
+#myCasesPanel h2{font-family:'Oswald',sans-serif;font-size:18px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+#myCasesPanel .close-btn{background:none;border:none;font-size:24px;cursor:pointer;color:var(--ink)}
+#myCasesPanel .share-box{background:var(--paper);border:2px dashed var(--line);padding:12px;margin-bottom:16px;text-align:center}
+#myCasesPanel .share-box p{font-size:12px;color:var(--olive);margin-bottom:8px}
+#myCasesPanel .share-btn{background:var(--stamp);color:#fff;border:none;padding:8px 16px;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.05em}
+#myCasesPanel .my-case{padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer}
+#myCasesPanel .my-case:hover{background:var(--paper)}
+#myCasesPanel .my-case .num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--stamp)}
+#myCasesPanel .my-case .title{font-size:13px;margin-top:2px}
+#panelOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:999;display:none}
+#panelOverlay.open{display:block}
+
+/* Tags bar */
+#tagsBar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.tag-chip{background:var(--card);border:1.5px solid var(--line);padding:4px 10px;font-family:'IBM Plex Mono',monospace;
+  font-size:11px;cursor:pointer;white-space:nowrap}
+.tag-chip:hover,.tag-chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tag-chip.subject{border-color:var(--stamp);color:var(--stamp)}
+.tag-chip.subject:hover,.tag-chip.subject.on{background:var(--stamp);color:#fff}
+#moreTags{background:none;border:1.5px dashed var(--line);padding:4px 8px;font-size:11px;cursor:pointer;color:var(--olive)}
+#moreTags:hover{border-color:var(--ink);color:var(--ink)}
 
 /* controls */
-#controls{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+#controls{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
 #q{flex:1;min-width:220px;border:2px solid var(--ink);background:var(--card);color:var(--ink);padding:10px 12px;
   font-family:'IBM Plex Mono',monospace;font-size:14px}
 #q:focus{outline:3px solid var(--stamp);outline-offset:1px}
@@ -180,18 +212,58 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 <header>
   <div class="brand">
     <h1>USE CASE ARMS RACE<span> →</span></h1>
-    <div class="tag">Building the case for AI. Report it before it reports you.</div>
+    <div class="tag">Building the case for good AI.<span class="line2"> Reporting bad AI before it reports you.</span></div>
   </div>
   <div class="hdr-btns">
-    <button class="hdr-btn" id="themeToggle">☀ Light</button>
+    <button class="hdr-btn" id="myCasesBtn">☆ My Cases</button>
+    <button class="hdr-btn" id="aboutBtn">About</button>
+    <button class="hdr-btn" id="themeToggle">☀</button>
     <button class="hdr-btn admin" id="adminBtn" style="display:none">ADMIN</button>
   </div>
 </header>
 
+<!-- My Cases slide-out panel -->
+<div id="panelOverlay"></div>
+<div id="myCasesPanel">
+  <h2>MY CASE FILE <button class="close-btn" id="closeMyCases">×</button></h2>
+  <div class="share-box">
+    <p>Share your case file to another device or user:</p>
+    <button class="share-btn" id="shareCaseFile">⛓ Generate Share Link</button>
+    <div id="shareLink" style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:10px;word-break:break-all"></div>
+  </div>
+  <div id="myCasesList"><p style="color:var(--olive);font-size:12px">Track cases to build your file.</p></div>
+</div>
+
+<!-- About modal -->
+<div id="aboutModal" class="modal">
+  <div class="submit-box" style="max-width:500px">
+    <h3>ABOUT USE CASE ARMS RACE</h3>
+    <p style="font-size:14px;line-height:1.6;margin-bottom:12px">
+      <strong>The AI Arms Race is here.</strong> Every week, new AI systems are deployed to surveil, score, manipulate, and decide.
+      This is the public docket—tracking what AI does to people, before it's normalized.
+    </p>
+    <p style="font-size:14px;line-height:1.6;margin-bottom:12px">
+      <strong>Cases</strong> = VERB + OBJECT + INSTRUMENT<br>
+      <em>"SURVEIL WORKERS · WITH EMOTION RECOGNITION"</em>
+    </p>
+    <p style="font-size:14px;line-height:1.6;margin-bottom:12px">
+      <strong>Articles</strong> are news events filed as evidence. Vote good, evil, or fake. Track cases you care about.
+      Submit corrections to improve the docket.
+    </p>
+    <p style="font-size:14px;line-height:1.6;margin-bottom:16px">
+      <strong>Your case file is anonymous.</strong> Share it across devices without logging in.
+      Report it before it reports you.
+    </p>
+    <button class="primary" id="closeAbout">GOT IT</button>
+  </div>
+</div>
+
 <main>
+  <div id="tagsBar"></div>
+
   <div id="controls">
-    <input id="q" type="search" placeholder="search: facial recognition, students, OpenAI…" aria-label="Search">
-    <button class="tab on" id="tab-articles">New Articles</button>
+    <input id="q" type="search" placeholder="search cases…" aria-label="Search">
+    <button class="tab on" id="tab-articles">Articles</button>
     <button class="tab" id="tab-cases">Cases</button>
   </div>
 
@@ -199,8 +271,7 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 </main>
 
 <footer>
-  Cases = VERB + OBJECT + INSTRUMENT. Articles are news events filed as evidence.
-  Vote good, evil, or fake. Submit corrections to improve the docket.
+  Use Case Arms Race · Building the case for good AI
 </footer>
 
 <div id="drawer" role="dialog" aria-modal="true">
@@ -255,6 +326,7 @@ const sb = createClient(SUPABASE_URL, ANON_KEY);
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 let USER = null, MODE = 'articles', MY_VOTES = new Map(), MY_TRACKS = new Set();
+let ALL_CASES = [], TOP_SUBJECTS = [], ACTIVE_TAG = null;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ago = d => { const s=(Date.now()-new Date(d))/1e3;
@@ -265,26 +337,120 @@ const fmtDate = d => new Date(d).toLocaleDateString('en-US', {month:'short', day
 function setTheme(t){
   document.body.dataset.theme = t;
   localStorage.setItem('ucar-theme', t);
-  $('#themeToggle').textContent = t === 'dark' ? '☾ Dark' : '☀ Light';
+  $('#themeToggle').textContent = t === 'dark' ? '☾' : '☀';
 }
 $('#themeToggle').onclick = () => setTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark');
 setTheme(localStorage.getItem('ucar-theme') || 'light');
 
+// My Cases Panel
+$('#myCasesBtn').onclick = () => { $('#myCasesPanel').classList.add('open'); $('#panelOverlay').classList.add('open'); updateMyCasesList(); };
+$('#closeMyCases').onclick = () => { $('#myCasesPanel').classList.remove('open'); $('#panelOverlay').classList.remove('open'); };
+$('#panelOverlay').onclick = () => { $('#myCasesPanel').classList.remove('open'); $('#panelOverlay').classList.remove('open'); };
+
+function updateMyCasesList(){
+  const list = $('#myCasesList');
+  if(MY_TRACKS.size === 0){
+    list.innerHTML = '<p style="color:var(--olive);font-size:12px">Track cases to build your file.</p>';
+    return;
+  }
+  const tracked = ALL_CASES.filter(c => MY_TRACKS.has(c.id));
+  list.innerHTML = tracked.map(c => `
+    <div class="my-case" data-case="${c.id}">
+      <div class="num">CASE #${c.case_number}</div>
+      <div class="title">${esc(c.title_render)}</div>
+    </div>
+  `).join('') || '<p style="color:var(--olive);font-size:12px">Loading...</p>';
+  list.querySelectorAll('.my-case').forEach(el => el.onclick = () => {
+    $('#myCasesPanel').classList.remove('open');
+    $('#panelOverlay').classList.remove('open');
+    openCase(el.dataset.case);
+  });
+}
+
+// Share case file
+$('#shareCaseFile').onclick = () => {
+  const ids = [...MY_TRACKS];
+  if(ids.length === 0){ $('#shareLink').textContent = 'Track some cases first!'; return; }
+  const code = btoa(JSON.stringify(ids)).replace(/=/g,'');
+  const url = `${location.origin}?import=${code}`;
+  navigator.clipboard.writeText(url).then(() => {
+    $('#shareLink').innerHTML = `<span style="color:var(--good)">✓ Link copied!</span><br>${url}`;
+  }).catch(() => {
+    $('#shareLink').textContent = url;
+  });
+};
+
+// Import shared case file
+const importParam = new URLSearchParams(location.search).get('import');
+if(importParam){
+  try {
+    const ids = JSON.parse(atob(importParam));
+    if(Array.isArray(ids)) ids.forEach(id => MY_TRACKS.add(id));
+    localStorage.setItem('ucar-tracks', JSON.stringify([...MY_TRACKS]));
+    history.replaceState(null, '', location.pathname);
+  } catch(e){}
+}
+
+// About modal
+$('#aboutBtn').onclick = () => $('#aboutModal').classList.add('open');
+$('#closeAbout').onclick = () => $('#aboutModal').classList.remove('open');
+
 // Admin
 let ADMIN_KEY = localStorage.getItem('ucar-admin-key') || '';
 if(ADMIN_KEY || location.search.includes('admin')) $('#adminBtn').style.display = 'block';
+
+// Tags bar
+async function loadTags(){
+  const { data: filings } = await sb.from('filings').select('subject').eq('status','live').not('subject','is',null);
+  const counts = {};
+  (filings||[]).forEach(f => { if(f.subject) counts[f.subject] = (counts[f.subject]||0)+1; });
+  TOP_SUBJECTS = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,6).map(e=>e[0]);
+  renderTags();
+}
+
+function renderTags(){
+  const bar = $('#tagsBar');
+  const isMobile = window.innerWidth < 600;
+  const shown = isMobile ? TOP_SUBJECTS.slice(0,3) : TOP_SUBJECTS;
+  const hidden = isMobile ? TOP_SUBJECTS.slice(3) : [];
+
+  bar.innerHTML = shown.map(s => `<button class="tag-chip subject ${ACTIVE_TAG===s?'on':''}" data-tag="${esc(s)}">${esc(s)}</button>`).join('');
+  if(hidden.length) bar.innerHTML += `<button id="moreTags">+${hidden.length} more</button>`;
+
+  bar.querySelectorAll('.tag-chip').forEach(el => el.onclick = () => {
+    ACTIVE_TAG = ACTIVE_TAG === el.dataset.tag ? null : el.dataset.tag;
+    renderTags();
+    loadFeed();
+  });
+  if($('#moreTags')) $('#moreTags').onclick = () => {
+    TOP_SUBJECTS.push(...hidden);
+    renderTags();
+  };
+}
 
 async function boot(){
   let { data:{ session } } = await sb.auth.getSession();
   if(!session) ({ data:{ session } } = await sb.auth.signInAnonymously());
   USER = session?.user ?? null;
 
+  // Load all cases for My Cases panel
+  const { data: cases } = await sb.from('cases')
+    .select('id, case_number, title_render')
+    .eq('status','live');
+  ALL_CASES = cases || [];
+
   if(USER){
     const { data: v } = await sb.from('votes').select('case_id, kind');
     (v??[]).forEach(r => MY_VOTES.set(r.case_id, r.kind));
     const { data: t } = await sb.from('tracks').select('case_id');
     (t??[]).forEach(r => MY_TRACKS.add(r.case_id));
+    // Also load from localStorage for cross-device sync
+    try {
+      const stored = JSON.parse(localStorage.getItem('ucar-tracks')||'[]');
+      stored.forEach(id => MY_TRACKS.add(id));
+    } catch(e){}
   }
+  loadTags();
   loadFeed();
 }
 
@@ -358,12 +524,14 @@ async function loadFeed(){
   }
 
   if(MODE === 'articles'){
-    const { data } = await sb.from('filings')
+    let query = sb.from('filings')
       .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes)')
       .eq('status','live').order('created_at',{ascending:false}).limit(200);
+    if(ACTIVE_TAG) query = query.ilike('subject', `%${ACTIVE_TAG}%`);
+    const { data } = await query;
     feed.innerHTML = (data?.length)
       ? data.map(a => articleCard(a, a.cases)).join('')
-      : `<div class="empty">No articles yet.</div>`;
+      : `<div class="empty">${ACTIVE_TAG ? `No articles for "${esc(ACTIVE_TAG)}"` : 'No articles yet.'}</div>`;
     wireArticles(feed);
   } else {
     const { data } = await sb.from('cases')
@@ -420,6 +588,8 @@ function wireArticles(root){
         await sb.from('tracks').upsert({ user_id: USER.id, case_id: caseId });
         MY_TRACKS.add(caseId);
       }
+      // Save to localStorage for cross-device sync
+      localStorage.setItem('ucar-tracks', JSON.stringify([...MY_TRACKS]));
       loadFeed();
     });
   });
