@@ -98,10 +98,10 @@ main{max-width:920px;margin:0 auto;padding:16px}
   display:none;margin-top:4px}
 .filter-dropdown.open{display:block}
 .filter-dropdown .filter-item{padding:10px 14px;cursor:pointer;font-family:'Archivo',sans-serif;font-size:13px;
-  border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;text-align:left}
 .filter-dropdown .filter-item:hover{background:var(--paper)}
 .filter-dropdown .filter-item.on{background:var(--stamp);color:#fff}
-.filter-dropdown .filter-item .count{font-family:'IBM Plex Mono',monospace;font-size:11px;opacity:.7}
+.filter-dropdown .filter-item .count{font-family:'IBM Plex Mono',monospace;font-size:11px;opacity:.7;margin-left:auto;padding-left:12px}
 
 /* Time filter buttons */
 .time-filter{background:var(--card);border:2px solid var(--line);padding:8px 14px;cursor:pointer;
@@ -665,10 +665,11 @@ async function loadFilters(){
   (filingsRes.data||[]).forEach(f => { if(f.subject) subjectCounts[f.subject] = (subjectCounts[f.subject]||0)+1; });
   ALL_COMPANIES = Object.entries(subjectCounts).sort((a,b)=>b[1]-a[1]);
 
-  // TO WHOM - objects
+  // TO WHOM - objects (from cases with vocab join)
   const objectCounts = {};
   (casesRes.data||[]).forEach(c => {
-    const obj = c['vocab_terms!cases_object_class_id_fkey']?.term;
+    // Supabase JS client returns nested object as 'vocab_terms' not with full FK path
+    const obj = c.vocab_terms?.term;
     if(obj) objectCounts[obj] = (objectCounts[obj]||0)+1;
   });
   ALL_OBJECTS = Object.entries(objectCounts).sort((a,b)=>b[1]-a[1]);
@@ -899,7 +900,7 @@ async function loadFeed(append = false){
     // Apply TO WHOM filter client-side (object class)
     if(data && ACTIVE_WHOM){
       data = data.filter(a => {
-        const objTerm = a.cases?.['vocab_terms!cases_object_class_id_fkey']?.term;
+        const objTerm = a.cases?.vocab_terms?.term;
         return objTerm && objTerm.toLowerCase().includes(ACTIVE_WHOM.toLowerCase());
       });
     }
