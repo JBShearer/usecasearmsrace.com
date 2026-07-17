@@ -718,12 +718,12 @@ document.querySelectorAll('.admin-action').forEach(btn => {
 
     try {
       if(action === 'crawl'){
-        const r = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=poll`, {
+        const r = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=run`, {
           method: 'POST',
           headers: { 'x-admin-key': ADMIN_KEY, 'content-type': 'application/json' },
           body: '{}'
         }).then(r => r.json());
-        status.innerHTML = `<b>Crawler:</b> ${r.sources_polled ?? 0} sources polled, ${r.new_prospects ?? 0} new prospects`;
+        status.innerHTML = `<b>Crawler:</b> ${r.discovered ?? 0} discovered, ${r.fetched ?? 0} fetched, ${r.promoted ?? 0} promoted`;
       }
       else if(action === 'extract'){
         const r = await fetch(`${SUPABASE_URL}/functions/v1/extract?action=run`, {
