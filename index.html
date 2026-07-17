@@ -50,11 +50,12 @@ header h1 span{color:var(--stamp)}
 header .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive);line-height:1.3}
 header .tag .line2{display:block}
 @media(min-width:480px){header .tag .line2{display:inline}}
-.hdr-btns{display:flex;gap:6px;flex-shrink:0}
+.hdr-btns{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap}
 .hdr-btn{background:none;border:2px solid var(--ink);color:var(--ink);padding:5px 10px;cursor:pointer;
   font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 @media(min-width:600px){.hdr-btn{padding:6px 14px;font-size:12px}}
 .hdr-btn:hover{background:var(--ink);color:var(--paper)}
+.hdr-btn.tab.on{background:var(--ink);color:var(--paper)}
 .hdr-btn.admin{border-color:var(--stamp);color:var(--stamp)}
 main{max-width:920px;margin:0 auto;padding:16px}
 @media(min-width:600px){main{padding:20px}}
@@ -83,7 +84,12 @@ main{max-width:920px;margin:0 auto;padding:16px}
 .tag-chip:hover,.tag-chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .tag-chip.subject{border-color:var(--stamp);color:var(--stamp)}
 .tag-chip.subject:hover,.tag-chip.subject.on{background:var(--stamp);color:#fff}
-#moreTags{background:none;border:1.5px dashed var(--line);padding:4px 8px;font-size:11px;cursor:pointer;color:var(--olive)}
+.tag-chip.verb{border-color:var(--good);color:var(--good)}
+.tag-chip.verb:hover,.tag-chip.verb.on{background:var(--good);color:#fff}
+.tag-chip.object{border-color:var(--olive);color:var(--olive)}
+.tag-chip.object:hover,.tag-chip.object.on{background:var(--olive);color:#fff}
+#moreTags{background:none;border:1.5px dashed var(--line);padding:4px 8px;font-size:11px;cursor:pointer;color:var(--olive);
+  font-family:'IBM Plex Mono',monospace}
 #moreTags:hover{border-color:var(--ink);color:var(--ink)}
 
 /* controls */
@@ -215,6 +221,8 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
     <div class="tag">Building the case for good AI.<span class="line2"> Reporting bad AI before it reports you.</span></div>
   </div>
   <div class="hdr-btns">
+    <button class="hdr-btn tab on" id="tab-articles">Articles</button>
+    <button class="hdr-btn tab" id="tab-cases">Cases</button>
     <button class="hdr-btn" id="myCasesBtn">☆ My Cases</button>
     <button class="hdr-btn" id="aboutBtn">About</button>
     <button class="hdr-btn" id="themeToggle">☀</button>
@@ -263,8 +271,6 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 
   <div id="controls">
     <input id="q" type="search" placeholder="search cases…" aria-label="Search">
-    <button class="tab on" id="tab-articles">Articles</button>
-    <button class="tab" id="tab-cases">Cases</button>
   </div>
 
   <div id="feed"><div class="empty">Opening the docket…</div></div>
@@ -399,23 +405,64 @@ $('#closeAbout').onclick = () => $('#aboutModal').classList.remove('open');
 let ADMIN_KEY = localStorage.getItem('ucar-admin-key') || '';
 if(ADMIN_KEY || location.search.includes('admin')) $('#adminBtn').style.display = 'block';
 
-// Tags bar
+// Tags bar - subjects (filed against), verbs, objects
+let TOP_VERBS = [], TOP_OBJECTS = [];
+
 async function loadTags(){
+  // Get subjects (filed against)
   const { data: filings } = await sb.from('filings').select('subject').eq('status','live').not('subject','is',null);
-  const counts = {};
-  (filings||[]).forEach(f => { if(f.subject) counts[f.subject] = (counts[f.subject]||0)+1; });
-  TOP_SUBJECTS = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,6).map(e=>e[0]);
+  const subjectCounts = {};
+  (filings||[]).forEach(f => { if(f.subject) subjectCounts[f.subject] = (subjectCounts[f.subject]||0)+1; });
+  TOP_SUBJECTS = Object.entries(subjectCounts).sort((a,b)=>b[1]-a[1]).slice(0,8).map(e=>e[0]);
+
+  // Get top verbs and objects from cases
+  const { data: terms } = await sb.from('vocab_terms').select('term, kind').eq('status','active');
+  const verbSet = new Set(), objSet = new Set();
+  (terms||[]).forEach(t => {
+    if(t.kind === 'verb') verbSet.add(t.term);
+    if(t.kind === 'object_class') objSet.add(t.term);
+  });
+
+  // Get case counts per verb/object
+  const { data: cases } = await sb.from('cases')
+    .select('verb_id, object_class_id, vocab_terms!cases_verb_id_fkey(term), vocab_terms!cases_object_class_id_fkey(term)')
+    .eq('status','live');
+  const verbCounts = {}, objCounts = {};
+  (cases||[]).forEach(c => {
+    const v = c['vocab_terms!cases_verb_id_fkey']?.term;
+    const o = c['vocab_terms!cases_object_class_id_fkey']?.term;
+    if(v) verbCounts[v] = (verbCounts[v]||0)+1;
+    if(o) objCounts[o] = (objCounts[o]||0)+1;
+  });
+  TOP_VERBS = Object.entries(verbCounts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(e=>e[0]);
+  TOP_OBJECTS = Object.entries(objCounts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(e=>e[0]);
+
   renderTags();
 }
 
 function renderTags(){
   const bar = $('#tagsBar');
   const isMobile = window.innerWidth < 600;
-  const shown = isMobile ? TOP_SUBJECTS.slice(0,3) : TOP_SUBJECTS;
-  const hidden = isMobile ? TOP_SUBJECTS.slice(3) : [];
 
-  bar.innerHTML = shown.map(s => `<button class="tag-chip subject ${ACTIVE_TAG===s?'on':''}" data-tag="${esc(s)}">${esc(s)}</button>`).join('');
-  if(hidden.length) bar.innerHTML += `<button id="moreTags">+${hidden.length} more</button>`;
+  // On mobile: show top 2 subjects + 1 verb + 1 object
+  // On desktop: show more of each
+  const subjects = isMobile ? TOP_SUBJECTS.slice(0,2) : TOP_SUBJECTS.slice(0,4);
+  const verbs = isMobile ? TOP_VERBS.slice(0,1) : TOP_VERBS.slice(0,3);
+  const objects = isMobile ? TOP_OBJECTS.slice(0,1) : TOP_OBJECTS.slice(0,3);
+
+  const hiddenCount = (TOP_SUBJECTS.length - subjects.length) + (TOP_VERBS.length - verbs.length) + (TOP_OBJECTS.length - objects.length);
+
+  let html = '';
+  // Subjects (filed against) - red accent
+  html += subjects.map(s => `<button class="tag-chip subject ${ACTIVE_TAG===s?'on':''}" data-tag="${esc(s)}" data-type="subject">${esc(s)}</button>`).join('');
+  // Verbs - default style
+  html += verbs.map(v => `<button class="tag-chip verb ${ACTIVE_TAG===v?'on':''}" data-tag="${esc(v)}" data-type="verb">${esc(v)}</button>`).join('');
+  // Objects - default style
+  html += objects.map(o => `<button class="tag-chip object ${ACTIVE_TAG===o?'on':''}" data-tag="${esc(o)}" data-type="object">${esc(o)}</button>`).join('');
+
+  if(hiddenCount > 0) html += `<button id="moreTags">+${hiddenCount}</button>`;
+
+  bar.innerHTML = html;
 
   bar.querySelectorAll('.tag-chip').forEach(el => el.onclick = () => {
     ACTIVE_TAG = ACTIVE_TAG === el.dataset.tag ? null : el.dataset.tag;
@@ -423,8 +470,21 @@ function renderTags(){
     loadFeed();
   });
   if($('#moreTags')) $('#moreTags').onclick = () => {
-    TOP_SUBJECTS.push(...hidden);
-    renderTags();
+    // Expand to show all
+    TOP_SUBJECTS = TOP_SUBJECTS; // keep all
+    TOP_VERBS = TOP_VERBS;
+    TOP_OBJECTS = TOP_OBJECTS;
+    const bar = $('#tagsBar');
+    let html = '';
+    html += TOP_SUBJECTS.map(s => `<button class="tag-chip subject ${ACTIVE_TAG===s?'on':''}" data-tag="${esc(s)}" data-type="subject">${esc(s)}</button>`).join('');
+    html += TOP_VERBS.map(v => `<button class="tag-chip verb ${ACTIVE_TAG===v?'on':''}" data-tag="${esc(v)}" data-type="verb">${esc(v)}</button>`).join('');
+    html += TOP_OBJECTS.map(o => `<button class="tag-chip object ${ACTIVE_TAG===o?'on':''}" data-tag="${esc(o)}" data-type="object">${esc(o)}</button>`).join('');
+    bar.innerHTML = html;
+    bar.querySelectorAll('.tag-chip').forEach(el => el.onclick = () => {
+      ACTIVE_TAG = ACTIVE_TAG === el.dataset.tag ? null : el.dataset.tag;
+      renderTags();
+      loadFeed();
+    });
   };
 }
 
