@@ -526,16 +526,20 @@ $('#aboutModal').onclick = e => { if(e.target.id === 'aboutModal') $('#aboutModa
 
 // Admin
 let ADMIN_KEY = localStorage.getItem('ucar-admin-key') || '';
-if(ADMIN_KEY || location.search.includes('admin')) $('#adminBtn').style.display = 'block';
+// Always show admin button if ?admin in URL or key exists
+if(ADMIN_KEY || location.search.includes('admin')) {
+  $('#adminBtn').style.display = 'block';
+}
 
 // Admin modal functionality
-$('#adminBtn').onclick = () => {
+$('#adminBtn').addEventListener('click', () => {
+  console.log('Admin button clicked');
   $('#adminModal').classList.add('open');
   $('#adminKeyInput').value = ADMIN_KEY;
   refreshAdminStatus();
-};
-$('#closeAdminX').onclick = () => $('#adminModal').classList.remove('open');
-$('#adminModal').onclick = e => { if(e.target.id === 'adminModal') $('#adminModal').classList.remove('open'); };
+});
+$('#closeAdminX').addEventListener('click', () => $('#adminModal').classList.remove('open'));
+$('#adminModal').addEventListener('click', e => { if(e.target.id === 'adminModal') $('#adminModal').classList.remove('open'); });
 
 $('#saveAdminKey').onclick = () => {
   ADMIN_KEY = $('#adminKeyInput').value.trim();
