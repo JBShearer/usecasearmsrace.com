@@ -199,6 +199,22 @@ main{max-width:920px;margin:0 auto;padding:16px}
 .sect{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--olive);margin:24px 0 10px;border-bottom:2px solid var(--ink);padding-bottom:6px}
 
+/* Comments */
+.comment-form{display:flex;gap:8px;margin-bottom:16px}
+.comment-form textarea{flex:1;padding:10px;border:2px solid var(--ink);background:var(--card);
+  font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink);resize:vertical}
+.comment-submit{background:var(--ink);color:var(--paper);border:none;padding:10px 16px;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.08em;white-space:nowrap}
+.comment-submit:hover{background:var(--stamp)}
+.comment-submit:disabled{opacity:.5;cursor:not-allowed}
+.comment{border-bottom:1px solid var(--line);padding:12px 0}
+.comment:last-child{border-bottom:none}
+.comment-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.comment-meta .mono{color:var(--olive)}
+.comment-delete{background:none;border:none;color:var(--stamp);cursor:pointer;font-size:16px;padding:2px 6px}
+.comment-delete:hover{background:var(--stamp);color:#fff}
+.comment-body{font-size:14px;line-height:1.5}
+
 /* Submit correction modal */
 #submitModal, #aboutModal{display:none;position:fixed;inset:0;background:rgba(20,18,16,.8);z-index:25;align-items:center;justify-content:center}
 #submitModal.open, #aboutModal.open{display:flex}
@@ -804,6 +820,15 @@ async function openArticle(articleId){
           <div class="c">${s.filing_count} articles · ${Math.round(s.sim*100)}% similar</div>
         </div>
       `).join('') : '<div class="empty">No similar cases yet.</div>'}
+
+      <div class="sect">COMMENTS</div>
+      <div id="commentsSection" data-case="${c.id}">
+        <div class="comment-form">
+          <textarea id="commentInput" placeholder="Add a comment..." rows="2"></textarea>
+          <button class="comment-submit" id="postComment">Post</button>
+        </div>
+        <div id="commentsList"><div class="empty">Loading comments...</div></div>
+      </div>
       ` : ''}
     </div>
   `;
@@ -866,6 +891,60 @@ async function openArticle(articleId){
   panel.querySelectorAll('[data-action="submit"]').forEach(btn => {
     btn.onclick = () => openSubmitModal(btn.dataset.article, btn.dataset.case);
   });
+
+  // Load and wire comments
+  if(c) loadComments(c.id, panel);
+}
+
+async function loadComments(caseId, panel){
+  const list = panel.querySelector('#commentsList');
+  if(!list) return;
+
+  const { data: comments } = await sb.from('comments')
+    .select('id, body, created_at, user_id')
+    .eq('case_id', caseId)
+    .order('created_at', {ascending: false})
+    .limit(50);
+
+  if(!comments?.length){
+    list.innerHTML = '<div class="empty">No comments yet. Be the first!</div>';
+  } else {
+    list.innerHTML = comments.map(cm => `
+      <div class="comment" data-id="${cm.id}" data-user="${cm.user_id}">
+        <div class="comment-meta">
+          <span class="mono">${ago(cm.created_at)} ago</span>
+          ${cm.user_id === USER?.id ? '<button class="comment-delete">×</button>' : ''}
+        </div>
+        <div class="comment-body">${esc(cm.body)}</div>
+      </div>
+    `).join('');
+
+    // Wire delete buttons
+    list.querySelectorAll('.comment-delete').forEach(btn => {
+      btn.onclick = async () => {
+        const commentId = btn.closest('.comment').dataset.id;
+        await sb.from('comments').delete().eq('id', commentId);
+        loadComments(caseId, panel);
+      };
+    });
+  }
+
+  // Wire post button
+  const postBtn = panel.querySelector('#postComment');
+  const input = panel.querySelector('#commentInput');
+  if(postBtn && input){
+    postBtn.onclick = async () => {
+      const body = input.value.trim();
+      if(!body || !USER) return;
+      postBtn.disabled = true;
+      postBtn.textContent = 'Posting...';
+      await sb.from('comments').insert({ user_id: USER.id, case_id: caseId, body });
+      input.value = '';
+      postBtn.disabled = false;
+      postBtn.textContent = 'Post';
+      loadComments(caseId, panel);
+    };
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -937,6 +1016,15 @@ async function openCase(caseId){
           <div class="c">${s.filing_count} articles · ${Math.round(s.sim*100)}% similar</div>
         </div>
       `).join('') : '<div class="empty">No similar cases yet.</div>'}
+
+      <div class="sect">COMMENTS</div>
+      <div id="commentsSection" data-case="${caseId}">
+        <div class="comment-form">
+          <textarea id="commentInput" placeholder="Add a comment..." rows="2"></textarea>
+          <button class="comment-submit" id="postComment">Post</button>
+        </div>
+        <div id="commentsList"><div class="empty">Loading comments...</div></div>
+      </div>
     </div>
   `;
 
@@ -993,6 +1081,9 @@ async function openCase(caseId){
     const firstArticle = articles?.[0]?.id;
     openSubmitModal(firstArticle, caseId);
   };
+
+  // Load comments
+  loadComments(caseId, panel);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
