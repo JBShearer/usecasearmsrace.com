@@ -81,35 +81,41 @@ main{max-width:920px;margin:0 auto;padding:16px}
 #panelOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:999;display:none}
 #panelOverlay.open{display:block}
 
-/* Filter Section - WHO / TO WHOM */
-#filterSection{margin-bottom:16px}
-.filter-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-.filter-label{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--olive);min-width:70px}
-#companyChips,#objectChips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:1}
-.chip{padding:5px 12px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.04em;cursor:pointer;
-  border:2px solid;box-shadow:2px 2px 0}
-.chip:hover{opacity:.85}
-.chip.on{opacity:1}
-/* WHO chips - red */
-.chip.who{background:var(--card);border-color:var(--stamp);color:var(--stamp);box-shadow-color:var(--stamp)}
-.chip.who:hover,.chip.who.on{background:var(--stamp);color:#fff}
-.chip.who.more{background:var(--stamp);color:#fff}
-/* TO WHOM chips - olive */
-.chip.whom{background:var(--card);border-color:var(--olive);color:var(--olive);box-shadow-color:var(--olive)}
-.chip.whom:hover,.chip.whom.on{background:var(--olive);color:#fff}
-.chip.whom.more{background:var(--olive);color:#fff}
-#statCounts{display:flex;gap:8px;margin-left:auto}
-#statCounts.hidden{display:none}
-.stat-box{background:var(--card);border:2px solid var(--ink);padding:6px 12px;text-align:center;box-shadow:2px 2px 0 var(--ink)}
-.stat-num{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;display:block}
-.stat-label{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--olive);text-transform:uppercase}
-#sortBar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+/* Filter Section - Popup buttons + time filters */
+#filterSection{margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.filter-popup-btn{background:var(--card);border:2px solid var(--ink);padding:8px 14px;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.05em;display:flex;align-items:center;gap:6px;
+  position:relative;box-shadow:2px 2px 0 var(--ink)}
+.filter-popup-btn:hover{background:var(--paper)}
+.filter-popup-btn.active{background:var(--ink);color:var(--paper)}
+.filter-popup-btn .arrow{font-size:10px;transition:transform .2s}
+.filter-popup-btn.open .arrow{transform:rotate(180deg)}
+.filter-popup-btn .badge{background:var(--stamp);color:#fff;font-size:9px;padding:2px 6px;border-radius:10px;margin-left:4px}
+
+/* Filter dropdowns */
+.filter-dropdown{position:absolute;top:100%;left:0;min-width:200px;max-height:300px;overflow-y:auto;
+  background:var(--card);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);z-index:100;
+  display:none;margin-top:4px}
+.filter-dropdown.open{display:block}
+.filter-dropdown .filter-item{padding:10px 14px;cursor:pointer;font-family:'Archivo',sans-serif;font-size:13px;
+  border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.filter-dropdown .filter-item:hover{background:var(--paper)}
+.filter-dropdown .filter-item.on{background:var(--stamp);color:#fff}
+.filter-dropdown .filter-item .count{font-family:'IBM Plex Mono',monospace;font-size:11px;opacity:.7}
+
+/* Time filter buttons */
+.time-filter{background:var(--card);border:2px solid var(--line);padding:8px 14px;cursor:pointer;
+  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.05em;box-shadow:2px 2px 0 var(--line)}
+.time-filter:hover{border-color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.time-filter.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.time-filter .num{font-weight:700;margin-right:4px}
+
+#sortBar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-left:auto}
 .sort-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive)}
 .sort-btn{background:none;border:1.5px solid var(--line);padding:4px 10px;font-family:'IBM Plex Mono',monospace;
   font-size:11px;cursor:pointer;color:var(--olive)}
 .sort-btn:hover{border-color:var(--ink);color:var(--ink)}
 .sort-btn.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-#moreTags:hover{border-color:var(--ink);color:var(--ink)}
 
 /* controls */
 #controls{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
@@ -314,18 +320,20 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
 
 <main>
   <div id="filterSection">
-    <div id="whoDidIt" class="filter-row">
-      <span class="filter-label">WHO:</span>
-      <div id="companyChips"></div>
-      <div id="statCounts">
-        <div class="stat-box" id="statToday"><span class="stat-num">0</span><span class="stat-label">Today</span></div>
-        <div class="stat-box" id="statWeek"><span class="stat-num">0</span><span class="stat-label">This Week</span></div>
-      </div>
-    </div>
-    <div id="toWhom" class="filter-row">
-      <span class="filter-label">TO WHOM:</span>
-      <div id="objectChips"></div>
-    </div>
+    <button class="filter-popup-btn" id="whoBtn">
+      WHO <span class="arrow">▼</span>
+      <div class="filter-dropdown" id="whoDropdown"></div>
+    </button>
+    <button class="filter-popup-btn" id="whomBtn">
+      TO WHOM <span class="arrow">▼</span>
+      <div class="filter-dropdown" id="whomDropdown"></div>
+    </button>
+    <button class="time-filter" id="todayFilter">
+      <span class="num" id="todayNum">0</span> Today
+    </button>
+    <button class="time-filter" id="weekFilter">
+      <span class="num" id="weekNum">0</span> This Week
+    </button>
     <div id="sortBar">
       <span class="sort-label">Sort:</span>
       <button class="sort-btn on" data-sort="newest">Newest</button>
@@ -526,9 +534,9 @@ async function boot(){
   loadFeed();
 }
 
-// Combined filter bar - WHO (companies) + TO WHOM (objects) + counts
-let WHO_EXPANDED = false, WHOM_EXPANDED = false;
+// Filter state - WHO, TO WHOM popups + time filters
 let ALL_COMPANIES = [], ALL_OBJECTS = [], TODAY_COUNT = 0, WEEK_COUNT = 0;
+let ACTIVE_WHO = null, ACTIVE_WHOM = null, TIME_FILTER = null; // 'today' | 'week' | null
 
 async function loadFilters(){
   const now = new Date();
@@ -559,56 +567,107 @@ async function loadFilters(){
   ALL_OBJECTS = Object.entries(objectCounts).sort((a,b)=>b[1]-a[1]);
 
   renderFilters();
+  wireFilterEvents();
 }
 
 function renderFilters(){
-  // WHO row
-  const whoContainer = $('#companyChips');
-  const shownWho = WHO_EXPANDED ? ALL_COMPANIES : ALL_COMPANIES.slice(0,3);
-  const hiddenWho = ALL_COMPANIES.length - 3;
-
-  whoContainer.innerHTML = shownWho.map(([name]) =>
-    `<button class="chip who ${ACTIVE_TAG===name?'on':''}" data-filter="${esc(name)}">${esc(name)}</button>`
-  ).join('');
-  if(!WHO_EXPANDED && hiddenWho > 0) {
-    whoContainer.innerHTML += `<button class="chip who more" id="expandWho">+${hiddenWho}</button>`;
-  } else if(WHO_EXPANDED) {
-    whoContainer.innerHTML += `<button class="chip who more" id="collapseWho">−</button>`;
-  }
-
-  // TO WHOM row
-  const whomContainer = $('#objectChips');
-  const shownWhom = WHOM_EXPANDED ? ALL_OBJECTS : ALL_OBJECTS.slice(0,4);
-  const hiddenWhom = ALL_OBJECTS.length - 4;
-
-  whomContainer.innerHTML = shownWhom.map(([name]) =>
-    `<button class="chip whom ${ACTIVE_TAG===name?'on':''}" data-filter="${esc(name)}">${esc(name)}</button>`
-  ).join('');
-  if(!WHOM_EXPANDED && hiddenWhom > 0) {
-    whomContainer.innerHTML += `<button class="chip whom more" id="expandWhom">+${hiddenWhom}</button>`;
-  } else if(WHOM_EXPANDED) {
-    whomContainer.innerHTML += `<button class="chip whom more" id="collapseWhom">−</button>`;
-  }
-
   // Update counts
-  $('#statToday .stat-num').textContent = TODAY_COUNT;
-  $('#statWeek .stat-num').textContent = WEEK_COUNT;
+  $('#todayNum').textContent = TODAY_COUNT;
+  $('#weekNum').textContent = WEEK_COUNT;
 
-  // Show/hide counts based on expansion
-  $('#statCounts').classList.toggle('hidden', WHO_EXPANDED);
+  // WHO dropdown
+  const whoDropdown = $('#whoDropdown');
+  whoDropdown.innerHTML = ALL_COMPANIES.map(([name, count]) =>
+    `<div class="filter-item ${ACTIVE_WHO===name?'on':''}" data-who="${esc(name)}">
+      ${esc(name)} <span class="count">${count}</span>
+    </div>`
+  ).join('') || '<div class="filter-item" style="color:var(--olive)">No companies yet</div>';
 
-  // Wire clicks
-  $$('.chip[data-filter]').forEach(el => {
-    el.onclick = () => {
-      ACTIVE_TAG = ACTIVE_TAG === el.dataset.filter ? null : el.dataset.filter;
+  // TO WHOM dropdown
+  const whomDropdown = $('#whomDropdown');
+  whomDropdown.innerHTML = ALL_OBJECTS.map(([name, count]) =>
+    `<div class="filter-item ${ACTIVE_WHOM===name?'on':''}" data-whom="${esc(name)}">
+      ${esc(name)} <span class="count">${count}</span>
+    </div>`
+  ).join('') || '<div class="filter-item" style="color:var(--olive)">No objects yet</div>';
+
+  // Update button states
+  $('#whoBtn').classList.toggle('active', !!ACTIVE_WHO);
+  $('#whomBtn').classList.toggle('active', !!ACTIVE_WHOM);
+  $('#todayFilter').classList.toggle('on', TIME_FILTER === 'today');
+  $('#weekFilter').classList.toggle('on', TIME_FILTER === 'week');
+
+  // Add badges for active filters
+  const whoBadge = ACTIVE_WHO ? `<span class="badge">${esc(ACTIVE_WHO)}</span>` : '';
+  $('#whoBtn').innerHTML = `WHO ${whoBadge}<span class="arrow">▼</span><div class="filter-dropdown" id="whoDropdown">${whoDropdown.innerHTML}</div>`;
+
+  const whomBadge = ACTIVE_WHOM ? `<span class="badge">${esc(ACTIVE_WHOM)}</span>` : '';
+  $('#whomBtn').innerHTML = `TO WHOM ${whomBadge}<span class="arrow">▼</span><div class="filter-dropdown" id="whomDropdown">${whomDropdown.innerHTML}</div>`;
+
+  wireDropdownClicks();
+}
+
+function wireFilterEvents(){
+  // Popup toggles
+  $('#whoBtn').onclick = (e) => {
+    if(e.target.closest('.filter-dropdown')) return;
+    e.stopPropagation();
+    closeAllDropdowns();
+    $('#whoBtn').classList.toggle('open');
+    $('#whoDropdown').classList.toggle('open');
+  };
+  $('#whomBtn').onclick = (e) => {
+    if(e.target.closest('.filter-dropdown')) return;
+    e.stopPropagation();
+    closeAllDropdowns();
+    $('#whomBtn').classList.toggle('open');
+    $('#whomDropdown').classList.toggle('open');
+  };
+
+  // Time filters
+  $('#todayFilter').onclick = () => {
+    TIME_FILTER = TIME_FILTER === 'today' ? null : 'today';
+    renderFilters();
+    loadFeed();
+  };
+  $('#weekFilter').onclick = () => {
+    TIME_FILTER = TIME_FILTER === 'week' ? null : 'week';
+    renderFilters();
+    loadFeed();
+  };
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', closeAllDropdowns);
+}
+
+function wireDropdownClicks(){
+  // WHO items
+  $$('#whoDropdown .filter-item[data-who]').forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      ACTIVE_WHO = ACTIVE_WHO === el.dataset.who ? null : el.dataset.who;
+      ACTIVE_TAG = ACTIVE_WHO; // For compatibility with existing feed filter
+      closeAllDropdowns();
       renderFilters();
       loadFeed();
     };
   });
-  if($('#expandWho')) $('#expandWho').onclick = () => { WHO_EXPANDED = true; renderFilters(); };
-  if($('#collapseWho')) $('#collapseWho').onclick = () => { WHO_EXPANDED = false; renderFilters(); };
-  if($('#expandWhom')) $('#expandWhom').onclick = () => { WHOM_EXPANDED = true; renderFilters(); };
-  if($('#collapseWhom')) $('#collapseWhom').onclick = () => { WHOM_EXPANDED = false; renderFilters(); };
+  // TO WHOM items
+  $$('#whomDropdown .filter-item[data-whom]').forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      ACTIVE_WHOM = ACTIVE_WHOM === el.dataset.whom ? null : el.dataset.whom;
+      ACTIVE_TAG = ACTIVE_WHOM; // For compatibility
+      closeAllDropdowns();
+      renderFilters();
+      loadFeed();
+    };
+  });
+}
+
+function closeAllDropdowns(){
+  $$('.filter-popup-btn').forEach(b => b.classList.remove('open'));
+  $$('.filter-dropdown').forEach(d => d.classList.remove('open'));
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -667,6 +726,11 @@ async function loadFeed(){
   const feed = $('#feed');
   const q = $('#q').value.trim();
 
+  // Calculate time boundaries
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const weekStart = new Date(now - 7*24*60*60*1000).toISOString();
+
   if(q){
     const r = await fetch(`${SUPABASE_URL}/functions/v1/api?action=search`, {
       method:'POST',
@@ -682,11 +746,15 @@ async function loadFeed(){
 
   if(MODE === 'articles'){
     let query = sb.from('filings')
-      .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes, filing_count, last_filed_at)')
+      .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes, filing_count, last_filed_at, object_class_id, vocab_terms!cases_object_class_id_fkey(term))')
       .eq('status','live').limit(200);
 
-    // Apply tag filter
-    if(ACTIVE_TAG) query = query.ilike('subject', `%${ACTIVE_TAG}%`);
+    // Apply WHO filter (company/subject)
+    if(ACTIVE_WHO) query = query.ilike('subject', `%${ACTIVE_WHO}%`);
+
+    // Apply time filter
+    if(TIME_FILTER === 'today') query = query.gte('created_at', todayStart);
+    else if(TIME_FILTER === 'week') query = query.gte('created_at', weekStart);
 
     // Apply sort
     if(SORT_BY === 'newest') query = query.order('created_at', {ascending: false});
@@ -696,14 +764,23 @@ async function loadFeed(){
 
     let { data } = await query;
 
+    // Apply TO WHOM filter client-side (object class)
+    if(data && ACTIVE_WHOM){
+      data = data.filter(a => {
+        const objTerm = a.cases?.['vocab_terms!cases_object_class_id_fkey']?.term;
+        return objTerm && objTerm.toLowerCase().includes(ACTIVE_WHOM.toLowerCase());
+      });
+    }
+
     // Client-side sort fallback for nested fields
     if(data && SORT_BY === 'votes') data.sort((a,b) => ((b.cases?.good_votes||0)+(b.cases?.evil_votes||0)) - ((a.cases?.good_votes||0)+(a.cases?.evil_votes||0)));
     if(data && SORT_BY === 'activity') data.sort((a,b) => (b.cases?.filing_count||0) - (a.cases?.filing_count||0));
     if(data && SORT_BY === 'trending') data.sort((a,b) => new Date(b.cases?.last_filed_at||0) - new Date(a.cases?.last_filed_at||0));
 
+    const filterDesc = [ACTIVE_WHO, ACTIVE_WHOM, TIME_FILTER === 'today' ? 'today' : TIME_FILTER === 'week' ? 'this week' : null].filter(Boolean).join(', ');
     feed.innerHTML = (data?.length)
       ? data.map(a => articleCard(a, a.cases)).join('')
-      : `<div class="empty">${ACTIVE_TAG ? `No articles for "${esc(ACTIVE_TAG)}"` : 'No articles yet.'}</div>`;
+      : `<div class="empty">${filterDesc ? `No articles for ${filterDesc}` : 'No articles yet.'}</div>`;
     wireArticles(feed);
   } else {
     let query = sb.from('cases')
