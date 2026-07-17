@@ -812,15 +812,6 @@ async function openArticle(articleId){
         </div>`).join('')}
       ` : ''}
 
-      <div class="sect">SIMILAR CASES</div>
-      ${(sim.results??[]).length ? sim.results.map(s => `
-        <div class="caserow" data-case="${s.id}" style="margin:8px 0">
-          <div class="num">CASE #${s.case_number}</div>
-          <div class="t" style="font-size:13px">${esc(s.title_render)}</div>
-          <div class="c">${s.filing_count} articles · ${Math.round(s.sim*100)}% similar</div>
-        </div>
-      `).join('') : '<div class="empty">No similar cases yet.</div>'}
-
       <div class="sect">COMMENTS</div>
       <div id="commentsSection" data-case="${c.id}">
         <div class="comment-form">
@@ -829,6 +820,15 @@ async function openArticle(articleId){
         </div>
         <div id="commentsList"><div class="empty">Loading comments...</div></div>
       </div>
+
+      <div class="sect">SIMILAR CASES</div>
+      ${(sim.results??[]).length ? sim.results.map(s => `
+        <div class="caserow" data-case="${s.id}" style="margin:8px 0">
+          <div class="num">CASE #${s.case_number}</div>
+          <div class="t" style="font-size:13px">${esc(s.title_render)}</div>
+          <div class="c">${s.filing_count} articles · ${Math.round(s.sim*100)}% similar</div>
+        </div>
+      `).join('') : '<div class="empty">No similar cases yet.</div>'}
       ` : ''}
     </div>
   `;
@@ -1008,15 +1008,6 @@ async function openCase(caseId){
         </div>
       </div>`).join('') || '<div class="empty">No articles filed yet.</div>'}
 
-      <div class="sect">SIMILAR CASES</div>
-      ${(sim.results??[]).length ? sim.results.map(s => `
-        <div class="caserow" data-case="${s.id}" style="margin:8px 0">
-          <div class="num">CASE #${s.case_number}</div>
-          <div class="t" style="font-size:13px">${esc(s.title_render)}</div>
-          <div class="c">${s.filing_count} articles · ${Math.round(s.sim*100)}% similar</div>
-        </div>
-      `).join('') : '<div class="empty">No similar cases yet.</div>'}
-
       <div class="sect">COMMENTS</div>
       <div id="commentsSection" data-case="${caseId}">
         <div class="comment-form">
@@ -1025,6 +1016,15 @@ async function openCase(caseId){
         </div>
         <div id="commentsList"><div class="empty">Loading comments...</div></div>
       </div>
+
+      <div class="sect">SIMILAR CASES</div>
+      ${(sim.results??[]).length ? sim.results.map(s => `
+        <div class="caserow" data-case="${s.id}" style="margin:8px 0">
+          <div class="num">CASE #${s.case_number}</div>
+          <div class="t" style="font-size:13px">${esc(s.title_render)}</div>
+          <div class="c">${s.filing_count} articles · ${Math.round(s.sim*100)}% similar</div>
+        </div>
+      `).join('') : '<div class="empty">No similar cases yet.</div>'}
     </div>
   `;
 
