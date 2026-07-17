@@ -396,6 +396,27 @@ footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid v
   </div>
 </div>
 
+<!-- Admin Modal -->
+<div id="adminModal" class="modal">
+  <div class="submit-box" style="max-width:500px;position:relative">
+    <button class="close-btn" id="closeAdminX" style="position:absolute;top:10px;right:14px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--ink)">×</button>
+    <h3>ADMIN PANEL</h3>
+    <div id="adminStatus" style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--paper);padding:12px;margin-bottom:16px;border:1px solid var(--line)">
+      Loading status...
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="primary" id="runCrawler">🔍 Run Crawler</button>
+      <button class="primary" id="runExtract">⚙️ Run Extract</button>
+      <button class="secondary" id="refreshStatus">↻ Refresh</button>
+    </div>
+    <div id="adminLog" style="font-family:'IBM Plex Mono',monospace;font-size:11px;max-height:200px;overflow-y:auto;background:#111;color:#0f0;padding:10px;display:none"></div>
+    <hr style="margin:16px 0;border:none;border-top:1px solid var(--line)">
+    <label>ADMIN KEY</label>
+    <input id="adminKeyInput" type="password" placeholder="Enter admin key" style="width:100%;padding:8px;margin-bottom:8px;font-family:'IBM Plex Mono',monospace">
+    <button class="secondary" id="saveAdminKey" style="width:100%">Save Key</button>
+  </div>
+</div>
+
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -506,6 +527,92 @@ $('#aboutModal').onclick = e => { if(e.target.id === 'aboutModal') $('#aboutModa
 // Admin
 let ADMIN_KEY = localStorage.getItem('ucar-admin-key') || '';
 if(ADMIN_KEY || location.search.includes('admin')) $('#adminBtn').style.display = 'block';
+
+// Admin modal functionality
+$('#adminBtn').onclick = () => {
+  $('#adminModal').classList.add('open');
+  $('#adminKeyInput').value = ADMIN_KEY;
+  refreshAdminStatus();
+};
+$('#closeAdminX').onclick = () => $('#adminModal').classList.remove('open');
+$('#adminModal').onclick = e => { if(e.target.id === 'adminModal') $('#adminModal').classList.remove('open'); };
+
+$('#saveAdminKey').onclick = () => {
+  ADMIN_KEY = $('#adminKeyInput').value.trim();
+  localStorage.setItem('ucar-admin-key', ADMIN_KEY);
+  $('#adminBtn').style.display = 'block';
+  adminLog('Admin key saved');
+};
+
+$('#refreshStatus').onclick = refreshAdminStatus;
+
+async function refreshAdminStatus(){
+  if(!ADMIN_KEY) {
+    $('#adminStatus').innerHTML = '<span style="color:var(--stamp)">Enter admin key to view status</span>';
+    return;
+  }
+  try {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=status`, {
+      headers: { 'x-admin-key': ADMIN_KEY }
+    });
+    const data = await r.json();
+    if(data.error) throw new Error(data.error);
+    const p = data.prospects || {};
+    $('#adminStatus').innerHTML = `
+      <strong>Prospects:</strong><br>
+      • Extracted: ${p.extracted || 0}<br>
+      • Promoted: ${p.promoted || 0} (pending extraction)<br>
+      • Skipped: ${p.skipped || 0}<br>
+      • Errors: ${p.error || 0}<br>
+      <strong>Cases:</strong> ${data.cases || 0} | <strong>Filings:</strong> ${data.filings || 0}
+    `;
+  } catch(e) {
+    $('#adminStatus').innerHTML = `<span style="color:var(--stamp)">Error: ${e.message}</span>`;
+  }
+}
+
+function adminLog(msg){
+  const log = $('#adminLog');
+  log.style.display = 'block';
+  log.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+  log.scrollTop = log.scrollHeight;
+}
+
+$('#runCrawler').onclick = async () => {
+  if(!ADMIN_KEY) return adminLog('No admin key');
+  adminLog('Starting crawler...');
+  try {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=run`, {
+      method: 'POST',
+      headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+    const data = await r.json();
+    adminLog(`Crawler done: ${data.discovered || 0} discovered, ${data.promoted || 0} promoted`);
+    refreshAdminStatus();
+  } catch(e) {
+    adminLog(`Error: ${e.message}`);
+  }
+};
+
+$('#runExtract').onclick = async () => {
+  if(!ADMIN_KEY) return adminLog('No admin key');
+  adminLog('Starting extraction...');
+  try {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/extract?action=run`, {
+      method: 'POST',
+      headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
+      body: '{"max": 10}'
+    });
+    const data = await r.json();
+    const extracted = (data.results || []).filter(r => r.result === 'extracted').length;
+    adminLog(`Extract done: ${data.processed || 0} processed, ${extracted} extracted`);
+    refreshAdminStatus();
+    loadFeed();
+  } catch(e) {
+    adminLog(`Error: ${e.message}`);
+  }
+};
 
 async function boot(){
   let { data:{ session } } = await sb.auth.getSession();
@@ -720,9 +827,18 @@ function caseCard(c){
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FEED
+// FEED with infinite scroll
 // ═══════════════════════════════════════════════════════════════════════════
-async function loadFeed(){
+const PAGE_SIZE = 30;
+let FEED_OFFSET = 0;
+let FEED_LOADING = false;
+let FEED_HAS_MORE = true;
+let FEED_DATA = []; // cached data for client-side filtering
+
+async function loadFeed(append = false){
+  if(FEED_LOADING) return;
+  if(append && !FEED_HAS_MORE) return;
+
   const feed = $('#feed');
   const q = $('#q').value.trim();
 
@@ -730,6 +846,14 @@ async function loadFeed(){
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
   const weekStart = new Date(now - 7*24*60*60*1000).toISOString();
+
+  // Reset pagination on new search/filter
+  if(!append) {
+    FEED_OFFSET = 0;
+    FEED_HAS_MORE = true;
+    FEED_DATA = [];
+    feed.innerHTML = '<div class="loading">Loading...</div>';
+  }
 
   if(q){
     const r = await fetch(`${SUPABASE_URL}/functions/v1/api?action=search`, {
@@ -741,13 +865,17 @@ async function loadFeed(){
       ? r.results.map(a => articleCard(a, a.cases)).join('')
       : `<div class="empty">No results for "${esc(q)}"</div>`;
     wireArticles(feed);
+    FEED_HAS_MORE = false;
     return;
   }
+
+  FEED_LOADING = true;
 
   if(MODE === 'articles'){
     let query = sb.from('filings')
       .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes, filing_count, last_filed_at, object_class_id, vocab_terms!cases_object_class_id_fkey(term))')
-      .eq('status','live').limit(200);
+      .eq('status','live')
+      .range(FEED_OFFSET, FEED_OFFSET + PAGE_SIZE - 1);
 
     // Apply WHO filter (company/subject)
     if(ACTIVE_WHO) query = query.ilike('subject', `%${ACTIVE_WHO}%`);
@@ -764,6 +892,10 @@ async function loadFeed(){
 
     let { data } = await query;
 
+    // Check if more data available
+    FEED_HAS_MORE = data && data.length === PAGE_SIZE;
+    FEED_OFFSET += data?.length || 0;
+
     // Apply TO WHOM filter client-side (object class)
     if(data && ACTIVE_WHOM){
       data = data.filter(a => {
@@ -777,15 +909,32 @@ async function loadFeed(){
     if(data && SORT_BY === 'activity') data.sort((a,b) => (b.cases?.filing_count||0) - (a.cases?.filing_count||0));
     if(data && SORT_BY === 'trending') data.sort((a,b) => new Date(b.cases?.last_filed_at||0) - new Date(a.cases?.last_filed_at||0));
 
+    FEED_DATA = append ? [...FEED_DATA, ...(data||[])] : (data||[]);
+
     const filterDesc = [ACTIVE_WHO, ACTIVE_WHOM, TIME_FILTER === 'today' ? 'today' : TIME_FILTER === 'week' ? 'this week' : null].filter(Boolean).join(', ');
-    feed.innerHTML = (data?.length)
-      ? data.map(a => articleCard(a, a.cases)).join('')
-      : `<div class="empty">${filterDesc ? `No articles for ${filterDesc}` : 'No articles yet.'}</div>`;
+
+    if(append) {
+      // Remove loading indicator and append new items
+      feed.querySelector('.load-more')?.remove();
+      const newHtml = (data||[]).map(a => articleCard(a, a.cases)).join('');
+      feed.insertAdjacentHTML('beforeend', newHtml);
+    } else {
+      feed.innerHTML = FEED_DATA.length
+        ? FEED_DATA.map(a => articleCard(a, a.cases)).join('')
+        : `<div class="empty">${filterDesc ? `No articles for ${filterDesc}` : 'No articles yet.'}</div>`;
+    }
+
+    // Add load more indicator
+    if(FEED_HAS_MORE) {
+      feed.insertAdjacentHTML('beforeend', '<div class="load-more" style="text-align:center;padding:20px;color:var(--olive);font-size:12px">Scroll for more...</div>');
+    }
+
     wireArticles(feed);
   } else {
     let query = sb.from('cases')
       .select('id, case_number, title_render, filing_count, good_votes, evil_votes, fake_votes, last_filed_at')
-      .eq('status','live').limit(200);
+      .eq('status','live')
+      .range(FEED_OFFSET, FEED_OFFSET + PAGE_SIZE - 1);
 
     // Apply sort for cases view
     if(SORT_BY === 'newest') query = query.order('case_number', {ascending: false});
@@ -794,13 +943,40 @@ async function loadFeed(){
     else if(SORT_BY === 'trending') query = query.order('last_filed_at', {ascending: false, nullsFirst: false});
 
     const { data } = await query;
-    feed.innerHTML = (data?.length)
-      ? data.map(c => caseCard(c)).join('')
-      : `<div class="empty">No cases yet.</div>`;
+
+    FEED_HAS_MORE = data && data.length === PAGE_SIZE;
+    FEED_OFFSET += data?.length || 0;
+
+    if(append) {
+      feed.querySelector('.load-more')?.remove();
+      const newHtml = (data||[]).map(c => caseCard(c)).join('');
+      feed.insertAdjacentHTML('beforeend', newHtml);
+    } else {
+      feed.innerHTML = (data?.length)
+        ? data.map(c => caseCard(c)).join('')
+        : `<div class="empty">No cases yet.</div>`;
+    }
+
+    if(FEED_HAS_MORE) {
+      feed.insertAdjacentHTML('beforeend', '<div class="load-more" style="text-align:center;padding:20px;color:var(--olive);font-size:12px">Scroll for more...</div>');
+    }
+
     feed.querySelectorAll('.caserow').forEach(el =>
       el.addEventListener('click', () => openCase(el.dataset.case)));
   }
+
+  FEED_LOADING = false;
 }
+
+// Infinite scroll listener
+window.addEventListener('scroll', () => {
+  if(FEED_LOADING || !FEED_HAS_MORE) return;
+  const scrollBottom = window.innerHeight + window.scrollY;
+  const docHeight = document.documentElement.scrollHeight;
+  if(scrollBottom >= docHeight - 500) {
+    loadFeed(true); // append mode
+  }
+});
 
 function wireArticles(root){
   root.querySelectorAll('.article').forEach(el => {
@@ -1365,7 +1541,7 @@ function checkRoute(){
 }
 
 $('#drawer').onclick = e => { if(e.target.id === 'drawer') $('#drawer').classList.remove('open'); };
-document.onkeydown = e => { if(e.key === 'Escape'){ $('#drawer').classList.remove('open'); $('#submitModal').classList.remove('open'); $('#aboutModal').classList.remove('open'); }};
+document.onkeydown = e => { if(e.key === 'Escape'){ $('#drawer').classList.remove('open'); $('#submitModal').classList.remove('open'); $('#aboutModal').classList.remove('open'); $('#adminModal').classList.remove('open'); }};
 
 $('#tab-articles').onclick = () => { MODE='articles'; $('#tab-articles').classList.add('on'); $('#tab-cases').classList.remove('on'); loadFeed(); };
 $('#tab-cases').onclick = () => { MODE='cases'; $('#tab-cases').classList.add('on'); $('#tab-articles').classList.remove('on'); loadFeed(); };
