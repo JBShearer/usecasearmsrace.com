@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v2 cache bust -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -134,6 +135,13 @@ main{max-width:920px;margin:0 auto;padding:16px}
 .article:hover{box-shadow:3px 3px 0 var(--stamp)}
 .article-inner{padding:16px 16px 12px;display:grid;grid-template-columns:80px 1fr;gap:14px}
 
+/* Article thumbnail - below the stamp */
+.article-thumb{width:80px;height:50px;overflow:hidden;border:1px solid var(--line);margin-top:8px}
+.article-thumb img{width:100%;height:100%;object-fit:cover}
+
+/* Stamp column contains stamp + optional thumbnail */
+.article-stamp-col{display:flex;flex-direction:column;align-items:center}
+
 /* Red filing stamp */
 .article-stamp{background:var(--stamp);color:#fff;padding:8px 6px;text-align:center;
   font-family:'Oswald',sans-serif;transform:rotate(-3deg);align-self:start;line-height:1.1}
@@ -202,6 +210,8 @@ main{max-width:920px;margin:0 auto;padding:16px}
 
 /* Article detail in drawer */
 .article-detail{background:var(--article-bg);border:2px solid var(--ink);padding:20px;margin-bottom:20px}
+.article-detail-img{width:100%;max-height:250px;overflow:hidden;margin-bottom:16px;border:1px solid var(--line)}
+.article-detail-img img{width:100%;height:auto;object-fit:cover;display:block}
 .article-detail .stamp-row{display:flex;gap:12px;align-items:center;margin-bottom:12px}
 .article-detail .stamp-badge{background:var(--stamp);color:#fff;padding:6px 12px;font-family:'Oswald',sans-serif;
   font-size:11px;letter-spacing:.1em}
@@ -790,12 +800,17 @@ function articleCard(a, c){
   const tracked = c ? MY_TRACKS.has(c.id) : false;
   const domain = a.source_domain || 'source';
 
+  const thumb = a.image_url ? `<div class="article-thumb"><img src="${esc(a.image_url)}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div>` : '';
+
   return `<div class="article" data-article="${a.id}" data-case="${c?.id || ''}">
     <div class="article-inner">
-      <div class="article-stamp">
-        <div class="label">FILED</div>
-        <div class="date">${fmtDate(a.created_at)}</div>
-        <div class="src">${esc(domain)}</div>
+      <div class="article-stamp-col">
+        <div class="article-stamp">
+          <div class="label">FILED</div>
+          <div class="date">${fmtDate(a.created_at)}</div>
+          <div class="src">${esc(domain)}</div>
+        </div>
+        ${thumb}
       </div>
       <div class="article-body">
         <a href="${esc(a.source_url)}" target="_blank" rel="noopener" class="source-link" onclick="event.stopPropagation()">
@@ -841,6 +856,7 @@ let FEED_HAS_MORE = true;
 let FEED_DATA = []; // cached data for client-side filtering
 
 async function loadFeed(append = false){
+  console.log('loadFeed called, FEED_LOADING:', FEED_LOADING, 'MODE:', MODE, 'ACTIVE_WHOM:', ACTIVE_WHOM);
   if(FEED_LOADING) return;
   if(append && !FEED_HAS_MORE) return;
 
@@ -877,10 +893,46 @@ async function loadFeed(append = false){
   FEED_LOADING = true;
 
   if(MODE === 'articles'){
+    // If TO WHOM filter is active, get the case IDs first
+    let caseIdsForWhom = null;
+    if(ACTIVE_WHOM) {
+      console.log('TO WHOM filter active:', ACTIVE_WHOM, 'lowercase:', ACTIVE_WHOM.toLowerCase());
+      // Get vocab term ID for the object class
+      const { data: vocabData, error: vocabErr } = await sb.from('vocab_terms')
+        .select('id, term')
+        .eq('kind', 'object_class')
+        .eq('term', ACTIVE_WHOM.toLowerCase())
+        .limit(1);
+      console.log('Vocab lookup result:', vocabData, 'error:', vocabErr);
+
+      if(vocabData?.length) {
+        // Get all case IDs with this object class
+        const { data: casesData, error: casesErr } = await sb.from('cases')
+          .select('id')
+          .eq('object_class_id', vocabData[0].id)
+          .eq('status', 'live');
+        console.log('Cases with object:', casesData, casesErr);
+        caseIdsForWhom = casesData?.map(c => c.id) || [];
+      } else {
+        caseIdsForWhom = []; // No matching vocab term
+      }
+      console.log('Case IDs for whom:', caseIdsForWhom);
+    }
+
     let query = sb.from('filings')
       .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes, filing_count, last_filed_at, object_class_id, vocab_terms!cases_object_class_id_fkey(term))')
-      .eq('status','live')
-      .range(FEED_OFFSET, FEED_OFFSET + PAGE_SIZE - 1);
+      .eq('status','live');
+
+    // Apply TO WHOM filter server-side
+    if(caseIdsForWhom !== null) {
+      if(caseIdsForWhom.length === 0) {
+        // No cases match - return empty
+        FEED_LOADING = false;
+        feed.innerHTML = `<div class="empty">No articles for ${ACTIVE_WHOM}</div>`;
+        return;
+      }
+      query = query.in('case_id', caseIdsForWhom);
+    }
 
     // Apply WHO filter (company/subject)
     if(ACTIVE_WHO) query = query.ilike('subject', `%${ACTIVE_WHO}%`);
@@ -895,19 +947,14 @@ async function loadFeed(append = false){
     else if(SORT_BY === 'activity') query = query.order('cases(filing_count)', {ascending: false, nullsFirst: false});
     else if(SORT_BY === 'trending') query = query.order('cases(last_filed_at)', {ascending: false, nullsFirst: false});
 
+    // Apply pagination after filters
+    query = query.range(FEED_OFFSET, FEED_OFFSET + PAGE_SIZE - 1);
+
     let { data } = await query;
 
     // Check if more data available
     FEED_HAS_MORE = data && data.length === PAGE_SIZE;
     FEED_OFFSET += data?.length || 0;
-
-    // Apply TO WHOM filter client-side (object class)
-    if(data && ACTIVE_WHOM){
-      data = data.filter(a => {
-        const objTerm = a.cases?.vocab_terms?.term;
-        return objTerm && objTerm.toLowerCase().includes(ACTIVE_WHOM.toLowerCase());
-      });
-    }
 
     // Client-side sort fallback for nested fields
     if(data && SORT_BY === 'votes') data.sort((a,b) => ((b.cases?.good_votes||0)+(b.cases?.evil_votes||0)) - ((a.cases?.good_votes||0)+(a.cases?.evil_votes||0)));
@@ -1092,6 +1139,7 @@ async function openArticle(articleId){
     </div>
     <div class="drawer-body">
       <div class="article-detail">
+        ${a.image_url ? `<div class="article-detail-img"><img src="${esc(a.image_url)}" alt="" onerror="this.parentElement.style.display='none'"></div>` : ''}
         <div class="stamp-row">
           <div class="stamp-badge">FILED ${fmtDate(a.created_at)}</div>
           <span class="mono">${esc(a.source_domain)}</span>
@@ -1309,7 +1357,7 @@ async function openCase(caseId){
 
   const [{ data: c }, { data: articles }, sim] = await Promise.all([
     sb.from('cases').select('*').eq('id', caseId).single(),
-    sb.from('filings').select('id, headline, summary, source_url, source_domain, created_at')
+    sb.from('filings').select('id, headline, summary, source_url, source_domain, image_url, created_at')
       .eq('case_id', caseId).eq('status','live').order('created_at',{ascending:false}).limit(30),
     fetch(`${SUPABASE_URL}/functions/v1/api?action=similar`, {
       method:'POST',
@@ -1567,3 +1615,4 @@ boot().then(checkRoute);
 </script>
 </body>
 </html>
+<!-- cache bust 1784352839 -->
