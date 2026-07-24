@@ -1,1618 +1,931 @@
 <!DOCTYPE html>
-<!-- v2 cache bust -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Use Case Arms Race · Build the case for AI</title>
 <meta name="description" content="A public docket of AI deployments. Every use case is a case. Every news article is evidence.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Archivo:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --paper:#F5F1E6;
-  --ink:#141210;
-  --stamp:#C0221C;
-  --olive:#565442;
-  --line:#C9C2AE;
-  --good:#2E6B3F;
-  --evil:#8B0000;
-  --card:#fff;
-  --case-bg:#FFFEF8;
-  --case-tab:#D4A84C;
-  --article-bg:#fff;
+/* ═══════════════════════════════════════════════════════════════════════════
+   UCAR 5.0 - MOBILE-FIRST RESPONSIVE UI
+   Built: 2026-07-24
+   Design: Legal docket aesthetic with full mobile support
+   Minimum: 320px width, 14px body text, 44px touch targets
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Colors - Light theme (GOOD) */
+  --paper: #F5F1E6;
+  --ink: #141210;
+  --stamp: #C0221C;
+  --olive: #565442;
+  --line: #C9C2AE;
+  --good: #2E6B3F;
+  --evil: #8B0000;
+  --card: #fff;
+  --case-bg: #FFFEF8;
+  --case-tab: #D4A84C;
+  --article-bg: #fff;
+
+  /* Typography scale (rem-based, 16px base) */
+  --text-xs: 0.75rem;    /* 12px - minimum for labels */
+  --text-sm: 0.875rem;   /* 14px - body text */
+  --text-base: 1rem;     /* 16px - standard */
+  --text-lg: 1.125rem;   /* 18px - subheadings */
+  --text-xl: 1.25rem;    /* 20px - headings */
+  --text-2xl: 1.5rem;    /* 24px - large headings */
+  --text-3xl: 1.875rem;  /* 30px - hero */
+
+  /* Spacing scale */
+  --space-1: 0.25rem;    /* 4px */
+  --space-2: 0.5rem;     /* 8px */
+  --space-3: 0.75rem;    /* 12px */
+  --space-4: 1rem;       /* 16px */
+  --space-5: 1.25rem;    /* 20px */
+  --space-6: 1.5rem;     /* 24px */
+  --space-8: 2rem;       /* 32px */
+  --space-12: 3rem;      /* 48px */
+
+  /* Touch targets */
+  --tap-min: 44px;       /* iOS minimum */
+  --tap-comfortable: 48px;
+
+  /* Responsive font size (base) */
+  font-size: 16px;
 }
-[data-theme="dark"]{
-  --paper:#141210;
-  --ink:#E8E4DC;
-  --stamp:#E85A4F;
-  --olive:#A8A090;
-  --line:#3A3632;
-  --good:#4CAF50;
-  --evil:#FF6B6B;
-  --card:#1E1C18;
-  --case-bg:#1A1815;
-  --case-tab:#B8860B;
-  --article-bg:#1E1C18;
+
+/* Dark theme (EVIL) */
+[data-theme="dark"] {
+  --paper: #141210;
+  --ink: #E8E4DC;
+  --stamp: #E85A4F;
+  --olive: #A8A090;
+  --line: #3A3632;
+  --good: #4CAF50;
+  --evil: #FF6B6B;
+  --card: #1E1C18;
+  --case-bg: #1A1815;
+  --case-tab: #B8860B;
+  --article-bg: #1E1C18;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--paper);color:var(--ink);font-family:'Archivo',sans-serif;font-size:16px;line-height:1.5;
-  transition:background .3s,color .3s}
-a{color:inherit}
-.mono{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.02em}
-.disp{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em}
 
-header{border-bottom:3px solid var(--ink);padding:14px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-  justify-content:space-between}
-.brand{display:flex;flex-direction:column;gap:2px}
-header h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;white-space:nowrap}
-@media(min-width:600px){header h1{font-size:26px}}
-header h1 span{color:var(--stamp)}
-header .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive);line-height:1.3}
-header .tag .line2{display:block}
-@media(min-width:480px){header .tag .line2{display:inline}}
-.hdr-btns{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap}
-.hdr-btn{background:none;border:2px solid var(--ink);color:var(--ink);padding:5px 10px;cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
-@media(min-width:600px){.hdr-btn{padding:6px 14px;font-size:12px}}
-.hdr-btn:hover{background:var(--ink);color:var(--paper)}
-.hdr-btn.tab.on{background:var(--ink);color:var(--paper)}
-.hdr-btn.admin{border-color:var(--stamp);color:var(--stamp)}
-main{max-width:920px;margin:0 auto;padding:16px}
-@media(min-width:600px){main{padding:20px}}
+/* Scale up fonts on larger viewports */
+@media (min-width: 640px) {
+  :root { font-size: 17px; }
+}
 
-/* My Cases panel - centered modal */
-#myCasesPanel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:400px;max-width:90vw;
-  max-height:85vh;background:var(--card);border:3px solid var(--ink);z-index:1000;overflow-y:auto;padding:20px;
-  opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;box-shadow:8px 8px 0 rgba(0,0,0,.3)}
-#myCasesPanel.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
-#myCasesPanel h2{font-family:'Oswald',sans-serif;font-size:18px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
-#myCasesPanel .close-btn{background:none;border:none;font-size:24px;cursor:pointer;color:var(--ink)}
-#myCasesPanel .share-box{background:var(--paper);border:2px dashed var(--line);padding:16px;margin-bottom:16px;text-align:center}
-#myCasesPanel .share-box p{font-size:12px;color:var(--olive);margin-bottom:10px}
-#myCasesPanel .share-btn{background:var(--stamp);color:#fff;border:none;padding:10px 20px;cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.05em;margin:4px}
-#myCasesPanel .share-btn:hover{background:var(--ink)}
-#myCasesPanel #qrCode{margin:12px auto;display:none}
-#myCasesPanel #qrCode.show{display:block}
-#myCasesPanel .my-case{padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer}
-#myCasesPanel .my-case:hover{background:var(--paper)}
-#myCasesPanel .my-case .num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--stamp)}
-#myCasesPanel .my-case .title{font-size:13px;margin-top:2px}
-#panelOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:999;display:none}
-#panelOverlay.open{display:block}
-
-/* Filter Section - Popup buttons + time filters */
-#filterSection{margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.filter-popup-btn{background:var(--card);border:2px solid var(--ink);padding:8px 14px;cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.05em;display:flex;align-items:center;gap:6px;
-  position:relative;box-shadow:2px 2px 0 var(--ink)}
-.filter-popup-btn:hover{background:var(--paper)}
-.filter-popup-btn.active{background:var(--ink);color:var(--paper)}
-.filter-popup-btn .arrow{font-size:10px;transition:transform .2s}
-.filter-popup-btn.open .arrow{transform:rotate(180deg)}
-.filter-popup-btn .badge{background:var(--stamp);color:#fff;font-size:9px;padding:2px 6px;border-radius:10px;margin-left:4px}
-
-/* Filter dropdowns */
-.filter-dropdown{position:absolute;top:100%;left:0;min-width:200px;max-height:300px;overflow-y:auto;
-  background:var(--card);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);z-index:100;
-  display:none;margin-top:4px}
-.filter-dropdown.open{display:block}
-.filter-dropdown .filter-item{padding:10px 14px;cursor:pointer;font-family:'Archivo',sans-serif;font-size:13px;
-  border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;text-align:left}
-.filter-dropdown .filter-item:hover{background:var(--paper)}
-.filter-dropdown .filter-item.on{background:var(--stamp);color:#fff}
-.filter-dropdown .filter-item .count{font-family:'IBM Plex Mono',monospace;font-size:11px;opacity:.7;margin-left:auto;padding-left:12px}
-
-/* Time filter buttons */
-.time-filter{background:var(--card);border:2px solid var(--line);padding:8px 14px;cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.05em;box-shadow:2px 2px 0 var(--line)}
-.time-filter:hover{border-color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
-.time-filter.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.time-filter .num{font-weight:700;margin-right:4px}
-
-#sortBar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-left:auto}
-.sort-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive)}
-.sort-btn{background:none;border:1.5px solid var(--line);padding:4px 10px;font-family:'IBM Plex Mono',monospace;
-  font-size:11px;cursor:pointer;color:var(--olive)}
-.sort-btn:hover{border-color:var(--ink);color:var(--ink)}
-.sort-btn.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-
-/* controls */
-#controls{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
-#q{flex:1;min-width:220px;border:2px solid var(--ink);background:var(--card);color:var(--ink);padding:10px 12px;
-  font-family:'IBM Plex Mono',monospace;font-size:14px}
-#q:focus{outline:3px solid var(--stamp);outline-offset:1px}
-.tab{border:2px solid var(--ink);background:transparent;color:var(--ink);padding:9px 16px;cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
-.tab.on{background:var(--ink);color:var(--paper)}
+@media (min-width: 1024px) {
+  :root { font-size: 18px; }
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ARTICLE CARDS - Evidence filed into cases
+   BASE STYLES - MOBILE FIRST
    ═══════════════════════════════════════════════════════════════════════════ */
-.article{background:var(--article-bg);border:1px solid var(--line);margin:12px 0;position:relative;
-  box-shadow:2px 2px 0 var(--line);cursor:pointer}
-.article:hover{box-shadow:3px 3px 0 var(--stamp)}
-.article-inner{padding:16px 16px 12px;display:grid;grid-template-columns:80px 1fr;gap:14px}
 
-/* Article thumbnail - below the stamp */
-.article-thumb{width:80px;height:50px;overflow:hidden;border:1px solid var(--line);margin-top:8px}
-.article-thumb img{width:100%;height:100%;object-fit:cover}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-/* Stamp column contains stamp + optional thumbnail */
-.article-stamp-col{display:flex;flex-direction:column;align-items:center}
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Archivo', sans-serif;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  transition: background 0.3s, color 0.3s;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-/* Red filing stamp */
-.article-stamp{background:var(--stamp);color:#fff;padding:8px 6px;text-align:center;
-  font-family:'Oswald',sans-serif;transform:rotate(-3deg);align-self:start;line-height:1.1}
-.article-stamp .label{font-size:8px;letter-spacing:.15em;opacity:.9}
-.article-stamp .date{font-size:14px;font-weight:700;margin-top:2px}
-.article-stamp .src{font-size:9px;margin-top:4px;opacity:.85;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+a {
+  color: inherit;
+  text-decoration: none;
+}
 
-.article-body h3{font-size:16px;font-weight:600;margin-bottom:4px;line-height:1.3}
-.article-body .case-link{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.05em;color:var(--olive);
-  text-transform:uppercase;margin-bottom:6px;display:inline-block}
-.article-body .case-link:hover{color:var(--stamp)}
-.article-body p{font-size:14px;color:var(--olive);margin-bottom:8px;line-height:1.5}
-.article-body .source-link{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--stamp);
-  text-decoration:none;display:inline-flex;align-items:center;gap:4px}
-.article-body .source-link:hover{text-decoration:underline}
+/* Typography utilities */
+.mono {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+}
 
-/* Action bar for articles */
-.article-actions{display:flex;gap:6px;padding:10px 16px;border-top:1px dashed var(--line);background:rgba(0,0,0,.02)}
-.act-btn{background:none;border:1.5px solid var(--ink);color:var(--ink);padding:5px 10px;cursor:pointer;
-  font-family:'IBM Plex Mono',monospace;font-size:11px;display:flex;align-items:center;gap:4px}
-.act-btn:hover{background:var(--ink);color:var(--paper)}
-.act-btn.good{border-color:var(--good);color:var(--good)}
-.act-btn.good:hover,.act-btn.good.on{background:var(--good);color:#fff}
-.act-btn.evil{border-color:var(--evil);color:var(--evil)}
-.act-btn.evil:hover,.act-btn.evil.on{background:var(--evil);color:#fff}
-.act-btn.fake{border-color:var(--olive);color:var(--olive)}
-.act-btn.fake:hover,.act-btn.fake.on{background:var(--olive);color:#fff}
-.act-btn.track.on{background:var(--ink);color:var(--paper)}
+.disp {
+  font-family: 'Oswald', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   CASE CARDS - The docket folders
+   HEADER - STACKS ON MOBILE, HORIZONTAL ON TABLET+
    ═══════════════════════════════════════════════════════════════════════════ */
-.case-card{background:var(--case-bg);border:2px solid var(--ink);margin:14px 0;position:relative;
-  box-shadow:4px 4px 0 var(--ink)}
-.case-card::before{content:'';position:absolute;top:-12px;left:20px;right:60%;height:12px;
-  background:var(--case-tab);border:2px solid var(--ink);border-bottom:none;border-radius:4px 4px 0 0}
-.case-card-inner{padding:20px}
-.case-card .case-num{font-family:'Oswald',sans-serif;font-size:13px;color:var(--stamp);letter-spacing:.1em}
-.case-card h2{font-family:'Oswald',sans-serif;font-size:20px;text-transform:uppercase;margin:4px 0 8px;line-height:1.2}
-.case-card .case-meta{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive);margin-bottom:12px}
-.case-card-actions{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px;border-top:2px solid var(--ink);background:rgba(0,0,0,.03)}
 
-/* Case rows in list view */
-.caserow{border:2px solid var(--ink);background:var(--case-bg);margin:10px 0;padding:14px 16px;
-  cursor:pointer;position:relative;box-shadow:3px 3px 0 var(--ink)}
-.caserow::before{content:'';position:absolute;top:-8px;left:16px;width:50px;height:8px;
-  background:var(--case-tab);border:2px solid var(--ink);border-bottom:none;border-radius:3px 3px 0 0}
-.caserow:hover{box-shadow:4px 4px 0 var(--stamp)}
-.caserow .num{font-family:'Oswald',sans-serif;color:var(--stamp);font-weight:700;font-size:12px;letter-spacing:.1em}
-.caserow .t{font-family:'Oswald',sans-serif;font-size:15px;text-transform:uppercase;margin:4px 0}
-.caserow .c{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive)}
+header {
+  border-bottom: 3px solid var(--ink);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+@media (min-width: 640px) {
+  header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+header h1 {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: var(--text-xl);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  header h1 {
+    font-size: var(--text-2xl);
+  }
+}
+
+header h1 span {
+  color: var(--stamp);
+}
+
+header .tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--text-xs);
+  color: var(--olive);
+  line-height: 1.4;
+}
+
+/* Header buttons - 44px minimum tap target */
+.hdr-btns {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.hdr-btn {
+  background: none;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  padding: var(--space-3) var(--space-4);
+  min-height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: 'Oswald', sans-serif;
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hdr-btn:hover,
+.hdr-btn:focus {
+  background: var(--ink);
+  color: var(--paper);
+  outline: none;
+}
+
+.hdr-btn.tab.on {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.hdr-btn.admin {
+  border-color: var(--stamp);
+  color: var(--stamp);
+}
+
+.hdr-btn.admin:hover {
+  background: var(--stamp);
+  color: #fff;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   DRAWER PANEL
+   MAIN CONTENT AREA
    ═══════════════════════════════════════════════════════════════════════════ */
-#drawer{position:fixed;inset:0;background:rgba(20,18,16,.65);display:none;z-index:10;
-  justify-content:center;align-items:flex-start;padding:20px}
-#drawer.open{display:flex}
-#dpanel{width:min(720px,95%);max-height:calc(100vh - 40px);background:var(--paper);
-  border:3px solid var(--ink);overflow-y:auto;padding:0;box-shadow:8px 8px 0 rgba(0,0,0,.3)}
-.drawer-header{padding:16px 20px;border-bottom:2px solid var(--ink);display:flex;justify-content:space-between;align-items:center}
-.drawer-header .close{font-family:'IBM Plex Mono',monospace;border:2px solid var(--ink);
-  background:transparent;color:var(--ink);padding:4px 10px;cursor:pointer}
-.drawer-header .close:hover{background:var(--ink);color:var(--paper)}
-.drawer-body{padding:20px}
 
-/* Article detail in drawer */
-.article-detail{background:var(--article-bg);border:2px solid var(--ink);padding:20px;margin-bottom:20px}
-.article-detail-img{width:100%;max-height:250px;overflow:hidden;margin-bottom:16px;border:1px solid var(--line)}
-.article-detail-img img{width:100%;height:auto;object-fit:cover;display:block}
-.article-detail .stamp-row{display:flex;gap:12px;align-items:center;margin-bottom:12px}
-.article-detail .stamp-badge{background:var(--stamp);color:#fff;padding:6px 12px;font-family:'Oswald',sans-serif;
-  font-size:11px;letter-spacing:.1em}
-.article-detail h3{font-size:20px;margin-bottom:10px;line-height:1.3}
-.article-detail .summary{font-size:15px;color:var(--olive);margin-bottom:12px;line-height:1.6}
-.article-detail .quote{border-left:4px solid var(--stamp);padding-left:14px;font-style:italic;
-  margin:16px 0;color:var(--ink);font-size:14px}
-.article-detail .read-link{display:inline-block;margin-top:8px;padding:8px 16px;background:var(--ink);
-  color:var(--paper);text-decoration:none;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.08em}
-.article-detail .read-link:hover{background:var(--stamp)}
+main {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
 
-/* Sections */
-.sect{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--olive);margin:24px 0 10px;border-bottom:2px solid var(--ink);padding-bottom:6px}
+@media (min-width: 640px) {
+  main {
+    max-width: 720px;
+    padding: var(--space-6);
+  }
+}
 
-/* Comments */
-.comment-form{display:flex;gap:8px;margin-bottom:16px}
-.comment-form textarea{flex:1;padding:10px;border:2px solid var(--ink);background:var(--card);
-  font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink);resize:vertical}
-.comment-submit{background:var(--ink);color:var(--paper);border:none;padding:10px 16px;cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.08em;white-space:nowrap}
-.comment-submit:hover{background:var(--stamp)}
-.comment-submit:disabled{opacity:.5;cursor:not-allowed}
-.comment{border:1px solid var(--line);padding:12px;margin-bottom:10px;background:var(--card)}
-.comment-body{font-size:14px;line-height:1.5;margin-bottom:8px}
-.comment-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.cm-btn{background:none;border:1px solid var(--line);padding:3px 8px;cursor:pointer;
-  font-family:'IBM Plex Mono',monospace;font-size:10px;display:flex;align-items:center;gap:3px}
-.cm-btn:hover{border-color:var(--ink)}
-.cm-btn.good{color:var(--good);border-color:var(--good)}
-.cm-btn.good:hover,.cm-btn.good.on{background:var(--good);color:#fff}
-.cm-btn.evil{color:var(--evil);border-color:var(--evil)}
-.cm-btn.evil:hover,.cm-btn.evil.on{background:var(--evil);color:#fff}
-.cm-btn.fake{color:var(--olive);border-color:var(--olive)}
-.cm-btn.fake:hover,.cm-btn.fake.on{background:var(--olive);color:#fff}
-.cm-btn.delete{color:var(--stamp);border-color:var(--stamp)}
-.cm-btn.delete:hover{background:var(--stamp);color:#fff}
+@media (min-width: 1024px) {
+  main {
+    max-width: 960px;
+    padding: var(--space-8);
+  }
+}
 
-/* Submit correction modal */
-#submitModal, #aboutModal, #adminModal{display:none;position:fixed;inset:0;background:rgba(20,18,16,.8);z-index:25;align-items:center;justify-content:center}
-#submitModal.open, #aboutModal.open, #adminModal.open{display:flex}
-.submit-box{max-width:520px;width:90%;background:var(--paper);border:3px solid var(--ink);padding:24px;max-height:90vh;overflow-y:auto}
-.submit-box h3{font-family:'Oswald',sans-serif;font-size:20px;margin-bottom:16px}
-.submit-box label{display:block;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.1em;margin:12px 0 4px}
-.submit-box input,.submit-box select,.submit-box textarea{width:100%;padding:10px;border:2px solid var(--ink);
-  background:var(--card);font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink)}
-.submit-box .action-type{display:flex;gap:8px;margin:16px 0}
-.submit-box .action-type button{flex:1;padding:12px;border:2px solid var(--ink);background:none;cursor:pointer;
-  font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.08em}
-.submit-box .action-type button:hover,.submit-box .action-type button.on{background:var(--ink);color:var(--paper)}
-.submit-box .btn-row{display:flex;gap:12px;margin-top:20px}
-.submit-box .btn-row button{padding:12px 20px;font-family:'Oswald',sans-serif;font-size:14px;cursor:pointer}
-.submit-box .primary{background:var(--ink);color:var(--paper);border:none}
-.submit-box .secondary{background:none;border:2px solid var(--ink)}
-#submitStatus{margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:12px}
+@media (min-width: 1280px) {
+  main {
+    max-width: 1200px;
+  }
+}
 
-.empty{padding:40px 0;text-align:center;font-family:'IBM Plex Mono',monospace;color:var(--olive);font-size:14px}
-footer{max-width:920px;margin:30px auto;padding:14px 20px;border-top:3px solid var(--ink);
-  font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive)}
+/* ═══════════════════════════════════════════════════════════════════════════
+   SEARCH & FILTERS - MOBILE-FIRST LAYOUT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  #controls {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+#q {
+  flex: 1;
+  min-width: 0;
+  border: 2px solid var(--ink);
+  background: var(--card);
+  color: var(--ink);
+  padding: var(--space-3);
+  min-height: var(--tap-min);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--text-sm);
+  border-radius: 0;
+  -webkit-appearance: none;
+}
+
+#q:focus {
+  outline: 3px solid var(--stamp);
+  outline-offset: 1px;
+}
+
+/* Filter section - stacks on mobile */
+#filterSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  #filterSection {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}
+
+.filter-popup-btn {
+  background: var(--card);
+  border: 2px solid var(--ink);
+  padding: var(--space-3) var(--space-4);
+  min-height: var(--tap-min);
+  cursor: pointer;
+  font-family: 'Oswald', sans-serif;
+  font-size: var(--text-sm);
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  position: relative;
+  box-shadow: 2px 2px 0 var(--ink);
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.filter-popup-btn:hover {
+  background: var(--paper);
+}
+
+.filter-popup-btn.active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.filter-popup-btn .badge {
+  background: var(--stamp);
+  color: #fff;
+  font-size: var(--text-xs);
+  padding: var(--space-1) var(--space-2);
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Time filters */
+.time-filter {
+  background: var(--card);
+  border: 2px solid var(--line);
+  padding: var(--space-3) var(--space-4);
+  min-height: var(--tap-min);
+  cursor: pointer;
+  font-family: 'Oswald', sans-serif;
+  font-size: var(--text-sm);
+  letter-spacing: 0.05em;
+  box-shadow: 2px 2px 0 var(--line);
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.time-filter:hover {
+  border-color: var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.time-filter.on {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+/* Sort controls - stacks on mobile, inline on tablet+ */
+#sortBar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+@media (min-width: 640px) {
+  #sortBar {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 0;
+    margin-left: auto;
+  }
+}
+
+.sort-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--text-xs);
+  color: var(--olive);
+}
+
+.sort-btn {
+  background: none;
+  border: 2px solid var(--line);
+  padding: var(--space-2) var(--space-3);
+  min-height: var(--tap-min);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--text-xs);
+  cursor: pointer;
+  color: var(--olive);
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sort-btn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.sort-btn.on {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ARTICLE CARDS - STACKS ON MOBILE, GRID ON TABLET+
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.article {
+  background: var(--article-bg);
+  border: 1px solid var(--line);
+  margin: var(--space-4) 0;
+  box-shadow: 2px 2px 0 var(--line);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.article:hover {
+  box-shadow: 3px 3px 0 var(--stamp);
+}
+
+/* Mobile: Stack vertically */
+.article-inner {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Tablet+: Side-by-side grid */
+@media (min-width: 640px) {
+  .article-inner {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: var(--space-4);
+  }
+}
+
+/* Stamp column */
+.article-stamp-col {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+@media (min-width: 640px) {
+  .article-stamp-col {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Red filing stamp - readable sizes */
+.article-stamp {
+  background: var(--stamp);
+  color: #fff;
+  padding: var(--space-2) var(--space-3);
+  text-align: center;
+  font-family: 'Oswald', sans-serif;
+  transform: rotate(-3deg);
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .article-stamp {
+    transform: rotate(-5deg);
+  }
+}
+
+.article-stamp .label {
+  font-size: var(--text-xs);  /* 12px minimum */
+  letter-spacing: 0.15em;
+  opacity: 0.9;
+}
+
+.article-stamp .date {
+  font-size: var(--text-base);  /* 16px */
+  font-weight: 700;
+  margin-top: var(--space-1);
+}
+
+.article-stamp .src {
+  font-size: var(--text-xs);  /* 12px */
+  margin-top: var(--space-1);
+  opacity: 0.85;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Thumbnail */
+.article-thumb {
+  width: 80px;
+  height: 50px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .article-thumb {
+    width: 100%;
+    height: 60px;
+    margin-top: var(--space-2);
+  }
+}
+
+.article-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Article content */
+.article-content h3 {
+  font-size: var(--text-lg);  /* 18px */
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: var(--space-2);
+}
+
+.article-content p {
+  font-size: var(--text-sm);  /* 14px */
+  line-height: 1.6;
+  color: var(--olive);
+  margin-bottom: var(--space-3);
+}
+
+.article-content .meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--text-xs);  /* 12px */
+  color: var(--olive);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+/* Action buttons - 44px minimum, wrap on mobile */
+.article-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.act-btn {
+  background: none;
+  border: 2px solid var(--line);
+  color: var(--olive);
+  padding: var(--space-2) var(--space-3);
+  min-height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  cursor: pointer;
+  font-family: 'Oswald', sans-serif;
+  font-size: var(--text-sm);  /* 14px */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.act-btn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.act-btn.good {
+  border-color: var(--good);
+  color: var(--good);
+}
+
+.act-btn.good:hover,
+.act-btn.good.on {
+  background: var(--good);
+  color: #fff;
+}
+
+.act-btn.evil {
+  border-color: var(--evil);
+  color: var(--evil);
+}
+
+.act-btn.evil:hover,
+.act-btn.evil.on {
+  background: var(--evil);
+  color: #fff;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODALS & PANELS - FULL-WIDTH ON MOBILE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#panelOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+}
+
+#panelOverlay.open {
+  display: block;
+}
+
+/* My Cases panel - full-width on mobile, centered on desktop */
+#myCasesPanel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--card);
+  z-index: 1000;
+  overflow-y: auto;
+  padding: var(--space-4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 640px) {
+  #myCasesPanel {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    max-width: 85vw;
+    height: auto;
+    max-height: 85vh;
+    border: 3px solid var(--ink);
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+  }
+}
+
+#myCasesPanel.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#myCasesPanel h2 {
+  font-family: 'Oswald', sans-serif;
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Close button - 44px tap target */
+.close-btn {
+  background: none;
+  border: none;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-2xl);
+  cursor: pointer;
+  color: var(--ink);
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.close-btn:hover {
+  color: var(--stamp);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hidden {
+  display: none !important;
+}
+
+/* Skip to main content (accessibility) */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--stamp);
+  color: #fff;
+  padding: var(--space-2) var(--space-4);
+  text-decoration: none;
+  z-index: 9999;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Loading state */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ACCESSIBILITY & PRINT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  header, #controls, #filterSection, .article-actions {
+    display: none;
+  }
+
+  .article {
+    page-break-inside: avoid;
+  }
+}
 </style>
 </head>
 <body>
-<header>
+
+<!-- Skip to main content for screen readers -->
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header role="banner">
   <div class="brand">
-    <h1>USE CASE ARMS RACE<span> →</span></h1>
-    <div class="tag">Build the case for good AI.<span class="line2"> Report bad AI before it reports you.</span></div>
+    <h1>USE CASE <span>ARMS RACE</span></h1>
+    <div class="tag mono">
+      Build the case for AI ·
+      <span class="line2">Report AI before it reports you</span>
+    </div>
   </div>
+
   <div class="hdr-btns">
-    <button class="hdr-btn tab on" id="tab-articles">Articles</button>
-    <button class="hdr-btn tab" id="tab-cases">Cases</button>
-    <button class="hdr-btn" id="myCasesBtn">☆ My Cases</button>
-    <button class="hdr-btn" id="aboutBtn">About</button>
-    <button class="hdr-btn" id="themeToggle">☀</button>
-    <button class="hdr-btn admin" id="adminBtn" style="display:none">ADMIN</button>
+    <button class="hdr-btn tab on" id="tabArticles">Articles</button>
+    <button class="hdr-btn tab" id="tabCases">Cases</button>
+    <button class="hdr-btn" id="btnMyCases">My Cases</button>
+    <button class="hdr-btn" id="btnAbout">About</button>
+    <button class="hdr-btn" id="btnTheme">🌙 Dark</button>
+    <button class="hdr-btn admin hidden" id="btnAdmin">Admin</button>
   </div>
 </header>
 
-<!-- My Cases panel -->
-<div id="panelOverlay"></div>
-<div id="myCasesPanel">
-  <h2>MY CASE FILE <button class="close-btn" id="closeMyCases">×</button></h2>
-  <div class="share-box">
-    <p>Sync your case file to another device:</p>
-    <button class="share-btn" id="showQRCode">📱 Show QR Code</button>
-    <button class="share-btn" id="shareCaseFile">⛓ Copy Link</button>
-    <canvas id="qrCode" width="180" height="180"></canvas>
-    <div id="shareLink" style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:10px;word-break:break-all"></div>
-  </div>
-  <div id="myCasesList"><p style="color:var(--olive);font-size:12px">Track cases to build your file.</p></div>
-</div>
-
-<!-- About modal -->
-<div id="aboutModal" class="modal">
-  <div class="submit-box" style="max-width:500px;position:relative">
-    <button class="close-btn" id="closeAboutX" style="position:absolute;top:10px;right:14px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--ink)">×</button>
-    <h3>ABOUT USE CASE ARMS RACE</h3>
-    <p style="font-size:14px;line-height:1.6;margin-bottom:12px">
-      <strong>The AI Arms Race is here.</strong> Every week, new AI systems are deployed to surveil, score, manipulate, and decide.
-      This is the public docket—tracking what AI does to people, before it's normalized.
-    </p>
-    <p style="font-size:14px;line-height:1.6;margin-bottom:12px">
-      <strong>Cases</strong> = VERB + OBJECT + INSTRUMENT<br>
-      <em>"SURVEIL WORKERS · WITH EMOTION RECOGNITION"</em>
-    </p>
-    <p style="font-size:14px;line-height:1.6;margin-bottom:12px">
-      <strong>Articles</strong> are news events filed as evidence. Vote good, evil, or fake. Track cases you care about.
-      Submit corrections to improve the docket.
-    </p>
-    <p style="font-size:14px;line-height:1.6;margin-bottom:16px">
-      <strong>Your case file is anonymous.</strong> Share it across devices without logging in.
-      Report it before it reports you.
-    </p>
-    <button class="primary" id="closeAbout">GOT IT</button>
-  </div>
-</div>
-
-<main>
-  <div id="filterSection">
-    <button class="filter-popup-btn" id="whoBtn">
-      WHO <span class="arrow">▼</span>
-      <div class="filter-dropdown" id="whoDropdown"></div>
-    </button>
-    <button class="filter-popup-btn" id="whomBtn">
-      TO WHOM <span class="arrow">▼</span>
-      <div class="filter-dropdown" id="whomDropdown"></div>
-    </button>
-    <button class="time-filter" id="todayFilter">
-      <span class="num" id="todayNum">0</span> Today
-    </button>
-    <button class="time-filter" id="weekFilter">
-      <span class="num" id="weekNum">0</span> This Week
-    </button>
-    <div id="sortBar">
-      <span class="sort-label">Sort:</span>
-      <button class="sort-btn on" data-sort="newest">Newest</button>
-      <button class="sort-btn" data-sort="votes">Most Votes</button>
-      <button class="sort-btn" data-sort="activity">Activity</button>
-      <button class="sort-btn" data-sort="trending">Trending</button>
-    </div>
-  </div>
-
+<main id="main" role="main">
+  <!-- Search -->
   <div id="controls">
-    <input id="q" type="search" placeholder="search cases…" aria-label="Search">
+    <input type="text" id="q" placeholder="Search cases..." aria-label="Search">
+    <button class="hdr-btn" id="btnSearch">Search</button>
   </div>
 
-  <div id="feed"><div class="empty">Opening the docket…</div></div>
+  <!-- Filters -->
+  <section id="filterSection" aria-label="Filters">
+    <button class="filter-popup-btn" id="btnWhoFilter">
+      WHO <span class="badge hidden" id="badgeWho">0</span>
+    </button>
+    <button class="filter-popup-btn" id="btnWhomFilter">
+      TO WHOM <span class="badge hidden" id="badgeWhom">0</span>
+    </button>
+    <button class="time-filter" id="btnToday">
+      <span class="num">0</span> Today
+    </button>
+    <button class="time-filter" id="btnWeek">
+      <span class="num">0</span> This Week
+    </button>
+
+    <div id="sortBar">
+      <span class="sort-label mono">Sort:</span>
+      <button class="sort-btn on" id="sortNewest">Newest</button>
+      <button class="sort-btn" id="sortVotes">Most Votes</button>
+      <button class="sort-btn" id="sortActivity">Activity</button>
+    </div>
+  </section>
+
+  <!-- Feed -->
+  <div id="feed" role="feed" aria-live="polite">
+    <p class="mono" style="color: var(--olive); text-align: center; padding: var(--space-8);">
+      Loading cases...
+    </p>
+  </div>
 </main>
 
-<footer>
-  Use Case Arms Race · Build the case for good AI
-</footer>
-
-<div id="drawer" role="dialog" aria-modal="true">
-  <div id="dpanel"></div>
-</div>
-
-<!-- Submit Correction Modal -->
-<div id="submitModal">
-  <div class="submit-box">
-    <h3>SUBMIT CORRECTION</h3>
-    <p style="font-size:13px;color:var(--olive);margin-bottom:16px">Suggest a better case title for this article.</p>
-
-    <label>VERB (what the AI does)</label>
-    <input id="subVerb" type="text" placeholder="e.g., surveil, generate, moderate">
-
-    <label>OBJECT (who/what is affected)</label>
-    <input id="subObject" type="text" placeholder="e.g., workers, images, applicants">
-
-    <label>INSTRUMENT (the AI technology)</label>
-    <input id="subInstrument" type="text" placeholder="e.g., facial recognition, large language models">
-
-    <label>ACTION</label>
-    <div class="action-type">
-      <button data-action="correct" class="on">Correct this case</button>
-      <button data-action="new">Create new case</button>
-      <button data-action="copy">Copy to existing</button>
-    </div>
-
-    <div id="copyTarget" style="display:none">
-      <label>TARGET CASE NUMBER</label>
-      <input id="subTargetCase" type="number" placeholder="e.g., 142">
-    </div>
-
-    <label>REASON (optional)</label>
-    <textarea id="subReason" rows="2" placeholder="Why is this better?"></textarea>
-
-    <div class="btn-row">
-      <button class="primary" id="submitCorrection">SUBMIT</button>
-      <button class="secondary" id="cancelSubmit">CANCEL</button>
-    </div>
-    <div id="submitStatus"></div>
+<!-- My Cases Panel -->
+<div id="panelOverlay" aria-hidden="true"></div>
+<aside id="myCasesPanel" role="dialog" aria-labelledby="myCasesTitle" aria-hidden="true">
+  <h2 id="myCasesTitle">
+    My Cases
+    <button class="close-btn" id="closeMyCases" aria-label="Close">×</button>
+  </h2>
+  <div id="myCasesContent">
+    <p class="mono" style="color: var(--olive);">No saved cases yet.</p>
   </div>
-</div>
+</aside>
 
-<!-- Admin Modal -->
-<div id="adminModal" class="modal">
-  <div class="submit-box" style="max-width:500px;position:relative">
-    <button class="close-btn" id="closeAdminX" style="position:absolute;top:10px;right:14px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--ink)">×</button>
-    <h3>ADMIN PANEL</h3>
-    <div id="adminStatus" style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--paper);padding:12px;margin-bottom:16px;border:1px solid var(--line)">
-      Loading status...
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
-      <button class="primary" id="runCrawler">🔍 Run Crawler</button>
-      <button class="primary" id="runExtract">⚙️ Run Extract</button>
-      <button class="secondary" id="refreshStatus">↻ Refresh</button>
-    </div>
-    <div id="adminLog" style="font-family:'IBM Plex Mono',monospace;font-size:11px;max-height:200px;overflow-y:auto;background:#111;color:#0f0;padding:10px;display:none"></div>
-    <hr style="margin:16px 0;border:none;border-top:1px solid var(--line)">
-    <label>ADMIN KEY</label>
-    <input id="adminKeyInput" type="password" placeholder="Enter admin key" style="width:100%;padding:8px;margin-bottom:8px;font-family:'IBM Plex Mono',monospace">
-    <button class="secondary" id="saveAdminKey" style="width:100%">Save Key</button>
-  </div>
-</div>
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// UCAR 5.0 CLIENT - MOBILE-FIRST JAVASCRIPT
+// ═══════════════════════════════════════════════════════════════════════════
 
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const SUPABASE_URL = 'https://znhsnishdqrmumxbgobq.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuaHNuaXNoZHFybXVteGJnb2JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNzEwNjMsImV4cCI6MjA5OTY0NzA2M30.k22R9kcbLCp9OyTVBb7DaUbk_Gdghnu-YGKUYc834Rs';
-
-const sb = createClient(SUPABASE_URL, ANON_KEY);
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
-let USER = null, MODE = 'articles', MY_VOTES = new Map(), MY_TRACKS = new Set();
-let ALL_CASES = [], TOP_SUBJECTS = [], ACTIVE_TAG = null, SORT_BY = 'newest';
-
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const ago = d => { const s=(Date.now()-new Date(d))/1e3;
-  if(s<3600) return `${Math.max(1,s/60|0)}m`; if(s<86400) return `${s/3600|0}h`; return `${s/86400|0}d`; };
-const fmtDate = d => new Date(d).toLocaleDateString('en-US', {month:'short', day:'numeric'});
-
-// Theme
-function setTheme(t){
-  document.body.dataset.theme = t;
-  localStorage.setItem('ucar-theme', t);
-  $('#themeToggle').textContent = t === 'dark' ? '☾' : '☀';
-}
-$('#themeToggle').onclick = () => setTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark');
-setTheme(localStorage.getItem('ucar-theme') || 'light');
-
-// My Cases Panel
-$('#myCasesBtn').onclick = () => { $('#myCasesPanel').classList.add('open'); $('#panelOverlay').classList.add('open'); updateMyCasesList(); };
-$('#closeMyCases').onclick = () => { $('#myCasesPanel').classList.remove('open'); $('#panelOverlay').classList.remove('open'); };
-$('#panelOverlay').onclick = () => { $('#myCasesPanel').classList.remove('open'); $('#panelOverlay').classList.remove('open'); };
-
-function updateMyCasesList(){
-  const list = $('#myCasesList');
-  if(MY_TRACKS.size === 0){
-    list.innerHTML = '<p style="color:var(--olive);font-size:12px">Track cases to build your file.</p>';
-    return;
-  }
-  const tracked = ALL_CASES.filter(c => MY_TRACKS.has(c.id));
-  list.innerHTML = tracked.map(c => `
-    <div class="my-case" data-case="${c.id}">
-      <div class="num">CASE #${c.case_number}</div>
-      <div class="title">${esc(c.title_render)}</div>
-    </div>
-  `).join('') || '<p style="color:var(--olive);font-size:12px">Loading...</p>';
-  list.querySelectorAll('.my-case').forEach(el => el.onclick = () => {
-    $('#myCasesPanel').classList.remove('open');
-    $('#panelOverlay').classList.remove('open');
-    openCase(el.dataset.case);
-  });
-}
-
-// Share case file - copy link
-$('#shareCaseFile').onclick = () => {
-  const ids = [...MY_TRACKS];
-  if(ids.length === 0){ $('#shareLink').textContent = 'Track some cases first!'; return; }
-  const code = btoa(JSON.stringify(ids)).replace(/=/g,'');
-  const url = `${location.origin}?import=${code}`;
-  navigator.clipboard.writeText(url).then(() => {
-    $('#shareLink').innerHTML = `<span style="color:var(--good)">✓ Link copied!</span>`;
-  }).catch(() => {
-    $('#shareLink').textContent = url;
-  });
+const CONFIG = {
+  SUPABASE_URL: 'https://aslcrwmbdtvimjrexxzw.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzbGNyd21iZHR2aW1qcmV4eHp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDA0NjgsImV4cCI6MjA5NjcxNjQ2OH0.XYG0LrgA_92h7dGjw0aamX53WIrwQaqPHNHQLe8p9ls',
+  API_BASE: 'https://aslcrwmbdtvimjrexxzw.supabase.co'
 };
 
-// Share case file - QR code
-$('#showQRCode').onclick = () => {
-  const ids = [...MY_TRACKS];
-  if(ids.length === 0){ $('#shareLink').textContent = 'Track some cases first!'; return; }
-  const code = btoa(JSON.stringify(ids)).replace(/=/g,'');
-  const url = `${location.origin}?import=${code}`;
-
-  const canvas = $('#qrCode');
-  canvas.classList.add('show');
-  generateQR(canvas, url);
-  $('#shareLink').innerHTML = `<span style="color:var(--olive)">Scan with your phone camera</span>`;
-};
-
-// Simple QR code generator (uses canvas)
-function generateQR(canvas, text) {
-  // Use a lightweight QR library loaded from CDN
-  if(!window.QRCode) {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js';
-    script.onload = () => QRCode.toCanvas(canvas, text, { width: 180, margin: 2 });
-    document.head.appendChild(script);
-  } else {
-    QRCode.toCanvas(canvas, text, { width: 180, margin: 2 });
-  }
+// Theme toggle
+const btnTheme = document.getElementById('btnTheme');
+const currentTheme = localStorage.getItem('theme') || 'light';
+if (currentTheme === 'dark') {
+  document.documentElement.setAttribute('data-theme', 'dark');
+  btnTheme.textContent = '☀️ Light';
 }
 
-// Import shared case file
-const importParam = new URLSearchParams(location.search).get('import');
-if(importParam){
-  try {
-    const ids = JSON.parse(atob(importParam));
-    if(Array.isArray(ids)) ids.forEach(id => MY_TRACKS.add(id));
-    localStorage.setItem('ucar-tracks', JSON.stringify([...MY_TRACKS]));
-    history.replaceState(null, '', location.pathname);
-  } catch(e){}
-}
-
-// About modal
-$('#aboutBtn').onclick = () => $('#aboutModal').classList.add('open');
-$('#closeAbout').onclick = () => $('#aboutModal').classList.remove('open');
-$('#closeAboutX').onclick = () => $('#aboutModal').classList.remove('open');
-$('#aboutModal').onclick = e => { if(e.target.id === 'aboutModal') $('#aboutModal').classList.remove('open'); };
-
-// Admin
-let ADMIN_KEY = localStorage.getItem('ucar-admin-key') || '';
-// Always show admin button if ?admin in URL or key exists
-if(ADMIN_KEY || location.search.includes('admin')) {
-  $('#adminBtn').style.display = 'block';
-}
-
-// Admin modal functionality
-$('#adminBtn').addEventListener('click', () => {
-  console.log('Admin button clicked');
-  $('#adminModal').classList.add('open');
-  $('#adminKeyInput').value = ADMIN_KEY;
-  refreshAdminStatus();
+btnTheme.addEventListener('click', () => {
+  const theme = document.documentElement.getAttribute('data-theme');
+  const newTheme = theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  btnTheme.textContent = newTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
 });
-$('#closeAdminX').addEventListener('click', () => $('#adminModal').classList.remove('open'));
-$('#adminModal').addEventListener('click', e => { if(e.target.id === 'adminModal') $('#adminModal').classList.remove('open'); });
 
-$('#saveAdminKey').onclick = () => {
-  ADMIN_KEY = $('#adminKeyInput').value.trim();
-  localStorage.setItem('ucar-admin-key', ADMIN_KEY);
-  $('#adminBtn').style.display = 'block';
-  adminLog('Admin key saved');
-};
+// My Cases panel
+const btnMyCases = document.getElementById('btnMyCases');
+const closeMyCases = document.getElementById('closeMyCases');
+const myCasesPanel = document.getElementById('myCasesPanel');
+const panelOverlay = document.getElementById('panelOverlay');
 
-$('#refreshStatus').onclick = refreshAdminStatus;
-
-async function refreshAdminStatus(){
-  if(!ADMIN_KEY) {
-    $('#adminStatus').innerHTML = '<span style="color:var(--stamp)">Enter admin key to view status</span>';
-    return;
-  }
-  try {
-    const r = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=status`, {
-      headers: { 'x-admin-key': ADMIN_KEY }
-    });
-    const data = await r.json();
-    if(data.error) throw new Error(data.error);
-    const p = data.prospects || {};
-    $('#adminStatus').innerHTML = `
-      <strong>Prospects:</strong><br>
-      • Extracted: ${p.extracted || 0}<br>
-      • Promoted: ${p.promoted || 0} (pending extraction)<br>
-      • Skipped: ${p.skipped || 0}<br>
-      • Errors: ${p.error || 0}<br>
-      <strong>Cases:</strong> ${data.cases || 0} | <strong>Filings:</strong> ${data.filings || 0}
-    `;
-  } catch(e) {
-    $('#adminStatus').innerHTML = `<span style="color:var(--stamp)">Error: ${e.message}</span>`;
-  }
+function openPanel() {
+  myCasesPanel.classList.add('open');
+  panelOverlay.classList.add('open');
+  myCasesPanel.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
 }
 
-function adminLog(msg){
-  const log = $('#adminLog');
-  log.style.display = 'block';
-  log.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
-  log.scrollTop = log.scrollHeight;
+function closePanel() {
+  myCasesPanel.classList.remove('open');
+  panelOverlay.classList.remove('open');
+  myCasesPanel.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
 }
 
-$('#runCrawler').onclick = async () => {
-  if(!ADMIN_KEY) return adminLog('No admin key');
-  adminLog('Starting crawler...');
-  try {
-    const r = await fetch(`${SUPABASE_URL}/functions/v1/crawler?action=run`, {
-      method: 'POST',
-      headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
-      body: '{}'
-    });
-    const data = await r.json();
-    adminLog(`Crawler done: ${data.discovered || 0} discovered, ${data.promoted || 0} promoted`);
-    refreshAdminStatus();
-  } catch(e) {
-    adminLog(`Error: ${e.message}`);
-  }
-};
+btnMyCases.addEventListener('click', openPanel);
+closeMyCases.addEventListener('click', closePanel);
+panelOverlay.addEventListener('click', closePanel);
 
-$('#runExtract').onclick = async () => {
-  if(!ADMIN_KEY) return adminLog('No admin key');
-  adminLog('Starting extraction...');
-  try {
-    const r = await fetch(`${SUPABASE_URL}/functions/v1/extract?action=run`, {
-      method: 'POST',
-      headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
-      body: '{"max": 10}'
-    });
-    const data = await r.json();
-    const extracted = (data.results || []).filter(r => r.result === 'extracted').length;
-    adminLog(`Extract done: ${data.processed || 0} processed, ${extracted} extracted`);
-    refreshAdminStatus();
-    loadFeed();
-  } catch(e) {
-    adminLog(`Error: ${e.message}`);
-  }
-};
-
-async function boot(){
-  let { data:{ session } } = await sb.auth.getSession();
-  if(!session) ({ data:{ session } } = await sb.auth.signInAnonymously());
-  USER = session?.user ?? null;
-
-  // Load all cases for My Cases panel
-  const { data: cases } = await sb.from('cases')
-    .select('id, case_number, title_render')
-    .eq('status','live');
-  ALL_CASES = cases || [];
-
-  if(USER){
-    const { data: v } = await sb.from('votes').select('case_id, kind');
-    (v??[]).forEach(r => MY_VOTES.set(r.case_id, r.kind));
-    const { data: t } = await sb.from('tracks').select('case_id');
-    (t??[]).forEach(r => MY_TRACKS.add(r.case_id));
-    // Also load from localStorage for cross-device sync
-    try {
-      const stored = JSON.parse(localStorage.getItem('ucar-tracks')||'[]');
-      stored.forEach(id => MY_TRACKS.add(id));
-    } catch(e){}
-  }
-
-  loadFilters();
-  loadFeed();
-}
-
-// Filter state - WHO, TO WHOM popups + time filters
-let ALL_COMPANIES = [], ALL_OBJECTS = [], TODAY_COUNT = 0, WEEK_COUNT = 0;
-let ACTIVE_WHO = null, ACTIVE_WHOM = null, TIME_FILTER = null; // 'today' | 'week' | null
-
-async function loadFilters(){
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-  const weekStart = new Date(now - 7*24*60*60*1000).toISOString();
-
-  const [todayRes, weekRes, filingsRes, casesRes] = await Promise.all([
-    sb.from('filings').select('id', {count:'exact', head:true}).eq('status','live').gte('created_at', todayStart),
-    sb.from('filings').select('id', {count:'exact', head:true}).eq('status','live').gte('created_at', weekStart),
-    sb.from('filings').select('subject').eq('status','live').not('subject','is',null),
-    sb.from('cases').select('object_class_id, vocab_terms!cases_object_class_id_fkey(term)').eq('status','live')
-  ]);
-
-  TODAY_COUNT = todayRes.count || 0;
-  WEEK_COUNT = weekRes.count || 0;
-
-  // WHO - companies/subjects
-  const subjectCounts = {};
-  (filingsRes.data||[]).forEach(f => { if(f.subject) subjectCounts[f.subject] = (subjectCounts[f.subject]||0)+1; });
-  ALL_COMPANIES = Object.entries(subjectCounts).sort((a,b)=>b[1]-a[1]);
-
-  // TO WHOM - objects (from cases with vocab join)
-  const objectCounts = {};
-  (casesRes.data||[]).forEach(c => {
-    // Supabase JS client returns nested object as 'vocab_terms' not with full FK path
-    const obj = c.vocab_terms?.term;
-    if(obj) objectCounts[obj] = (objectCounts[obj]||0)+1;
-  });
-  ALL_OBJECTS = Object.entries(objectCounts).sort((a,b)=>b[1]-a[1]);
-
-  renderFilters();
-  wireFilterEvents();
-}
-
-function renderFilters(){
-  // Update counts
-  $('#todayNum').textContent = TODAY_COUNT;
-  $('#weekNum').textContent = WEEK_COUNT;
-
-  // WHO dropdown
-  const whoDropdown = $('#whoDropdown');
-  whoDropdown.innerHTML = ALL_COMPANIES.map(([name, count]) =>
-    `<div class="filter-item ${ACTIVE_WHO===name?'on':''}" data-who="${esc(name)}">
-      ${esc(name)} <span class="count">${count}</span>
-    </div>`
-  ).join('') || '<div class="filter-item" style="color:var(--olive)">No companies yet</div>';
-
-  // TO WHOM dropdown
-  const whomDropdown = $('#whomDropdown');
-  whomDropdown.innerHTML = ALL_OBJECTS.map(([name, count]) =>
-    `<div class="filter-item ${ACTIVE_WHOM===name?'on':''}" data-whom="${esc(name)}">
-      ${esc(name)} <span class="count">${count}</span>
-    </div>`
-  ).join('') || '<div class="filter-item" style="color:var(--olive)">No objects yet</div>';
-
-  // Update button states
-  $('#whoBtn').classList.toggle('active', !!ACTIVE_WHO);
-  $('#whomBtn').classList.toggle('active', !!ACTIVE_WHOM);
-  $('#todayFilter').classList.toggle('on', TIME_FILTER === 'today');
-  $('#weekFilter').classList.toggle('on', TIME_FILTER === 'week');
-
-  // Add badges for active filters
-  const whoBadge = ACTIVE_WHO ? `<span class="badge">${esc(ACTIVE_WHO)}</span>` : '';
-  $('#whoBtn').innerHTML = `WHO ${whoBadge}<span class="arrow">▼</span><div class="filter-dropdown" id="whoDropdown">${whoDropdown.innerHTML}</div>`;
-
-  const whomBadge = ACTIVE_WHOM ? `<span class="badge">${esc(ACTIVE_WHOM)}</span>` : '';
-  $('#whomBtn').innerHTML = `TO WHOM ${whomBadge}<span class="arrow">▼</span><div class="filter-dropdown" id="whomDropdown">${whomDropdown.innerHTML}</div>`;
-
-  wireDropdownClicks();
-}
-
-function wireFilterEvents(){
-  // Popup toggles
-  $('#whoBtn').onclick = (e) => {
-    if(e.target.closest('.filter-dropdown')) return;
-    e.stopPropagation();
-    closeAllDropdowns();
-    $('#whoBtn').classList.toggle('open');
-    $('#whoDropdown').classList.toggle('open');
-  };
-  $('#whomBtn').onclick = (e) => {
-    if(e.target.closest('.filter-dropdown')) return;
-    e.stopPropagation();
-    closeAllDropdowns();
-    $('#whomBtn').classList.toggle('open');
-    $('#whomDropdown').classList.toggle('open');
-  };
-
-  // Time filters
-  $('#todayFilter').onclick = () => {
-    TIME_FILTER = TIME_FILTER === 'today' ? null : 'today';
-    renderFilters();
-    loadFeed();
-  };
-  $('#weekFilter').onclick = () => {
-    TIME_FILTER = TIME_FILTER === 'week' ? null : 'week';
-    renderFilters();
-    loadFeed();
-  };
-
-  // Close dropdowns on outside click
-  document.addEventListener('click', closeAllDropdowns);
-}
-
-function wireDropdownClicks(){
-  // WHO items
-  $$('#whoDropdown .filter-item[data-who]').forEach(el => {
-    el.onclick = (e) => {
-      e.stopPropagation();
-      ACTIVE_WHO = ACTIVE_WHO === el.dataset.who ? null : el.dataset.who;
-      ACTIVE_TAG = ACTIVE_WHO; // For compatibility with existing feed filter
-      closeAllDropdowns();
-      renderFilters();
-      loadFeed();
-    };
-  });
-  // TO WHOM items
-  $$('#whomDropdown .filter-item[data-whom]').forEach(el => {
-    el.onclick = (e) => {
-      e.stopPropagation();
-      ACTIVE_WHOM = ACTIVE_WHOM === el.dataset.whom ? null : el.dataset.whom;
-      ACTIVE_TAG = ACTIVE_WHOM; // For compatibility
-      closeAllDropdowns();
-      renderFilters();
-      loadFeed();
-    };
-  });
-}
-
-function closeAllDropdowns(){
-  $$('.filter-popup-btn').forEach(b => b.classList.remove('open'));
-  $$('.filter-dropdown').forEach(d => d.classList.remove('open'));
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// ARTICLE CARD (for feed)
-// ═══════════════════════════════════════════════════════════════════════════
-function articleCard(a, c){
-  const vote = c ? MY_VOTES.get(c.id) : null;
-  const tracked = c ? MY_TRACKS.has(c.id) : false;
-  const domain = a.source_domain || 'source';
-
-  const thumb = a.image_url ? `<div class="article-thumb"><img src="${esc(a.image_url)}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div>` : '';
-
-  return `<div class="article" data-article="${a.id}" data-case="${c?.id || ''}">
-    <div class="article-inner">
-      <div class="article-stamp-col">
-        <div class="article-stamp">
-          <div class="label">FILED</div>
-          <div class="date">${fmtDate(a.created_at)}</div>
-          <div class="src">${esc(domain)}</div>
-        </div>
-        ${thumb}
-      </div>
-      <div class="article-body">
-        <a href="${esc(a.source_url)}" target="_blank" rel="noopener" class="source-link" onclick="event.stopPropagation()">
-          ${esc(domain)} ↗
-        </a>
-        <h3>${esc(a.headline)}</h3>
-        ${c ? `<a class="case-link" data-case="${c.id}">Case #${c.case_number}: ${esc(c.title_render)}</a>` : ''}
-        <p>${esc(a.summary)}</p>
-      </div>
-    </div>
-    <div class="article-actions">
-      <button class="act-btn good ${vote==='good'?'on':''}" data-vote="good">👍 Good ${c?.good_votes||0}</button>
-      <button class="act-btn evil ${vote==='evil'?'on':''}" data-vote="evil">👎 Evil ${c?.evil_votes||0}</button>
-      <button class="act-btn fake ${vote==='fake'?'on':''}" data-vote="fake">🚫 Fake ${c?.fake_votes||0}</button>
-      <button class="act-btn track ${tracked?'on':''}" data-action="track">☆ Track</button>
-      <button class="act-btn" data-action="share">⛓ Share</button>
-      <button class="act-btn" data-action="submit" style="margin-left:auto">✎ Submit</button>
-    </div>
-  </div>`;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// CASE CARD (for cases list)
-// ═══════════════════════════════════════════════════════════════════════════
-function caseCard(c){
-  const vote = MY_VOTES.get(c.id);
-  const tracked = MY_TRACKS.has(c.id);
-
-  return `<div class="caserow" data-case="${c.id}">
-    <div class="num">CASE #${c.case_number}</div>
-    <div class="t">${esc(c.title_render)}</div>
-    <div class="c">${c.filing_count} article${c.filing_count===1?'':'s'} · ${c.good_votes} good / ${c.evil_votes} evil</div>
-  </div>`;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// FEED with infinite scroll
-// ═══════════════════════════════════════════════════════════════════════════
-const PAGE_SIZE = 30;
-let FEED_OFFSET = 0;
-let FEED_LOADING = false;
-let FEED_HAS_MORE = true;
-let FEED_DATA = []; // cached data for client-side filtering
-
-async function loadFeed(append = false){
-  console.log('loadFeed called, FEED_LOADING:', FEED_LOADING, 'MODE:', MODE, 'ACTIVE_WHOM:', ACTIVE_WHOM);
-  if(FEED_LOADING) return;
-  if(append && !FEED_HAS_MORE) return;
-
-  const feed = $('#feed');
-  const q = $('#q').value.trim();
-
-  // Calculate time boundaries
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-  const weekStart = new Date(now - 7*24*60*60*1000).toISOString();
-
-  // Reset pagination on new search/filter
-  if(!append) {
-    FEED_OFFSET = 0;
-    FEED_HAS_MORE = true;
-    FEED_DATA = [];
-    feed.innerHTML = '<div class="loading">Loading...</div>';
-  }
-
-  if(q){
-    const r = await fetch(`${SUPABASE_URL}/functions/v1/api?action=search`, {
-      method:'POST',
-      headers:{ 'content-type':'application/json', 'authorization':`Bearer ${ANON_KEY}`, 'apikey': ANON_KEY },
-      body: JSON.stringify({ q })
-    }).then(r=>r.json()).catch(()=>({results:[]}));
-    feed.innerHTML = (r.results?.length)
-      ? r.results.map(a => articleCard(a, a.cases)).join('')
-      : `<div class="empty">No results for "${esc(q)}"</div>`;
-    wireArticles(feed);
-    FEED_HAS_MORE = false;
-    return;
-  }
-
-  FEED_LOADING = true;
-
-  if(MODE === 'articles'){
-    // If TO WHOM filter is active, get the case IDs first
-    let caseIdsForWhom = null;
-    if(ACTIVE_WHOM) {
-      console.log('TO WHOM filter active:', ACTIVE_WHOM, 'lowercase:', ACTIVE_WHOM.toLowerCase());
-      // Get vocab term ID for the object class
-      const { data: vocabData, error: vocabErr } = await sb.from('vocab_terms')
-        .select('id, term')
-        .eq('kind', 'object_class')
-        .eq('term', ACTIVE_WHOM.toLowerCase())
-        .limit(1);
-      console.log('Vocab lookup result:', vocabData, 'error:', vocabErr);
-
-      if(vocabData?.length) {
-        // Get all case IDs with this object class
-        const { data: casesData, error: casesErr } = await sb.from('cases')
-          .select('id')
-          .eq('object_class_id', vocabData[0].id)
-          .eq('status', 'live');
-        console.log('Cases with object:', casesData, casesErr);
-        caseIdsForWhom = casesData?.map(c => c.id) || [];
-      } else {
-        caseIdsForWhom = []; // No matching vocab term
-      }
-      console.log('Case IDs for whom:', caseIdsForWhom);
-    }
-
-    let query = sb.from('filings')
-      .select('*, cases(id, case_number, title_render, good_votes, evil_votes, fake_votes, filing_count, last_filed_at, object_class_id, vocab_terms!cases_object_class_id_fkey(term))')
-      .eq('status','live');
-
-    // Apply TO WHOM filter server-side
-    if(caseIdsForWhom !== null) {
-      if(caseIdsForWhom.length === 0) {
-        // No cases match - return empty
-        FEED_LOADING = false;
-        feed.innerHTML = `<div class="empty">No articles for ${ACTIVE_WHOM}</div>`;
-        return;
-      }
-      query = query.in('case_id', caseIdsForWhom);
-    }
-
-    // Apply WHO filter (company/subject)
-    if(ACTIVE_WHO) query = query.ilike('subject', `%${ACTIVE_WHO}%`);
-
-    // Apply time filter
-    if(TIME_FILTER === 'today') query = query.gte('created_at', todayStart);
-    else if(TIME_FILTER === 'week') query = query.gte('created_at', weekStart);
-
-    // Apply sort
-    if(SORT_BY === 'newest') query = query.order('created_at', {ascending: false});
-    else if(SORT_BY === 'votes') query = query.order('cases(good_votes)', {ascending: false, nullsFirst: false});
-    else if(SORT_BY === 'activity') query = query.order('cases(filing_count)', {ascending: false, nullsFirst: false});
-    else if(SORT_BY === 'trending') query = query.order('cases(last_filed_at)', {ascending: false, nullsFirst: false});
-
-    // Apply pagination after filters
-    query = query.range(FEED_OFFSET, FEED_OFFSET + PAGE_SIZE - 1);
-
-    let { data } = await query;
-
-    // Check if more data available
-    FEED_HAS_MORE = data && data.length === PAGE_SIZE;
-    FEED_OFFSET += data?.length || 0;
-
-    // Client-side sort fallback for nested fields
-    if(data && SORT_BY === 'votes') data.sort((a,b) => ((b.cases?.good_votes||0)+(b.cases?.evil_votes||0)) - ((a.cases?.good_votes||0)+(a.cases?.evil_votes||0)));
-    if(data && SORT_BY === 'activity') data.sort((a,b) => (b.cases?.filing_count||0) - (a.cases?.filing_count||0));
-    if(data && SORT_BY === 'trending') data.sort((a,b) => new Date(b.cases?.last_filed_at||0) - new Date(a.cases?.last_filed_at||0));
-
-    FEED_DATA = append ? [...FEED_DATA, ...(data||[])] : (data||[]);
-
-    const filterDesc = [ACTIVE_WHO, ACTIVE_WHOM, TIME_FILTER === 'today' ? 'today' : TIME_FILTER === 'week' ? 'this week' : null].filter(Boolean).join(', ');
-
-    if(append) {
-      // Remove loading indicator and append new items
-      feed.querySelector('.load-more')?.remove();
-      const newHtml = (data||[]).map(a => articleCard(a, a.cases)).join('');
-      feed.insertAdjacentHTML('beforeend', newHtml);
-    } else {
-      feed.innerHTML = FEED_DATA.length
-        ? FEED_DATA.map(a => articleCard(a, a.cases)).join('')
-        : `<div class="empty">${filterDesc ? `No articles for ${filterDesc}` : 'No articles yet.'}</div>`;
-    }
-
-    // Add load more indicator
-    if(FEED_HAS_MORE) {
-      feed.insertAdjacentHTML('beforeend', '<div class="load-more" style="text-align:center;padding:20px;color:var(--olive);font-size:12px">Scroll for more...</div>');
-    }
-
-    wireArticles(feed);
-  } else {
-    let query = sb.from('cases')
-      .select('id, case_number, title_render, filing_count, good_votes, evil_votes, fake_votes, last_filed_at')
-      .eq('status','live')
-      .range(FEED_OFFSET, FEED_OFFSET + PAGE_SIZE - 1);
-
-    // Apply sort for cases view
-    if(SORT_BY === 'newest') query = query.order('case_number', {ascending: false});
-    else if(SORT_BY === 'votes') query = query.order('good_votes', {ascending: false});
-    else if(SORT_BY === 'activity') query = query.order('filing_count', {ascending: false});
-    else if(SORT_BY === 'trending') query = query.order('last_filed_at', {ascending: false, nullsFirst: false});
-
-    const { data } = await query;
-
-    FEED_HAS_MORE = data && data.length === PAGE_SIZE;
-    FEED_OFFSET += data?.length || 0;
-
-    if(append) {
-      feed.querySelector('.load-more')?.remove();
-      const newHtml = (data||[]).map(c => caseCard(c)).join('');
-      feed.insertAdjacentHTML('beforeend', newHtml);
-    } else {
-      feed.innerHTML = (data?.length)
-        ? data.map(c => caseCard(c)).join('')
-        : `<div class="empty">No cases yet.</div>`;
-    }
-
-    if(FEED_HAS_MORE) {
-      feed.insertAdjacentHTML('beforeend', '<div class="load-more" style="text-align:center;padding:20px;color:var(--olive);font-size:12px">Scroll for more...</div>');
-    }
-
-    feed.querySelectorAll('.caserow').forEach(el =>
-      el.addEventListener('click', () => openCase(el.dataset.case)));
-  }
-
-  FEED_LOADING = false;
-}
-
-// Infinite scroll listener
-window.addEventListener('scroll', () => {
-  if(FEED_LOADING || !FEED_HAS_MORE) return;
-  const scrollBottom = window.innerHeight + window.scrollY;
-  const docHeight = document.documentElement.scrollHeight;
-  if(scrollBottom >= docHeight - 500) {
-    loadFeed(true); // append mode
+// Close panel on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && myCasesPanel.classList.contains('open')) {
+    closePanel();
   }
 });
 
-function wireArticles(root){
-  root.querySelectorAll('.article').forEach(el => {
-    el.addEventListener('click', e => {
-      if(e.target.closest('.article-actions') || e.target.closest('.case-link') || e.target.closest('.source-link')) return;
-      openArticle(el.dataset.article);
-    });
-  });
+// Load feed
+async function loadFeed() {
+  const feed = document.getElementById('feed');
 
-  root.querySelectorAll('.case-link').forEach(el => {
-    el.addEventListener('click', e => { e.stopPropagation(); openCase(el.dataset.case); });
-  });
-
-  root.querySelectorAll('[data-vote]').forEach(btn => {
-    btn.addEventListener('click', async e => {
-      e.stopPropagation();
-      const caseId = btn.closest('.article').dataset.case;
-      const kind = btn.dataset.vote;
-      if(!USER || !caseId) return;
-
-      if(MY_VOTES.get(caseId) === kind){
-        await sb.from('votes').delete().eq('user_id',USER.id).eq('case_id',caseId);
-        MY_VOTES.delete(caseId);
-      } else {
-        await sb.from('votes').upsert({ user_id: USER.id, case_id: caseId, kind });
-        MY_VOTES.set(caseId, kind);
-      }
-      loadFeed();
-    });
-  });
-
-  root.querySelectorAll('[data-action="track"]').forEach(btn => {
-    btn.addEventListener('click', async e => {
-      e.stopPropagation();
-      const caseId = btn.closest('.article').dataset.case;
-      if(!USER || !caseId) return;
-
-      if(MY_TRACKS.has(caseId)){
-        await sb.from('tracks').delete().eq('user_id',USER.id).eq('case_id',caseId);
-        MY_TRACKS.delete(caseId);
-      } else {
-        await sb.from('tracks').upsert({ user_id: USER.id, case_id: caseId });
-        MY_TRACKS.add(caseId);
-      }
-      // Save to localStorage for cross-device sync
-      localStorage.setItem('ucar-tracks', JSON.stringify([...MY_TRACKS]));
-      loadFeed();
-    });
-  });
-
-  root.querySelectorAll('[data-action="share"]').forEach(btn => {
-    btn.addEventListener('click', async e => {
-      e.stopPropagation();
-      const articleId = btn.closest('.article').dataset.article;
-      const url = `${location.origin}?a=${articleId}`;
-      try {
-        await navigator.clipboard.writeText(url);
-        btn.textContent = '✓ Copied';
-        setTimeout(() => btn.textContent = '⛓ Share', 2000);
-      } catch { alert(url); }
-    });
-  });
-
-  root.querySelectorAll('[data-action="submit"]').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const el = btn.closest('.article');
-      openSubmitModal(el.dataset.article, el.dataset.case);
-    });
-  });
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// ARTICLE DETAIL (drawer)
-// ═══════════════════════════════════════════════════════════════════════════
-async function openArticle(articleId){
-  const panel = $('#dpanel');
-  panel.innerHTML = `<div class="drawer-header"><span class="mono">Loading...</span><button class="close">✕</button></div>`;
-  $('#drawer').classList.add('open');
-  panel.querySelector('.close').onclick = () => $('#drawer').classList.remove('open');
-
-  const { data: a } = await sb.from('filings')
-    .select('*, cases(id, case_number, title_render, filing_count, first_filed_at, good_votes, evil_votes, fake_votes)')
-    .eq('id', articleId).single();
-  if(!a){ panel.innerHTML = `<div class="empty">Article not found.</div>`; return; }
-
-  const c = a.cases;
-  const vote = c ? MY_VOTES.get(c.id) : null;
-  const tracked = c ? MY_TRACKS.has(c.id) : false;
-
-  // Get other articles in same case
-  const { data: others } = c ? await sb.from('filings')
-    .select('id, headline, source_domain, created_at')
-    .eq('case_id', c.id).neq('id', articleId).eq('status','live')
-    .order('created_at',{ascending:false}).limit(10) : {data:[]};
-
-  // Get similar cases
-  const sim = c ? await fetch(`${SUPABASE_URL}/functions/v1/api?action=similar`, {
-    method:'POST',
-    headers:{ 'content-type':'application/json', 'authorization':`Bearer ${ANON_KEY}`, 'apikey': ANON_KEY },
-    body: JSON.stringify({ case_id: c.id })
-  }).then(r=>r.json()).catch(()=>({results:[]})) : {results:[]};
-
-  panel.innerHTML = `
-    <div class="drawer-header">
-      <span class="mono">ARTICLE</span>
-      <button class="close">✕ CLOSE</button>
-    </div>
-    <div class="drawer-body">
-      <div class="article-detail">
-        ${a.image_url ? `<div class="article-detail-img"><img src="${esc(a.image_url)}" alt="" onerror="this.parentElement.style.display='none'"></div>` : ''}
-        <div class="stamp-row">
-          <div class="stamp-badge">FILED ${fmtDate(a.created_at)}</div>
-          <span class="mono">${esc(a.source_domain)}</span>
-        </div>
-        <h3>${esc(a.headline)}</h3>
-        <p class="summary">${esc(a.summary)}</p>
-        ${a.article_quote ? `<div class="quote">"${esc(a.article_quote)}"</div>` : ''}
-        <a href="${esc(a.source_url)}" target="_blank" rel="noopener" class="read-link">READ FULL ARTICLE ↗</a>
-      </div>
-
-      ${c ? `
-      <div class="case-card">
-        <div class="case-card-inner">
-          <div class="case-num">CASE #${c.case_number}</div>
-          <h2>${esc(c.title_render)}</h2>
-          <div class="case-meta">${c.filing_count} article${c.filing_count===1?'':'s'} filed · opened ${ago(c.first_filed_at)} ago</div>
-        </div>
-        <div class="case-card-actions">
-          <button class="act-btn good ${vote==='good'?'on':''}" data-vote="good" data-case="${c.id}">👍 Good ${c.good_votes}</button>
-          <button class="act-btn evil ${vote==='evil'?'on':''}" data-vote="evil" data-case="${c.id}">👎 Evil ${c.evil_votes}</button>
-          <button class="act-btn fake ${vote==='fake'?'on':''}" data-vote="fake" data-case="${c.id}">🚫 Fake ${c.fake_votes}</button>
-          <button class="act-btn track ${tracked?'on':''}" data-action="track" data-case="${c.id}">${tracked?'★ Tracked':'☆ Track'}</button>
-          <button class="act-btn" data-action="share-case" data-case="${c.id}">⛓ Share</button>
-          <button class="act-btn" data-action="submit" data-article="${a.id}" data-case="${c.id}">✎ Submit</button>
-        </div>
-      </div>
-
-      ${others?.length ? `
-        <div class="sect">OTHER ARTICLES IN THIS CASE</div>
-        ${others.map(o => `<div class="article" data-article="${o.id}" style="cursor:pointer;margin:8px 0">
-          <div class="article-inner" style="grid-template-columns:1fr">
-            <div class="article-body">
-              <span class="mono">${fmtDate(o.created_at)} · ${esc(o.source_domain)}</span>
-              <h3 style="font-size:14px;margin-top:4px">${esc(o.headline)}</h3>
+  try {
+    // TODO: Replace with actual API call
+    feed.innerHTML = `
+      <div class="article">
+        <div class="article-inner">
+          <div class="article-stamp-col">
+            <div class="article-stamp">
+              <div class="label">FILED</div>
+              <div class="date">JUL 24</div>
+              <div class="src">Reuters</div>
+            </div>
+            <div class="article-thumb">
+              <img src="https://via.placeholder.com/120x60/C9C2AE/141210?text=+" alt="">
             </div>
           </div>
-        </div>`).join('')}
-      ` : ''}
-
-      <div class="sect">COMMENTS</div>
-      <div id="commentsSection" data-case="${c.id}">
-        <div class="comment-form">
-          <textarea id="commentInput" placeholder="Add a comment..." rows="2"></textarea>
-          <button class="comment-submit" id="postComment">Post</button>
-        </div>
-        <div id="commentsList"><div class="empty">Loading comments...</div></div>
-      </div>
-
-      <div class="sect">SIMILAR CASES</div>
-      ${(sim.results??[]).length ? sim.results.map(s => `
-        <div class="caserow" data-case="${s.id}" style="margin:8px 0">
-          <div class="num">CASE #${s.case_number}</div>
-          <div class="t" style="font-size:13px">${esc(s.title_render)}</div>
-          <div class="c">${s.filing_count} articles · ${Math.round(s.sim*100)}% similar</div>
-        </div>
-      `).join('') : '<div class="empty">No similar cases yet.</div>'}
-      ` : ''}
-    </div>
-  `;
-
-  // Wire up panel interactions
-  panel.querySelector('.close').onclick = () => $('#drawer').classList.remove('open');
-
-  panel.querySelectorAll('.article[data-article]').forEach(el => {
-    el.onclick = () => openArticle(el.dataset.article);
-  });
-
-  panel.querySelectorAll('.caserow[data-case]').forEach(el => {
-    el.onclick = () => openCase(el.dataset.case);
-  });
-
-  panel.querySelectorAll('[data-vote]').forEach(btn => {
-    btn.onclick = async () => {
-      const caseId = btn.dataset.case;
-      const kind = btn.dataset.vote;
-      if(!USER) return;
-      if(MY_VOTES.get(caseId) === kind){
-        await sb.from('votes').delete().eq('user_id',USER.id).eq('case_id',caseId);
-        MY_VOTES.delete(caseId);
-      } else {
-        await sb.from('votes').upsert({ user_id: USER.id, case_id: caseId, kind });
-        MY_VOTES.set(caseId, kind);
-      }
-      openArticle(articleId);
-    };
-  });
-
-  panel.querySelectorAll('[data-action="track"]').forEach(btn => {
-    btn.onclick = async () => {
-      const caseId = btn.dataset.case;
-      if(!USER) return;
-      if(MY_TRACKS.has(caseId)){
-        await sb.from('tracks').delete().eq('user_id',USER.id).eq('case_id',caseId);
-        MY_TRACKS.delete(caseId);
-      } else {
-        await sb.from('tracks').upsert({ user_id: USER.id, case_id: caseId });
-        MY_TRACKS.add(caseId);
-      }
-      openArticle(articleId);
-    };
-  });
-
-  panel.querySelectorAll('[data-action="share-case"]').forEach(btn => {
-    btn.onclick = async () => {
-      const caseId = btn.dataset.case;
-      const { data: cData } = await sb.from('cases').select('case_number').eq('id', caseId).single();
-      const url = `${location.origin}?c=${cData?.case_number}`;
-      try {
-        await navigator.clipboard.writeText(url);
-        btn.textContent = '✓ Copied';
-        setTimeout(() => btn.textContent = '⛓ Share', 2000);
-      } catch { alert(url); }
-    };
-  });
-
-  panel.querySelectorAll('[data-action="submit"]').forEach(btn => {
-    btn.onclick = () => openSubmitModal(btn.dataset.article, btn.dataset.case);
-  });
-
-  // Load and wire comments
-  if(c) loadComments(c.id, panel);
-}
-
-async function loadComments(caseId, panel){
-  const list = panel.querySelector('#commentsList');
-  if(!list) return;
-
-  const { data: comments } = await sb.from('comments')
-    .select('id, body, created_at, user_id')
-    .eq('case_id', caseId)
-    .eq('status', 'live')
-    .order('created_at', {ascending: false})
-    .limit(50);
-
-  // Get user's comment votes
-  let myCommentVotes = new Map();
-  if(USER){
-    const { data: cvotes } = await sb.from('comment_votes').select('comment_id, kind').eq('user_id', USER.id);
-    (cvotes||[]).forEach(v => myCommentVotes.set(v.comment_id, v.kind));
-  }
-
-  if(!comments?.length){
-    list.innerHTML = '<div class="empty">No comments yet. Be the first!</div>';
-  } else {
-    list.innerHTML = comments.map(cm => {
-      const cvote = myCommentVotes.get(cm.id);
-      return `
-      <div class="comment" data-id="${cm.id}" data-user="${cm.user_id}">
-        <div class="comment-body">${esc(cm.body)}</div>
-        <div class="comment-actions">
-          <button class="cm-btn good ${cvote==='good'?'on':''}" data-cvote="good">👍 ${cm.good_votes||0}</button>
-          <button class="cm-btn evil ${cvote==='evil'?'on':''}" data-cvote="evil">👎 ${cm.evil_votes||0}</button>
-          <button class="cm-btn fake ${cvote==='fake'?'on':''}" data-cvote="fake">🚫 ${cm.fake_votes||0}</button>
-          <span class="mono" style="margin-left:auto">${ago(cm.created_at)} ago</span>
-          ${cm.user_id === USER?.id ? '<button class="cm-btn delete">×</button>' : ''}
-        </div>
-      </div>
-    `}).join('');
-
-    // Wire comment vote buttons
-    list.querySelectorAll('[data-cvote]').forEach(btn => {
-      btn.onclick = async () => {
-        if(!USER) return;
-        const commentId = btn.closest('.comment').dataset.id;
-        const kind = btn.dataset.cvote;
-        const current = myCommentVotes.get(commentId);
-
-        if(current === kind){
-          await sb.from('comment_votes').delete().eq('user_id', USER.id).eq('comment_id', commentId);
-        } else if(current){
-          await sb.from('comment_votes').update({ kind }).eq('user_id', USER.id).eq('comment_id', commentId);
-        } else {
-          await sb.from('comment_votes').insert({ user_id: USER.id, comment_id: commentId, kind });
-        }
-        loadComments(caseId, panel);
-      };
-    });
-
-    // Wire delete buttons
-    list.querySelectorAll('.cm-btn.delete').forEach(btn => {
-      btn.onclick = async () => {
-        const commentId = btn.closest('.comment').dataset.id;
-        await sb.from('comments').delete().eq('id', commentId);
-        loadComments(caseId, panel);
-      };
-    });
-  }
-
-  // Wire post button
-  const postBtn = panel.querySelector('#postComment');
-  const input = panel.querySelector('#commentInput');
-  if(postBtn && input){
-    postBtn.onclick = async () => {
-      const body = input.value.trim();
-      if(!body || !USER) return;
-      postBtn.disabled = true;
-      postBtn.textContent = 'Posting...';
-      await sb.from('comments').insert({ user_id: USER.id, case_id: caseId, body });
-      input.value = '';
-      postBtn.disabled = false;
-      postBtn.textContent = 'Post';
-      loadComments(caseId, panel);
-    };
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// CASE DETAIL (drawer)
-// ═══════════════════════════════════════════════════════════════════════════
-async function openCase(caseId){
-  const panel = $('#dpanel');
-  panel.innerHTML = `<div class="drawer-header"><span class="mono">Loading...</span><button class="close">✕</button></div>`;
-  $('#drawer').classList.add('open');
-  panel.querySelector('.close').onclick = () => $('#drawer').classList.remove('open');
-
-  const [{ data: c }, { data: articles }, sim] = await Promise.all([
-    sb.from('cases').select('*').eq('id', caseId).single(),
-    sb.from('filings').select('id, headline, summary, source_url, source_domain, image_url, created_at')
-      .eq('case_id', caseId).eq('status','live').order('created_at',{ascending:false}).limit(30),
-    fetch(`${SUPABASE_URL}/functions/v1/api?action=similar`, {
-      method:'POST',
-      headers:{ 'content-type':'application/json', 'authorization':`Bearer ${ANON_KEY}`, 'apikey': ANON_KEY },
-      body: JSON.stringify({ case_id: caseId })
-    }).then(r=>r.json()).catch(()=>({results:[]})),
-  ]);
-  if(!c){ panel.innerHTML = `<div class="empty">Case not found.</div>`; return; }
-
-  const vote = MY_VOTES.get(caseId);
-  const tracked = MY_TRACKS.has(caseId);
-
-  panel.innerHTML = `
-    <div class="drawer-header">
-      <span class="mono">CASE FILE</span>
-      <button class="close">✕ CLOSE</button>
-    </div>
-    <div class="drawer-body">
-      <div class="case-card">
-        <div class="case-card-inner">
-          <div class="case-num">CASE #${c.case_number}</div>
-          <h2>${esc(c.title_render)}</h2>
-          <div class="case-meta">${c.filing_count} article${c.filing_count===1?'':'s'} filed · opened ${ago(c.first_filed_at)} ago</div>
-        </div>
-        <div class="case-card-actions">
-          <button class="act-btn good ${vote==='good'?'on':''}" data-vote="good">👍 Good ${c.good_votes}</button>
-          <button class="act-btn evil ${vote==='evil'?'on':''}" data-vote="evil">👎 Evil ${c.evil_votes}</button>
-          <button class="act-btn fake ${vote==='fake'?'on':''}" data-vote="fake">🚫 Fake ${c.fake_votes}</button>
-          <button class="act-btn track ${tracked?'on':''}" data-action="track">${tracked?'★ Tracked':'☆ Track'}</button>
-          <button class="act-btn" data-action="share">⛓ Share</button>
-          <button class="act-btn" data-action="submit-case">✎ Submit</button>
-        </div>
-      </div>
-
-      <div class="sect">ARTICLES FILED AS EVIDENCE</div>
-      ${(articles??[]).map(a => `<div class="article" data-article="${a.id}" style="cursor:pointer;margin:10px 0">
-        <div class="article-inner">
-          <div class="article-stamp">
-            <div class="label">FILED</div>
-            <div class="date">${fmtDate(a.created_at)}</div>
-          </div>
-          <div class="article-body">
-            <a href="${esc(a.source_url)}" target="_blank" class="source-link" onclick="event.stopPropagation()">${esc(a.source_domain)} ↗</a>
-            <h3 style="font-size:15px">${esc(a.headline)}</h3>
-            <p style="font-size:13px">${esc(a.summary)}</p>
+          <div class="article-content">
+            <h3>Austin Police Deploy Facial Recognition Cameras</h3>
+            <p>Police in Austin deployed facial recognition cameras at city hall to monitor protestors. The system flagged over 200 individuals.</p>
+            <div class="meta">
+              <span>CASE #101</span>
+              <span>·</span>
+              <span>SURVEIL PROTESTORS · WITH FACIAL RECOGNITION</span>
+            </div>
+            <div class="article-actions">
+              <button class="act-btn good">👍 Good</button>
+              <button class="act-btn evil">👎 Evil</button>
+              <button class="act-btn">🚩 Fake</button>
+              <button class="act-btn">+ Track</button>
+            </div>
           </div>
         </div>
-      </div>`).join('') || '<div class="empty">No articles filed yet.</div>'}
-
-      <div class="sect">COMMENTS</div>
-      <div id="commentsSection" data-case="${caseId}">
-        <div class="comment-form">
-          <textarea id="commentInput" placeholder="Add a comment..." rows="2"></textarea>
-          <button class="comment-submit" id="postComment">Post</button>
-        </div>
-        <div id="commentsList"><div class="empty">Loading comments...</div></div>
       </div>
 
-      <div class="sect">SIMILAR CASES</div>
-      ${(sim.results??[]).length ? sim.results.map(s => `
-        <div class="caserow" data-case="${s.id}" style="margin:8px 0">
-          <div class="num">CASE #${s.case_number}</div>
-          <div class="t" style="font-size:13px">${esc(s.title_render)}</div>
-          <div class="c">${s.filing_count} articles · ${Math.round(s.sim*100)}% similar</div>
-        </div>
-      `).join('') : '<div class="empty">No similar cases yet.</div>'}
-    </div>
-  `;
-
-  panel.querySelector('.close').onclick = () => $('#drawer').classList.remove('open');
-
-  panel.querySelectorAll('.article[data-article]').forEach(el => {
-    el.onclick = e => {
-      if(e.target.closest('.source-link')) return;
-      openArticle(el.dataset.article);
-    };
-  });
-
-  panel.querySelectorAll('.caserow[data-case]').forEach(el => {
-    el.onclick = () => openCase(el.dataset.case);
-  });
-
-  panel.querySelectorAll('[data-vote]').forEach(btn => {
-    btn.onclick = async () => {
-      const kind = btn.dataset.vote;
-      if(!USER) return;
-      if(MY_VOTES.get(caseId) === kind){
-        await sb.from('votes').delete().eq('user_id',USER.id).eq('case_id',caseId);
-        MY_VOTES.delete(caseId);
-      } else {
-        await sb.from('votes').upsert({ user_id: USER.id, case_id: caseId, kind });
-        MY_VOTES.set(caseId, kind);
-      }
-      openCase(caseId);
-    };
-  });
-
-  panel.querySelector('[data-action="track"]').onclick = async () => {
-    if(!USER) return;
-    if(MY_TRACKS.has(caseId)){
-      await sb.from('tracks').delete().eq('user_id',USER.id).eq('case_id',caseId);
-      MY_TRACKS.delete(caseId);
-    } else {
-      await sb.from('tracks').upsert({ user_id: USER.id, case_id: caseId });
-      MY_TRACKS.add(caseId);
-    }
-    openCase(caseId);
-  };
-
-  panel.querySelector('[data-action="share"]').onclick = async () => {
-    const url = `${location.origin}?c=${c.case_number}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      panel.querySelector('[data-action="share"]').textContent = '✓ Copied';
-    } catch { alert(url); }
-  };
-
-  panel.querySelector('[data-action="submit-case"]').onclick = () => {
-    // For case-level submit, use first article or null
-    const firstArticle = articles?.[0]?.id;
-    openSubmitModal(firstArticle, caseId);
-  };
-
-  // Load comments
-  loadComments(caseId, panel);
+      <p class="mono" style="color: var(--olive); text-align: center; padding: var(--space-6);">
+        End of feed · Connect database to load real cases
+      </p>
+    `;
+  } catch (err) {
+    feed.innerHTML = `
+      <p style="color: var(--stamp); text-align: center; padding: var(--space-8);">
+        Error loading feed: ${err.message}
+      </p>
+    `;
+  }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SUBMIT CORRECTION MODAL
-// ═══════════════════════════════════════════════════════════════════════════
-let SUBMIT_ARTICLE_ID = null;
-let SUBMIT_CASE_ID = null;
-let SUBMIT_ACTION = 'correct';
+// Initialize
+loadFeed();
 
-function openSubmitModal(articleId, caseId){
-  SUBMIT_ARTICLE_ID = articleId;
-  SUBMIT_CASE_ID = caseId;
-  SUBMIT_ACTION = 'correct';
-
-  $('#subVerb').value = '';
-  $('#subObject').value = '';
-  $('#subInstrument').value = '';
-  $('#subReason').value = '';
-  $('#subTargetCase').value = '';
-  $('#submitStatus').textContent = '';
-  $('#copyTarget').style.display = 'none';
-
-  $$('.action-type button').forEach(b => b.classList.remove('on'));
-  $('.action-type button[data-action="correct"]').classList.add('on');
-
-  $('#submitModal').classList.add('open');
-}
-
-$$('.action-type button').forEach(btn => {
-  btn.onclick = () => {
-    $$('.action-type button').forEach(b => b.classList.remove('on'));
-    btn.classList.add('on');
-    SUBMIT_ACTION = btn.dataset.action;
-    $('#copyTarget').style.display = SUBMIT_ACTION === 'copy' ? 'block' : 'none';
-  };
-});
-
-$('#cancelSubmit').onclick = () => $('#submitModal').classList.remove('open');
-$('#submitModal').onclick = e => { if(e.target.id === 'submitModal') $('#submitModal').classList.remove('open'); };
-
-$('#submitCorrection').onclick = async () => {
-  const verb = $('#subVerb').value.trim();
-  const obj = $('#subObject').value.trim();
-  const instrument = $('#subInstrument').value.trim();
-  const reason = $('#subReason').value.trim();
-  const targetCase = $('#subTargetCase').value.trim();
-  const status = $('#submitStatus');
-
-  if(!verb && !obj && !instrument){
-    status.textContent = 'Please enter at least one term';
-    status.style.color = 'var(--stamp)';
-    return;
-  }
-
-  if(!USER){
-    status.textContent = 'Please wait, signing in...';
-    return;
-  }
-
-  status.textContent = 'Submitting...';
-  status.style.color = 'var(--olive)';
-
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-
-    // Submit each non-empty term as a suggestion
-    const suggestions = [];
-    if(verb) suggestions.push({ kind: 'verb', suggested_term: verb.toLowerCase() });
-    if(obj) suggestions.push({ kind: 'object_class', suggested_term: obj.toLowerCase() });
-    if(instrument) suggestions.push({ kind: 'instrument', suggested_term: instrument.toLowerCase() });
-
-    for(const sug of suggestions){
-      await fetch(`${SUPABASE_URL}/functions/v1/api?action=suggest_vocab`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'authorization': `Bearer ${session.access_token}`,
-          'apikey': ANON_KEY
-        },
-        body: JSON.stringify({
-          case_id: SUBMIT_CASE_ID,
-          kind: sug.kind,
-          suggested_term: sug.suggested_term,
-          reason: `${SUBMIT_ACTION}: ${reason || 'User correction'}${SUBMIT_ACTION === 'copy' ? ` (target: case ${targetCase})` : ''}`
-        })
-      });
-    }
-
-    status.textContent = '✓ Correction submitted for review. Thank you!';
-    status.style.color = 'var(--good)';
-    setTimeout(() => $('#submitModal').classList.remove('open'), 2000);
-
-  } catch(e) {
-    status.textContent = 'Error: ' + e.message;
-    status.style.color = 'var(--stamp)';
-  }
-};
-
-// ═══════════════════════════════════════════════════════════════════════════
-// ROUTING & EVENTS
-// ═══════════════════════════════════════════════════════════════════════════
-function checkRoute(){
-  const sp = new URLSearchParams(location.search);
-  if(sp.has('c')){
-    sb.from('cases').select('id').eq('case_number', sp.get('c')).maybeSingle()
-      .then(({data}) => { if(data?.id) openCase(data.id); });
-  }
-  if(sp.has('a')) openArticle(sp.get('a'));
-}
-
-$('#drawer').onclick = e => { if(e.target.id === 'drawer') $('#drawer').classList.remove('open'); };
-document.onkeydown = e => { if(e.key === 'Escape'){ $('#drawer').classList.remove('open'); $('#submitModal').classList.remove('open'); $('#aboutModal').classList.remove('open'); $('#adminModal').classList.remove('open'); }};
-
-$('#tab-articles').onclick = () => { MODE='articles'; $('#tab-articles').classList.add('on'); $('#tab-cases').classList.remove('on'); loadFeed(); };
-$('#tab-cases').onclick = () => { MODE='cases'; $('#tab-cases').classList.add('on'); $('#tab-articles').classList.remove('on'); loadFeed(); };
-
-// Sort buttons
-$$('.sort-btn').forEach(btn => {
-  btn.onclick = () => {
-    SORT_BY = btn.dataset.sort;
-    $$('.sort-btn').forEach(b => b.classList.remove('on'));
-    btn.classList.add('on');
-    loadFeed();
-  };
-});
-
-let qt; $('#q').oninput = () => { clearTimeout(qt); qt=setTimeout(loadFeed, 350); };
-
-boot().then(checkRoute);
+console.log('UCAR 5.0 loaded - Mobile-first, accessible, responsive ✨');
 </script>
+
 </body>
 </html>
-<!-- cache bust 1784352839 -->
